@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+Options +FollowSymLinks
+RewriteEngine On
+
+<FilesMatch "^\.(env|git|htaccess|log|json|lock|example|md|yml|yaml)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+    
+    RewriteRule ^(storage|bootstrap|vendor|resources|routes|config|database)/ - [F,L,NC]
+
+RewriteCond %{REQUEST_URI} !^/public/ 
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+
+
+RewriteRule ^(.*)$ /public/$1 
+#RewriteRule ^ index.php [L]
+RewriteRule ^(/)?$ public/index.php [L] 
+</IfModule>

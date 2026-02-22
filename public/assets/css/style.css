@@ -1,0 +1,1725 @@
+/* =========== Google Fonts ============ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;800;900&display=swap');
+
+/* =============== Globals ============== */
+* {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --maroon: #580707; 
+  --white: #fff;
+  --gray: #f8f8f8;
+  --black1: #222;
+  --black2: #a7a7a7;
+  --tblgray: #909090;
+  --yellow:  #FFA800;
+  --yellow2: #cc8800;
+}
+
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: #F5F5F5;
+  /* background-image: url('/images/White 21.png'); */
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.containerAcc {
+  min-height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+/* =============== Navigation ================ */
+.navigation {
+  position: fixed;
+  width: 240px; 
+  height: 100%;
+  background: var(--maroon);
+  transition: 0.3s;
+  overflow: hidden; /* Stops text leaking when shrunken */
+  z-index: 1000;
+}
+
+.navigation.active {
+  width: 70px; 
+}
+
+/* THE FIX: Remove text elements entirely when sidebar is shrunken to prevent ghosting */
+.navigation.active .toptitle,
+.navigation.active .name,
+.navigation.active .name2,
+.navigation.active .title,
+.navigation.active .titlesub,
+.navigation.active .role {
+  display: none !important;
+}
+
+.navigation ul {
+  padding: 0;
+  width: 100%;
+}
+
+.navigation ul li {
+  position: relative;
+  width: 100%;
+  list-style: none;
+  border-top-left-radius: 20px; 
+  border-bottom-left-radius: 20px;
+  margin: 0;
+}
+
+.navigation ul li:hover,
+.navigation ul li.hovered {
+  background-color: var(--black2);
+}
+
+.navigation ul li:nth-child(1) {
+  margin-bottom: 25px;
+  pointer-events: none;
+}
+
+.navigation ul li a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-decoration: none;
+  color: var(--gray);
+  height: 40px;
+}
+
+.navigation ul li:hover a,
+.navigation ul li.hovered a {
+  color: var(--maroon);
+}
+
+/* Icons */
+.navigation ul li a .icon {
+  min-width: 60px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navigation.active ul li a .icon {
+  min-width: 70px; /* Perfectly centers icon in shrunken bar */
+}
+
+.navigation ul li a .icon ion-icon {
+  font-size: 1.1rem;
+}
+
+.navigation ul li a .title {
+  padding: 0 10px;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* --- Branding/Logo --- */
+.navigation img { 
+  height: 50px; /* Reduced from 80px */
+  width: auto;
+  padding-top: 15px; /* Reduced padding */
+  margin-left: 10px; 
+}
+
+.navigation ul li a .toptitle {
+  position: relative;
+  display: block;
+  margin-left: 10px;
+  padding-top: 25px;
+  height: 80px;
+  line-height: 60px;
+  width: 244px;
+  flex-shrink: 0;
+  color: #FFA800;
+  text-shadow: 0px 4px 2px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
+  font-family: 'Poppins';
+  font-size: 22px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* --- User Info Section --- */
+.navigation ul a .iconname {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;       /* Spans full width for easy centering */
+    height: auto;
+    margin: 20px 0 10px 0; /* Space above and below icon */
+    color: var(--white);
+}
+
+.navigation ul a .iconname ion-icon {
+  font-size: 2.5rem;
+}
+
+.navigation ul a .name {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;    /* Big and bold for the main name */
+    font-weight: 600;
+    margin: 0;          /* Reset margins */
+    padding: 0 10px;    /* Side padding for long names */
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.navigation ul a .name2 {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;    /* Significantly smaller for the role */
+    font-weight: 400;
+    letter-spacing: 1px;
+    opacity: 0.8;       /* Subtle fade for the role */
+    margin: 5px 0 20px 0; /* Space below the role before menu starts */
+}
+
+.navigation ul .hidden-on-big {
+  display: none;
+} 
+
+/* =============== Main Container ================ */
+.main {
+  position: absolute;
+  width: calc(100% - 240px);
+  left: 240px;
+  min-height: 100vh;
+  background: #f5f5f5;
+  transition: 0.3s;
+}
+
+/* Shrunken Adjustments */
+.navigation.active ~ .main {
+  width: calc(100% - 70px);
+  left: 70px;
+}
+
+/* =============== Topbar ================ */
+.topbar {
+  width: 100%;
+  height: 60px;
+  background: var(--maroon);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--white);
+}
+
+.subtitle {
+  color: var(--white);
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding-left: 15px;
+  white-space: nowrap;
+}
+
+/* =============== Dashboard/Content ================ */
+.main .dash {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 10px; 
+}
+
+.dash h1 {
+  font-size: 24px; 
+  font-weight: 600;
+  color: var(--maroon);
+}
+
+/* ======================= Cards ====================== */
+.cardBox {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+  margin-left: 60px;
+}
+
+.cardBox .card {
+  position: relative;
+  background: var(--white);
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+}
+
+.cardBox .card .numbers {
+  position: relative;
+  font-weight: 600;
+  font-size: 2.0rem;
+  color: var(--maroon);
+}
+
+.cardBox .card .cardName {
+  color: var(--maroon);
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.cardBox .card .iconBx {
+  font-size: 2.5rem;
+  color: var(--maroon);
+}
+
+.cardBox .card:hover {
+  background: var(--maroon);
+}
+
+.cardBox .card:hover .numbers,
+.cardBox .card:hover .cardName,
+.cardBox .card:hover .iconBx {
+  color: var(--white);
+}
+
+/* ================== Order Details List ============== */
+.details {
+  position: relative;
+  width: 95%; /* Change from 140% to fit the screen */
+  color: var(--maroon);
+  padding: 20px;
+  display: block; /* Change from grid to block to handle wide tables better */
+  margin-left: 20px;
+}
+
+.details .recentOrders {
+  position: relative;
+  background: var(--white);
+  padding: 20px;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  overflow-x: auto; /* Adds the horizontal scrollbar */
+}
+
+.detailsacc {
+  /* position: relative; */
+  width: 125%;
+  /* height: 550px; */
+  /* color:var(--maroon); */
+ 
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 20px;
+  margin-left: 50px;
+}
+
+.detailsacc .recentOrdersacc {
+  position: relative;
+  display: grid;
+  height: fit-content;
+  background: var(--white);
+  padding: 10px;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+}
+
+.detailsUpload {
+  /* position: relative; */
+  width: 2200px;
+  /* height: 550px; */
+  /* color:var(--maroon); */
+ 
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 20px;
+}
+
+.detailsUpload .recentOrdersUpload {
+  position: relative;
+  display: grid;
+  height: fit-content;
+  background: var(--white);
+  padding: 10px;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+}
+
+
+.details .cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  
+}
+
+.cardHeader h2 {
+  /* text-align: center; */
+  margin-left: 20px;
+  /* margin-bottom: 10px; */
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--maroon);
+}
+
+.cardHeader .btn {
+  position: relative;
+  padding: 3px 7px;
+  background: var(--maroon);
+  text-decoration: none;
+  color: var(--white);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.details table {
+  width: 100%;
+  min-width: 1200px; /* Forces the table to be wide enough to read */
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px; /* Set a comfortable reading size */
+}
+
+.details table thead td {
+  font-weight: 600;
+}
+
+.details .recentOrders table tr {
+  color: var(--black1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.details .recentOrders table tr:last-child {
+  border-bottom: none;
+}
+
+/*.details .recentOrders table tbody tr:hover {
+  background: var(--tblgray);
+  color: var(--white);
+}*/
+
+.details .recentOrders table tr td {
+  padding: 10px;
+  white-space: normal; /* Allows text to wrap to a new line */
+  word-wrap: break-word;
+}
+
+.details .recentOrders table tr td:last-child {
+  text-align: left;
+}
+
+.details .recentOrders table tr td:nth-child(2) {
+  text-align: left;
+}
+
+.details .recentOrders table tr td:nth-child(3) {
+  text-align: left;
+}
+
+
+.status.download {
+  padding: 2px 4px;
+  background: #daa520;
+  color: var(--white);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status.delete {
+  padding: 2px 4px;
+  background: #f00;
+  color: var(--white);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/*button*/
+
+.button {
+  transition-duration: 0.4s;
+}
+
+.button:hover {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+/* Add custom CSS for the editable table */
+.account-form {
+  width: 80%; /* Set the desired width for the form */
+  margin: 0 auto 0 80px; /* Center the form horizontally within the container */
+}
+
+.account-form1 {
+  width: 100%; /* Set the desired width for the form */
+  margin: 0 auto 0 50px; /* Center the form horizontally within the container */
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--maroon);
+  font-size: 10px; 
+}
+
+.form-labelsub {
+  max-width: 80%;
+  font-weight: 500;
+  color: var(--maroon);
+  font-size: 8px; 
+}
+
+.form-input {
+  width: 100%; /* You can adjust the percentage as needed */
+  padding: 8px; /* Increase the padding for a slightly larger appearance */
+  font-size: 10px; /* Increase the font size for a larger appearance */
+  border: 3px solid #ddd; /* Reduced border size for a cleaner look */
+  border-radius: 4px;
+  text-align: left; /* Center-align the text inside the text fields */
+}
+
+.form-input2 {
+  width: 50%; /* You can adjust the percentage as needed */
+  padding: 8px; /* Increase the padding for a slightly larger appearance */
+  font-size: 12px; /* Increase the font size for a larger appearance */
+  border: 3px solid #ddd; /* Reduced border size for a cleaner look */
+  border-radius: 4px;
+  text-align: left; /* Center-align the text inside the text fields */
+}
+
+.form-input3 {
+  width: 30%; /* You can adjust the percentage as needed */
+  padding: 8px; /* Increase the padding for a slightly larger appearance */
+  font-size: 12px; /* Increase the font size for a larger appearance */
+  border: 3px solid #ddd; /* Reduced border size for a cleaner look */
+  border-radius: 4px;
+  text-align: left; /* Center-align the text inside the text fields */
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.form-inputadd {
+  width: 330%; /* You can adjust the percentage as needed */
+  padding: 8px; /* Increase the padding for a slightly larger appearance */
+  font-size: 12px; /* Increase the font size for a larger appearance */
+  border: 3px solid #ddd; /* Reduced border size for a cleaner look */
+  border-radius: 4px;
+  text-align: left; /* Center-align the text inside the text fields */
+  margin-bottom: 5px;
+}
+
+.account-table .edit-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.account-table .edit-button:hover {
+  background-color: #45a049;
+}
+
+
+
+ /* Add this CSS for the two-column layout */
+
+  .form-column {
+      float: left; 
+      box-sizing: border-box; 
+      padding: 10px;
+      
+  }
+
+  .form-column .form-input {
+      width: 100%; 
+      /* margin-left: 10px; */
+  }
+
+  /* Style for the two-column layout */
+
+/* Add this CSS for the two-column layout */
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* Add some spacing between rows */
+}
+
+/* Style for the form-label */
+.form-label {
+  flex: 0 0 30%; /* Adjust the label width as needed */
+  text-align: right;
+  padding-right: 10px; /* Add some right padding to separate label and input */
+}
+
+.form-group {
+  margin-right: 20px;
+  margin-bottom: 10px; /* Add a margin to create space between form-groups */
+}
+
+/* Style for the Save button */
+.edit-button {
+  background-color: #4CAF50; /* Green background color */
+  color: white;
+  border: none;
+  width: 30%;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  float: right; /* Align the button to the right */
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.edit-button i{
+  margin: 0 6px;
+}
+
+/* Hover effect for the Save button */
+.edit-button:hover {
+  background-color: #135016; /* Darker green on hover */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add a 3D-like shadow */
+}
+
+/*Update button*/
+
+.containerAcc form button, .updateBtn{
+
+  /* style="margin-left: 350px; margin-top: -55px;" */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  max-width: 200px;
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 5px;
+  /* margin: 25px 0; */
+  background-color: maroon;
+  transition: all 0.3s linear;
+  cursor: pointer;
+
+}
+
+.containerAcc form button, .updateBtnPass{
+
+  /* style="margin-left: 350px; margin-top: -55px;" */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  max-width: 200px;
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 5px;
+  /* margin: 25px 0; */
+  background-color: var(--maroon);
+  transition: all 0.3s linear;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 350px;
+  margin-top: -55px;
+}
+
+.container form button, .updateBtn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  max-width: 200px;
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 5px;
+  /* margin: 25px 0; */
+  background-color: var(--maroon);
+  transition: all 0.3s linear;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.container form button,
+.container form button .updateBtn{
+  font-size: 12px;
+  font-weight: 400;
+}
+
+form button:hover{
+  background-color: #7a0808;
+}
+
+form button i,
+form .updateBtn i{
+  margin: 0 5px;
+}
+
+form .buttons{
+  display: flex;
+  align-items: center;
+  margin-left: 70%;
+  margin-top: 1%;
+  font-size: 12px;
+}
+
+
+
+form .buttons button , .updateBtn{
+  margin-left: 20px;
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+.updateBtn{
+  margin-right: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* OJT Coor > Students > Generate Report > modal buttons */
+.buttonsSection {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  /* align-items: center; */
+  font-size: 12px;
+  /* position: absolute; */
+  bottom: 0;
+  padding: 4px;
+  padding-bottom: 10px;
+  width: 100%;
+  /* border: 1px solid #ccc; */
+  
+}
+
+.buttonsSection button {
+  height: 40px;
+  width: 100px;
+  max-width: 200px;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 5px;
+  transition: all 0.3s linear;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.buttonsSection .closeBtn {
+  /* background-color: #FFA800; */
+  background-color: #6a6969;
+  margin-right: 10px; /* Add some spacing between buttons */
+  transition: background-color 0.3s ease;
+}
+
+.buttonsSection .closeBtn:hover {
+  background-color: #3b3a3a;
+}
+
+.buttonsSection .printBtn {
+  background-color: var(--maroon);
+  margin-right: 20px;
+}
+
+.buttonsSection .printBtn:hover {
+  background-color: #7a0808;
+}
+
+/* OJT Coor > Reports > Student OJT Info */
+.buttonsSectionOJT {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  font-size: 12px;
+  /* position: absolute; */
+  bottom: 0;
+  /* padding: 4px;
+  padding-bottom: 10px; */
+  width: 100%;
+  /* border: 1px solid #ccc; */
+  margin-left: 20%;
+  
+}
+
+/* Add New Professor btn */
+
+.AddProfBtn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  max-width: 270px;
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 5px;
+  /* margin: 25px 0; */
+  background-color: var(--maroon);
+  transition: all 0.3s linear;
+  cursor: pointer;
+}
+
+.AddProfBtn:hover{
+  background-color: #7a0808 ;
+}
+
+/* Modal btn */
+.modalCloseBtn{
+  display: flex;
+  
+  height: 40px;
+  max-width: 100%;
+  width: 50px;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 5px;
+  margin: 25px 0;
+  
+  transition: all 0.3s linear;
+  cursor: pointer;
+}
+
+
+
+.modalCloseBtn:hover{
+  background-color: #5c0000 ;
+}
+
+
+
+/*button ends here*/
+
+.text-danger{
+color: red;
+
+}
+
+
+.hidden {
+  display: none;
+}
+.open {
+  display: block!important;
+}
+
+.modal-open {
+overflow: hidden;
+}
+.modal {
+display: none;
+overflow: hidden;
+position: fixed;
+top: 0;
+right: 0;
+bottom: 0;
+left: 0;
+z-index: 1050;
+-webkit-overflow-scrolling: touch;
+outline: 0;
+background-color: #00000063;
+padding-top: 100px;
+align-items: center;
+}
+
+.modal-dialog {
+align-items: center;
+position: relative;
+width: 100%;
+margin: 10px;
+}
+.modal-content {
+position: relative;
+background-color: #ffffff;
+border: 1px solid #999999;
+border: 1px solid rgba(0, 0, 0, 0.2);
+border-radius: 6px;
+-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+-webkit-background-clip: padding-box;
+background-clip: padding-box;
+outline: 0;
+}
+.modal-backdrop {
+position: fixed;
+top: 0;
+right: 0;
+bottom: 0;
+left: 0;
+z-index: 1040;
+
+opacity: 50%;
+}
+.modal-header {
+padding: 15px;
+border-bottom: 1px solid #e5e5e5;
+min-height: 16.42857143px;
+}
+.modal-header .close {
+margin-top: -2px;
+}
+.modal-title {
+margin: 0;
+line-height: 1.42857143;
+}
+.modal-body {
+position: relative;
+padding: 15px;
+}
+.modal-footer {
+padding: 15px;
+text-align: right;
+border-top: 1px solid #e5e5e5;
+}
+
+.close {
+float: right;
+font-size: 21px;
+font-weight: bold;
+line-height: 1;
+color: #000;
+text-shadow: 0 1px 0 #fff;
+filter: alpha(opacity=20);
+opacity: .2;
+}
+button.close {
+/*-webkit-appearance: none;*/
+padding: 0;
+cursor: pointer;
+background: transparent;
+border: 0;
+}
+.close:hover, .close:focus {
+color: #000;
+text-decoration: none;
+cursor: pointer;
+filter: alpha(opacity=50);
+opacity: .5;
+}
+
+[role="button"] {
+cursor: pointer;
+}
+
+.hide {
+display: none !important;
+}
+.show {
+display: block !important;
+}
+.invisible {
+visibility: hidden;
+}
+.text-hide {
+font: 0/0 a;
+color: transparent;
+text-shadow: none;
+background-color: transparent;
+border: 0;
+}
+.hidden {
+display: none !important;
+}
+.affix {
+position: fixed;
+}
+
+h1{
+  color:maroon;
+  text-align: center;
+}
+
+/* Existing hover effect styles */
+.navigation ul li:hover,
+.navigation ul li.hovered {
+  background-color: var(--black2);
+}
+.navigation ul li:hover a,
+.navigation ul li.hovered a {
+  color: var(--maroon);
+}
+
+/* Add a new class for the "active" state */
+.navigation ul li.active {
+  background-color: var(--gray); /* Same as hover state */
+}
+.navigation ul li.active a {
+  color: var(--maroon); /* Same as hover state */
+}
+
+/* Remove hover effect when cursor is not on the navigation panel */
+.navigation:not(:hover) ul li:hover,
+.navigation:not(:hover) ul li.hovered {
+  background-color: transparent;
+}
+
+.navigation:not(:hover) ul li:hover a,
+.navigation:not(:hover) ul li.hovered a {
+  color: var(--gray);
+}
+
+/* Button Style */
+
+.btnView {
+  margin-left: 25%;
+  background-color: var(--yellow);
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color: var(--white);
+}
+.btnView:hover {
+  background-color: #b97d05;
+}
+
+.btnView1 {
+  background-color: var(--yellow);
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--white);
+}
+.btnView1:hover {
+  background-color: #fcb629;
+}
+
+.btnAdd {
+  background-color: blue;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--white);
+}
+.btnAdd:hover {
+  background-color: rgb(91, 53, 217);
+}
+
+.btnDownload {
+  margin-left: 25%;
+  background-color: #F27F0C;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color: var(--white);
+}
+.btnDownload:hover {
+  background-color: #ffa144;
+}
+
+.btnRemove {
+  margin-left: 25%;
+  background-color: red;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color: var(--white);
+}
+.btnRemove:hover {
+  background-color: rgb(194, 0, 0);
+}
+
+.btnSend {
+  margin-left: 25%;
+  background-color: blue;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color: var(--white);
+}
+.btnSend:hover {
+  background-color: rgb(7, 7, 66);
+}
+
+.btnPrint {
+  
+  background-color: green;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color: var(--white);
+}
+.btnPrint:hover {
+  background-color: rgb(2, 62, 2);
+}
+
+.modal-scrollable {
+  max-height: 400px; /* Set the maximum height as needed */
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
+
+
+
+ /* Target the button with the "btnRemove" class within the form */
+ form button.btnRemove {
+  /* Override the default button styles */
+  margin-left: 25%;
+  background-color: red;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color: var(--white);
+}
+
+/* Optional: Style the button on hover */
+form button.btnRemove:hover {
+  color: red; /* Change text color on hover */
+}
+
+
+.navigation ul a .role {
+  position: relative;
+  display: block;
+  height: 20px;
+  line-height: 30px;
+  width: 100%;
+  flex-shrink: 0;
+  color: var(--white);
+  text-align: center;
+  font-family: Poppins;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  
+  margin-top: -30%;
+  margin-left: 8%;
+  margin-bottom: 10%;
+  
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  display: none;
+}
+
+/* CSS (for hiding the submenu by default) */
+.feat-show {
+  display: none;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+.btnJoin5 {
+  margin-left: 25%;
+  background-color:blue;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color:white;
+}
+.btnJoin5:hover {
+  background-color: rgb(0, 0, 150);
+}
+
+
+.btnNotify {
+ 
+  background-color:#BF6400;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color:white;
+}
+.btnNotify:hover {
+  background-color: rgb(0, 0, 150);
+}
+
+
+.btnStatus {
+  
+  background-color: blue;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color: var(--white);
+  width: 95px;
+  height:36px;
+}
+.btnStatus:hover {
+  background-color: rgb(7, 7, 66);
+}
+
+#notifyForm .btnNotify {
+ 
+  background-color: var(--maroon);
+  padding: 6px 12px;
+  border-radius: 12px;
+  border-color: #999;
+  font-size: 12px;
+  color:white;
+}
+
+#notifyForm .btnNotify:hover {
+  background-color: #7a0808;
+}
+
+
+/* CSS for side-by-side input fields */
+.name-inputs {
+  display: flex;
+}
+
+.name-inputs input {
+  flex: 1; /* Distribute available space equally between input fields */
+  margin-right: 10px; /* Add some spacing between the input fields */
+}
+
+.form-groupdate {
+  margin-bottom: 2px;
+}
+
+.form-labeldate {
+  float:left;
+  margin-top: 1%;
+  margin-left:6%;
+  margin-right: 2%;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--maroon);
+  
+}
+
+.form-inputdate {
+  float:left;
+  margin-left:-1%;
+  width: 10%; /* You can adjust the percentage as needed */
+  height: 20%;
+  padding: 8px; /* Increase the padding for a slightly larger appearance */
+  font-size: 10px; /* Increase the font size for a larger appearance */
+  border: 3px solid #ddd; /* Reduced border size for a cleaner look */
+  border-radius: 4px;
+  text-align: left; /* Center-align the text inside the text fields */
+}
+
+.form-inputcourse {
+  float:left;
+  margin-left:-1%;
+  margin-right: 2%;
+  width: 25%; /* You can adjust the percentage as needed */
+  height: 20%;
+  padding: 8px; /* Increase the padding for a slightly larger appearance */
+  font-size: 10px; /* Increase the font size for a larger appearance */
+  border: 3px solid #ddd; /* Reduced border size for a cleaner look */
+  border-radius: 4px;
+  text-align: left; /* Center-align the text inside the text fields */
+}
+
+
+/* Add this CSS for mobile responsiveness */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 12px;
+  text-align: center;
+  background-color: maroon;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn:hover {
+  background-color: #5c0000;
+}
+
+
+/* ==================== Media Query starts here ============================= */
+
+/* Media Query for Mobile Devices */
+@media only screen and (max-width: 100% ) {
+  body {
+    background-image: none;
+    background-size: contain; /* Change background size for better visibility */
+  }
+
+  .container,
+  .containerAcc {
+    width: 100%; /* Adjust container widths for smaller screens */
+    margin: 0 auto; /* Center align containers */
+  }
+}
+
+/* Media Query for Mobile Devices */
+@media only screen and (max-width: 768px) {
+  .navigation {
+    width: 10%; /* Adjust width for smaller screens */
+    border: none; /* Remove borders for smaller screens */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+    
+  }
+
+  .navigation.active {
+    width: 10%; /* Adjust width when active for smaller screens */
+  }
+
+  .navigation ul .hidden-on-big {
+    display: inline;
+   
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+    color: var(--white);
+    text-align: left;
+    /* text-shadow: 0px 4px 2px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25); */
+    font-family: 'Poppins';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+  
+    margin-top: -160px;
+    margin-left: 12%;
+    margin-right: 10%;
+    margin-bottom: 45px;
+    max-width: 100%; /* Adjust as needed */
+  } 
+
+  .navigation ul a .iconname ion-icon {
+    margin-top: -65px;
+    margin-bottom: 30px;
+  }
+
+  .navigation ul li a .icon ion-icon {
+    font-size: 1.25rem; /* Adjusted size for smaller screens */
+    
+  }
+
+  .navigation ul li a .title {
+    font-size: 1.00rem; /* Adjusted size for smaller screens */
+    display: inline;
+  }
+
+  .navigation ul li a .titlesub {
+    margin-left: 24%;
+  }
+
+  img { 
+    
+    height: 100px;
+    width: 80px;
+    
+  }
+
+  .navigation ul li a .toptitle {
+    margin-top: 10px;
+    font-size: 32px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  /* Adjust styles for smaller screens */
+  .subtitle {
+    margin-bottom: 5px;
+    font-size: 10px; /* Decrease font size */
+  }
+  .dash h1 {
+    font-size: 18px; /* Decrease font size */
+  }
+
+  .topbar {
+    width: 100%;
+    height: 50px;
+    background: var(--maroon);
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding: 0 10px;
+  }
+  
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .main {
+    width: 100%;
+    left: 0;
+  }
+  .main.active {
+    left: 100%;
+  }
+  
+  /* Adjust styles for .toggle on smaller screens */
+  .toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 1.75rem;
+  }
+
+  /* Adjust styles for .dash on smaller screens */
+  .main .dash {
+    margin-left: 18px;
+    padding: 10px; /* Example adjustment for smaller screens */
+  }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .cardBox {
+    grid-template-columns: repeat(2, 1fr);
+    width: 90%;
+    margin-left: 20px;
+  }
+
+  .cardBox .card {
+    padding: 20px;
+  }
+
+  .cardBox .card .numbers {
+    font-size: 1.50rem;
+  }
+
+  .cardBox .card .cardName {
+    font-size: 1rem;
+  }
+
+  .cardBox .card .iconBx {
+    font-size: 2.50rem;
+  }
+
+  #notifyForm .btnNotify {
+    margin-bottom: 20%;
+  }
+
+  form .buttons .AddProfBtn{
+    align-items: left;
+    margin-left: -8%;
+  }
+
+  /* .buttonsSection {
+    margin-bottom: -25%;
+  } */
+
+  .buttonsSectionOJT {
+    margin-left: -5px;
+  }
+
+  .form-groupdateCourse .form-labeldate {
+    margin-top: 10%;
+    margin-left: -245px;
+    margin-bottom: 10px;
+  }
+
+  .form-groupdateCourse .form-inputcourse {
+    margin-top: 20px;
+    margin-left: 10%;
+  }
+
+  .input-group {
+    max-width: 100%;
+  }
+
+  
+}
+
+/* Media query for smaller screens */
+@media (max-width: 1200px) {
+  .details {
+    width: 95%; /* Adjusted width for smaller screens */
+    grid-template-columns: 1fr; /* Single column layout for smaller screens */
+    margin-left: 10px;
+  }
+
+  .detailsacc {
+    max-width: 100%; /* Adjusted width for smaller screens */
+    grid-template-columns: 1fr 2fr; /* Single column layout for smaller screens */
+    margin-left: 10px;
+  }
+
+ 
+
+  .detailsacc .recentOrdersacc {
+    
+    max-width:360px; /* Set the desired width */
+    overflow-x: auto; /* Enable horizontal scrollbar when content exceeds the container width */
+    white-space: nowrap; /* Prevent wrapping of form elements */
+    margin: 0 auto; /* Center the container horizontally */
+  }
+
+  .form-label {
+    font-size: 10px; 
+    display: block; /* Ensure each label appears on its own line */
+    margin-bottom: 5px; /* Add some space between labels */
+    text-align: left;
+  }
+
+  .form-input {
+    font-size: 10px;
+    width: 300px; /* Adjust the width of the input fields as needed */
+    box-sizing: border-box; /* Include padding and border in the width calculation */
+    margin-bottom: 10px; /* Add some space between input fields */
+  }
+
+  .cardHeader .btn {
+    font-size: 10px;
+  }
+
+  .container form button, .updateBtn{
+    margin-left: 10px;
+    max-width: 80px;
+    font-size: 10px;
+    /* margin-right: 20px; */
+  }
+
+  .container form button, .updateBtnPass{
+    /* margin-left: 175px; */
+    margin-left: 35px;
+    margin-top: 25px;
+    max-width: 150px;
+    font-size: 10px;
+  }
+
+  .form-groupdate {
+    margin-bottom: 10px;
+    margin-left: 12px;
+  }
+  
+  .form-labeldate {
+    float:left;
+    margin-top: 1%;
+    margin-left:5%;
+    margin-right: 2%;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--maroon);
+    
+  }
+  
+  .form-inputdate {
+    float:left;
+    margin-left:1%;
+    margin-right: 3%;
+    margin-bottom: 1%;
+    width: 60%; /* You can adjust the percentage as needed */
+    height: 20%;
+    padding: 8px; /* Increase the padding for a slightly larger appearance */
+    font-size: 10px; /* Increase the font size for a larger appearance */
+  }
+  
+  .form-inputcourse {
+    float:left;
+    margin-left:-1%;
+    margin-bottom: 2%;
+    width: 70%; /* You can adjust the percentage as needed */
+    height: 20%;
+    padding: 8px; /* Increase the padding for a slightly larger appearance */
+    font-size: 10px; /* Increase the font size for a larger appearance */
+  }
+
+
+
+  form .buttons{
+    margin-left: 58%;
+    width: 170px;
+  }
+
+  
+
+
+}
+
+/* ====================== Responsive Design ========================== */
+@media (max-width: 991px) {
+  .navigation {
+    left: -300px;
+  }
+  .navigation.active {
+    width: 300px;
+    left: 0;
+  }
+  .main {
+    width: 100%;
+    left: 0;
+  }
+  .main.active {
+    left: 300px;
+  }
+  .cardBox {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .details {
+    grid-template-columns: 1fr;
+  }
+  .recentOrders {
+    overflow-x: auto;
+  }
+  .status.inProgress {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardBox {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .cardHeader h2 {
+    font-size: 12px;
+  }
+  .user {
+    min-width: 40px;
+  }
+  .navigation {
+    width: 100%;
+    left: -100%;
+    z-index: 1000;
+  }
+  .navigation.active {
+    width: 100%;
+    left: 0;
+  }
+  .toggle {
+    z-index: 10001;
+  }
+  .main.active .toggle {
+    color: #fff;
+    position: fixed;
+    right: 0;
+    left: initial;
+  }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .account-form {
+    width: 100%; /* Set the form width to 100% for smaller screens */
+    margin: 0 auto; /* Center the form horizontally within the container */
+  }
+
+  .account-form1 {
+    width: 100%; /* Set the form width to 100% for smaller screens */
+    margin-left: 0; /* Remove left margin for smaller screens */
+  }
+
+  .form-inputadd {
+    width: 600px; /* Set the width to 100% for smaller screens */
+  }
+
+  .account-table .edit-button {
+    padding: 8px 16px; /* Adjust padding for smaller screens */
+  }
+}
+
+@media (min-width: 768px) {
+  .modal-dialog {
+    width: 600px;
+    margin: 30px auto;
+  }
+  .modal-content {
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  }
+  .modal-sm {
+    width: 300px;
+  }
+}
+
+@media (min-width: 992px) {
+  .modal-lg {
+    width: 900px;
+  }
+}
+
