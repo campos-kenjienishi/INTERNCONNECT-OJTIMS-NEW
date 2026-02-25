@@ -116,7 +116,7 @@
                     </li>
 
                     <li>
-                        <a href="{{ url('/student/pending') }}">
+                        <a href="{{ url('/student/MOA') }}">
                             <span class="icon">
                                 <ion-icon name="document-outline"></ion-icon>
                             </span>
@@ -276,31 +276,8 @@
 
                     
                 </div>
-
-                
-
-
-         
-
-
-            
-
-
-
-
-
-
-        </div>
-
-
-        
+        </div>    
     </div>
-
-
-   
-
-    
-
 </body>
 </html>
 
@@ -343,7 +320,7 @@
     function showRemoveConfirmation(fileId) {
         Swal.fire({
             title: 'Are you sure?',
-            text: 'You are about to remove this file category.',
+            text: 'You are about to remove this requirement.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',

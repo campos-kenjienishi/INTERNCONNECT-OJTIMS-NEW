@@ -93,7 +93,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ url('/student/pending') }}">
+                    <a href="{{ url('/student/MOA') }}">
                         <span class="icon">
                             <ion-icon name="document-outline"></ion-icon>
                         </span>

@@ -89,7 +89,7 @@
                     </li>
 
                     <li >
-                        <a href="{{ url('/student/pending') }}">
+                        <a href="{{ url('/student/MOA') }}">
                             <span class="icon">
                                 <ion-icon name="document-outline"></ion-icon>
                             </span>
@@ -99,11 +99,13 @@
                             </span>
                         </a>
 
-                        <li class="active" >
+                        {{-- 
+                        <li >
                             <a href="{{ url('/student/pending') }}">
-                            <span class="title" style="margin-left: 60px; padding: 10px; width: 78%; white-space: nowrap;">Pending MOA</span>
+                                <span class="title" style="margin-left: 60px; padding: 10px; width: 78%; white-space: nowrap;">Pending MOA</span>
                             </a>
                         </li>
+                        --}}
 
                         <li  >
                             <a href="{{ url('/student/MOA') }}">
@@ -201,13 +203,6 @@
         </div> 
     </div>
 </div>
-
-
-
-
-
-
-
 </body>
 </html>
 
