@@ -3,7 +3,7 @@
 
 <head>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,9 +11,10 @@
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png"> 
     <!-- ======= Styles ====== -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -409,7 +410,9 @@
                                       data-first-name="{{ $usersP->where('email', $professor->email)->first()->first_name }}"
                                       data-last-name="{{ $usersP->where('email', $professor->email)->first()->last_name }}"
                                       data-bs-toggle="modal" data-bs-target="#editProfessorModal">Edit</button>
-
+                                      <button class="btnRemove" data-professor-id="{{ $professor->id }}">
+                                        Remove
+                                      </button>
 
 
                                         <!-- Modal for editing professor details -->
@@ -468,7 +471,47 @@
     </div>
 </div>
 
+<script>
+$(document).ready(function () {
+    $(document).on('click', '.btnRemove', function (event) {
+        event.preventDefault();
+        var professorId = $(this).data('professor-id');
 
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will remove the professor permanently.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, remove!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/removeProfessor/' + professorId,
+                    data: { _token: $('meta[name="csrf-token"]').attr('content') },
+                    success: function(response) {
+                        Swal.fire(
+                            'Removed!',
+                            response.message,
+                            'success'
+                        ).then(() => location.reload());
+                    },
+                    error: function(xhr) {
+                        Swal.fire(
+                            'Oops!',
+                            'Something went wrong. Check console.',
+                            'error'
+                        );
+                        console.log(xhr.responseText);
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
 
 <script>
     $(document).ready(function () {
@@ -544,13 +587,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-

@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+
 
 class ProfessorController extends Controller
 {
@@ -332,6 +334,61 @@ public function allStudents()
     return view('professor.allStudents', compact('studentData', 'user', 'subjectData','course'));
 }
 
+public function removeProfessor($id)
+{
+    DB::beginTransaction();
+
+    try {
+        // Find the professor
+        $professor = Professor::find($id);
+
+        if (!$professor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Professor not found'
+            ], 404);
+        }
+
+        // Find the corresponding user by email
+        $user = User::where('email', $professor->email)->first();
+
+        // Get all subject codes associated with this professor
+        $subjectCodes = $professor->subjects->pluck('subject_code');
+
+        // Delete schedules linked to these subjects
+        Schedule::whereIn('subject_code', $subjectCodes)->delete();
+
+        // Remove associated subjects
+        $professor->subjects()->delete();
+
+        // Update students who had this professor as adviser
+        Student::where('adviser_name', $professor->full_name)
+            ->update(['adviser_name' => null]);
+
+        // Delete the professor
+        $professor->delete();
+
+        // Delete the user account if exists
+        if ($user) {
+            $user->delete();
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Professor and all associated data removed successfully'
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to remove professor: ' . $e->getMessage()
+        ], 500);
+    }
+}
 
 public function fetchProfessors(Request $request, $semester,$startYear,$endYear)
 {
@@ -363,6 +420,5 @@ $uniqueProfessorNames = array_unique($professorNames);
 
 // Return the unique professor names as a JSON response
 return response()->json($uniqueProfessorNames);
-}
-    
+}    
 }

@@ -130,9 +130,7 @@ class AuthController extends Controller
         $roleCount = User::where('role', 0)
         ->where('created_at', '>=', $sixMonthsAgo)
         ->count();
-        $roleCountP = User::where('role', 2)
-        ->where('created_at', '>=', $sixMonthsAgo)
-        ->where('created_at', '>=', $sixMonthsAgo)->count();
+        $roleCountP = User::where('role', 2)->count();
         
         $data=array();
             if(Session::has('loginId')){

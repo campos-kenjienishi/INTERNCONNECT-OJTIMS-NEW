@@ -130,7 +130,7 @@ Route::post('/professor/approve/{email}', [ProfessorController::class,'approve']
 Route::post('/professor/deny/{email}', [ProfessorController::class,'deny']);
 Route::get('/professor/upload', [ProfessorController::class,'uploadP']);
 Route::get('/allStudents', [ProfessorController::class,'allStudents']);
-
+Route::post('/removeProfessor/{id}', [ProfessorController::class, 'removeProfessor'])->name('removeProfessor');
  
 Route::get('/pending',[AuthController::class,'pending']);
 

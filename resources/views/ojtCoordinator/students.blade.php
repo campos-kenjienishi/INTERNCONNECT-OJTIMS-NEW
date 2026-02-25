@@ -277,16 +277,15 @@
                                 <td>{{$data['student']->course }}</td>
                                 <td>{{ $data['student']->year_and_section }}</td>
                                 <td>{{ $data['student']->adviser_name }}</td>
-                                @if (isset($data['subjects']))
-                                @foreach ($data['subjects'] as $subject)
-                                <td>{{ $subject['subject_code'] }}</td>
-                                @endforeach
-                                @else
-                                <td>No subjects</td>
-
-                                @endif
-
-
+                                <td>
+                                    @if (isset($data['subjects']) && count($data['subjects']) > 0)
+                                        @foreach ($data['subjects'] as $subject)
+                                            {{ $subject['subject_code'] ?? '--' }}<br>
+                                        @endforeach
+                                    @else
+                                        --
+                                    @endif
+                                </td>
 
                                 <td class="text-center">
                                     <button class="btnView" data-bs-toggle="modal" data-bs-target="#exampleModal" style="margin-left:1%" data-full-name="{{ $data['student']->full_name }}" data-contact-number="{{ $data['student']->contact_number }}" data-email="{{ $data['student']->email }}" data-address="{{ $data['student']->address }}" data-date-of-birth="{{ $data['student']->date_of_birth }}" data-student-num="{{ $data['ojt']->studentNum }}">
