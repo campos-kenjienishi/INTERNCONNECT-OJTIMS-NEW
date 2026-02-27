@@ -94,6 +94,7 @@ class AuthController extends Controller
             if($user){
                 if(Hash::check($request->password, $user->password)){
                     $request->session()->put('loginId',$user->id);
+                    $request->session()->put('show_terms', true);
                     if ($user->role == 0) {
                         return redirect()->route('student_home');
                     } 
@@ -148,6 +149,10 @@ class AuthController extends Controller
     public function logout(){
         if(Session::has('loginId')){
             Session::pull('loginId');
+
+            // Clear the terms modal flag so it shows next login
+            Session::forget('termsAccepted');
+
             return redirect('login');
         }
     }
@@ -278,47 +283,44 @@ $sched->schedule_day = $scheduleJson;
     
 public function student_home()
 {
- 
-    
     if (Session::has('loginId')) {
         $user = User::where('id', Session::get('loginId'))->first();
         
-     
-      
         $fileCount = UploadedFile::where(function ($query) use ($user) {
             $query->where('uploader_name', 'Gina Dela Cruz')
                   ->orWhere('uploader_name', $user->adviser_name);
         })->count();
 
+        // Get the current year
+        $currentYear = now()->year;
 
-         // Get the current year
-         $currentYear = now()->year;
-    
-         // Retrieve the selected company or companies
-         $companies = Company::all(); // Get all companies
-     
-         $stu = Student::all();
-     
-         // Filter companies based on the start year of "school_year"
-         $companies = $companies->filter(function ($company) use ($currentYear) {
-             // Extract the start year from the "school_year" format
-             list($startYear, $endYear) = explode('-', $company->school_year);
-     
-             // Convert them to integers
-             $startYear = (int) $startYear;
-             $endYear = (int) $endYear;
-     
-           
-             return $currentYear >= $startYear && $currentYear <= $startYear + 3;
-         });
-     
-         $companyNames = $companies->pluck('company_name')->toArray();
+        // Retrieve the selected company or companies
+        $companies = Company::all(); // Get all companies
 
-        return view('students.student_home', compact('companies', 'user', 'fileCount'));
+        $stu = Student::all();
+
+        // Filter companies based on the start year of "school_year"
+        $companies = $companies->filter(function ($company) use ($currentYear) {
+            list($startYear, $endYear) = explode('-', $company->school_year);
+            $startYear = (int) $startYear;
+            $endYear = (int) $endYear;
+            return $currentYear >= $startYear && $currentYear <= $startYear + 3;
+        });
+
+        $companyNames = $companies->pluck('company_name')->toArray();
+
+        // TERMS MODAL LOGIC
+        $showTerms = false;
+        $lastAccepted = Session::get('termsAcceptedTime'); // timestamp of last acceptance
+
+        if (!$lastAccepted || now()->diffInHours($lastAccepted) >= 24) { // 24 hours = 1 day
+            $showTerms = true;
+        }
+        
+        return view('students.student_home', compact('companies', 'user', 'fileCount', 'showTerms'));
     }
 
-    // Handle the case where Session::has('loginId') is false (user not logged in)
-    return redirect()->route('login'); // Redirect to the login page or handle accordingly
+    return redirect()->route('login');
 }
     public function professor_home(){
 

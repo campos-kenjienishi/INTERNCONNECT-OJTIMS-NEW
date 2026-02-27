@@ -266,28 +266,11 @@
                 </div>
 
             </div> 
-
-            
-
-
-
-
         </div>
-
-
-
-            
-
-
-
-
     </div>
-
-
-
-
-
-
+@if(!session()->has('termsAccepted'))
+    @include('students.terms_modal')
+@endif
 </body>
 </html>
 

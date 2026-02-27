@@ -281,9 +281,6 @@ public function ojt_edit(Request $request,$studentNum)
     
         $user = OJTInformation::where('studentNum', $data->studentNum)->first();
 
-
-    
-    
         // Update user data
         $user->company_name = $request->company_name;
         $user->company_address = $request->company_address;
@@ -319,9 +316,6 @@ public function ojt_edit(Request $request,$studentNum)
         return back()->with('success', 'You have updated the information successfully!');
     }
 
-
-  
-
     public function notify(Request $request, $studentNum)
     {
         // Find the student's email
@@ -347,6 +341,10 @@ public function ojt_edit(Request $request,$studentNum)
     
         return back()->with('success', 'Notification sent.');
     }
-    
 
+    public function acceptTerms(Request $request)
+    {
+        Session::put('termsAccepted', true); // lasts for this session only
+        return response()->json(['success' => true]);
+    }
 }
