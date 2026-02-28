@@ -26,10 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const navigation = document.querySelector(".navigation");
   const main = document.querySelector(".main");
 
-  toggle.addEventListener("click", function () {
-    navigation.classList.toggle("active");
-    main.classList.toggle("active");
-  });
+  // FIX: Added check to see if toggle exists before adding event listener
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      navigation.classList.toggle("active");
+      main.classList.toggle("active");
+    });
+  }
 
   // Form Validation
   function validateForm() {
@@ -37,13 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Check each required field
     document.querySelectorAll("input[required]").forEach(function (input) {
+      const errorMessageId = input.getAttribute("name") + "-error";
+      const errorElement = document.getElementById(errorMessageId);
+
       if (input.value.trim() === "") {
         valid = false;
-        let errorMessageId = input.getAttribute("name") + "-error";
-        document.getElementById(errorMessageId).style.display = "block";
+        if (errorElement) errorElement.style.display = "block";
       } else {
-        let errorMessageId = input.getAttribute("name") + "-error";
-        document.getElementById(errorMessageId).style.display = "none";
+        if (errorElement) errorElement.style.display = "none";
       }
     });
 
@@ -51,9 +55,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Handle form submission
-  document.querySelector(".updateBtn").addEventListener("click", function (event) {
-    if (!validateForm()) {
-      event.preventDefault(); // Prevent form submission if validation fails
-    }
-  });
+  const updateBtn = document.querySelector(".updateBtn");
+
+  // FIX: Added check to see if updateBtn exists before adding event listener
+  if (updateBtn) {
+    updateBtn.addEventListener("click", function (event) {
+      if (!validateForm()) {
+        event.preventDefault(); // Prevent form submission if validation fails
+      }
+    });
+  }
 });

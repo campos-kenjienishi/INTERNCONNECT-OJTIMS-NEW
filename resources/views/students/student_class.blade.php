@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png"> 
     <!-- ======= Styles ====== -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -93,7 +93,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ url('/student/pending') }}">
+                    <a href="{{ url('/student/MOA') }}">
                         <span class="icon">
                             <ion-icon name="document-outline"></ion-icon>
                         </span>
@@ -180,7 +180,7 @@
                                 @if ($data->status != 1 && $data->status != 3)
                                     <button class="btnJoin5" onclick="joinStudent('{{ url('/student/join', $data->email) }}')">Join</button>
                                 @else
-                                    <span style="color: red;">Already Joined</span>
+                                    <button class="btnRemove" onclick="leaveStudent()">Leave</button>
                                 @endif
 
                                 <button class="btnView1" data-bs-toggle="modal" data-bs-target="#modal{{ $loop->iteration }}" style="margin-left: 10%;">
@@ -242,6 +242,46 @@
             });
         }
         </script>
+
+        <script>
+        function leaveStudent() {
+            Swal.fire({
+                title: 'Leave this room?',
+                text: 'You will be removed from this class.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, leave',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ url("/student/leave") }}',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function() {
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: 'You left the room',
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            Swal.fire('Oops!', 'Something went wrong.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+        </script>
+
         <br>
 
         <!-- Announcements -->

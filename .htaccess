@@ -1,22 +1,98 @@
+# ====================================================
+# MAIN REWRITE + SECURITY
+# ====================================================
 <IfModule mod_rewrite.c>
-Options +FollowSymLinks
-RewriteEngine On
+    Options +FollowSymLinks
+    RewriteEngine On
 
-<FilesMatch "^\.(env|git|htaccess|log|json|lock|example|md|yml|yaml)$">
-        Order allow,deny
-        Deny from all
+    # ----------------------------------------------------
+    # FORCE HTTPS
+    # ----------------------------------------------------
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # ----------------------------------------------------
+    # BLOCK SENSITIVE FILES
+    # ----------------------------------------------------
+    <FilesMatch "^\.|(\.env|\.git|composer\.json|composer\.lock|package\.json|yarn\.lock|\.htaccess|log|json|lock|example|md|yml|yaml)$">
+        Require all denied
     </FilesMatch>
-    
+
+    # ----------------------------------------------------
+    # BLOCK CORE LARAVEL FOLDERS FROM DIRECT ACCESS
+    # ----------------------------------------------------
     RewriteRule ^(storage|bootstrap|vendor|resources|routes|config|database)/ - [F,L,NC]
 
-RewriteCond %{REQUEST_URI} !^/public/ 
+    # ----------------------------------------------------
+    # LARAVEL FRONT CONTROLLER (DO NOT OVERWRITE)
+    # ----------------------------------------------------
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /public/$1 [L]
 
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-f
+</IfModule>
 
+# ====================================================
+# PUBLIC FOLDER RULES
+# ====================================================
+<IfModule mod_rewrite.c>
+    RewriteBase /public/
 
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
 
-RewriteRule ^(.*)$ /public/$1 
-#RewriteRule ^ index.php [L]
-RewriteRule ^(/)?$ public/index.php [L] 
+    RewriteRule ^(/)?$ public/index.php [L]
+</IfModule>
+
+# ====================================================
+# 🔒 BLOCK KNOWN MALICIOUS IPs
+# ====================================================
+<RequireAll>
+    Require all granted
+
+    Require not ip 13.78.21.205
+    Require not ip 48.218.184.140
+    Require not ip 203.0.113.0/24
+    Require not ip 45.155.205.0/24
+    Require not ip 5.188.10.0/24
+    Require not ip 193.32.162.157
+    Require not ip 178.62.201.8
+    Require not ip 2.57.121.112
+    Require not ip 2.57.121.25
+    Require not ip 116.110.144.208
+    Require not ip 62.60.131.157
+    Require not ip 193.32.162.146
+    Require not ip 80.94.92.186
+</RequireAll>
+
+# ====================================================
+# PERFORMANCE
+# ====================================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 day"
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType font/woff2 "access plus 30 days"
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ====================================================
+# SECURITY HEADERS
+# ====================================================
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>

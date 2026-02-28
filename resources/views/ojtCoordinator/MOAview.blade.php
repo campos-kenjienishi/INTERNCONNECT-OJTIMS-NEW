@@ -17,9 +17,9 @@
         
         
             <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-        
-        
-            <script src="http://www.position-absolute.com/creation/print/jquery.printPage.js"></script>
+
+
+            <script src="js/jquery.printPage.js"></script>
             <style>
                 /* Style the content container */
                 .content-container {

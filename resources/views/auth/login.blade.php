@@ -75,7 +75,13 @@
                                         name="password" autocomplete="current-password" required="" id="id_password">
                                         <span class="text-danger">@error('password') {{$message}} @enderror</span>
                                     </div>
-
+                                    <br>
+                                    <!-- Terms Notice -->
+                                    <div class="text-center mt-2 mb-3" style="font-size: 13px; color: #555;">
+                                        By using this service, you understand and agree to the 
+                                        <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> and 
+                                        <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
+                                    </div>
                                     <br>
 
                                     <div class="form-group">

@@ -108,10 +108,11 @@ Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
 Route::put('/student/edit/{email}', [StudentController::class,'edit']);
 Route::get('/student/class', [StudentController::class,'class']);
 Route::post('/student/join/{email}', [StudentController::class,'join']);
+Route::post('/student/leave', [StudentController::class,'leave']);
 Route::get('/student/files', [StudentController::class,'fileSee']);
 Route::get('/student/ojtinfo', [StudentController::class,'ojtInformation']);
 Route::put('/student/ojtEdit/{studentNum}', [StudentController::class,'ojt_edit']); 
-
+Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
 
 Route::get('/professor/home',[AuthController::class,'professor_home'])->name('professor_home');
 Route::get('/professor/login',[AuthController::class, 'logout']);
@@ -123,12 +124,13 @@ Route::get('/professor/listStudents/{course}', [ProfessorController::class,'show
 Route::get('/supTab', [AuthController::class,'supTab']);
 Route::post('/supCreate', [AuthController::class,'supCreate'])->name('supCreate');
 Route::post('/roomCreate', [ProfessorController::class,'roomCreate'])->name('roomCreate');
+Route::post('/roomDelete/{id}', [ProfessorController::class,'roomDelete'])->name('roomDelete');
 Route::get('/professor/classList/{course}', [ProfessorController::class,'show_list']);
 Route::post('/professor/approve/{email}', [ProfessorController::class,'approve']);
 Route::post('/professor/deny/{email}', [ProfessorController::class,'deny']);
 Route::get('/professor/upload', [ProfessorController::class,'uploadP']);
 Route::get('/allStudents', [ProfessorController::class,'allStudents']);
-
+Route::post('/removeProfessor/{id}', [ProfessorController::class, 'removeProfessor'])->name('removeProfessor');
  
 Route::get('/pending',[AuthController::class,'pending']);
 
@@ -146,3 +148,11 @@ Route::post('/update/approve/status/{id}', [PassDocuController::class, 'updateAp
 Route::post('/update/denied/status/{id}', [PassDocuController::class, 'updateDeniedStatus']);
 Route::get('/requireview',[PassDocuController::class,'requirementsView']);
 Route::get('/download/req/{file}', [PassDocuController::class,'download']);
+
+Route::get('/terms', function () {
+    return view('legal.terms'); 
+});
+
+Route::get('/privacy', function () {
+    return view('legal.privacy'); 
+});

@@ -156,6 +156,7 @@
                                     <td>Student Name</td>
                                     <td>Course</td>
                                     <td>Year & Section</td>
+                                    <td>School Year</td>
                                     <td>Personal Information</td>
                                     <td>OJT Information</td>
                                     <td>Student Requirements</td>
@@ -168,6 +169,7 @@
                                     <td>{{ $data['student']->full_name }}</td>
                                     <td>{{ $data['student']->course }}</td>
                                     <td>{{ $data['student']->year_and_section }}</td>
+                                    <td>{{ $data['student']->studentInfo->school_year_start ?? '-' }} - {{ $data['student']->studentInfo->school_year_end ?? '-' }}</td>
 
                                     <!-- Personal Info Button -->
                                     <td class="text-center">
@@ -296,9 +298,6 @@
                         $('#ojt-contact-position').text(button.data('contact-position'));
                         $('#ojt-contact-number').text(button.data('contact-number'));
                     });
-
-                    // Initialize DataTable
-                    $('#fileTable').DataTable();
                 });
                 </script>
                 </tbody>
@@ -327,9 +326,10 @@
                     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
                     <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 
-                    <!-- Enable sorting for the fileTable -->
                     <script>
                         $(document).ready(function() {
-                            $('#fileTable').DataTable();
+                            $('#fileTable').DataTable({
+                                order: [] 
+                            });
                         });
                     </script>

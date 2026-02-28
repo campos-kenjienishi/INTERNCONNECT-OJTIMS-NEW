@@ -83,7 +83,7 @@
                 </li>
                 
                 <li>
-                    <a href="{{ url('/student/pending') }}">
+                    <a href="{{ url('/student/MOA') }}">
                         <span class="icon">
                             <ion-icon name="document-outline"></ion-icon>
                         </span>
@@ -232,15 +232,7 @@
                     <button class="updateBtnPass" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         <span class ="btnText">Change Password </span>
                         <i class="uil uil-lock" style="font-size: 14px; margin-left: 5px;"></i>
-                    </button>  
-                        
-                        
-                    
-                        
-                       
-                         
-                            
-                        
+                    </button>    
                         </div>  
                     </div>
                 </div>
@@ -271,42 +263,69 @@
 @endif
 
                                                <!-- Change Password -->
-       
-                    
-                    
-
                     <form class="account-form" action="{{url('/change_password',$data->id)}}" method="post">
                         @csrf
                         @method('PUT')
             
-                        <div class="form-group form-row">
-                            <label class="form-label" for="current_password">Current Password:</label>
-                            <input class="form-input" type="password" id="current_password" name="current_password">
+                    <div class="form-group form-row">
+                        <label class="form-label" for="current_password">Current Password:</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="current_password" name="current_password">
+                            <span class="input-group-text" id="toggleCurrent" style="cursor:pointer;">
+                                <i class="fa fa-eye"></i>
+                            </span>
                             <span class="text-danger">@error('current_password') {{$message}} @enderror</span>
                         </div>
-            
-                        <div class="form-group form-row">
-                            <label class="form-label" for="new_password">New Password:</label>
-                            <input class="form-input" type="password" id="new_password" name="new_password">
+                    </div>
+
+                    <div class="form-group form-row">
+                        <label class="form-label" for="new_password">New Password:</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="new_password" name="new_password">
+                            <span class="input-group-text" id="toggleNew" style="cursor:pointer;">
+                                <i class="fa fa-eye"></i>
+                            </span>
                             <span class="text-danger">@error('new_password') {{$message}} @enderror</span>
                         </div>
+                    </div>
 
-                        <div class="form-group form-row">
-                            <label class="form-label" for="confirm_password">Confirm New Password:</label>
-                            <input class="form-input" type="password" id="confirm_password" name="confirm_password">
+                    <div class="form-group form-row">
+                        <label class="form-label" for="confirm_password">Confirm New Password:</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                            <span class="input-group-text" id="toggleConfirm" style="cursor:pointer;">
+                                <i class="fa fa-eye"></i>
+                            </span>
                             <span class="text-danger">@error('confirm_password') {{$message}} @enderror</span>
                         </div>
+                    </div>
                 
                         <div class="buttonsSection" >
                             <button class="closeBtn" type="button" data-bs-dismiss="modal"> Close </button>
                             <button type="submit" class="printBtn">Update</button>
                         </div>
                     
-                    
-                
+                                        <script>
+                    document.addEventListener("DOMContentLoaded", function() {
 
-        
-                                        
+                        function setupToggle(toggleId, inputId) {
+                            const toggle = document.getElementById(toggleId);
+                            const input = document.getElementById(inputId);
+
+                            toggle.addEventListener('click', function () {
+                                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                                input.setAttribute('type', type);
+
+                                this.querySelector('i').classList.toggle('fa-eye-slash');
+                            });
+                        }
+
+                        setupToggle('toggleCurrent', 'current_password');
+                        setupToggle('toggleNew', 'new_password');
+                        setupToggle('toggleConfirm', 'confirm_password');
+
+                    });
+                    </script>                                        
                                     </form>
         
                                 </div>

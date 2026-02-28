@@ -50,11 +50,11 @@
                         <span class="text-danger">@error('first_name') {{$message}} @enderror</span>
                     </div>
                     
-                    <label for="first_name">Middle Initial</label>
+                    <label for="middle_name">Middle Name</label>
                     <div class="form-group">
                         
-                        <input type="text" class="form-control" placeholder="Enter Middle Initial"
-                        name="first_name" value = "{{old('first_name')}}">
+                        <input type="text" class="form-control" placeholder="Enter Middle Name"
+                        name="middle_name" value = "{{old('middle_name')}}">
                         <span class="text-danger">@error('middle_name') {{$message}} @enderror</span>
                     </div>
 
@@ -177,13 +177,8 @@
                     
                     <div class="form-group">
                         <label for="subject_code">Subject Code</label>
-                        <select name="subject_code" class="form-control">
-                            @foreach ($schedules as $schedule) 
-                            @if ($schedule->subject)
-                            <option value="{{ $schedule->subject->subject_code }}">{{ $schedule->subject->subject_code }}</option>
-                             @endif
-                            @endforeach
-                        </select>
+                        <input type="text" name="subject_code" class="form-control"
+                            value="@foreach($schedules as $schedule)@if($schedule->subject){{ $schedule->subject->subject_code }}@break @endif @endforeach">
                     </div>
 
                     <div class="form-group">

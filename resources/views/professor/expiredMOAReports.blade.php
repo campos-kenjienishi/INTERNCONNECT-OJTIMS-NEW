@@ -20,7 +20,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 
-    <script src="http://www.position-absolute.com/creation/print/jquery.printPage.js"></script>
+    <script src="js/jquery.printPage.js"></script>
     <style>
         .table-container {
             max-height: 400px; /* Set your desired maximum height */

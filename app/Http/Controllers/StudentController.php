@@ -160,19 +160,33 @@ public function join(Request $request,$email)
 
     }
 
+    public function leave(Request $request)
+    {
+        if (Session::has('loginId')) {
+
+            $user = User::where('id', Session::get('loginId'))->first();
+
+            if (!$user) {
+                return response()->json(['error' => true], 404);
+            }
+
+            // Just change the status to "not joined"
+            $user->status = 0;
+
+            $user->save();
+
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['error' => true], 403);
+    }
     public function fileSee()
     {   
-
-        
-
         $data=array();
             if(Session::has('loginId')){
 
                 $user=User::where('id','=', Session::get('loginId'))->first();
                         }
-                        
-    
-       
            $class = Classes::where('adviser_name', $user->adviser_name)->get();
             // Fetch and display the templates where Uploader_name matches adviser_name
     $upload = UploadedFile::where(function ($query) use ($user) {
@@ -180,9 +194,6 @@ public function join(Request $request,$email)
               ->orWhere('uploader_name', $user->adviser_name);
     })
     ->get();
-
-    
-
 
     // Pass the $professor and $students variables to the view
     return view('students.student_file', compact('data','upload','class','user'));
@@ -337,5 +348,11 @@ public function ojt_edit(Request $request,$studentNum)
         return back()->with('success', 'Notification sent.');
     }
     
+    
+    public function acceptTerms(Request $request)
+    {
+        Session::put('termsAccepted', true); // lasts for this session only
+        return response()->json(['success' => true]);
+    }
 
 }

@@ -30,11 +30,6 @@
         max-height: 100%;
         overflow-y: auto;
     }
-
-
-    
-
-    
     </style>
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
@@ -44,7 +39,7 @@
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="http://www.position-absolute.com/creation/print/jquery.printPage.js"></script>
+    <script src="js/jquery.printPage.js"></script>
     
 </head>
 
@@ -115,7 +110,7 @@
                     </li>
 
                     <li>
-                        <a href="{{ url('/student/pending') }}">
+                        <a href="{{ url('/student/MOA') }}">
                             <span class="icon">
                                 <ion-icon name="document-outline"></ion-icon>
                             </span>
@@ -124,13 +119,13 @@
                                 <ion-icon name="chevron-down-outline"></ion-icon>
                             </span>
                         </a>
-
+                        {{-- 
                         <li >
                             <a href="{{ url('/student/pending') }}">
                                 <span class="title" style="margin-left: 60px; padding: 10px; width: 78%; white-space: nowrap;">Pending MOA</span>
                             </a>
                         </li>
-
+                        --}}
                         <li class="active" >
                             <a href="{{ url('/student/MOA') }}">
                                 <span class="title" style="margin-left: 60px; padding: 10px; width: 78%; white-space: nowrap;">Notarized MOA</span>
@@ -304,22 +299,13 @@
                                     <td>{{$companies->company_email}}</td>
                                     <td>{{$companies->school_year}}</td>
                                     
-                                   
-
                                     <td>
-                                        
-
+                                    
                                         <button class="btnDownload" style="margin-left: 5px;">
                                             <i class="fa fa-download"></i>
                                             <a href="{{url('/moa/download',$companies->file)}}" style="color: white; text-decoration: none;" >Download</a>
                                         </button>
-
-                                        
-
-                                        
-
-
-                                       <!-- Modal -->
+                                    <!-- Modal -->
                                        <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
@@ -339,21 +325,11 @@
                                                 </div>
                                             </div>
                                         </div>
-
-                               
-
-
                                         <button class="btnPrint" style="margin-left: 5px;" onclick="openViewModal('{{ route('print-data', ['company' => $companies->id]) }}')">
                                             <i class="uil uil-print"></i>
                                             <span style="color: var(--white); text-decoration: none; font-family: 'poppins'; font-style: normal;">Print Company Details</span>
                                         </button>
-
-
-
-                                    </td>
-
-                                  
-                                   
+                                    </td>          
                                     <td>
                                                                         
   <!-- Button trigger modal -->
@@ -437,43 +413,18 @@ function printRegularPreview() {
     }
 }
 </script>
-                                               
-                                        
+                                                                                
                                     </td>
                                         
                                 </tr>
                                 @endforeach
                             </tbody>
                                 
-                        </table>
-
-
-
-                        
-                            
-                    </div>
-
-
-                    
+                        </table>                           
+                    </div>                   
                 </div>
-
-                
-
-
             </div>
-
-
-            
-
-
-
-
-
-
-        </div>
-
-
-        
+        </div>  
     </div>
 
 

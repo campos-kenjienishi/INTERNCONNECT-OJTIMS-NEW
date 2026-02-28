@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>InternConnect</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png"> 
@@ -192,6 +193,7 @@
                     <td>Needing Approval</td>
                     <td>Students List</td>
                     <td>Add Announcements</td>
+                    <td>Delete Room</td>
                 </tr>
             </thead>
 
@@ -259,13 +261,58 @@
                                 </div>
                             </div>
                         </td>
-
+                        <td>
+                            <button class="btnRemove" data-id="{{ $room->id }}">
+                                Remove
+                            </button>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- Include jQuery and DataTables scripts -->
+                        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+                        <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+                    
+                        <!-- Enable sorting for the fileTable -->
+                        <script>
+                            $(document).ready(function() {
+                                $('#fileTable').DataTable();
+                            });
+                        </script>
+    
+
+    <!-- Include SweetAlert JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Function to show SweetAlert toast
+    function showSuccessToast() {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+
+        Toast.fire({
+            icon: "success",
+            title: "Announcement created successfully!",
+            customClass: {
+                icon: 'custom-icon-class',
+                title: 'custom-title-class'
+            }
+        });
+    }
+</script>
 
 <!-- ================ AJAX for Add Room & Announcements ================= -->
 <script>
@@ -334,9 +381,52 @@ $(document).ready(function() {
         });
     });
 
+    $('.btnRemove').on('click', function() {
+
+        let roomId = $(this).data('id');
+
+        Swal.fire({
+            title: 'Remove this room?',
+            text: "This will permanently delete the room and its records!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/roomDelete/' + roomId,
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function() {
+                        Swal.fire({
+                            toast: true,
+                            icon: 'success',
+                            title: 'Room deleted successfully!',
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Error deleting room');
+                    }
+                });
+
+            }
+        });
+    });
     // Initialize DataTables
     $('#fileTable').DataTable();
 });
+    
 </script>
 </body>
 </html>
@@ -350,42 +440,3 @@ $(document).ready(function() {
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
                  
-<!-- Include jQuery and DataTables scripts -->
-                        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-                        <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                    
-                        <!-- Enable sorting for the fileTable -->
-                        <script>
-                            $(document).ready(function() {
-                                $('#fileTable').DataTable();
-                            });
-                        </script>
-    
-
-    <!-- Include SweetAlert JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    // Function to show SweetAlert toast
-    function showSuccessToast() {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            }
-        });
-
-        Toast.fire({
-            icon: "success",
-            title: "Announcement created successfully!",
-            customClass: {
-                icon: 'custom-icon-class',
-                title: 'custom-title-class'
-            }
-        });
-    }
