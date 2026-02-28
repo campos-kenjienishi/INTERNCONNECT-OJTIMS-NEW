@@ -111,7 +111,7 @@ Route::post('/student/join/{email}', [StudentController::class,'join']);
 Route::post('/student/leave', [StudentController::class,'leave']);
 Route::get('/student/files', [StudentController::class,'fileSee']);
 Route::get('/student/ojtinfo', [StudentController::class,'ojtInformation']);
-Route::put('/student/ojtEdit/{studentNum}', [StudentController::class,'ojt_edit']); 
+Route::put('/student/ojtEdit/{studentNum}', [StudentController::class,'ojt_edit']);
 Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
 
 Route::get('/professor/home',[AuthController::class,'professor_home'])->name('professor_home');
@@ -148,11 +148,3 @@ Route::post('/update/approve/status/{id}', [PassDocuController::class, 'updateAp
 Route::post('/update/denied/status/{id}', [PassDocuController::class, 'updateDeniedStatus']);
 Route::get('/requireview',[PassDocuController::class,'requirementsView']);
 Route::get('/download/req/{file}', [PassDocuController::class,'download']);
-
-Route::get('/terms', function () {
-    return view('legal.terms'); 
-});
-
-Route::get('/privacy', function () {
-    return view('legal.privacy'); 
-});

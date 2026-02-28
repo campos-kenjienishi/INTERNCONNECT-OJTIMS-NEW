@@ -151,7 +151,6 @@ class AuthController extends Controller
     public function logout(){
         if(Session::has('loginId')){
             Session::pull('loginId');
-            Session::forget('termsAccepted');
             return redirect('login');
         }
     }
