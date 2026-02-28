@@ -144,7 +144,15 @@ public function show_list($courseName)
             return redirect()->back()->with('error', 'Course not found.');
         }
 
-        $students = User::where('course', $course->course)->where('status', 1)->where('adviser_name', $data->full_name)->get();
+        $students = User::with('studentInfo')
+            ->join('students', 'users.studentNum', '=', 'students.studentNum')
+            ->where('users.course', $course->course)
+            ->where('users.status', 1)
+            ->where('users.adviser_name', $data->full_name)
+            ->orderBy('students.school_year_start', 'desc')
+            ->orderBy('students.school_year_end', 'desc')
+            ->select('users.*')
+            ->get();
 
         $studentData = [];
 

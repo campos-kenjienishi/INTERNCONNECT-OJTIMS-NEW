@@ -42,4 +42,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // In User.php
+    public function studentInfo()
+    {
+        return $this->hasOne(Student::class, 'studentNum', 'studentNum');
+    }
 }

@@ -68,6 +68,8 @@ class AuthController extends Controller
         $studentE->studentNum =$user->studentNum;
         $studentE->course = $user->course;
         $studentE->year_and_section =$user->year_and_section;
+        $studentE->school_year_start = $request->academic_year_start;
+        $studentE->school_year_end   = $request->academic_year_end;
         $studentE->adviser_name =$user->adviser_name;
         $studentE->full_name = $user->full_name;
 
