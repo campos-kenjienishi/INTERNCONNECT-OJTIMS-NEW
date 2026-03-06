@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\OJTInformation;
+use App\Helpers\AuditLogger;
 
 class OJTController extends Controller
 {

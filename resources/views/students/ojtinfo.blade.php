@@ -103,8 +103,7 @@
                         <span class="title">Requirements</span>
                     </a>
                 </li>
-
-
+ 
                 <li>
                     <a href="{{ url('/login') }}">
                         <span class="icon">

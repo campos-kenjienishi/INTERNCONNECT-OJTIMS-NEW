@@ -17,8 +17,9 @@ use App\Models\Professor;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Stroage;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditLogger;
 
 class MOAUploadController extends Controller
 {
@@ -64,7 +65,14 @@ class MOAUploadController extends Controller
 
         // Delete the company
         $company->delete();
-
+        AuditLogger::log(
+            'MOA Upload',
+            'Delete',
+            'Deleted company and associated students: ' . $company->company_name,
+            Session::get('loginId') ?? null,
+            ['company_id' => $company->id, 'students' => $students->pluck('id')->toArray()],
+            null
+        );
         return redirect()->back()->with('success', 'Company and associated students deleted successfully.');
     }
 

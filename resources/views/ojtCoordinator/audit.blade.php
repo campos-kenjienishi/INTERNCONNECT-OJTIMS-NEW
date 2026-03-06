@@ -3,14 +3,12 @@
 
 <head>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
-    <!-- ======= Styles ====== -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 </head>
 
 <body>
@@ -23,31 +21,17 @@
                         <img src="/images/final-puptg_logo-ojtims_nbg.png">
                         <span class="toptitle">InternConnect</span>
                     </a>
-
                 </li>
-
 
                 <a href="{{ url('/accountinfo') }}" style="text-decoration: none;">
                     <span class="iconname">
                         <ion-icon name="person-circle-outline"></ion-icon>
-
                     </span>
-
-                    <span class="name"> {{ $data->full_name }} </span>
-                    <span class="name2">OJT COORDINATOR </span>
-
+                    <span class="name">{{ $data->full_name }}</span>
+                    <span class="name2">OJT COORDINATOR</span>
                 </a>
 
-                <a href="{{ url('/accountinfo') }}" style="text-decoration: none;">
-                    <span class="hidden-on-big">{{ $data->full_name }}</span>
-                    <!-- <div class="toggle" id="toggle2">
-                        <ion-icon name="menu-outline"></ion-icon>
-                    </div> -->
-                </a>
-
-
-
-                <li class="active">
+                <li>
                     <a href="{{ url('/dashboard') }}">
                         <span class="icon">
                             <ion-icon name="home-outline"></ion-icon>
@@ -55,7 +39,6 @@
                         <span class="title">Dashboard</span>
                     </a>
                 </li>
-
 
                 <li>
                     <a href="{{ url('/studentLists') }}">
@@ -92,6 +75,7 @@
                         <span class="title">Maintenance</span>
                     </a>
                 </li>
+
                 <li>
                     <a href="{{ url('/MOA') }}">
                         <span class="icon">
@@ -100,6 +84,7 @@
                         <span class="title">MOA</span>
                     </a>
                 </li>
+
                 <li>
                     <a href="{{ url('/reports') }}">
                         <span class="icon">
@@ -111,8 +96,8 @@
                         </span>
                     </a>
                 </li>
-                
-                <li>
+
+                <li class="active">
                     <a href="{{ url('/auditlog') }}">
                         <span class="icon">
                             <ion-icon name="clipboard-outline"></ion-icon>
@@ -134,105 +119,56 @@
 
         <!-- ========================= Main ==================== -->
         <div class="main">
-
             <div class="topbar">
-
                 <div class="toggle">
                     <ion-icon name="menu-outline"></ion-icon>
                 </div>
-
-                <span class="subtitle">On-the-Job Training Information Management System </span>
-
+                <span class="subtitle">On-the-Job Training Information Management System</span>
             </div>
 
             <div class="dash">
-                <h1>Dashboard</h1>
+                <h1>Audit Log</h1>
             </div>
 
-            <!-- ======================= Cards ================== -->
-            <div class="cardBox">
-                <div class="card">
-                    <div>
-                        <a href="{{ url('/studentLists') }}" style="color:maroon;text-decoration:none;">
-                            <div class="numbers">{{ $roleCount }}</div>
-                            <div class="cardName">Students</div>
-                    </div>
-
-                    <div class="iconBx">
-                        <ion-icon name="people-outline"></ion-icon>
-                    </div>
-                    </a>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <a href="{{ url('/professorTab') }}" style="color:maroon;text-decoration:none;">
-                            <div class="numbers">{{ $roleCountP }}</div>
-                            <div class="cardName">Professors</div>
-                    </div>
-
-                    <div class="iconBx">
-                        <ion-icon name="person-circle-outline"></ion-icon>
-                    </div>
-                    </a>
-                </div>
-
-
-                <div class="card">
-                    <div>
-                        <a href="{{ url('/uploadpage') }}" style="color:maroon;text-decoration:none;">
-                            <div class="numbers">{{ $fileCount }}</div>
-                            <div class="cardName">Uploaded Templates</div>
-                    </div>
-
-                    <div class="iconBx">
-                        <ion-icon name="cloud-upload-outline"></ion-icon>
-                    </div>
-                    </a>
+            <!-- Audit Log Table -->
+            <div class="details" style="margin-left: 2%; width: 95%; overflow-x: auto;">
+                <div class="recentOrders" style="width: 100%;">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Action</th>
+                                <th>Name</th>
+                                <th>Module</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($logs as $log)
+                                <tr>
+                                    <td>{{ $log->created_at }}</td>
+                                    <td>{{ $log->action }}</td>
+                                    <td>{{ $log->affected_name ?? 'N/A' }}</td>
+                                    <td>{{ $log->module }}</td>
+                                    <td>{{ $log->description }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" style="text-align:center; color: gray; font-style: italic;">
+                                        No audit logs yet.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-
-
-            <!-- ================ Order Details List =================-->
-            <div class="details">
-                <div class="recentOrders">
-                    <div class="cardHeader">
-                        <h2>Create Announcement</h2>
-                    </div>
-
-                    <div class="container">
-                        <form method="POST" action="{{url('/announcements')}}">
-                            @csrf
-
-                            <div class="form-group">
-                                <label class="form-label" for="title">Title:</label>
-                                <input class="form-input" type="text" id="title" name="title" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="content">Content:</label>
-                                <textarea class="form-input" id="content" name="content" rows="4" required></textarea>
-                            </div>
-
-                            <button class="btn btn-primary" type="submit">Create Announcement</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
         </div>
-
-
-
     </div>
 
-
-
-
     <!-- =========== Scripts =========  -->
-    <script src="assets/js/main.js"></script>
-
-    <!-- ====== ionicons ======= -->
+    <script src="{{ asset('assets/js/main.js') }}"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </body>

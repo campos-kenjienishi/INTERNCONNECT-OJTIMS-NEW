@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Professor;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use App\Helpers\AuditLogger;
 
 
 
@@ -58,7 +59,27 @@ class AccountInfo extends Controller
     
         $professor->save();
         $user->save();
-    
+        AuditLogger::log(
+            'AccountInfo',
+            'Update',
+            'Updated account info for: ' . $user->full_name,
+            Session::get('loginId') ?? null,
+            null,
+            [
+                'first_name' => $user->first_name,
+                'middle_name' => $user->middle_name,
+                'last_name' => $user->last_name,
+                'full_name' => $user->full_name,
+                'suffix' => $user->suffix,
+                'address' => $user->address,
+                'contact_number' => $user->contact_number,
+                'date_of_birth' => $user->date_of_birth,
+                'course' => $user->course,
+                'year_and_section' => $user->year_and_section,
+                'studentNum' => $user->studentNum,
+                'email' => $user->email
+            ]
+        );
         return back()->with('success', 'You have updated the information successfully!');
 
     }
@@ -78,6 +99,12 @@ class AccountInfo extends Controller
         // Passwords match, proceed with updating the password
         $user->password = Hash::make($request->new_password);
         $user->save();
+        AuditLogger::log(
+            'AccountInfo',
+            'Update',
+            'Changed password for: ' . $user->full_name,
+            Session::get('loginId') ?? null
+        );
 
         // Redirect with a success message
         return back()->with('success', 'You have updated the password successfully!');
@@ -126,7 +153,27 @@ class AccountInfo extends Controller
     
         
         $user->save();
-    
+        AuditLogger::log(
+            'AccountInfo',
+            'Update',
+            'Updated OJT student info for: ' . $user->full_name,
+            Session::get('loginId') ?? null,
+            null,
+            [
+                'first_name' => $user->first_name,
+                'middle_name' => $user->middle_name,
+                'last_name' => $user->last_name,
+                'full_name' => $user->full_name,
+                'suffix' => $user->suffix,
+                'address' => $user->address,
+                'contact_number' => $user->contact_number,
+                'date_of_birth' => $user->date_of_birth,
+                'course' => $user->course,
+                'year_and_section' => $user->year_and_section,
+                'studentNum' => $user->studentNum,
+                'email' => $user->email
+            ]
+        );    
         return back()->with('success', 'You have updated the information successfully!');
 
     }

@@ -123,6 +123,14 @@
                     </a>
                 </li>
 
+                <li>
+                    <a href="{{ url('/auditlog') }}">
+                        <span class="icon">
+                            <ion-icon name="clipboard-outline"></ion-icon>
+                        </span>
+                        <span class="title">Audit Log</span>
+                    </a>
+                </li>
 
                 <li>
                     <a href="{{ url('/login') }}">
