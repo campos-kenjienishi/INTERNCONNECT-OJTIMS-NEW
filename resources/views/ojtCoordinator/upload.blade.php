@@ -548,11 +548,108 @@
 <!-- =============== SIDEBAR =============== -->
 <div class="sidebar" id="sidebar">
 
+<<<<<<< HEAD
     <a href="#" class="sidebar-brand">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
             <span class="sidebar-brand-sub">OJTIMS</span>
+=======
+                <a href="{{ url('/accountinfo') }}" style="text-decoration: none;">
+                    <span class="hidden-on-big">{{ $user->full_name }}</span>
+                    <!-- <div class="toggle" id="toggle2">
+                        <ion-icon name="menu-outline"></ion-icon>
+                    </div> -->
+                </a>
+
+                <li>
+                    <a href="{{ url('/dashboard') }}">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="{{ url('/studentLists') }}">
+                        <span class="icon">
+                            <ion-icon name="people-outline"></ion-icon>
+                        </span>
+                        <span class="title">Students</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/professorTab') }}">
+                        <span class="icon">
+                            <ion-icon name="people-circle-outline"></ion-icon>
+                        </span>
+                        <span class="title">Professors</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="{{ url('/uploadpage') }}">
+                        <span class="icon">
+                            <ion-icon name="document-outline"></ion-icon>
+                        </span>
+                        <span class="title">Upload Templates</span>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="{{ url('/maintenance') }}">
+                        <span class="icon">
+                            <ion-icon name="code-working-outline"></ion-icon>
+                        </span>
+                        <span class="title">Maintenance</span>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="{{ url('/MOA') }}">
+                        <span class="icon">
+                            <ion-icon name="folder-outline"></ion-icon>
+                        </span>
+                        <span class="title">MOA</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/reports') }}">
+                        <span class="icon">
+                            <ion-icon name="cellular-outline"></ion-icon>
+                        </span>
+                        <span class="title">Reports</span>
+                        <span class="icon" style="margin-left: 30%; font-size: 22px;">
+                            <ion-icon name="chevron-down-outline"></ion-icon>
+                        </span>
+                    </a>
+                </li> 
+                
+                <li>
+                    <a href="{{ url('/auditlog') }}">
+                        <span class="icon">
+                            <ion-icon name="clipboard-outline"></ion-icon>
+                        </span>
+                        <span class="title">Audit Log</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/login') }}">
+                        <span class="icon">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </span>
+                        <span class="title">Log Out</span>
+                    </a>
+                </li>
+            </ul>
+>>>>>>> aa6a5d91508198ff4cee6146a9d2421213520478
         </div>
     </a>
 

@@ -558,6 +558,7 @@
 
     <div class="page-content">
 
+<<<<<<< HEAD
         <!-- Page Header -->
         <div class="page-header">
             <div>
@@ -568,6 +569,66 @@
                     <span>Account Info</span>
                 </div>
             </div>
+=======
+                <li>
+                    <a href="{{ url('/uploadpage') }}">
+                        <span class="icon">
+                            <ion-icon name="document-outline"></ion-icon>
+                        </span>
+                        <span class="title">Upload Templates</span>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="{{ url('/maintenance') }}">
+                        <span class="icon">
+                            <ion-icon name="code-working-outline"></ion-icon>
+                        </span>
+                        <span class="title">Maintenance</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/MOA') }}">
+                        <span class="icon">
+                            <ion-icon name="folder-outline"></ion-icon>
+                        </span>
+                        <span class="title">MOA</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/reports') }}">
+                        <span class="icon">
+                            <ion-icon name="cellular-outline"></ion-icon>
+                        </span>
+                        <span class="title">Reports</span>
+                        <span class="icon" style="margin-left: 30%; font-size: 22px;">
+                            <ion-icon name="chevron-down-outline"></ion-icon>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{{ url('/auditlog') }}">
+                        <span class="icon">
+                            <ion-icon name="clipboard-outline"></ion-icon>
+                        </span>
+                        <span class="title">Audit Log</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href=" {{url('/login') }}">
+                        <span class="icon">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </span>
+                        <span class="title">Log Out</span>
+                    </a>
+                </li>
+            </ul>
+>>>>>>> aa6a5d91508198ff4cee6146a9d2421213520478
         </div>
 
         <!-- Account Grid -->

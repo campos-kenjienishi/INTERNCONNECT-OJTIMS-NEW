@@ -669,12 +669,99 @@
 <!-- =============== SIDEBAR =============== -->
 <div class="sidebar" id="sidebar">
 
+<<<<<<< HEAD
     <!-- Brand -->
     <a href="#" class="sidebar-brand">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
             <span class="sidebar-brand-sub">OJT IMS</span>
+=======
+
+                <a href="{{ url('/student/accountinfo') }}" style="text-decoration: none;">
+                    <span class="iconname">
+                        <ion-icon name="person-circle-outline"></ion-icon>
+                    </span>
+                    <span class="name"> {{ $user->first_name }} {{ $user->last_name }} </span>
+                    {{-- <span class="name"> {{ $user->full_name }} </span> --}}
+                    <span class="name2">STUDENT </span>
+                </a>
+
+                <a href="{{ url('/student/accountinfo') }}" style="text-decoration: none;">
+                    <span class="hidden-on-big">{{ $user->first_name }} {{ $user->last_name }}</span>
+                    <!-- <div class="toggle" id="toggle2">
+                        <ion-icon name="menu-outline"></ion-icon>
+                    </div> -->
+                </a>
+
+                <li class="active">
+                    <a href="{{ url('/student/home') }}">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title" >Home</span>
+                    </a>
+                </li>
+
+
+
+                <li>
+                    <a href="{{ url('/student/ojtinfo') }}">
+                        <span class="icon">
+                            <ion-icon name="albums-outline"></ion-icon>
+                        </span>
+                        <span class="title">OJT Information</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/student/class') }}">
+                        <span class="icon">
+                            <ion-icon name="clipboard-outline"></ion-icon>
+                        </span>
+                        <span class="title">Class</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/student/files') }}">
+                        <span class="icon">
+                            <ion-icon name="download-outline"></ion-icon>
+                        </span>
+                        <span class="title">Downloadable Files</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url('/student/MOA') }}">
+                        <span class="icon">
+                            <ion-icon name="document-outline"></ion-icon>
+                        </span>
+                        <span class="title">MOA</span>
+                        <span class="icon" style="margin-left: 30%; font-size: 22px;">
+                                <ion-icon name="chevron-down-outline"></ion-icon>
+                            </span>
+                    </a>
+                </li>
+
+                <li >
+                    <a href="{{ url('/student/requirements') }}">
+                        <span class="icon">
+                            <ion-icon name="cloud-upload-outline"></ion-icon>
+                        </span>
+                        <span class="title">Requirements</span>
+                    </a>
+                </li>
+                 
+                <li>
+                    <a href="{{ url('/login') }}">
+                        <span class="icon">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </span>
+                        <span class="title">Log Out</span>
+                    </a>
+                </li>
+            </ul>
+>>>>>>> aa6a5d91508198ff4cee6146a9d2421213520478
         </div>
     </a>
 

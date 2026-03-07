@@ -14,6 +14,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+<<<<<<< HEAD
         :root {
             --red:        #dc2626;
             --red-dark:   #991b1b;
@@ -22,6 +23,189 @@
             --sidebar-w-collapsed: 70px;
             --topbar-h:   64px;
         }
+=======
+            <script src="js/jquery.printPage.js"></script>
+            <style>
+                /* Style the content container */
+                .content-container {
+                    display: flex; /* Use flexbox layout */
+                    flex-wrap: wrap; /* Allow columns to wrap to the next row on smaller screens */
+                    gap: 20px; /* Spacing between columns */
+                    justify-content: space-between; /* Distribute columns evenly horizontally */
+                }
+            
+                /* Style each column */
+                .column {
+                    flex-basis: calc(50% - 10px); /* Set column width to 50% minus spacing */
+                    box-sizing: border-box; /* Include padding and border in column width */
+                    padding: 10px; /* Add padding to the columns */
+                    background-color: #f0f0f0; /* Background color for columns (adjust as needed) */
+                   
+                }
+            
+                /* Center the iframe within the second column */
+                .column iframe {
+                    display: block; /* Make the iframe a block-level element */
+                    margin: 0 auto; /* Center horizontally within the column */
+                }
+            
+                /* Add additional styling for the content within columns */
+                .student-info {
+                    margin-bottom: 10px; /* Add spacing between student info items */
+                }
+    
+    
+                /* Add this CSS to your stylesheet */
+                .scrollable-container {
+                    max-height: 80vh; /* Adjust the maximum height as needed */
+                    overflow-y: auto;
+                    padding: 20px; /* Optional: Add padding for spacing */
+                    /* Add any other styles you need for the container */
+                }
+                 /* Add this CSS to your stylesheet */
+                .scrollable-container {
+             
+                    max-height: 600px;
+                    overflow-y: auto;
+                    padding: 20px; /* Optional: Add padding for spacing */
+                    /* Add any other styles you need for the container */
+                }
+    
+    
+            </style>
+        
+            
+        </head>
+        
+        <body>
+            <!-- =============== Navigation ================ -->
+            <div class="container">
+                <div class="navigation">
+                    <ul>
+                        <li>
+                            <a href="#">
+                                <img src="/images/final-puptg_logo-ojtims_nbg.png">
+                                <span class="toptitle">InternConnect</span>
+                            </a>
+        
+        
+                        </li>
+        
+                        <a href="{{ url('/accountinfo') }}" style="text-decoration: none;">
+                            <span class="iconname">
+                                <ion-icon name="person-circle-outline"></ion-icon>
+                            </span>
+                            <span class="name"> {{ $user->full_name }} </span>
+                            <span class="name2">OJT COORDINATOR </span>
+        
+                        </a>
+        
+                        <a href="{{ url('/accountinfo') }}" style="text-decoration: none;">
+                            <span class="hidden-on-big">{{ $user->full_name }}</span>
+                            <!-- <div class="toggle" id="toggle2">
+                                <ion-icon name="menu-outline"></ion-icon>
+                            </div> -->
+                        </a>
+        
+        
+                        <li>
+                            <a href="{{ url('/dashboard') }}">
+                                <span class="icon">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </span>
+                                <span class="title" >Dashboard</span>
+                            </a>
+                        </li>
+        
+                        <li>
+                            <a href="{{ url('/studentLists') }}">
+                                <span class="icon">
+                                    <ion-icon name="people-outline"></ion-icon>
+                                </span>
+                                <span class="title">Students</span>
+                            </a>
+                        </li>
+        
+                        <li>
+                            <a href="{{ url('/professorTab') }}">
+                                <span class="icon">
+                                    <ion-icon name="people-circle-outline"></ion-icon>
+                                </span>
+                                <span class="title">Professors</span>
+                            </a>
+                        </li>
+        
+                        <li>
+                            <a href="{{ url('/uploadpage') }}">
+                                <span class="icon">
+                                    <ion-icon name="document-outline"></ion-icon>
+                                </span>
+                                <span class="title">Upload Templates</span>
+                            </a>
+                        </li>
+        
+                        <li>
+                            <a href="{{ url('/maintenance') }}">
+                                <span class="icon">
+                                    <ion-icon name="code-working-outline"></ion-icon>
+                                </span>
+                                <span class="title">Maintenance</span>
+                            </a>
+                        </li>
+        
+                        <li class="active">
+                            <a href="{{ url('/MOA') }}">
+                                <span class="icon">
+                                    <ion-icon name="folder-outline"></ion-icon>
+                                </span>
+                                <span class="title">MOA</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/reports') }}">
+                                <span class="icon">
+                                    <ion-icon name="cellular-outline"></ion-icon>
+                                </span>
+                                <span class="title">Reports</span>
+                                <span class="icon" style="margin-left: 30%; font-size: 22px;">
+                                    <ion-icon name="chevron-down-outline"></ion-icon>
+                                </span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url('/auditlog') }}">
+                                <span class="icon">
+                                    <ion-icon name="clipboard-outline"></ion-icon>
+                                </span>
+                                <span class="title">Audit Log</span>
+                            </a>
+                        </li> 
+                               
+                        <li>
+                            <a href="{{ url('/login') }}">
+                                <span class="icon">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </span>
+                                <span class="title">Log Out</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+        
+                <!-- ========================= Main ==================== -->
+                <div class="main">
+        
+                    <div class="topbar">
+        
+                        <div class="toggle">
+                            <ion-icon name="menu-outline"></ion-icon>
+                        </div>
+        
+                        <span class="subtitle">On-the-Job Training Information Management System </span>
+        
+                    </div>
+>>>>>>> aa6a5d91508198ff4cee6146a9d2421213520478
 
         body {
             font-family: 'Poppins', sans-serif;
