@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\AuditLogger;
 
 class FileController extends Controller
 {
@@ -73,6 +74,15 @@ class FileController extends Controller
         $data->uploader_name = $user->full_name;
         $data->save();
 
+        AuditLogger::log(
+            'upload',
+            'File Upload',
+            'Uploaded a new file: ' . $data->name,
+            $user->id ?? null,
+            null,
+            ['file' => $data->file, 'name' => $data->name]
+        );
+
         return redirect()->back()->with('success', 'File uploaded successfully!');
     }
 
@@ -109,6 +119,14 @@ class FileController extends Controller
         }
     
         $data->delete();
+        AuditLogger::log(
+            'upload',
+            'File Delete',
+            'Deleted file: ' . $data->name,
+            $user->id ?? null,
+            ['file' => $data->file, 'name' => $data->name], // old values
+            null // new values
+        );
     
         return redirect()->back();
     }

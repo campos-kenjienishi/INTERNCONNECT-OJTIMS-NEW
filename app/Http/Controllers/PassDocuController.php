@@ -24,7 +24,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
+use App\Helpers\AuditLogger; 
 
 class PassDocuController extends Controller
 {
@@ -54,6 +55,14 @@ class PassDocuController extends Controller
         $res = $files->save();
         
         if($res){
+            AuditLogger::log(
+                'FileCategory',
+                'Create',
+                'Added new file category: ' . $files->fileName,
+                Session::get('loginId') ?? null,
+                null,
+                ['fileName' => $files->fileName, 'uploadedBy' => $files->uploadedBy]
+            );
             return back()->with('success','You have added the course successfully!');
         }
         else{
@@ -71,7 +80,14 @@ class PassDocuController extends Controller
         }
     
         $data->delete();
-    
+        AuditLogger::log(
+            'FileCategory',
+            'Delete',
+            'Deleted file category: ' . $data->fileName,
+            Session::get('loginId') ?? null,
+            ['id' => $data->id, 'fileName' => $data->fileName, 'uploadedBy' => $data->uploadedBy],
+            null
+        );
         return redirect()->back();
     }
 
@@ -112,6 +128,14 @@ public function fileReqCreate(Request $request){
     $res = $fileup->save();
 
     if($res){
+        AuditLogger::log(
+            'PassDocu',
+            'Upload',
+            'Uploaded file: ' . $fileup->fileName,
+            Session::get('loginId') ?? null,
+            null,
+            ['fileName' => $fileup->fileName, 'file' => $fileup->file, 'uploadedBy' => $fileup->uploadedBy]
+        );
         return back()->with('success', 'File uploaded successfully!');
     } else {
         // If saving fails, delete the uploaded file
@@ -130,7 +154,14 @@ public function removeFile($id)
         }
     
         $data->delete();
-    
+        AuditLogger::log(
+            'PassDocu',
+            'Delete',
+            'Deleted file: ' . $data->fileName,
+            Session::get('loginId') ?? null,
+            ['id' => $data->id, 'fileName' => $data->fileName, 'file' => $data->file],
+            null
+        );
         return redirect()->back();
     }
 
@@ -171,7 +202,14 @@ public function removeFile($id)
                 // Update the status based on the request data
                 $fileRequirement->status = 1;
                 $fileRequirement->save();
-        
+                AuditLogger::log(
+                    'PassDocu',
+                    'Update',
+                    'Approved file: ' . $fileRequirement->fileName,
+                    Session::get('loginId') ?? null,
+                    ['status' => 0],
+                    ['status' => 1]
+                );
                 return back()->with('success', 'You have updated the information successfully!');
             }
 
@@ -186,7 +224,14 @@ public function removeFile($id)
                 // Update the status based on the request data
                 $fileRequirement->status = 2;
                 $fileRequirement->save();
-        
+                AuditLogger::log(
+                    'PassDocu',
+                    'Update',
+                    'Denied file: ' . $fileRequirement->fileName,
+                    Session::get('loginId') ?? null,
+                    ['status' => 0],
+                    ['status' => 2]
+                );
                 return back()->with('success', 'You have updated the information successfully!');
             }
 

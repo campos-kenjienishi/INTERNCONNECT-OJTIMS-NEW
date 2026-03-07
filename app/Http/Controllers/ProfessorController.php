@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditLogger;
 
 
 class ProfessorController extends Controller
@@ -105,7 +106,13 @@ $room->adviser_name = $data->full_name;
 
 $res = $room->save();
 
-if($res){
+if ($res) {
+    AuditLogger::log(
+        'Class Room',           // module
+        'create',               // action
+        'Created room: ' . $room->room . ' for course: ' . $room->course, // description
+        $data->id ?? null       // affected user ID (the acting professor)
+    );
     return back()->with('success','You have registered successfully!');
 }
 else{
@@ -120,10 +127,17 @@ public function roomDelete($id)
     if (!$room) {
         return response()->json(['error' => 'Room not found'], 404);
     }
-
-    // Delete the room immediately
-    $room->delete();
-
+    if ($room) {
+        $roomName = $room->room;
+        $courseName = $room->course;
+        $room->delete();
+        AuditLogger::log(
+            'Class Room',
+            'delete',
+            'Deleted room: ' . $roomName . ' from course: ' . $courseName,
+            $data->id ?? null
+        );
+    }
     return response()->json(['success' => true]);
 }
 
@@ -186,7 +200,12 @@ public function approve(Request $request, $email)
     // Update user data
     $user->status = 1;
     $user->save();
-
+    AuditLogger::log(
+        'Student Account',
+        'approve',
+        'Approved student: ' . $user->full_name,
+        $user->id
+    );
     // Send approval email
     Mail::to($user->email)->send(new UserApproved($user));
 
@@ -209,6 +228,12 @@ public function approve(Request $request, $email)
 
     // Get the reason for denial from the form
     $reason = $request->input('reason');
+    AuditLogger::log(
+        'Student Account',
+        'deny',
+        'Denied student: ' . $user->full_name . '. Reason: ' . $request->input('reason'),
+        $user->id
+    );
 
     // Send denial email with reason
     Mail::to($user->email)->send(new DenialReason($reason));
@@ -260,6 +285,13 @@ $professor->email = $validatedData['email'];
 Student::where('adviser_name', $professor->full_name)->update(['adviser_name' => $professor->full_name]);
 // Save the updated professor
 $professor->save();
+AuditLogger::log(
+    'Professor',
+    'update',
+    'Updated professor: ' . $professor->full_name . '. Email changed: ' . $initialProfessorEmail . ' → ' . $professor->email,
+    $user->id ?? null
+);
+
 
 // Retrieve the associated subjects and update them
 $professor->subjects()->update([
@@ -373,8 +405,28 @@ public function removeProfessor($id)
         Student::where('adviser_name', $professor->full_name)
             ->update(['adviser_name' => null]);
 
+        // Remove classes/rooms created by this professor
+        $rooms = Classes::where('adviser_name', $professor->full_name)->get();
+        foreach ($rooms as $room) {
+            $roomName = $room->room;
+            $courseName = $room->course;
+            $room->delete();
+            AuditLogger::log(
+                'Class Room',
+                'delete',
+                'Deleted room: ' . $roomName . ' from course: ' . $courseName,
+                $user ? $user->id : null
+            );
+        }
+
         // Delete the professor
         $professor->delete();
+        AuditLogger::log(
+            'Professor',
+            'delete',
+            'Deleted professor: ' . $professor->full_name . ' and all associated data (students, subjects, schedules, rooms)',
+            $user ? $user->id : null
+        );
 
         // Delete the user account if exists
         if ($user) {

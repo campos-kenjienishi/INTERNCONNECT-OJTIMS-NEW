@@ -32,7 +32,7 @@ Route::get('/', function () {
 });
 
 
-Route::get('/login', [AuthController::class,'login']);
+Route::get('/login', [AuthController::class,'login'])->name('login');
 Route::get('/registration', [AuthController::class,'registration']);
 
 Route::post('/register-user', [AuthController::class,'registerUser'])->name('register-user');
@@ -56,6 +56,7 @@ Route::put('/updateProfessor', [ProfessorController::class, 'update'])->name('up
 Route::get('/maintenance',[MaintenanceController::class,'maintenance']);
 Route::post('/remove/course/{id}', [MaintenanceController::class,'remove']);
 Route::post('/courses', [MaintenanceController::class,'courses'])->name('courses');
+Route::get('/auditlog', [MaintenanceController::class, 'auditTrail'])->name('auditlog');
 
 Route::get('/uploadpage', [FileController::class, 'show'])->name('uploadpage');
 Route::get('/reports', [ReportsController::class, 'reports'])->name('reports');
@@ -156,3 +157,11 @@ Route::get('/terms', function () {
 Route::get('/privacy', function () {
     return view('legal.privacy'); 
 });
+Route::get('/terms', function () {
+    return view('students.terms');
+});
+
+Route::get('/privacy', function () {
+    return view('students.privacy');
+});
+Route::put('/student/uploadPhoto/{email}', [StudentController::class, 'uploadPhoto'])->name('student.uploadPhoto');
