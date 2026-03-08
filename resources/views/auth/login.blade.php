@@ -44,7 +44,7 @@
                 </h1>
 
                 <p class="hero-desc">
-                    InternConnect brings the On-The-Job training process into one centralized platform, helping students, coordinators, and supervisors manage information more efficiently.
+                    InternConnect brings the On-The-Job training process into one centralized platform, helping students, coordinators, and professors manage information more efficiently.
                 </p>
 
                 <div class="stats-row">
