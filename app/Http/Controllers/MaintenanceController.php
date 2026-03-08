@@ -12,6 +12,7 @@ Use App\Mail\TemporaryPasswordNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Mail;
+use App\Helpers\AuditLogger;
 
 class MaintenanceController extends Controller
 {
@@ -38,6 +39,14 @@ class MaintenanceController extends Controller
         $res = $courses->save();
         
         if($res){
+            AuditLogger::log(
+                'Maintenance',
+                'Create',
+                'Added course: ' . $courses->course . ' (' . $courses->acronym . ')',
+                Session::get('loginId') ?? null,
+                null,
+                ['course' => $courses->course, 'acronym' => $courses->acronym]
+            );
             return back()->with('success','You have added the course successfully!');
         }
         else{
@@ -58,10 +67,32 @@ class MaintenanceController extends Controller
         }
     
         $data->delete();
-    
+        if($data){
+            AuditLogger::log(
+                'Maintenance',
+                'Delete',
+                'Deleted course: ' . $data->course . ' (' . $data->acronym . ')',
+                Session::get('loginId') ?? null,
+                ['course_id' => $data->id, 'course' => $data->course, 'acronym' => $data->acronym],
+                null
+            );
+        }
         return redirect()->back();
     }
     
+    public function auditTrail()
+    {
+        // Get the logged-in coordinator info
+        $data = [];
+        if (Session::has('loginId')) {
+            $data = User::where('id', Session::get('loginId'))->first();
+        }
 
+        // Fetch all audit logs for display in coordinator tab, latest first
+        $logs = \App\Models\AuditLog::orderBy('created_at', 'desc')->get();
+
+        // Return the coordinator audit log view
+        return view('ojtCoordinator.audit', compact('logs', 'data'));
+    }
     
 }

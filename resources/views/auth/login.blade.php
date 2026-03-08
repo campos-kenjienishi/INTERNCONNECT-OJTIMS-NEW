@@ -1,117 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background: #3b0000;">
 <head>
-    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
-    <link rel="stylesheet" href="/frontend/css/custom.css">
+    <!-- CRITICAL: Prevents white flash -->
+    <style>
+        html, body { background: #3b0000 !important; }
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InternConnect</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png"> 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <title>InternConnect - Login</title>
+    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
 
-    <!-- Font-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="card">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png">
-        <br>
+<div class="main-wrapper">
+    <div class="login-container">
 
-        <div class="container">
-            {{-- <div class="row justify-content-center align-items-center vh-100">
-                <div class="col-md-6"> --}}
-                    <div class="row">
-                        {{-- <div > --}}
-                            <!-- <h2>On-<span>t</span>he-<span>j</span>ob<span> T</span>raining<span> I</span>nformation<span> M</span>anagement<span> S</span>ystem</h2> -->
-                            <h2>InternConnect<br>OJT INFORMATION MANAGEMENT SYSTEM</h2>
-                            <h4>Login</h4>
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+            <div class="orb orb-4"></div>
 
-                            <div class="card2">
-
-                                <form action="{{route('login-user')}}" method="post" class="mt-4">
-
-                                    @if(Session::has('success'))
-                                    <div class="alert alert-success">{{Session::get('success')}}</div>
-                                    @endif
-                                    @if(Session::has('fail'))
-                                    <div class="alert alert-danger">{{Session::get('fail')}}</div>
-                                    @endif
-
-                                    @csrf
-
-                                    <!-- <div class="form-group">
-                                        <label for="email">E-mail</label>
-                                        <input type="text" class="form-control" placeholder="Enter Email"
-                                        name="email" value = "{{old('email')}}">
-                                        <span class="text-danger">@error('email') {{$message}} @enderror</span>
-                                    </div> -->
-
-                                    <label for="email">E-mail</label>
-                                    <div class="input-field">
-                                        <i class="fa fa-user" ></i>
-                                        <input type="text" class="form-control" placeholder="Enter Email"
-                                        name="email" value = "{{old('email')}}">
-                                        <span class="text-danger">@error('email') {{$message}} @enderror</span>
-                                    </div>
-
-                                    <br>
-
-                                    <!--<div class="password-container">
-                                        <label for="password">Password</label>
-                                        <input type="password" class="form-control" placeholder="Enter Password"
-                                        name="password" autocomplete="current-password" required="" id="id_password">
-                                        <i class="far fa-eye" id="togglePassword"></i>
-                                        <span class="text-danger">@error('password') {{$message}} @enderror</span>
-                                    </div>-->
-
-                                    <label for="password">Password</label>
-                                    <div class="input-field">
-                                        <i class="far fa-eye" id="togglePassword"></i>
-                                        <input type="password" class="form-control" placeholder="Enter Password"
-                                        name="password" autocomplete="current-password" required="" id="id_password">
-                                        <span class="text-danger">@error('password') {{$message}} @enderror</span>
-                                    </div>
-                                    <br>
-                                    <!-- Terms Notice -->
-                                    <div class="text-center mt-2 mb-3" style="font-size: 13px; color: #555;">
-                                        By using this service, you understand and agree to the 
-                                        <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> and 
-                                        <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
-                                    </div>
-                                    <br>
-
-                                    <div class="form-group">
-                                        <button class="btn btn-block btn-primary" type="submit">Login</button>
-                                    </div>
-                                    <br>
-                                    <!-- Terms Notice -->
-                                    <div class="text-center mt-2 mb-3" style="font-size: 13px; color: #555;">
-                                        By using this service, you understand and agree to the 
-                                        <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> and 
-                                        <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
-                                    </div>
-
-                                    <br>
-
-                                    <a href="forgot">Forgot Password?</a>
-                                    <br>
-                                    <a href="registration">Student? Don't have an account?</a>
-                                </form>
-                            </div>
-                        {{-- </div> --}}
+            <div class="brand-area">
+                <div class="logo-wrapper">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
+                    <div>
+                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="system-title">OJT Information Management System</div>
                     </div>
-                {{-- </div>
-            </div> --}}
-        
+                </div>
+
+                <h1 class="hero-heading">
+                    Manage your<br>
+                    <span>OJT journey</span><br>
+                    seamlessly.
+                </h1>
+
+                <p class="hero-desc">
+                    InternConnect streamlines every step of your on-the-job training — from document submissions and DTR tracking to supervisor evaluations and clearance processing, all in one secure platform.
+                </p>
+
+                <div class="stats-row">
+                    <div>
+                        <div class="stat-num">100%</div>
+                        <div class="stat-label">Digital Process</div>
+                    </div>
+                    <div>
+                        <div class="stat-num">Real-time</div>
+                        <div class="stat-label">DTR Tracking</div>
+                    </div>
+                    <div>
+                        <div class="stat-num">Secure</div>
+                        <div class="stat-label">Data Platform</div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <div class="login-header">
+                <h2>Welcome back 👋</h2>
+                <p>Sign in to your InternConnect account</p>
+            </div>
+
+            <form action="{{route('login-user')}}" method="post">
+                @csrf
+
+                @if(Session::has('success'))
+                    <div class="alert alert-success">{{ Session::get('success') }}</div>
+                @endif
+                @if(Session::has('fail'))
+                    <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                @endif
+
+                <div class="field-group">
+                    <label class="form-label">E-mail Address</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-envelope i-icon"></i>
+                        <input type="text" placeholder="Enter your email" name="email" value="{{ old('email') }}" autocomplete="email">
+                    </div>
+                    <span class="text-danger">@error('email') {{ $message }} @enderror</span>
+                </div>
+
+                <div class="field-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-lock i-icon"></i>
+                        <input type="password" placeholder="Enter your password" name="password" autocomplete="current-password" required id="id_password">
+                        <i class="far fa-eye toggle-pw" id="togglePassword"></i>
+                    </div>
+                    <span class="text-danger">@error('password') {{ $message }} @enderror</span>
+                </div>
+
+                <div class="terms-wrap">
+                    <div class="terms-text">
+                        By signing in, you agree to our
+                        <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> and
+                        <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
+                    </div>
+                </div>
+
+                <div class="btn-wrap">
+                    <button type="submit" class="btn-login">
+                        <i class="fa fa-sign-in-alt me-2"></i> Sign In
+                    </button>
+                </div>
+
+                <div class="footer-wrap">
+                    <div class="footer-links">
+                        <a href="forgot"><i class="fa fa-key"></i> Forgot Password?</a>
+                        <a href="registration"><i class="fa fa-user-plus"></i> Create Account</a>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
     </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url('/frontend/js/script.js') }}"></script>
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput  = document.getElementById('id_password');
+
+    togglePassword.addEventListener('click', function () {
+        const isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+        this.classList.remove('toggled');
+        void this.offsetWidth;
+        this.classList.add('toggled');
+    });
+</script>
 </body>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-
 </html>
-<script src="{{url('/frontend/js/script.js')}}"></script>

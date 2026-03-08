@@ -1,64 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background: #3b0000;">
 <head>
-    
-    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
+    <!-- CRITICAL: Prevents white flash -->
+    <style>
+        html, body { background: #3b0000 !important; }
+    </style>
 
-    <link rel="stylesheet" href="/frontend/css/custom.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InternConnect</title>
+    <title>InternConnect - Reset Password</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
 
-    <!-- Font-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="card">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png">
-        <br>
-        
-        <div class="container">
-            <div class="row">
-                <!-- <h2>On-<span>t</span>he-<span>j</span>ob<span> T</span>raining<span> I</span>nformation<span> M</span>anagement<span> S</span>ystem</h2> -->
-                <h2>InternConnect<br>OJT INFORMATION MANAGEMENT SYSTEM</h2>
-                <h4>Reset Password</h4>
+<div class="main-wrapper">
+    <div class="login-container">
 
-                <form action="{{url('/forgotPass')}}" method="post">
-                    @if(Session::has('success'))
-                    <div class="alert alert-success">{{Session::get('success')}}</div>
-                    @endif
-                    @if(Session::has('fail'))
-                    <div class="alert alert-danger">{{Session::get('fail')}}</div>
-                    @endif
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+            <div class="orb orb-4"></div>
 
-                    @csrf
-
-                    <br>
-
-                    <div class="form-group">
-                        <label for="email">E-mail</label>
-                        <input type="text" class="form-control" placeholder="Enter Email"
-                        name="email" >
+            <div class="brand-area">
+                <div class="logo-wrapper">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
+                    <div>
+                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="system-title">OJT Information Management System</div>
                     </div>
+                </div>
 
-                    <br>
+                <h1 class="hero-heading">
+                    Recover your<br>
+                    <span>account</span><br>
+                    securely.
+                </h1>
 
-                    <div class="form-group">
-                        <button class="btn btn-block btn-primary" type="submit">Send Reset Link</button>
+                <p class="hero-desc">
+                    No worries — it happens to everyone. Enter your registered email and we'll send you a secure link to reset your InternConnect password right away.
+                </p>
+
+                <div class="steps-list">
+                    <div class="step-item">
+                        <div class="step-icon"><i class="fa fa-envelope"></i></div>
+                        <div class="step-text">
+                            <strong>Enter your email</strong>
+                            Use the email linked to your account
+                        </div>
                     </div>
-
-                    <br>
-                    <a href="login" style="text-decoration: none; color:maroon;">Login Here...</a>
-                </form>
+                    <div class="step-item">
+                        <div class="step-icon"><i class="fa fa-paper-plane"></i></div>
+                        <div class="step-text">
+                            <strong>Check your inbox</strong>
+                            We'll send a secure reset link instantly
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-icon"><i class="fa fa-lock"></i></div>
+                        <div class="step-text">
+                            <strong>Set a new password</strong>
+                            Click the link and create a new password
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</body>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+
+            <!-- Floating lock icon -->
+            <div class="lock-icon-wrap">
+                <div class="lock-circle">
+                    <i class="fa fa-lock"></i>
+                </div>
+            </div>
+
+            <div class="forgot-header">
+                <h2>Forgot Password? 🔐</h2>
+                <p>Enter your registered email address and we'll send you a link to reset your password.</p>
+            </div>
+
+            <form action="{{url('/forgotPass')}}" method="post">
+                @csrf
+
+                @if(Session::has('success'))
+                    <div class="alert alert-success">{{ Session::get('success') }}</div>
+                @endif
+                @if(Session::has('fail'))
+                    <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                @endif
+
+                <div class="field-group">
+                    <label class="form-label">E-mail Address</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-envelope i-icon"></i>
+                        <input type="text" placeholder="Enter your registered email" name="email" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="info-note">
+                    <i class="fa fa-info-circle"></i>
+                    <p>Make sure to check your spam or junk folder if you don't see the email in your inbox within a few minutes.</p>
+                </div>
+
+                <div class="btn-wrap">
+                    <button type="submit" class="btn-reset">
+                        <i class="fa fa-paper-plane me-2"></i> Send Reset Link
+                    </button>
+                </div>
+
+                <div class="footer-wrap">
+                    <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url('/frontend/js/script.js') }}"></script>
+</body>
 </html>

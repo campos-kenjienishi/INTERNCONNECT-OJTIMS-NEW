@@ -15,6 +15,7 @@ use App\Models\OJTInformation;
 use App\Mail\PrintContentsEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use App\Helpers\AuditLogger;
 
 class ReportsController extends Controller
 {

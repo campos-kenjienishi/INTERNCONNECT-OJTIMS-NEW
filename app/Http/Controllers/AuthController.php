@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use App\Helpers\AuditLogger;
 
 
 class AuthController extends Controller
@@ -78,6 +79,12 @@ class AuthController extends Controller
         $studentE->save();
         
         if($res){
+            AuditLogger::log(
+                'Student Account',
+                'create',
+                'Registered new student: ' . $user->full_name,
+                $user->id
+            );
             return back()->with('success','You have registered successfully!');
         }
         else{
@@ -273,6 +280,12 @@ $sched->schedule_day = $scheduleJson;
 
     if($res){
         $subj->professors()->attach($professor->id);
+        AuditLogger::log(
+            'Professor',
+            'create',
+            'Created professor: ' . $professor->full_name . ' with subject: ' . $subj->subject_code,
+            $user->id
+        );
         return back()->with('success','You have registered successfully!');
     }
     else{
@@ -423,8 +436,6 @@ else{
     return back()->with('fail','Oh no! Something went wrong.');
 }
 }
-
-
 
 public function pending(){
 

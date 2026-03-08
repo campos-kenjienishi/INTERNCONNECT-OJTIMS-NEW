@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>InternConnect - Downloadable Files</title>
+    <title>InternConnect - Audit Log</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -247,7 +248,7 @@
         /* Stats row */
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -264,20 +265,21 @@
         }
 
         .stat-icon {
-            width: 46px; height: 46px;
+            width: 44px; height: 44px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             flex-shrink: 0;
         }
 
         .stat-icon.red   { background: #fee2e2; color: var(--red); }
-        .stat-icon.green { background: #dcfce7; color: #16a34a; }
         .stat-icon.blue  { background: #dbeafe; color: #2563eb; }
+        .stat-icon.green { background: #dcfce7; color: #16a34a; }
+        .stat-icon.amber { background: #fef9c3; color: #ca8a04; }
 
-        .stat-num { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
+        .stat-num  { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
         .stat-name { font-size: 12px; color: #888; margin-top: 3px; }
 
         /* Table card */
@@ -300,11 +302,7 @@
             flex-wrap: wrap;
         }
 
-        .table-card-header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .table-card-header-left { display: flex; align-items: center; gap: 12px; }
 
         .header-icon {
             width: 38px; height: 38px;
@@ -319,24 +317,11 @@
         }
 
         .table-card-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
-        .table-card-header p { font-size: 12.5px; color: #888; margin-top: 2px; }
+        .table-card-header p  { font-size: 12.5px; color: #888; margin-top: 2px; }
 
-        /* File count badge */
-        .file-count-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #fee2e2;
-            color: var(--red);
-            border-radius: 20px;
-            padding: 5px 14px;
-            font-size: 12.5px;
-            font-weight: 700;
-        }
-
-        /* DataTables overrides */
         .table-card-body { padding: 0; }
 
+        /* DataTables overrides */
         .table-card-body .dataTables_wrapper {
             padding: 16px 22px;
             font-family: 'Poppins', sans-serif;
@@ -361,7 +346,7 @@
         }
 
         .table-card-body table.dataTable tbody td {
-            padding: 14px 14px;
+            padding: 14px;
             color: #333;
             border-bottom: 1px solid #f9f9f9;
             font-size: 13.5px;
@@ -378,7 +363,6 @@
             font-family: 'Poppins', sans-serif !important;
             font-size: 13px !important;
             outline: none !important;
-            transition: border-color 0.2s !important;
         }
 
         .dataTables_filter input:focus {
@@ -413,95 +397,117 @@
             color: var(--red) !important;
         }
 
-        /* File name cell */
-        .file-name-cell {
-            display: flex;
+        /* Action badges */
+        .action-badge {
+            display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: capitalize;
         }
 
-        .file-icon-wrap {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: #fee2e2;
+        .action-create  { background: #dcfce7; color: #16a34a; }
+        .action-update  { background: #dbeafe; color: #2563eb; }
+        .action-delete  { background: #fee2e2; color: var(--red); }
+        .action-approve { background: #dcfce7; color: #16a34a; }
+        .action-deny    { background: #fee2e2; color: var(--red); }
+        .action-default { background: #f3f4f6; color: #6b7280; }
+
+        /* Module badge */
+        .module-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 600;
+            background: #fff5f5;
+            color: var(--red);
+            border: 1px solid #fecaca;
+        }
+
+        /* Name cell */
+        .name-cell {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .name-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--red);
-            font-size: 16px;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
             flex-shrink: 0;
         }
 
-        .file-name-text {
-            font-weight: 600;
-            color: #1a1a1a;
-            font-size: 13.5px;
+        .name-text { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+
+        /* Date cell */
+        .date-main { font-size: 13px; color: #444; font-weight: 500; }
+        .date-sub  { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+        /* Description cell */
+        .desc-text {
+            font-size: 13px;
+            color: #555;
+            max-width: 280px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .file-ext {
-            font-size: 11px;
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #e5e5e5;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
             color: #888;
-            margin-top: 1px;
-        }
-
-        /* Uploader cell */
-        .uploader-cell {
+            padding: 18px 28px;
+            font-size: 12.5px;
+            margin-top: auto;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
             gap: 8px;
         }
 
-        .uploader-avatar {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            background: #fee2e2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--red);
-            font-size: 11px;
-            flex-shrink: 0;
-        }
-
-        /* Download button */
-        .btn-download {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-family: 'Poppins', sans-serif;
-            font-size: 12.5px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.25s;
-            box-shadow: 0 3px 10px rgba(22,163,74,0.2);
-        }
-
-        .btn-download:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(22,163,74,0.3);
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .btn-download:active { transform: translateY(0); }
-
-        /* Date badge */
-        .date-cell {
-            font-size: 13px;
-            color: #555;
-        }
-
-        .date-cell .date-time {
-            font-size: 11.5px;
-            color: #aaa;
-            margin-top: 2px;
-        }
+        .dashboard-footer .footer-left { display: flex; align-items: center; gap: 8px; }
+        .dashboard-footer .footer-logo { width: 22px; height: 22px; object-fit: contain; opacity: 0.6; }
+        .dashboard-footer .footer-copy { font-size: 12.5px; color: #aaa; font-weight: 500; }
+        .dashboard-footer .footer-copy span { color: var(--red); font-weight: 600; }
+        .dashboard-footer .footer-links { display: flex; align-items: center; gap: 6px; }
+        .dashboard-footer a { color: #888; text-decoration: none; font-weight: 500; font-size: 12.5px; transition: color 0.2s; }
+        .dashboard-footer a:hover { color: var(--red); }
+        .dashboard-footer .divider { color: #e5e5e5; margin: 0 2px; }
 
         /* Mobile overlay */
         .sidebar-overlay {
@@ -524,70 +530,8 @@
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
             .stats-row { grid-template-columns: 1fr 1fr; }
+            .desc-text { max-width: 160px; }
         }
-        /* Dashboard Footer */
-.dashboard-footer {
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    color: #888;
-    text-align: center;
-    padding: 18px 28px;
-    font-size: 12.5px;
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-logo {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    opacity: 0.6;
-}
-
-.dashboard-footer .footer-copy {
-    font-size: 12.5px;
-    color: #aaa;
-    font-weight: 500;
-}
-
-.dashboard-footer .footer-copy span {
-    color: var(--red);
-    font-weight: 600;
-}
-
-.dashboard-footer .footer-links {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.dashboard-footer a {
-    color: #888;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 12.5px;
-    transition: color 0.2s;
-}
-
-.dashboard-footer a:hover {
-    color: var(--red);
-    text-decoration: none;
-}
-
-.dashboard-footer .divider {
-    color: #e5e5e5;
-    margin: 0 2px;
-}
     </style>
 </head>
 
@@ -602,48 +546,60 @@
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
-            <span class="sidebar-brand-sub">OJT IMS</span>
+            <span class="sidebar-brand-sub">OJTIMS</span>
         </div>
     </a>
 
-    <a href="{{ url('/student/accountinfo') }}" class="sidebar-user">
-        <div class="user-avatar"><i class="fa fa-user"></i></div>
+    <a href="{{ url('/accountinfo') }}" class="sidebar-user">
+        <div class="user-avatar">
+            <i class="fa fa-user-tie"></i>
+        </div>
         <div class="user-info">
-            <span class="user-name">{{ $user->full_name }}</span>
-            <span class="user-role">Student</span>
+            <span class="user-name">{{ $data->full_name }}</span>
+            <span class="user-role">OJT Coordinator</span>
         </div>
     </a>
 
     <nav class="sidebar-nav">
-        <a href="{{ url('/student/home') }}" class="nav-item">
+        <a href="{{ url('/dashboard') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-home"></i></span>
-            <span class="nav-label">Home</span>
-            <span class="tooltip-label">Home</span>
+            <span class="nav-label">Dashboard</span>
+            <span class="tooltip-label">Dashboard</span>
         </a>
-        <a href="{{ url('/student/ojtinfo') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-layer-group"></i></span>
-            <span class="nav-label">OJT Information</span>
-            <span class="tooltip-label">OJT Information</span>
+        <a href="{{ url('/studentLists') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-users"></i></span>
+            <span class="nav-label">Students</span>
+            <span class="tooltip-label">Students</span>
         </a>
-        <a href="{{ url('/student/class') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-clipboard"></i></span>
-            <span class="nav-label">Class</span>
-            <span class="tooltip-label">Class</span>
+        <a href="{{ url('/professorTab') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-chalkboard-teacher"></i></span>
+            <span class="nav-label">Professors</span>
+            <span class="tooltip-label">Professors</span>
         </a>
-        <a href="{{ url('/student/files') }}" class="nav-item active">
-            <span class="nav-icon"><i class="fa fa-download"></i></span>
-            <span class="nav-label">Downloadable Files</span>
-            <span class="tooltip-label">Downloadable Files</span>
+        <a href="{{ url('/uploadpage') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-file-upload"></i></span>
+            <span class="nav-label">Upload Templates</span>
+            <span class="tooltip-label">Upload Templates</span>
         </a>
-        <a href="{{ url('/student/MOA') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-alt"></i></span>
+        <a href="{{ url('/maintenance') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-cogs"></i></span>
+            <span class="nav-label">Maintenance</span>
+            <span class="tooltip-label">Maintenance</span>
+        </a>
+        <a href="{{ url('/MOA') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-folder-open"></i></span>
             <span class="nav-label">MOA</span>
             <span class="tooltip-label">MOA</span>
         </a>
-        <a href="{{ url('/student/requirements') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-cloud-upload-alt"></i></span>
-            <span class="nav-label">Requirements</span>
-            <span class="tooltip-label">Requirements</span>
+        <a href="{{ url('/reports') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
+            <span class="nav-label">Reports</span>
+            <span class="tooltip-label">Reports</span>
+        </a>
+        <a href="{{ url('/auditlog') }}" class="nav-item active">
+            <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
+            <span class="nav-label">Audit Log</span>
+            <span class="tooltip-label">Audit Log</span>
         </a>
     </nav>
 
@@ -671,8 +627,8 @@
         </div>
         <div class="topbar-right">
             <div class="topbar-badge">
-                <i class="fa fa-graduation-cap"></i>
-                Student Portal
+                <i class="fa fa-user-shield"></i>
+                OJT Coordinator
             </div>
         </div>
     </div>
@@ -683,11 +639,11 @@
         <!-- Page Header -->
         <div class="page-header">
             <div>
-                <h1>Downloadable <span>Files</span></h1>
+                <h1>Audit <span>Log</span></h1>
                 <div class="breadcrumb">
-                    <a href="{{ url('/student/home') }}"><i class="fa fa-home"></i> Home</a>
+                    <a href="{{ url('/dashboard') }}"><i class="fa fa-home"></i> Dashboard</a>
                     <i class="fa fa-chevron-right"></i>
-                    <span>Downloadable Files</span>
+                    <span>Audit Log</span>
                 </div>
             </div>
         </div>
@@ -695,146 +651,167 @@
         <!-- Stats Row -->
         <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-icon red"><i class="fa fa-file-alt"></i></div>
+                <div class="stat-icon red"><i class="fa fa-clipboard-list"></i></div>
                 <div>
-                    <div class="stat-num">{{ count($upload) }}</div>
-                    <div class="stat-name">Total Files</div>
+                    <div class="stat-num">{{ count($logs) }}</div>
+                    <div class="stat-name">Total Logs</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon green"><i class="fa fa-download"></i></div>
+                <div class="stat-icon green"><i class="fa fa-plus-circle"></i></div>
                 <div>
-                    <div class="stat-num">Free</div>
-                    <div class="stat-name">All Downloads</div>
+                    <div class="stat-num">{{ $logs->where('action', 'create')->count() }}</div>
+                    <div class="stat-name">Create Actions</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-folder-open"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-edit"></i></div>
                 <div>
-                    <div class="stat-num">OJT</div>
-                    <div class="stat-name">Templates & Forms</div>
+                    <div class="stat-num">{{ $logs->where('action', 'update')->count() }}</div>
+                    <div class="stat-name">Update Actions</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber"><i class="fa fa-trash"></i></div>
+                <div>
+                    <div class="stat-num">{{ $logs->where('action', 'delete')->count() }}</div>
+                    <div class="stat-name">Delete Actions</div>
                 </div>
             </div>
         </div>
 
-        <!-- Files Table Card -->
+        <!-- Audit Log Table -->
         <div class="table-card">
             <div class="table-card-header">
                 <div class="table-card-header-left">
-                    <div class="header-icon"><i class="fa fa-folder-open"></i></div>
+                    <div class="header-icon"><i class="fa fa-clipboard-list"></i></div>
                     <div>
-                        <h2>Downloadable Files</h2>
-                        <p>Click the download button to save any file to your device</p>
+                        <h2>System Activity Logs</h2>
+                        <p>Track all actions performed within the InternConnect system</p>
                     </div>
-                </div>
-                <div class="file-count-badge">
-                    <i class="fa fa-file"></i>
-                    {{ count($upload) }} file{{ count($upload) != 1 ? 's' : '' }} available
                 </div>
             </div>
 
             <div class="table-card-body">
 
-                <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-                    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
-                        $('#fileTable').DataTable({
-                            "order": [[2, 'desc']]
+                        $('#auditTable').DataTable({
+                            "order": [[0, 'desc']],
+                            "pageLength": 15,
                         });
                     });
                 </script>
 
-                <table id="fileTable" class="display" style="width:100%">
+                @if($logs->isEmpty())
+                    <div class="empty-state">
+                        <i class="fa fa-clipboard-list"></i>
+                        <p>No audit logs recorded yet.</p>
+                    </div>
+                @else
+                <table id="auditTable" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <th>File Name</th>
-                            <th>File</th>
-                            <th>Date Uploaded</th>
-                            <th>Uploaded By</th>
+                            <th>Date / Time</th>
                             <th>Action</th>
+                            <th>Name</th>
+                            <th>Module</th>
+                            <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($upload as $file)
+                        @foreach($logs as $log)
                         <tr>
                             <td>
-                                <div class="file-name-cell">
-                                    <div class="file-icon-wrap">
-                                        @php
-                                            $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
-                                            $icon = match($ext) {
-                                                'pdf'  => 'fa-file-pdf',
-                                                'doc', 'docx' => 'fa-file-word',
-                                                'xls', 'xlsx' => 'fa-file-excel',
-                                                'ppt', 'pptx' => 'fa-file-powerpoint',
-                                                'jpg', 'jpeg', 'png', 'gif' => 'fa-file-image',
-                                                'zip', 'rar' => 'fa-file-archive',
-                                                default => 'fa-file-alt'
-                                            };
-                                        @endphp
-                                        <i class="fa {{ $icon }}"></i>
+                                <div class="date-main">
+                                    {{ \Carbon\Carbon::parse($log->created_at)->format('M d, Y') }}
+                                </div>
+                                <div class="date-sub">
+                                    {{ \Carbon\Carbon::parse($log->created_at)->format('h:i A') }}
+                                </div>
+                            </td>
+                            <td>
+                                @php
+                                    $action = strtolower($log->action);
+                                    $actionClass = match($action) {
+                                        'create'  => 'action-create',
+                                        'update'  => 'action-update',
+                                        'delete'  => 'action-delete',
+                                        'approve' => 'action-approve',
+                                        'deny'    => 'action-deny',
+                                        default   => 'action-default',
+                                    };
+                                    $actionIcon = match($action) {
+                                        'create'  => 'fa-plus-circle',
+                                        'update'  => 'fa-edit',
+                                        'delete'  => 'fa-trash',
+                                        'approve' => 'fa-check-circle',
+                                        'deny'    => 'fa-times-circle',
+                                        default   => 'fa-circle',
+                                    };
+                                @endphp
+                                <span class="action-badge {{ $actionClass }}">
+                                    <i class="fa {{ $actionIcon }}"></i>
+                                    {{ ucfirst($log->action) }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="name-avatar">
+                                        {{ strtoupper(substr($log->affected_name ?? 'N', 0, 1)) }}
                                     </div>
-                                    <div>
-                                        <div class="file-name-text">{{ $file->name }}</div>
-                                        <div class="file-ext">{{ strtoupper($ext) }} file</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="color:#888; font-size:12.5px;">{{ $file->file }}</td>
-                            <td>
-                                <div class="date-cell">
-                                    {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
-                                    <div class="date-time">{{ \Carbon\Carbon::parse($file->created_at)->format('h:i A') }}</div>
+                                    <span class="name-text">{{ $log->affected_name ?? 'N/A' }}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class="uploader-cell">
-                                    <div class="uploader-avatar"><i class="fa fa-user"></i></div>
-                                    {{ $file->uploader_name }}
-                                </div>
+                                <span class="module-badge">
+                                    <i class="fa fa-tag"></i>
+                                    {{ $log->module }}
+                                </span>
                             </td>
                             <td>
-                                <a href="{{ url('/download', $file->file) }}" class="btn-download">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
+                                <div class="desc-text" title="{{ $log->description }}">
+                                    {{ $log->description }}
+                                </div>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+                @endif
 
             </div>
         </div>
 
     </div>
+
+    <!-- Footer -->
     <footer class="dashboard-footer">
-    <div class="footer-left">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-        <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
-        </span>
-    </div>
-    <div class="footer-links">
-        <a href="https://www.pup.edu.ph/" target="_blank">
-            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
-            PUP Website
-        </a>
-        <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
-        <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
-    </div>
-</footer>
+        <div class="footer-left">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <span class="footer-copy">
+                © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            </span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank">
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                PUP Website
+            </a>
+            <span class="divider">|</span>
+            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        </div>
+    </footer>
+
 </div>
 
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Sidebar toggle
     const sidebar     = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const menuToggle  = document.getElementById('menuToggle');

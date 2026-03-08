@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentNotificationMail;
 use Illuminate\Support\Facades\Session;
+use App\Helpers\AuditLogger;
 
 class StudentController extends Controller
 {
@@ -80,6 +81,12 @@ class StudentController extends Controller
                 $student->email = $user->email;
                 $student->save();
                 $user->save();
+                AuditLogger::log(
+                    'Student Account',       // module
+                    'update',                // action
+                    'Updated personal information',  // description
+                    $user->id                // affected user ID
+                );
     
             return back()->with('success', 'You have updated the information successfully!');
       
@@ -155,7 +162,12 @@ public function join(Request $request,$email)
         $user->status = 3;
     
         $user->save();
-    
+        AuditLogger::log(
+            'Student Account',
+            'join',
+            'Student joined a room',
+            $user->id
+        );   
         return back()->with('success', 'You have updated the information successfully!');
 
     }
@@ -174,7 +186,12 @@ public function join(Request $request,$email)
             $user->status = 0;
 
             $user->save();
-
+            AuditLogger::log(
+                'Student Account',
+                'leave',
+                'Student left a room',
+                $user->id
+            );
             return response()->json(['success' => true]);
         }
 
@@ -295,6 +312,12 @@ public function ojt_edit(Request $request,$studentNum)
         $user->contact_number = $request->contact_number;
     
         $user->save();
+        AuditLogger::log(
+            'OJT Information',
+            'update',
+            'Edited OJT information',
+            $data->id
+        );
     
         return back()->with('success', 'You have updated the information successfully!');
 
@@ -312,6 +335,12 @@ public function ojt_edit(Request $request,$studentNum)
         // Update the status of the OJTInformation model
         $ojtInformation->status = $request->status;
         $ojtInformation->save();
+        AuditLogger::log(
+            'OJT Status',
+            'update',
+            'Changed OJT status',
+            $data->id ?? null
+        );
     
         return back()->with('success', 'You have updated the information successfully!');
     }

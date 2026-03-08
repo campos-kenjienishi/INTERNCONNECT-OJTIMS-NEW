@@ -15,7 +15,8 @@ use App\Models\Professor;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Stroage;
+use Illuminate\Support\Facades\Storage;
+use App\Helpers\AuditLogger;
 
 
 class ForgotPassController extends Controller
@@ -70,5 +71,4 @@ class ForgotPassController extends Controller
 
  
 }
-
 
