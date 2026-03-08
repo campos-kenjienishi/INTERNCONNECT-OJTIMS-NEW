@@ -208,7 +208,7 @@
 
                 <h1 class="hero-heading">
                     Start your<br>
-                    <span>OJT journey</span><br>
+                    <span>OJT Journey</span><br>
                     Today.
                 </h1>
 
