@@ -204,7 +204,7 @@
                         <label class="form-label">Professor</label>
                         <div class="input-wrap has-select">
                             <i class="fa fa-chalkboard-teacher i-icon"></i>
-                            <select name="adviser_name">
+                            <select name="adviser_name" required>
                                 <option value="">Select Professor</option>
                                 @foreach($data as $professor)
                                     <option value="{{ $professor->full_name }}">{{ $professor->full_name }}</option>
@@ -263,7 +263,6 @@
         void this.offsetWidth;
         this.classList.add('toggled');
     });
-<<<<<<< HEAD
 
     // Academic year end dropdown
     document.addEventListener("DOMContentLoaded", function () {
@@ -323,8 +322,6 @@
 
         fetchProfessors(semesterSelect.value, startYearSelect.value, endYearSelect.value);
     });
-=======
->>>>>>> 3fe4bd7520d0e3093895cea5a8a6885218cd3bf0
 </script>
 </body>
 </html>
