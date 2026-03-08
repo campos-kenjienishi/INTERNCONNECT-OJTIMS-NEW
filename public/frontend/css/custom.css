@@ -2441,3 +2441,21 @@ img {
             .left-panel, .right-panel { padding: 40px 28px; }
             .hero-heading { font-size: 28px; }
         }
+
+        body::before,
+body::after {
+    pointer-events: none !important;
+}
+
+.main-wrapper {
+    position: relative;
+    z-index: 2 !important;
+}
+
+#btnProceed,
+.btn-proceed,
+.btn-back-step {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: all !important;
+}
