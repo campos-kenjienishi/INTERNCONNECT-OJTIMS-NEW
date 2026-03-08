@@ -710,7 +710,6 @@
     <!-- Page Content -->
     <div class="page-content">
 
-<<<<<<< HEAD
         <!-- Page Header -->
         <div class="page-header">
             <div>
@@ -721,26 +720,6 @@
                     <span>Account Information</span>
                 </div>
             </div>
-=======
-                <li >
-                    <a href="{{ url('/student/requirements') }}">
-                        <span class="icon">
-                            <ion-icon name="cloud-upload-outline"></ion-icon>
-                        </span>
-                        <span class="title">Requirements</span>
-                    </a>
-                </li>  
-
-                <li>
-                    <a href="{{ url('/login') }}">
-                        <span class="icon">
-                            <ion-icon name="log-out-outline"></ion-icon>
-                        </span>
-                        <span class="title">Log Out</span>
-                    </a>
-                </li>
-            </ul>
->>>>>>> aa6a5d91508198ff4cee6146a9d2421213520478
         </div>
 
         <div class="account-layout">

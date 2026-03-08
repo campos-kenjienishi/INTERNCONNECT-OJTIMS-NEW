@@ -116,47 +116,8 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999;
             }
 
-<<<<<<< HEAD
             .sidebar.collapsed .nav-item:hover .tooltip-label { opacity: 1; }
             .sidebar-footer { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
-=======
-                <li>
-                    <a href="{{ url('/maintenance') }}">
-                        <span class="icon">
-                            <ion-icon name="code-working-outline"></ion-icon>
-                        </span>
-                        <span class="title">Maintenance</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/MOA') }}">
-                        <span class="icon">
-                            <ion-icon name="folder-outline"></ion-icon>
-                        </span>
-                        <span class="title">MOA</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/reports') }}">
-                        <span class="icon">
-                            <ion-icon name="cellular-outline"></ion-icon>
-                        </span>
-                        <span class="title">Reports</span>
-                        <span class="icon" style="margin-left: 30%; font-size: 22px;">
-                            <ion-icon name="chevron-down-outline"></ion-icon>
-                        </span>
-                    </a>
-                </li>
-                
-                <li>
-                    <a href="{{ url('/auditlog') }}">
-                        <span class="icon">
-                            <ion-icon name="clipboard-outline"></ion-icon>
-                        </span>
-                        <span class="title">Audit Log</span>
-                    </a>
-                </li>
->>>>>>> aa6a5d91508198ff4cee6146a9d2421213520478
 
             /* =============== MAIN =============== */
             .main-content {

@@ -741,7 +741,6 @@
 <!-- =============== SIDEBAR =============== -->
 <div class="sidebar" id="sidebar">
 
-<<<<<<< HEAD
     <a href="#" class="sidebar-brand">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
         <div class="sidebar-brand-text">
@@ -749,27 +748,6 @@
             <span class="sidebar-brand-sub">OJT IMS</span>
         </div>
     </a>
-=======
-                    <li class="active">
-                        <a href="{{ url('/student/requirements') }}">
-                            <span class="icon">
-                                <ion-icon name="cloud-upload-outline"></ion-icon>
-                            </span>
-                            <span class="title">Requirements</span>
-                        </a>
-                    </li>
-    
-                    <li>
-                        <a href="{{ url('/login') }}">
-                            <span class="icon">
-                                <ion-icon name="log-out-outline"></ion-icon>
-                            </span>
-                            <span class="title">Log Out</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
->>>>>>> aa6a5d91508198ff4cee6146a9d2421213520478
 
     <a href="{{ url('/student/accountinfo') }}" class="sidebar-user">
         <div class="user-avatar"><i class="fa fa-user"></i></div>
