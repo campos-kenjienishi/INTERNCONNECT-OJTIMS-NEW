@@ -677,7 +677,7 @@
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
-            <span class="sidebar-brand-sub">OJT IMS</span>
+            <span class="sidebar-brand-sub">OJTIMS</span>
         </div>
     </a>
 
