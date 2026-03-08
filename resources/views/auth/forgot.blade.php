@@ -32,19 +32,19 @@
                 <div class="logo-wrapper">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
-                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="brand-name">Intern<span>Connect</span> - BETA</div>
                         <div class="system-title">OJT Information Management System</div>
                     </div>
                 </div>
 
                 <h1 class="hero-heading">
                     Recover your<br>
-                    <span>account</span><br>
-                    securely.
+                    <span>Account</span><br>
+                    Securely.
                 </h1>
 
                 <p class="hero-desc">
-                    No worries — it happens to everyone. Enter your registered email and we'll send you a secure link to reset your InternConnect password right away.
+                    No worries, it happens to everyone. Enter your registered email and we'll send you a secure link to reset your InternConnect password right away.
                 </p>
 
                 <div class="steps-list">
@@ -84,7 +84,7 @@
             </div>
 
             <div class="forgot-header">
-                <h2>Forgot Password? 🔐</h2>
+                <h2>Forgot Password?</h2>
                 <p>Enter your registered email address and we'll send you a link to reset your password.</p>
             </div>
 

@@ -632,11 +632,7 @@
 
     <a href="{{ url('/student/accountinfo') }}" class="sidebar-user">
         <div class="user-avatar">
-            @if($data->profile_photo)
-                <img src="{{ asset('storage/' . $data->profile_photo) }}" alt="Profile">
-            @else
-                <i class="fa fa-user"></i>
-            @endif
+            <i class="fa fa-user"></i>
         </div>
         <div class="user-info">
             <span class="user-name">{{ $data->full_name }}</span>
@@ -730,18 +726,8 @@
                     <div class="profile-pic-wrap">
                         <!-- Profile picture display -->
                         <div class="profile-pic" id="profilePicDisplay">
-                            @if($data->profile_photo)
-                                <img src="{{ asset('storage/' . $data->profile_photo) }}"
-                                     alt="Profile Photo" id="profilePicImg">
-                            @else
-                                <i class="fa fa-user" id="profilePicIcon"></i>
-                            @endif
+                            <i class="fa fa-user" id="profilePicIcon"></i>
                         </div>
-
-                        <!-- Edit button triggers hidden file input -->
-                        <label class="profile-pic-edit" for="profilePhotoInput" title="Change photo">
-                            <i class="fa fa-camera"></i>
-                        </label>
                     </div>
 
                     <div class="profile-name">{{ $data->full_name }}</div>
@@ -793,15 +779,6 @@
 
             <!-- ===== RIGHT: Edit Form ===== -->
             <div>
-
-                <!-- Profile Photo Upload Form -->
-                <form action="{{ url('/student/uploadPhoto', $data->email) }}"
-                      method="post" enctype="multipart/form-data" id="photoUploadForm">
-                    @csrf
-                    @method('PUT')
-                    <input type="file" name="profile_photo" id="profilePhotoInput"
-                           class="profile-pic-input" accept="image/*">
-                </form>
 
                 <!-- Account Details Form -->
                 <div class="form-card">
@@ -1029,33 +1006,6 @@
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
-    });
-
-    // Profile photo preview + auto-submit
-    document.getElementById('profilePhotoInput').addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const display = document.getElementById('profilePicDisplay');
-
-            // Replace icon with image preview
-            display.innerHTML = `<img src="${e.target.result}" alt="Profile Preview"
-                style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-
-            // Also update sidebar avatar
-            const sidebarAvatar = document.querySelector('.sidebar-user .user-avatar');
-            if (sidebarAvatar) {
-                sidebarAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile"
-                    style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-            }
-        };
-
-        reader.readAsDataURL(file);
-
-        // Auto-submit the photo upload form
-        document.getElementById('photoUploadForm').submit();
     });
 
     // Password toggles

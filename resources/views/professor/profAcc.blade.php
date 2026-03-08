@@ -572,11 +572,7 @@
 
     <a href="{{ url('/professor/accountinfo') }}" class="sidebar-user">
         <div class="user-avatar">
-            @if(isset($data->profile_photo) && $data->profile_photo)
-                <img src="{{ asset('storage/' . $data->profile_photo) }}" alt="Profile">
-            @else
                 <i class="fa fa-user-tie"></i>
-            @endif
         </div>
         <div class="user-info">
             <span class="user-name">{{ $data->full_name }}</span>
@@ -666,18 +662,9 @@
 
                 <div class="profile-photo-wrap">
                     <div class="profile-photo-ring" id="profilePhotoRing">
-                        @if(isset($data->profile_photo) && $data->profile_photo)
-                            <img src="{{ asset('storage/' . $data->profile_photo) }}"
-                                 alt="Profile" id="profilePhotoPreview">
-                        @else
-                            <span class="photo-placeholder" id="profilePhotoPreview">
-                                {{ strtoupper(substr($data->first_name, 0, 1)) }}
-                            </span>
-                        @endif
-
-                        <label class="profile-photo-btn" for="photoInput" title="Change photo">
-                            <i class="fa fa-camera"></i>
-                        </label>
+                        <span class="photo-placeholder" id="profilePhotoPreview">
+                            {{ strtoupper(substr($data->first_name, 0, 1)) }}
+                        </span>
                     </div>
                 </div>
 
@@ -978,38 +965,6 @@
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
-    });
-
-    // Profile photo upload with instant preview
-    document.getElementById('photoInput').addEventListener('change', function () {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const ring = document.getElementById('profilePhotoRing');
-                // Remove placeholder span if present
-                const placeholder = ring.querySelector('.photo-placeholder');
-                if (placeholder) placeholder.remove();
-
-                // Update or create img
-                let img = ring.querySelector('img#profilePhotoPreview');
-                if (!img) {
-                    img = document.createElement('img');
-                    img.id = 'profilePhotoPreview';
-                    img.alt = 'Profile';
-                    ring.insertBefore(img, ring.querySelector('.profile-photo-btn'));
-                }
-                img.src = e.target.result;
-
-                // Also update sidebar avatar
-                const sidebarAvatar = document.querySelector('.user-avatar');
-                if (sidebarAvatar) {
-                    sidebarAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-                }
-            };
-            reader.readAsDataURL(this.files[0]);
-            // Auto-submit
-            document.getElementById('photoUploadForm').submit();
-        }
     });
 
     // Password toggle

@@ -88,7 +88,7 @@ $email = $_GET['email'] ?? '';
             </div>
 
             <div class="reset-header">
-                <h2>Set New Password 🔑</h2>
+                <h2>Set New Password</h2>
                 <p>Your new password must be different from your previous password.</p>
             </div>
 

@@ -32,33 +32,29 @@
                 <div class="logo-wrapper">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
-                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="brand-name">Intern<span>Connect</span> - BETA</div>
                         <div class="system-title">OJT Information Management System</div>
                     </div>
                 </div>
 
                 <h1 class="hero-heading">
-                    Manage your<br>
-                    <span>OJT journey</span><br>
-                    seamlessly.
+                    Smarter<br>
+                    <span>OJT Management</span><br>
+                    Starts Here.
                 </h1>
 
                 <p class="hero-desc">
-                    InternConnect streamlines every step of your on-the-job training — from document submissions and DTR tracking to supervisor evaluations and clearance processing, all in one secure platform.
+                    InternConnect brings the On-The-Job training process into one centralized platform, helping students, coordinators, and supervisors manage information more efficiently.
                 </p>
 
                 <div class="stats-row">
                     <div>
                         <div class="stat-num">100%</div>
-                        <div class="stat-label">Digital Process</div>
-                    </div>
-                    <div>
-                        <div class="stat-num">Real-time</div>
-                        <div class="stat-label">DTR Tracking</div>
+                        <div class="stat-label">Digital Management</div>
                     </div>
                     <div>
                         <div class="stat-num">Secure</div>
-                        <div class="stat-label">Data Platform</div>
+                        <div class="stat-label">Information System</div>
                     </div>
                 </div>
             </div>
@@ -67,8 +63,8 @@
         <!-- RIGHT PANEL -->
         <div class="right-panel">
             <div class="login-header">
-                <h2>Welcome back 👋</h2>
-                <p>Sign in to your InternConnect account</p>
+                <h2>Welcome Back</h2>
+                <p>Sign in to your InternConnect Account</p>
             </div>
 
             <form action="{{route('login-user')}}" method="post">

@@ -201,7 +201,7 @@
                 <div class="logo-wrapper">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
-                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="brand-name">Intern<span>Connect</span> - BETA</div>
                         <div class="system-title">OJT Information Management System</div>
                     </div>
                 </div>
@@ -209,32 +209,32 @@
                 <h1 class="hero-heading">
                     Start your<br>
                     <span>OJT journey</span><br>
-                    today.
+                    Today.
                 </h1>
 
                 <p class="hero-desc">
-                    Create your InternConnect account to access document submissions, DTR tracking, supervisor evaluations, and clearance processing — all in one place.
+                    Sign up for InternConnect to access a centralized platform designed to support and manage your On-The-Job training activities.
                 </p>
 
                 <div class="steps-list">
                     <div class="step-item">
                         <div class="step-icon"><i class="fa fa-user-plus"></i></div>
                         <div class="step-text">
-                            <strong>Create your account</strong>
+                            <strong>Create your Account</strong>
                             Fill in your personal and academic details
                         </div>
                     </div>
                     <div class="step-item">
                         <div class="step-icon"><i class="fa fa-file-alt"></i></div>
                         <div class="step-text">
-                            <strong>Submit requirements</strong>
+                            <strong>Submit Requirements</strong>
                             Upload and track your OJT documents
                         </div>
                     </div>
                     <div class="step-item">
                         <div class="step-icon"><i class="fa fa-check-circle"></i></div>
                         <div class="step-text">
-                            <strong>Get cleared</strong>
+                            <strong>Get Cleared</strong>
                             Complete evaluations and earn your clearance
                         </div>
                     </div>
@@ -252,8 +252,8 @@
                 <div class="step-dot" id="dot2">2</div>
             </div>
             <div class="step-label-row">
-                <span class="step-label active" id="label1">Personal Info</span>
-                <span class="step-label" id="label2">Academic Info</span>
+                <span class="step-label active" id="label1">Personal Information</span>
+                <span class="step-label" id="label2">Academic Information</span>
             </div>
 
             <form action="{{ route('register-user') }}" method="post" id="regForm">
@@ -272,8 +272,8 @@
                     <div class="form-step active" id="step1">
 
                         <div class="reg-header">
-                            <h2>Personal Info ✍️</h2>
-                            <p>Step 1 of 2 — Fill in your personal details</p>
+                            <h2>Personal Information</h2>
+                            <p>Step 1 of 2 — Fill in your Personal Details</p>
                         </div>
 
                         <div class="fields-grid">
@@ -282,7 +282,7 @@
                                 <label class="form-label">First Name</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
-                                    <input type="text" placeholder="First name" name="first_name"
+                                    <input type="text" placeholder="eg. Juan" name="first_name"
                                         id="first_name" value="{{ old('first_name') }}">
                                 </div>
                                 <span class="text-danger">@error('first_name') {{ $message }} @enderror</span>
@@ -292,7 +292,7 @@
                                 <label class="form-label">Middle Name</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
-                                    <input type="text" placeholder="Middle name" name="middle_name"
+                                    <input type="text" placeholder="eg. Dela" name="middle_name"
                                         id="middle_name" value="{{ old('middle_name') }}">
                                 </div>
                                 <span class="text-danger">@error('middle_name') {{ $message }} @enderror</span>
@@ -302,7 +302,7 @@
                                 <label class="form-label">Last Name</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
-                                    <input type="text" placeholder="Last name" name="last_name"
+                                    <input type="text" placeholder="eg. Cruz" name="last_name"
                                         id="last_name" value="{{ old('last_name') }}">
                                 </div>
                                 <span class="text-danger">@error('last_name') {{ $message }} @enderror</span>
@@ -322,7 +322,7 @@
                                 <label class="form-label">Student No.</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-id-card i-icon"></i>
-                                    <input type="text" placeholder="Student number" name="studentNum"
+                                    <input type="text" placeholder="202X-000XX-TG-0" name="studentNum"
                                         id="studentNum">
                                 </div>
                                 <span class="text-danger">@error('studentNum') {{ $message }} @enderror</span>
@@ -346,12 +346,12 @@
                                     id="btnProceed"
                                     class="btn-proceed"
                                     onclick="goToStep2()">
-                                Proceed to Academic Info &nbsp;<i class="fa fa-arrow-right"></i>
+                                Proceed to Academic Information &nbsp;<i class="fa fa-arrow-right"></i>
                             </button>
                         </div>
 
                         <div class="footer-wrap" style="margin-top: 16px;">
-                            <a href="login"><i class="fa fa-sign-in-alt"></i> Already registered? Sign in here</a>
+                            <a href="login"><i class="fa fa-sign-in-alt"></i> Already Registered? Sign in here</a>
                         </div>
 
                     </div>
@@ -360,7 +360,7 @@
                     <div class="form-step" id="step2">
 
                         <div class="reg-header">
-                            <h2>Academic Info 🎓</h2>
+                            <h2>Academic Information</h2>
                             <p>Step 2 of 2 — Fill in your academic details</p>
                         </div>
 
@@ -438,7 +438,7 @@
                                 <label class="form-label">Year and Section</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-users i-icon"></i>
-                                    <input type="text" placeholder="e.g. 4-A" name="year_and_section">
+                                    <input type="text" placeholder="e.g. 4-1" name="year_and_section">
                                 </div>
                             </div>
 
@@ -456,7 +456,7 @@
                         </div>
 
                         <div class="footer-wrap" style="margin-top: 16px;">
-                            <a href="login"><i class="fa fa-sign-in-alt"></i> Already registered? Sign in here</a>
+                            <a href="login"><i class="fa fa-sign-in-alt"></i> Already Registered? Sign in here</a>
                         </div>
 
                     </div>
