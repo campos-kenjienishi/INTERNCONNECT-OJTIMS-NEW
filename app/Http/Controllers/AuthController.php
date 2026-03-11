@@ -120,7 +120,7 @@ class AuthController extends Controller
                     }
 
                         else {
-                        return redirect('/supervisor/home');
+                        return redirect('/login');
                          }
                     
                 }
@@ -385,57 +385,6 @@ public function student_home()
             }
 
 
-
-    public function sup_home(){
-
-        $data=array();
-            if(Session::has('loginId')){
-
-                $data=User::where('id','=', Session::get('loginId'))->first();
-                        }
-        return view('ojtSupervisor.sup_home', compact('data'));
-   }
-        
-
-   public function supTab(){
-    $user=array();
-        if(Session::has('loginId')){
-    
-            $user=User::where('id','=', Session::get('loginId'))->first();
-                    }
-    $data=User::where('role', 3)->get();
-
-return view('professor.supTab', compact('data','user'));
-}
-
-   public function supCreate(Request $request){
-
-
-
-    $request->validate([
-        
-        'email'=>'required|email|unique:users,email',
-
-]);
-
-$temporaryPassword = Str::random(8);
-$user =new User();
-$user->email = $request->email;
-$user->password = Hash::make($temporaryPassword);
-$user->role = 3;
-Mail::to($user->email)->send(new TemporaryPasswordNotification($temporaryPassword));
-
-
-
-$res = $user->save();
-
-if($res){
-    return back()->with('success','You have registered successfully!');
-}
-else{
-    return back()->with('fail','Oh no! Something went wrong.');
-}
-}
 
 public function pending(){
 
