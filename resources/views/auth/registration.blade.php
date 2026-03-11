@@ -388,7 +388,7 @@
                             </div>
 
                             <div class="field-group full-width">
-                                <label class="form-label">Academic Year</label>
+                                <label class="form-label">Academic Year <small style="color: #e65100; font-weight: normal;"><i class="fa fa-info-circle"></i> Enter the current school year (e.g. 2025–2026)</small></label>
                                 <div class="year-row">
                                     <div class="input-wrap has-select">
                                         <i class="fa fa-calendar-alt i-icon"></i>
