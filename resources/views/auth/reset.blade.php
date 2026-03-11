@@ -43,8 +43,8 @@ $email = $_GET['email'] ?? '';
 
                 <h1 class="hero-heading">
                     Create your<br>
-                    <span>new password</span><br>
-                    securely.
+                    <span>New Password</span><br>
+                    Securely.
                 </h1>
 
                 <p class="hero-desc">
