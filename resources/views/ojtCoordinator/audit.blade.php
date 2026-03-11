@@ -759,9 +759,9 @@
                             <td>
                                 <div class="name-cell">
                                     <div class="name-avatar">
-                                        {{ strtoupper(substr($log->affected_name ?? 'N', 0, 1)) }}
+                                        {{ strtoupper(substr($log->user_name ?? 'N', 0, 1)) }}
                                     </div>
-                                    <span class="name-text">{{ $log->affected_name ?? 'N/A' }}</span>
+                                    <span class="name-text">{{ $log->user_name ?? 'N/A' }}</span>
                                 </div>
                             </td>
                             <td>
