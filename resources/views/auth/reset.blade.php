@@ -36,7 +36,7 @@ $email = $_GET['email'] ?? '';
                 <div class="logo-wrapper">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
-                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="brand-name">Intern<span>Connect</span> - BETA</div>
                         <div class="system-title">OJT Information Management System</div>
                     </div>
                 </div>
