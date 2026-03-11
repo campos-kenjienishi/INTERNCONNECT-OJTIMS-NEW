@@ -668,16 +668,6 @@
                     </div>
                 </div>
 
-                <!-- Hidden photo upload form -->
-                <form id="photoUploadForm"
-                      action="{{ url('/professor/uploadPhoto/' . $data->email) }}"
-                      method="POST" enctype="multipart/form-data" style="display:none;">
-                    @csrf
-                    @method('PUT')
-                    <input type="file" id="photoInput" name="profile_photo"
-                           accept="image/jpeg,image/png,image/gif" style="display:none;">
-                </form>
-
                 <div class="profile-card-body">
                     <div class="profile-name">{{ $data->full_name }}</div>
                     <div class="profile-role-badge">

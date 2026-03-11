@@ -4,19 +4,29 @@ namespace App\Helpers;
 
 use App\Models\User;
 use App\Models\AuditLog;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AuditLogger
 {
+    private static array $roleLabels = [
+        '0' => 'Student',
+        '1' => 'OJT Coordinator',
+        '2' => 'Professor',
+    ];
+
     public static function log(
         string $module,
         string $action,
         string $description,
         $affectedUserId = null
     ) {
-        $actor = Auth::user();
+        // Get the actor from session (this app uses session-based auth, not Auth::user())
+        $actor = null;
+        if (Session::has('loginId')) {
+            $actor = User::find(Session::get('loginId'));
+        }
 
-        // Make sure the affected user exists
+        // Get the affected user's name
         $affectedName = null;
         if ($affectedUserId) {
             $affectedUser = User::find($affectedUserId);
@@ -28,10 +38,16 @@ class AuditLogger
         $action = is_array($action) ? json_encode($action) : (string) $action;
         $description = is_array($description) ? json_encode($description) : (string) $description;
 
+        // Map role number to readable label
+        $roleLabel = 'Unknown';
+        if ($actor) {
+            $roleLabel = self::$roleLabels[(string) $actor->role] ?? 'Unknown';
+        }
+
         AuditLog::create([
-            'user_id'          => null,
-            'user_name'        => $affectedName, 
-            'user_role'        => $actor ? $actor->role : 'unknown',
+            'user_id'          => $actor ? $actor->id : null,
+            'user_name'        => $actor ? $actor->full_name : 'System',
+            'user_role'        => $roleLabel,
             'affected_user_id' => $affectedUserId,
             'affected_name'    => $affectedName,
             'module'           => $module,

@@ -1323,12 +1323,21 @@
         $(document).on('submit', '.notifyForm', function (e) {
             e.preventDefault();
             const form = $(this);
+            const btn = form.find('button[type="submit"]');
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Sending...');
             $.ajax({
                 type: 'POST',
                 url: form.attr('action'),
                 data: { _token: "{{ csrf_token() }}" },
-                success: function () { location.reload(); },
-                error:   function () { console.error('Notify error.'); }
+                success: function () {
+                    btn.html('<i class="fa fa-check"></i> Sent!');
+                    alert('Notification email sent successfully!');
+                    location.reload();
+                },
+                error: function () {
+                    btn.prop('disabled', false).html('<i class="fa fa-bell"></i> Notify');
+                    alert('Failed to send notification. Please try again.');
+                }
             });
         });
 

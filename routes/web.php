@@ -73,26 +73,19 @@ Route::middleware(['role:1'])->group(function () {
     Route::post('/reports/send-email', [ReportsController::class, 'sendEmail'])->name('reports.send.email');
     Route::get('/reportsExpired', [ReportsController::class, 'reportsExpired'])->name('reportsExpired');
     Route::match(['get', 'post'], '/ExpiredMOAReports', [ReportsController::class, 'generateMOAReport'])->name('reports.generate');
-    Route::post('/reportsExpired/send-email', [ReportsController::class, 'sendEmailExpired'])->name('reportsExpired.send.email');
+
     Route::get('/MOA', [CompanyController::class,'companies']);
-    Route::post('/companyCreate', [CompanyController::class,'companyCreate'])->name('companyCreate');
     Route::post('/uploadMOA', [MOAUploadController::class,'uploadfile']);
-    Route::get('/moa/download/{file}', [MOAUploadController::class,'download']);
     Route::post('/moa/remove/{id}', [MOAUploadController::class,'remove']);
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');
     Route::post('/sendFile', [MOAUploadController::class,'sendFiles']);
     Route::get('/send/download/{file}', [MOAUploadController::class, 'downloadFile'])->name('download.file');
-    Route::get('/print-data/{company}', [MOAUploadController::class, 'printData'])->name('print-data');
     Route::post('/status/{studentNum}', [StudentController::class,'update']);
-    Route::post('/notify/{studentNum}', [StudentController::class, 'notify']);
-    Route::get('/voucher/{company}', [CompanyController::class,'voucher'])->name('voucher');
     Route::get('/studentLists', [StudentController::class,'StuList']);
     Route::get('/ojt-report', [OJTController::class, 'showForm'])->name('ojt.report.form');
     Route::post('/ojt-report', [OJTController::class, 'generateReport'])->name('ojt.report.generate');
-    Route::post('/announcements', [AnnouncementController::class,'announcement']);
     Route::get('/accountinfo', [AccountInfo::class,'accountinfo']);
     Route::put('/edit/{email}', [AccountInfo::class,'editojt']);
-    Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::get('/pending',[AuthController::class,'pending']);
     Route::post('/removeProfessor/{id}', [ProfessorController::class, 'removeProfessor'])->name('removeProfessor');
 });
@@ -116,7 +109,6 @@ Route::middleware(['role:0'])->group(function () {
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
     Route::post('/remove/filesReq/{id}', [PassDocuController::class,'removeFile']);
-    Route::put('/student/uploadPhoto/{email}', [StudentController::class, 'uploadPhoto'])->name('student.uploadPhoto');
 });
 
 // ─── PROFESSOR (role 2) ─────────────────────────────────────────────
@@ -147,12 +139,30 @@ Route::middleware(['role:2'])->group(function () {
     Route::match(['get', 'post'], '/ExpiredMOAReportsProf', [ReportsController::class, 'generateMOAReportProf'])->name('reports.generate.prof');
 });
 
+// ─── SHARED: ALL AUTHENTICATED USERS (roles 0, 1 & 2) ──────────────
+
+Route::middleware(['role:0,1,2'])->group(function () {
+    Route::get('/download/{file}', [FileController::class,'download']);
+    Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
+    Route::post('/announcements', [AnnouncementController::class,'announcement']);
+    Route::post('/companyCreate', [CompanyController::class,'companyCreate'])->name('companyCreate');
+    Route::get('/print-data/{company}', [MOAUploadController::class, 'printData'])->name('print-data');
+    Route::get('/voucher/{company}', [CompanyController::class,'voucher'])->name('voucher');
+    Route::post('/notify/{studentNum}', [StudentController::class, 'notify']);
+    Route::get('/moa/download/{file}', [MOAUploadController::class,'download']);
+});
+
+// ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ── Reports ───────
+
+Route::middleware(['role:1,2'])->group(function () {
+    Route::post('/reportsExpired/send-email', [ReportsController::class, 'sendEmailExpired'])->name('reportsExpired.send.email');
+});
+
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ─────────────────
 
 Route::middleware(['role:1,2'])->group(function () {
     Route::get('/uploadpage', [FileController::class, 'show'])->name('uploadpage');
     Route::post('/uploadfile', [FileController::class,'uploadfile']);
-    Route::get('/download/{file}', [FileController::class,'download']);
     Route::get('/view/{is}', [FileController::class,'view']);
     Route::post('/remove/{id}', [FileController::class,'remove']);
     Route::post('/remove/file/{id}', [FileController::class,'remove']);
