@@ -723,7 +723,7 @@
                     <tbody>
                         @foreach($logs as $log)
                         <tr>
-                            <td>
+                            <td data-order="{{ \Carbon\Carbon::parse($log->created_at)->format('Y-m-d H:i:s') }}">
                                 <div class="date-main">
                                     {{ \Carbon\Carbon::parse($log->created_at)->format('M d, Y') }}
                                 </div>
