@@ -98,7 +98,7 @@ Route::middleware(['role:0'])->group(function () {
     Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
     Route::put('/student/edit/{email}', [StudentController::class,'edit']);
     Route::get('/student/class', [StudentController::class,'class']);
-    Route::post('/student/join/{email}', [StudentController::class,'join']);
+    Route::post('/student/join/{email}/{classId}', [StudentController::class,'join']);
     Route::post('/student/leave', [StudentController::class,'leave']);
     Route::get('/student/files', [StudentController::class,'fileSee']);
     Route::get('/student/ojtinfo', [StudentController::class,'ojtInformation']);
@@ -120,13 +120,16 @@ Route::middleware(['role:2'])->group(function () {
     Route::put('/professor/edit/{id}', [AccountInfo::class,'edit']);
     Route::put('/professor/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::get('/professor/class', [ProfessorController::class,'class']);
-    Route::get('/professor/listStudents/{course}', [ProfessorController::class,'show']);
-    Route::get('/professor/classList/{course}', [ProfessorController::class,'show_list']);
+    Route::get('/professor/listStudents/{roomId}', [ProfessorController::class,'show']);
+    Route::get('/professor/classList/{roomId}', [ProfessorController::class,'show_list']);
     Route::post('/professor/approve/{email}', [ProfessorController::class,'approve']);
     Route::post('/professor/deny/{email}', [ProfessorController::class,'deny']);
-    Route::get('/professor/upload', [ProfessorController::class,'uploadP']);
+    Route::get('/professor/upload', function () {
+        return redirect('/professor/class');
+    });
     Route::get('/allStudents', [ProfessorController::class,'allStudents']);
     Route::post('/roomCreate', [ProfessorController::class,'roomCreate'])->name('roomCreate');
+    Route::put('/roomUpdate/{id}', [ProfessorController::class,'roomUpdate'])->name('roomUpdate');
     Route::post('/roomDelete/{id}', [ProfessorController::class,'roomDelete'])->name('roomDelete');
     Route::get('/professor/maintain',[PassDocuController::class,'maintainFileCategory']);
     Route::post('/fileCategory', [PassDocuController::class,'fileCategory']);
@@ -161,11 +164,14 @@ Route::middleware(['role:1,2'])->group(function () {
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ─────────────────
 
 Route::middleware(['role:1,2'])->group(function () {
-    Route::get('/uploadpage', [FileController::class, 'show'])->name('uploadpage');
     Route::post('/uploadfile', [FileController::class,'uploadfile']);
+    Route::get('/download/req/{file}', [PassDocuController::class,'download']);
+});
+
+Route::middleware(['role:1'])->group(function () {
+    Route::get('/uploadpage', [FileController::class, 'show'])->name('uploadpage');
     Route::get('/view/{is}', [FileController::class,'view']);
     Route::post('/remove/{id}', [FileController::class,'remove']);
     Route::post('/remove/file/{id}', [FileController::class,'remove']);
     Route::get('/search', [FileController::class,'search']);
-    Route::get('/download/req/{file}', [PassDocuController::class,'download']);
 });

@@ -782,6 +782,7 @@
                         <tr>
                             <th>Course</th>
                             <th>Room</th>
+                            <th>School Year</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -799,24 +800,31 @@
                                 </div>
                             </td>
                             <td>
-                                @if ($data->status == 1)
+                                {{ $classItem->school_year_start && $classItem->school_year_end ? $classItem->school_year_start . ' - ' . $classItem->school_year_end : 'N/A' }}
+                            </td>
+                            <td>
+                                @if ($data->class_id == $classItem->id && $data->status == 1)
                                     <span class="status-badge status-approved"><i class="fa fa-check-circle"></i> Approved</span>
-                                @elseif ($data->status == 2)
+                                @elseif ($data->class_id == $classItem->id && $data->status == 2)
                                     <span class="status-badge status-denied"><i class="fa fa-times-circle"></i> Denied</span>
-                                @elseif ($data->status == 3)
+                                @elseif ($data->class_id == $classItem->id && $data->status == 3)
                                     <span class="status-badge status-pending"><i class="fa fa-clock"></i> Pending</span>
                                 @else
                                     <span class="status-badge status-default"><i class="fa fa-minus-circle"></i> Not Joined</span>
                                 @endif
                             </td>
                             <td>
-                                @if ($data->status != 1 && $data->status != 3)
-                                    <button class="btn-join" onclick="joinStudent('{{ url('/student/join', $data->email) }}')">
-                                        <i class="fa fa-sign-in-alt"></i> Join
-                                    </button>
-                                @else
+                                @if ($data->class_id == $classItem->id && ($data->status == 1 || $data->status == 3))
                                     <button class="btn-leave" onclick="leaveStudent()">
                                         <i class="fa fa-sign-out-alt"></i> Leave
+                                    </button>
+                                @elseif (empty($data->class_id))
+                                    <button class="btn-join" onclick="joinStudent('{{ url('/student/join/' . $data->email . '/' . $classItem->id) }}')">
+                                        <i class="fa fa-sign-in-alt"></i> Join
+                                    </button>
+                                @elseif ($data->status != 1 && $data->status != 3)
+                                    <button class="btn-join" onclick="joinStudent('{{ url('/student/join/' . $data->email . '/' . $classItem->id) }}')">
+                                        <i class="fa fa-sign-in-alt"></i> Join
                                     </button>
                                 @endif
 
@@ -854,14 +862,48 @@
                                                     <div>
                                                         <div class="modal-detail-label">Status</div>
                                                         <div class="modal-detail-value">
-                                                            @if ($data->status == 1)
+                                                            @if ($data->class_id == $classItem->id && $data->status == 1)
                                                                 <span class="status-badge status-approved"><i class="fa fa-check-circle"></i> Approved</span>
-                                                            @elseif ($data->status == 2)
+                                                            @elseif ($data->class_id == $classItem->id && $data->status == 2)
                                                                 <span class="status-badge status-denied"><i class="fa fa-times-circle"></i> Denied</span>
-                                                            @elseif ($data->status == 3)
+                                                            @elseif ($data->class_id == $classItem->id && $data->status == 3)
                                                                 <span class="status-badge status-pending"><i class="fa fa-clock"></i> Pending</span>
                                                             @else
                                                                 <span class="status-badge status-default"><i class="fa fa-minus-circle"></i> Not Joined</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-detail-row">
+                                                    <div class="modal-detail-icon"><i class="fa fa-calendar-alt"></i></div>
+                                                    <div>
+                                                        <div class="modal-detail-label">Semester</div>
+                                                        <div class="modal-detail-value">{{ $classItem->semester ?? 'N/A' }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-detail-row">
+                                                    <div class="modal-detail-icon"><i class="fa fa-clock"></i></div>
+                                                    <div>
+                                                        <div class="modal-detail-label">Schedule</div>
+                                                        <div class="modal-detail-value">
+                                                            @if (empty($classItem->schedule_parsed))
+                                                                <span style="color:#888;">No schedule available</span>
+                                                            @else
+                                                                @php
+                                                                    $groupedSchedule = [];
+                                                                    foreach ($classItem->schedule_parsed as $slot) {
+                                                                        if (!empty($slot['day'])) {
+                                                                            $startRaw = $slot['start_time'] ?? '';
+                                                                            $endRaw = $slot['end_time'] ?? '';
+                                                                            $startFormatted = !empty($startRaw) ? date('g:i A', strtotime($startRaw)) : '';
+                                                                            $endFormatted = !empty($endRaw) ? date('g:i A', strtotime($endRaw)) : '';
+                                                                            $groupedSchedule[$slot['day']][] = trim($startFormatted . ' - ' . $endFormatted);
+                                                                        }
+                                                                    }
+                                                                @endphp
+                                                                @foreach ($groupedSchedule as $day => $times)
+                                                                    <div><strong>{{ $day }}:</strong> {{ implode(', ', array_filter($times)) }}</div>
+                                                                @endforeach
                                                             @endif
                                                         </div>
                                                     </div>
@@ -889,6 +931,55 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Room Templates Table Card -->
+        <div class="table-card">
+            <div class="table-card-header">
+                <div class="header-icon"><i class="fa fa-file-download"></i></div>
+                <div>
+                    <h2>Room Templates</h2>
+                    <p>Templates uploaded by your professor for your current room</p>
+                </div>
+            </div>
+            <div class="table-card-body">
+                @if (empty($data->class_id))
+                    <div class="empty-state">
+                        <i class="fa fa-door-closed"></i>
+                        <p>Join a room first to access room-specific templates.</p>
+                    </div>
+                @elseif ($roomTemplates->isEmpty())
+                    <div class="empty-state">
+                        <i class="fa fa-file-alt"></i>
+                        <p>No room templates uploaded yet.</p>
+                    </div>
+                @else
+                    <table class="rooms-table" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Template Name</th>
+                                <th>File</th>
+                                <th>Date Uploaded</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($roomTemplates as $template)
+                                <tr>
+                                    <td>{{ $template->name }}</td>
+                                    <td>{{ $template->file }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($template->created_at)->format('M d, Y h:i A') }}</td>
+                                    <td>
+                                        <a href="{{ url('/download', $template->file) }}" class="btn-view-action">
+                                            <i class="fa fa-download"></i> Download
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
             </div>
         </div>
 

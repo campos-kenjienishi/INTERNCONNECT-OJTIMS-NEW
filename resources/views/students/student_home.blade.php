@@ -790,16 +790,6 @@
                 </div>
             </a>
 
-            <div class="stat-card">
-                <div class="stat-icon blue">
-                    <i class="fa fa-building"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-num">{{ count($companies) }}</div>
-                    <div class="stat-name">Partner Companies</div>
-                </div>
-            </div>
-
             <a href="{{ url('/student/requirements') }}" class="stat-card">
                 <div class="stat-icon green">
                     <i class="fa fa-tasks"></i>
@@ -819,58 +809,6 @@
                     <div class="stat-name">OJT Information</div>
                 </div>
             </a>
-        </div>
-
-        <!-- Companies Table -->
-        <div class="content-grid">
-            <div class="table-card">
-                <div class="table-card-header">
-                    <h2>
-                        <div class="header-icon"><i class="fa fa-building"></i></div>
-                        Partner Companies
-                    </h2>
-                </div>
-                <div class="table-card-body">
-
-                    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-                        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-                    <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                    <script>
-                        $(document).ready(function () {
-                            $('#companyTable').DataTable({
-                                "order": [[0, 'desc']],
-                                "columnDefs": [
-                                    { "targets": 0, "visible": false }
-                                ]
-                            });
-                        });
-                    </script>
-
-                    <table id="companyTable" class="display" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>id</th>
-                                <th>Company Name</th>
-                                <th>Company Address</th>
-                                <th>Contact No.</th>
-                                <th>Email</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($companies as $company)
-                            <tr>
-                                <td>{{ $company->id }}</td>
-                                <td>{{ $company->company_name }}</td>
-                                <td>{{ $company->company_address }}</td>
-                                <td>{{ $company->companyNo }}</td>
-                                <td>{{ $company->company_email }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
         </div>
 
     </div>

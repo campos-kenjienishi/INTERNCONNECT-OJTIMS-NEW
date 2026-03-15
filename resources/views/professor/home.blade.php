@@ -616,11 +616,6 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
-        <a href="{{ url('/professor/upload') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-upload"></i></span>
-            <span class="nav-label">Upload Templates</span>
-            <span class="tooltip-label">Upload Templates</span>
-        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>
@@ -676,7 +671,7 @@
         <div class="welcome-banner">
             <div class="welcome-text">
                 <h2>Welcome back, {{ explode(' ', $data->full_name)[0] }}! 👋</h2>
-                <p>Manage your OJT classes, upload templates, and monitor your students' progress.</p>
+                <p>Manage your OJT classes, room templates, and monitor your students' progress.</p>
             </div>
             <div class="welcome-icon">🎓</div>
         </div>
@@ -690,16 +685,6 @@
                 <div class="stat-info">
                     <div class="stat-num">{{ $roleCount }}</div>
                     <div class="stat-name">Total Students</div>
-                </div>
-            </a>
-
-            <a href="{{ url('/professor/upload') }}" class="stat-card">
-                <div class="stat-icon blue">
-                    <i class="fa fa-file-alt"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-num">{{ $fileCount }}</div>
-                    <div class="stat-name">Downloadable Templates</div>
                 </div>
             </a>
 

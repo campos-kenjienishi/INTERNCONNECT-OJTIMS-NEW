@@ -9,6 +9,16 @@ class Schedule extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'class_id',
+        'subject_code',
+        'course',
+        'academic_year',
+        'semester',
+        'schedule_day',
+        'schedule_time',
+    ];
+
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_code', 'subject_code');

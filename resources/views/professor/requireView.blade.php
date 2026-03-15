@@ -420,11 +420,6 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
-        <a href="{{ url('/professor/upload') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-upload"></i></span>
-            <span class="nav-label">Upload Templates</span>
-            <span class="tooltip-label">Upload Templates</span>
-        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>
@@ -469,6 +464,9 @@
 
     <!-- Page Content -->
     <div class="page-content">
+        @php
+            $backToRequirementsUrl = url('/studentrequire') . '?value=' . urlencode($value) . (!empty($roomId) ? '&roomId=' . $roomId : '');
+        @endphp
 
         <!-- Page Header -->
         <div class="page-header">
@@ -479,13 +477,13 @@
                         <i class="fa fa-home"></i> Dashboard
                     </a>
                     <i class="fa fa-chevron-right"></i>
-                    <a href="{{ url('/studentrequire') }}?value={{ $value }}">Requirements</a>
+                    <a href="{{ $backToRequirementsUrl }}">Requirements</a>
                     <i class="fa fa-chevron-right"></i>
                     <span>{{ $file }}</span>
                 </div>
             </div>
             <button class="btn-back"
-                onclick="window.location.href='{{ url('/studentrequire') }}?value={{ $value }}'">
+                onclick="window.location.href='{{ $backToRequirementsUrl }}'">
                 <i class="fa fa-arrow-left"></i> Back to Requirements
             </button>
         </div>

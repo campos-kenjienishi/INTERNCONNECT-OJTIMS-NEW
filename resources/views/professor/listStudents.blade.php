@@ -590,11 +590,6 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
-        <a href="{{ url('/professor/upload') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-upload"></i></span>
-            <span class="nav-label">Upload Templates</span>
-            <span class="tooltip-label">Upload Templates</span>
-        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>

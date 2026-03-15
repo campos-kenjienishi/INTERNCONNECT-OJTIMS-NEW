@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 
 class FileController extends Controller
@@ -72,6 +73,9 @@ class FileController extends Controller
         $data->file = $filename;
         $data->name = $request->name;
         $data->uploader_name = $user->full_name;
+        if (Schema::hasColumn('uploaded_files', 'class_id')) {
+            $data->class_id = $request->filled('class_id') ? $request->class_id : null;
+        }
         $data->save();
 
         AuditLogger::log(

@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 
 
@@ -193,104 +194,51 @@ class AuthController extends Controller
 
     public function professorCreate(Request $request){
 
-
-
         $request->validate([
-            
-            'email'=>'required|email|unique:users,email',
-            
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'subject_code' => 'required|string|max:255',
+            'subject_description' => 'required|string|max:255',
+        ]);
 
-    ]);
+        $temporaryPassword = Str::random(8);
 
-    $startYear = $request->academic_year_start;
-    $endYear = $request->academic_year_end;
+        $user = new User();
+        $professor = new Professor();
+        $subject = Subject::firstOrCreate([
+            'subject_code' => $request->subject_code,
+            'subject_description' => $request->subject_description,
+        ]);
 
-    $schoolYear = $startYear . '-' . $endYear;
-    $temporaryPassword = Str::random(8);
-    $user =new User();
-    $subj =new Subject();
-    $professor =new Professor();
-    $professor->email = $request->email;
+        $user->email = $request->email;
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->full_name = $user->first_name . ' ' . $user->last_name;
+        $user->password = Hash::make($temporaryPassword);
+        $user->role = 2;
 
-    
-    $user->email = $request->email;
-    $user->first_name = $request->first_name;
-    $user->last_name = $request->last_name;
-    $user->full_name = $user->first_name . ' ' . $user->last_name;
-    $professor->full_name = $user->first_name . ' ' . $user->last_name;
-    $subj->subject_code = $request->subject_code;
-    $subj->subject_description = $request->subject_description;
-    $user->password = Hash::make($temporaryPassword);
-    $user->role = 2;
+        $professor->email = $request->email;
+        $professor->full_name = $user->full_name;
 
-   /* $room =new Classes();
-    $room->room = $request->room;
-    $room->course = $request->course;
-    $room->adviser_name = $user->full_name; */
+        Mail::to($user->email)->send(new TemporaryPasswordNotification($temporaryPassword));
 
-    $sched =new Schedule();
-    $sched->subject_code = $subj->subject_code;
-    $sched->course = $request->course;
-    $sched->academic_year = $schoolYear;
-    $sched->semester = $request->semester;
-   // Retrieve schedule days and time slots from the form
-$scheduleDays = isset($_POST['schedule_day']) ? $_POST['schedule_day'] : [];
-$timeSlots = isset($_POST['time_slots']) ? $_POST['time_slots'] : 1;
+        $professor->save();
+        $res = $user->save();
 
-// Prepare an array to store schedule day and time data
-$scheduleData = [];
-
-// Iterate over each selected schedule day
-foreach ($scheduleDays as $day) {
-    // Retrieve the corresponding start and end time inputs based on the number of time slots
-    for ($i = 1; $i <= $timeSlots; $i++) {
-        $startTimeKey = $day . '_start_time_' . $i;
-        $endTimeKey = $day . '_end_time_' . $i;
-
-        $startTime = isset($_POST[$startTimeKey]) ? $_POST[$startTimeKey] : '';
-        $endTime = isset($_POST[$endTimeKey]) ? $_POST[$endTimeKey] : '';
-
-        // Create an array for each schedule day containing its day and time data
-        $scheduleData[] = [
-            'day' => $day,
-            'start_time' => $startTime,
-            'end_time' => $endTime
-        ];
-    }
-}
-
-// Serialize the schedule data into JSON format
-$scheduleJson = json_encode($scheduleData);
-
-// Save the serialized JSON data into the database field
-$sched->schedule_day = $scheduleJson;
-    $sched->schedule_time = $request->schedule_time;
-
-
-    Mail::to($user->email)->send(new TemporaryPasswordNotification($temporaryPassword));
-    
- 
-    $subj->save();
-    $professor->save();
-    /*$room->save();*/
-    $res = $user->save();
-    $sched->save();
-
-   
-
-    if($res){
-        $subj->professors()->attach($professor->id);
-        AuditLogger::log(
-            'Professor',
-            'create',
-            'Created professor: ' . $professor->full_name . ' with subject: ' . $subj->subject_code,
-            $user->id
-        );
-        return back()->with('success','You have registered successfully!');
-    }
-    else{
-        return back()->with('fail','Oh no! Something went wrong.');
-    }
+        if($res){
+            $professor->subjects()->syncWithoutDetaching([$subject->id]);
+            AuditLogger::log(
+                'Professor',
+                'create',
+                'Created professor account: ' . $professor->full_name . ' with subject: ' . $subject->subject_code,
+                $user->id
+            );
+            return back()->with('success','You have registered successfully!');
+        }
+        else{
+            return back()->with('fail','Oh no! Something went wrong.');
+        }
     }
     
 public function student_home()
@@ -298,28 +246,15 @@ public function student_home()
     if (Session::has('loginId')) {
         $user = User::where('id', Session::get('loginId'))->first();
         
-        $fileCount = UploadedFile::where(function ($query) use ($user) {
-            $query->where('uploader_name', 'Gina Dela Cruz')
-                  ->orWhere('uploader_name', $user->adviser_name);
-        })->count();
-
-        // Get the current year
-        $currentYear = now()->year;
-
-        // Retrieve the selected company or companies
-        $companies = Company::all(); // Get all companies
-
-        $stu = Student::all();
-
-        // Filter companies based on the start year of "school_year"
-        $companies = $companies->filter(function ($company) use ($currentYear) {
-            list($startYear, $endYear) = explode('-', $company->school_year);
-            $startYear = (int) $startYear;
-            $endYear = (int) $endYear;
-            return $currentYear >= $startYear && $currentYear <= $startYear + 3;
-        });
-
-        $companyNames = $companies->pluck('company_name')->toArray();
+        if (Schema::hasColumn('uploaded_files', 'class_id')) {
+            $fileCount = UploadedFile::where(function ($query) {
+                    $query->whereNull('class_id')
+                          ->orWhere('class_id', 0);
+                })
+                ->count();
+        } else {
+            $fileCount = UploadedFile::count();
+        }
 
         // TERMS MODAL LOGIC
         $showTerms = false;
@@ -329,7 +264,7 @@ public function student_home()
             $showTerms = true;
         }
         
-        return view('students.student_home', compact('companies', 'user', 'fileCount', 'showTerms'));
+        return view('students.student_home', compact('user', 'fileCount', 'showTerms'));
     }
 
     return redirect()->route('login');

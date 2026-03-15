@@ -567,11 +567,6 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
-        <a href="{{ url('/professor/upload') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-upload"></i></span>
-            <span class="nav-label">Upload Templates</span>
-            <span class="tooltip-label">Upload Templates</span>
-        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>
@@ -664,8 +659,12 @@
                         <tr>
                             <th>Course</th>
                             <th>Room Name</th>
+                            <th>Semester</th>
+                            <th>School Year</th>
+                            <th>Schedule</th>
                             <th>Needing Approval</th>
                             <th>Students List</th>
+                            <th>Templates</th>
                             <th>Announcement</th>
                             <th>Action</th>
                         </tr>
@@ -685,17 +684,102 @@
                                     <span class="room-name-text">{{ $room->room }}</span>
                                 </div>
                             </td>
+                            <td>{{ $room->semester ?? 'N/A' }}</td>
                             <td>
-                                <a href="{{ url('/professor/listStudents', $room->course) }}"
+                                {{ $room->school_year_start && $room->school_year_end ? $room->school_year_start . ' - ' . $room->school_year_end : 'N/A' }}
+                            </td>
+                            <td>
+                                @if (empty($room->schedule_parsed))
+                                    <span style="font-size:12px;color:#888;">No schedule</span>
+                                @else
+                                    <div style="font-size:12px;line-height:1.5;">
+                                        @php
+                                            $groupedSchedule = [];
+                                            foreach ($room->schedule_parsed as $slot) {
+                                                if (!empty($slot['day'])) {
+                                                    $startRaw = $slot['start_time'] ?? '';
+                                                    $endRaw = $slot['end_time'] ?? '';
+                                                    $startFormatted = !empty($startRaw) ? date('g:i A', strtotime($startRaw)) : '';
+                                                    $endFormatted = !empty($endRaw) ? date('g:i A', strtotime($endRaw)) : '';
+                                                    $groupedSchedule[$slot['day']][] = trim($startFormatted . ' - ' . $endFormatted);
+                                                }
+                                            }
+                                        @endphp
+                                        @foreach ($groupedSchedule as $day => $times)
+                                            <div><strong>{{ $day }}:</strong> {{ implode(', ', array_filter($times)) }}</div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ url('/professor/listStudents', $room->id) }}"
                                    class="btn-view-action">
                                     <i class="fa fa-eye"></i> View
                                 </a>
                             </td>
                             <td>
-                                <a href="{{ url('/professor/classList', $room->course) }}"
+                                <a href="{{ url('/professor/classList', $room->id) }}"
                                    class="btn-view-action">
                                     <i class="fa fa-users"></i> View
                                 </a>
+                            </td>
+                            <td>
+                                <button type="button" class="btn-view-action"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#templateModal{{ $loop->index }}">
+                                    <i class="fa fa-file-upload"></i>
+                                    {{ $room->templateFiles->count() > 0 ? 'Manage (' . $room->templateFiles->count() . ')' : 'Upload' }}
+                                </button>
+
+                                <div class="modal fade" id="templateModal{{ $loop->index }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">
+                                                    <i class="fa fa-file-upload"></i>
+                                                    Room Templates - {{ $room->room }}
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+
+                                            <form method="POST" action="{{ url('/uploadfile') }}" enctype="multipart/form-data">
+                                                @csrf
+                                                <input type="hidden" name="class_id" value="{{ $room->id }}">
+                                                <div class="modal-body">
+                                                    <label class="modal-field-label"><i class="fa fa-tag"></i> Template Name</label>
+                                                    <input class="modal-field-input" type="text" name="name" placeholder="Enter template name" required>
+
+                                                    <label class="modal-field-label"><i class="fa fa-paperclip"></i> File</label>
+                                                    <input class="modal-field-input" type="file" name="file" accept=".doc,.docx,.pdf" required>
+
+                                                    <div style="margin-top:12px;">
+                                                        <strong style="font-size:13px; color:#555;">Uploaded in this room:</strong>
+                                                        @if ($room->templateFiles->isEmpty())
+                                                            <p style="font-size:12px; color:#888; margin-top:6px;">No templates yet.</p>
+                                                        @else
+                                                            <ul style="margin-top:8px; padding-left:18px; max-height:120px; overflow:auto;">
+                                                                @foreach ($room->templateFiles as $template)
+                                                                    <li style="font-size:12px; margin-bottom:6px;">
+                                                                        {{ $template->name }}
+                                                                        <a href="{{ url('/download', $template->file) }}" style="margin-left:8px;">Download</a>
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                                                        <i class="fa fa-times me-1"></i> Close
+                                                    </button>
+                                                    <button type="submit" class="btn-modal-submit">
+                                                        <i class="fa fa-upload me-1"></i> Upload Template
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <button type="button" class="btn-announce"
@@ -748,9 +832,93 @@
                                 <!-- End Announcement Modal -->
                             </td>
                             <td>
+                                <button class="btn-view-action" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ $room->id }}">
+                                    <i class="fa fa-edit"></i> Edit
+                                </button>
                                 <button class="btn-remove-room" data-id="{{ $room->id }}">
                                     <i class="fa fa-trash"></i> Remove
                                 </button>
+
+                                <div class="modal fade" id="editRoomModal{{ $room->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">
+                                                    <i class="fa fa-edit"></i> Edit Room
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="POST" action="{{ url('/roomUpdate', $room->id) }}">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="modal-body">
+                                                    <label class="modal-field-label"><i class="fa fa-chalkboard"></i> Room Name</label>
+                                                    <input class="modal-field-input" type="text" name="room" value="{{ $room->room }}" required>
+
+                                                    <label class="modal-field-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                                                    <select name="course" class="modal-field-select" required>
+                                                        @foreach ($course as $c)
+                                                            <option value="{{ $c->course }}" {{ $room->course == $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
+                                                        @endforeach
+                                                    </select>
+
+                                                    <label class="modal-field-label"><i class="fa fa-calendar-alt"></i> Semester</label>
+                                                    <select name="semester" class="modal-field-select" required>
+                                                        <option value="1st Sem" {{ ($room->semester ?? '') == '1st Sem' ? 'selected' : '' }}>1st Sem</option>
+                                                        <option value="2nd Sem" {{ ($room->semester ?? '') == '2nd Sem' ? 'selected' : '' }}>2nd Sem</option>
+                                                        <option value="Summer" {{ ($room->semester ?? '') == 'Summer' ? 'selected' : '' }}>Summer</option>
+                                                    </select>
+
+                                                    <label class="modal-field-label"><i class="fa fa-calendar"></i> School Year</label>
+                                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                                        <input class="modal-field-input" type="number" name="school_year_start" min="2000" max="2100" value="{{ $room->school_year_start }}" required>
+                                                        <input class="modal-field-input" type="number" name="school_year_end" min="2001" max="2101" value="{{ $room->school_year_end }}" required>
+                                                    </div>
+
+                                                    @php
+                                                        $existingSchedule = is_array($room->schedule_parsed ?? null) ? $room->schedule_parsed : [];
+                                                        $selectedEditDays = [];
+                                                        foreach ($existingSchedule as $slot) {
+                                                            if (!empty($slot['day'])) {
+                                                                $selectedEditDays[] = $slot['day'];
+                                                            }
+                                                        }
+                                                        $selectedEditDays = array_values(array_unique($selectedEditDays));
+                                                        $editSlotCount = !empty($room->schedule_slots) ? (int) $room->schedule_slots : 1;
+                                                    @endphp
+
+                                                    <label class="modal-field-label"><i class="fa fa-calendar-week"></i> Schedule Days</label>
+                                                    <div style="display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:8px;">
+                                                        @foreach(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as $day)
+                                                            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#444;">
+                                                                <input type="checkbox" class="edit-schedule-day" data-room-id="{{ $room->id }}" name="schedule_day[]" value="{{ $day }}" {{ in_array($day, $selectedEditDays) ? 'checked' : '' }}>
+                                                                {{ $day }}
+                                                            </label>
+                                                        @endforeach
+                                                    </div>
+
+                                                    <label class="modal-field-label" style="margin-top:10px;"><i class="fa fa-list-ol"></i> Number of Time Slots</label>
+                                                    <select id="edit_time_slots_{{ $room->id }}" name="time_slots" class="modal-field-select edit-time-slots" data-room-id="{{ $room->id }}">
+                                                        <option value="1" {{ $editSlotCount === 1 ? 'selected' : '' }}>1</option>
+                                                        <option value="2" {{ $editSlotCount === 2 ? 'selected' : '' }}>2</option>
+                                                        <option value="3" {{ $editSlotCount === 3 ? 'selected' : '' }}>3</option>
+                                                        <option value="4" {{ $editSlotCount === 4 ? 'selected' : '' }}>4</option>
+                                                    </select>
+
+                                                    <div id="editRoomScheduleInputs{{ $room->id }}" data-initial-schedule='@json($existingSchedule)' style="margin-top:10px;"></div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                                                        <i class="fa fa-times me-1"></i> Close
+                                                    </button>
+                                                    <button type="submit" class="btn-modal-submit">
+                                                        <i class="fa fa-save me-1"></i> Save Changes
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -809,6 +977,48 @@
                             <option value="{{ $c->course }}">{{ $c->course }}</option>
                         @endforeach
                     </select>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-calendar-alt"></i> Semester
+                    </label>
+                    <select name="semester" class="modal-field-select" required>
+                        <option value="">Select semester</option>
+                        <option value="1st Sem">1st Sem</option>
+                        <option value="2nd Sem">2nd Sem</option>
+                        <option value="Summer">Summer</option>
+                    </select>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-calendar"></i> School Year
+                    </label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <input class="modal-field-input" type="number" name="school_year_start" min="2000" max="2100" placeholder="Start Year" required>
+                        <input class="modal-field-input" type="number" name="school_year_end" min="2001" max="2101" placeholder="End Year" required>
+                    </div>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-calendar-week"></i> Schedule Days
+                    </label>
+                    <div style="display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:8px;">
+                        @foreach(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as $day)
+                            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#444;">
+                                <input type="checkbox" class="add-schedule-day" name="schedule_day[]" value="{{ $day }}" {{ $day === 'Monday' ? 'checked' : '' }}>
+                                {{ $day }}
+                            </label>
+                        @endforeach
+                    </div>
+
+                    <label class="modal-field-label" style="margin-top:10px;">
+                        <i class="fa fa-list-ol"></i> Number of Time Slots
+                    </label>
+                    <select id="add_time_slots" name="time_slots" class="modal-field-select">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+
+                    <div id="addRoomScheduleInputs" style="margin-top:10px;"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
@@ -853,6 +1063,126 @@
     });
 
     $(document).ready(function () {
+
+        function buildScheduleMapFromArray(scheduleArray) {
+            const map = {};
+            if (!Array.isArray(scheduleArray)) return map;
+            scheduleArray.forEach(item => {
+                if (!item || !item.day) return;
+                if (!map[item.day]) map[item.day] = [];
+                map[item.day].push({
+                    start_time: item.start_time || '',
+                    end_time: item.end_time || ''
+                });
+            });
+            return map;
+        }
+
+        function buildScheduleMapFromForm(form) {
+            const map = {};
+            if (!form) return map;
+
+            const timeInputs = form.querySelectorAll('input[type="time"][name]');
+            timeInputs.forEach(input => {
+                const startMatch = input.name.match(/^(.*)_start_time_(\d+)$/);
+                const endMatch = input.name.match(/^(.*)_end_time_(\d+)$/);
+
+                if (!startMatch && !endMatch) return;
+
+                const day = (startMatch || endMatch)[1];
+                const slotIndex = parseInt((startMatch || endMatch)[2], 10) - 1;
+                if (!map[day]) map[day] = [];
+                if (!map[day][slotIndex]) {
+                    map[day][slotIndex] = { start_time: '', end_time: '' };
+                }
+
+                if (startMatch) {
+                    map[day][slotIndex].start_time = input.value || '';
+                }
+                if (endMatch) {
+                    map[day][slotIndex].end_time = input.value || '';
+                }
+            });
+
+            return map;
+        }
+
+        function renderScheduleInputs(daySelector, slotSelectId, containerId, fallbackScheduleMap) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const slotSelect = document.getElementById(slotSelectId);
+            const slots = parseInt((slotSelect && slotSelect.value) ? slotSelect.value : '1', 10);
+            const selectedDays = Array.from(document.querySelectorAll(daySelector)).map(el => el.value);
+
+            const form = container.closest('form');
+            const currentMap = buildScheduleMapFromForm(form);
+            const scheduleMap = Object.keys(currentMap).length > 0 ? currentMap : (fallbackScheduleMap || {});
+
+            if (selectedDays.length === 0) {
+                container.innerHTML = '<p style="font-size:12px;color:#888;margin:0;">Select at least one day to set time slots.</p>';
+                return;
+            }
+
+            let html = '';
+            selectedDays.forEach(day => {
+                html += '<div style="border:1px solid #eee;border-radius:10px;padding:10px;margin-bottom:10px;background:#fafafa;">';
+                html += '<strong style="font-size:13px;color:#444;">' + day + '</strong>';
+
+                for (let i = 1; i <= slots; i++) {
+                    const startName = day + '_start_time_' + i;
+                    const endName = day + '_end_time_' + i;
+                    const existing = scheduleMap[day] && scheduleMap[day][i - 1] ? scheduleMap[day][i - 1] : { start_time: '', end_time: '' };
+
+                    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">';
+                    html += '<input class="modal-field-input" type="time" name="' + startName + '" value="' + (existing.start_time || '') + '" required>';
+                    html += '<input class="modal-field-input" type="time" name="' + endName + '" value="' + (existing.end_time || '') + '" required>';
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderAddRoomScheduleInputs() {
+            renderScheduleInputs('.add-schedule-day:checked', 'add_time_slots', 'addRoomScheduleInputs', {});
+        }
+
+        function renderEditRoomScheduleInputs(roomId) {
+            const container = document.getElementById('editRoomScheduleInputs' + roomId);
+            if (!container) return;
+
+            let initialSchedule = [];
+            try {
+                initialSchedule = JSON.parse(container.getAttribute('data-initial-schedule') || '[]');
+            } catch (e) {
+                initialSchedule = [];
+            }
+
+            renderScheduleInputs(
+                '.edit-schedule-day[data-room-id="' + roomId + '"]:checked',
+                'edit_time_slots_' + roomId,
+                'editRoomScheduleInputs' + roomId,
+                buildScheduleMapFromArray(initialSchedule)
+            );
+        }
+
+        $(document).on('change', '.add-schedule-day, #add_time_slots', renderAddRoomScheduleInputs);
+        $(document).on('change', '.edit-schedule-day, .edit-time-slots', function () {
+            const roomId = $(this).data('room-id');
+            if (roomId) {
+                renderEditRoomScheduleInputs(roomId);
+            }
+        });
+
+        $('[id^="editRoomModal"]').on('shown.bs.modal', function () {
+            const roomId = this.id.replace('editRoomModal', '');
+            renderEditRoomScheduleInputs(roomId);
+        });
+
+        renderAddRoomScheduleInputs();
 
         // Add Room AJAX
         $('#addRoomForm').on('submit', function (e) {
