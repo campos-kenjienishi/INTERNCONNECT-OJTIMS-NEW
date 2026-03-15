@@ -762,6 +762,13 @@
                                                                     <li style="font-size:12px; margin-bottom:6px;">
                                                                         {{ $template->name }}
                                                                         <a href="{{ url('/download', $template->file) }}" style="margin-left:8px;">Download</a>
+                                                                        <button
+                                                                            type="button"
+                                                                            class="btn-remove-template"
+                                                                            data-action="{{ url('/professor/template/remove', $template->id) }}"
+                                                                            style="margin-left:8px;border:none;background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">
+                                                                            Remove
+                                                                        </button>
                                                                     </li>
                                                                 @endforeach
                                                             </ul>
@@ -1271,6 +1278,37 @@
                             Swal.fire('Oops!', 'Error deleting room.', 'error');
                         }
                     });
+                }
+            });
+        });
+
+        // Delete Room Template (Professor)
+        $(document).on('click', '.btn-remove-template', function () {
+            const actionUrl = $(this).data('action');
+
+            Swal.fire({
+                title: 'Remove this template?',
+                text: 'This will permanently delete the template file record.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="fa fa-trash"></i> Yes, remove it',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = actionUrl;
+
+                    const csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = '_token';
+                    csrf.value = '{{ csrf_token() }}';
+
+                    form.appendChild(csrf);
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             });
         });

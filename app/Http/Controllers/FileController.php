@@ -116,6 +116,11 @@ class FileController extends Controller
     public function remove($id)
     {
 
+        $user = null;
+        if (Session::has('loginId')) {
+            $user = User::where('id', Session::get('loginId'))->first();
+        }
+
         $data = UploadedFile::find($id);
 
         if (!$data) {
@@ -133,6 +138,52 @@ class FileController extends Controller
         );
     
         return redirect()->back();
+    }
+
+    public function removeProfessorTemplate($id)
+    {
+        $user = null;
+        if (Session::has('loginId')) {
+            $user = User::where('id', Session::get('loginId'))->first();
+        }
+
+        if (!$user || (int) $user->role !== 2) {
+            return redirect()->back()->with('error', 'Unauthorized action.');
+        }
+
+        $file = UploadedFile::find($id);
+        if (!$file) {
+            return redirect()->back()->with('error', 'Template not found.');
+        }
+
+        // Professors can only remove their own room-scoped templates.
+        if ($file->uploader_name !== $user->full_name) {
+            return redirect()->back()->with('error', 'You can only remove your own templates.');
+        }
+
+        if (!Schema::hasColumn('uploaded_files', 'class_id') || empty($file->class_id)) {
+            return redirect()->back()->with('error', 'Only room templates can be removed here.');
+        }
+
+        $oldValues = [
+            'id' => $file->id,
+            'file' => $file->file,
+            'name' => $file->name,
+            'class_id' => $file->class_id,
+        ];
+
+        $file->delete();
+
+        AuditLogger::log(
+            'upload',
+            'File Delete',
+            'Professor removed room template: ' . $oldValues['name'],
+            $user->id,
+            $oldValues,
+            null
+        );
+
+        return redirect()->back()->with('success', 'Template removed successfully.');
     }
     
     public function search(Request $request){

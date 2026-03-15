@@ -140,6 +140,7 @@ Route::middleware(['role:2'])->group(function () {
     Route::get('/requireview',[PassDocuController::class,'requirementsView']);
     Route::get('/reportsExpiredProf', [ReportsController::class, 'reportsExpiredProf'])->name('reportsExpiredProf');
     Route::match(['get', 'post'], '/ExpiredMOAReportsProf', [ReportsController::class, 'generateMOAReportProf'])->name('reports.generate.prof');
+    Route::post('/professor/template/remove/{id}', [FileController::class, 'removeProfessorTemplate']);
 });
 
 // ─── SHARED: ALL AUTHENTICATED USERS (roles 0, 1 & 2) ──────────────
