@@ -266,6 +266,29 @@
             padding-right: 4px;
         }
 
+        .student-search-wrap { margin-bottom: 12px; }
+        .student-search-input {
+            width: 100%;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .student-search-input:focus {
+            border-color: #fca5a5;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+        }
+        .student-no-match {
+            display: none;
+            text-align: center;
+            padding: 22px 16px;
+            color: #888;
+            font-size: 12.5px;
+        }
+
         .student-list::-webkit-scrollbar { width: 4px; }
         .student-list::-webkit-scrollbar-thumb { background: #fecaca; border-radius: 10px; }
 
@@ -643,6 +666,14 @@
                     </div>
                 </div>
                 <div class="panel-card-body">
+                    <div class="student-search-wrap">
+                        <input
+                            type="text"
+                            id="studentSearchInput"
+                            class="student-search-input"
+                            placeholder="Search assigned students by name"
+                        >
+                    </div>
                     <div class="student-list">
                         @if ($displayStudents->isNotEmpty())
                             @foreach ($displayStudents as $displayStudent)
@@ -713,6 +744,9 @@
                             </div>
                             @endforelse
                         @endif
+                        <div id="studentNoMatch" class="student-no-match">
+                            No assigned student matched your search.
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -785,6 +819,30 @@
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
     });
+
+    const studentSearchInput = document.getElementById('studentSearchInput');
+    if (studentSearchInput) {
+        studentSearchInput.addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            const cards = Array.from(document.querySelectorAll('.student-list .student-card'));
+            let visibleCount = 0;
+
+            cards.forEach(function (card) {
+                const nameEl = card.querySelector('.student-name');
+                const studentName = (nameEl ? nameEl.textContent : '').toLowerCase();
+                const isVisible = !query || studentName.includes(query);
+                card.style.display = isVisible ? '' : 'none';
+                if (isVisible) {
+                    visibleCount++;
+                }
+            });
+
+            const noMatchEl = document.getElementById('studentNoMatch');
+            if (noMatchEl) {
+                noMatchEl.style.display = (cards.length > 0 && visibleCount === 0) ? 'block' : 'none';
+            }
+        });
+    }
 </script>
 
 </body>

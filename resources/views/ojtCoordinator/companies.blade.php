@@ -853,6 +853,14 @@
 
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-user-graduate"></i> Student Names <span style="color:#aaa; font-weight:400;">(Optional, hold Ctrl to select multiple)</span></label>
+                        <input
+                            id="moaStudentSearch"
+                            class="field-input"
+                            type="text"
+                            placeholder="Search student name"
+                            style="margin-bottom:8px;"
+                            disabled
+                        >
                         <select name="student_names[]" id="moaStudentSelect" class="field-select" multiple style="min-height:100px;" disabled>
                             @foreach ($stu as $student)
                                 <option value="{{ $student->full_name }}" data-course="{{ strtolower(trim($student->course ?? '')) }}">{{ $student->full_name }}</option>
@@ -1003,7 +1011,9 @@
 
         function filterStudentOptionsByCourse() {
             const selectedCourse = (($('#moaCourseSelect').val() || '').trim()).toLowerCase();
+            const searchQuery = (($('#moaStudentSearch').val() || '').trim()).toLowerCase();
             const studentSelect = document.getElementById('moaStudentSelect');
+            const studentSearch = document.getElementById('moaStudentSearch');
             const studentHint = document.getElementById('moaStudentHint');
 
             if (!studentSelect) {
@@ -1012,6 +1022,9 @@
 
             const hasSelectedCourse = selectedCourse.length > 0;
             studentSelect.disabled = !hasSelectedCourse;
+            if (studentSearch) {
+                studentSearch.disabled = !hasSelectedCourse;
+            }
 
             if (studentHint) {
                 studentHint.textContent = hasSelectedCourse
@@ -1021,7 +1034,9 @@
 
             Array.from(studentSelect.options).forEach(function (option) {
                 const studentCourse = (option.getAttribute('data-course') || '').trim().toLowerCase();
-                const isMatch = !selectedCourse || studentCourse === selectedCourse;
+                const matchesCourse = !selectedCourse || studentCourse === selectedCourse;
+                const matchesSearch = !searchQuery || option.value.toLowerCase().includes(searchQuery);
+                const isMatch = matchesCourse && matchesSearch;
 
                 option.hidden = !isMatch;
                 option.disabled = !isMatch;
@@ -1032,7 +1047,11 @@
             });
         }
 
-        $('#moaCourseSelect').on('change', filterStudentOptionsByCourse);
+        $('#moaCourseSelect').on('change', function () {
+            $('#moaStudentSearch').val('');
+            filterStudentOptionsByCourse();
+        });
+        $('#moaStudentSearch').on('input', filterStudentOptionsByCourse);
         filterStudentOptionsByCourse();
 
         // File validation error
