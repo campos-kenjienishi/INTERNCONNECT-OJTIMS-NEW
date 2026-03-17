@@ -552,11 +552,6 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
-        <a href="{{ url('/professor/upload') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-upload"></i></span>
-            <span class="nav-label">Upload Templates</span>
-            <span class="tooltip-label">Upload Templates</span>
-        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>
@@ -601,6 +596,9 @@
 
     <!-- Page Content -->
     <div class="page-content">
+        @php
+            $backToClassListUrl = !empty($roomId) ? url('/professor/classList', $roomId) : url('/professor/class');
+        @endphp
 
         <!-- Page Header -->
         <div class="page-header">
@@ -611,13 +609,13 @@
                         <i class="fa fa-home"></i> Dashboard
                     </a>
                     <i class="fa fa-chevron-right"></i>
-                    <a href="{{ url('/professor/classList', $course) }}">Class List</a>
+                    <a href="{{ $backToClassListUrl }}">Class List</a>
                     <i class="fa fa-chevron-right"></i>
                     <span>Requirements</span>
                 </div>
             </div>
             <button class="btn-back"
-                onclick="window.location.href='{{ url('/professor/classList', $course) }}'">
+                onclick="window.location.href='{{ $backToClassListUrl }}'">
                 <i class="fa fa-arrow-left"></i> Back to Class List
             </button>
         </div>
@@ -770,7 +768,7 @@
                                     @endif
 
                                     <!-- View -->
-                                    <a href="/requireview?file={{ $file->fileName }}&value={{ $value }}"
+                                    <a href="/requireview?file={{ $file->fileName }}&value={{ urlencode($value) }}@if(!empty($roomId))&roomId={{ $roomId }}@endif"
                                        class="btn-view">
                                         <i class="fa fa-eye"></i> View
                                     </a>

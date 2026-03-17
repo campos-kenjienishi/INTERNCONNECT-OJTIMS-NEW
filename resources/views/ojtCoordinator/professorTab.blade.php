@@ -921,74 +921,19 @@
                     <div class="field-row">
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-tag"></i> Subject Code</label>
-                            <input class="field-input" type="text" name="subject_code" placeholder="e.g. OJT101">
+                            <input class="field-input" type="text" name="subject_code" placeholder="e.g. OJT101" required>
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-align-left"></i> Subject Description</label>
-                            <input class="field-input" type="text" name="subject_description" placeholder="Subject description">
-                        </div>
-                    </div>
-
-                    <div class="field-row">
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-calendar-alt"></i> Semester</label>
-                            <select class="field-select" name="semester">
-                                <option value="1st Sem">1st Sem</option>
-                                <option value="2nd Sem">2nd Sem</option>
-                                <option value="Summer">Summer</option>
-                            </select>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
-                            <select name="course" class="field-select">
-                                @foreach ($course as $c)
-                                    <option value="{{ $c->course }}">{{ $c->course }}</option>
-                                @endforeach
-                            </select>
+                            <input class="field-input" type="text" name="subject_description" placeholder="Subject description" required>
                         </div>
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label"><i class="fa fa-calendar"></i> Academic Year</label>
-                        <div class="year-row">
-                            <select class="field-select" name="academic_year_start" id="academic_year_start" required>
-                                <option value="">Start Year</option>
-                                @for ($year = (date('Y') - 10); $year <= (date('Y') + 10); $year++)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endfor
-                            </select>
-                            <span>–</span>
-                            <select class="field-select" name="academic_year_end" id="academic_year_end" required>
-                                <option value="">End Year</option>
-                            </select>
-                        </div>
+                        <small style="color:#666;display:block;margin-top:4px;">
+                            Temporary password will be generated automatically and sent to the professor email.
+                        </small>
                     </div>
-
-                    <div class="modal-section"><i class="fa fa-clock"></i> Schedule</div>
-
-                    <div class="field-group">
-                        <label class="field-label"><i class="fa fa-calendar-week"></i> Schedule Days</label>
-                        <div class="checkbox-grid">
-                            @foreach(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as $day)
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="schedule_day[]" value="{{ $day }}">
-                                {{ $day }}
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="field-row">
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-list-ol"></i> Number of Time Slots</label>
-                            <select class="field-select" id="time_slots" name="time_slots">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="timeInputs"></div>
 
                 </div>
                 <div class="modal-footer">

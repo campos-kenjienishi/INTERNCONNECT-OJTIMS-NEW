@@ -586,9 +586,37 @@
                         <p>All partner companies with MOA agreements</p>
                     </div>
                 </div>
-                <div class="count-badge">
-                    <i class="fa fa-building"></i>
-                    {{ $totalCompanies }} {{ $totalCompanies == 1 ? 'company' : 'companies' }}
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <form action="{{ url('/MOA') }}" method="GET" style="display:flex; align-items:center; gap:8px;">
+                        <select name="school_year" class="field-select" style="min-width:170px; height:36px; font-size:12px;">
+                            <option value="">All School Years</option>
+                            @foreach ($schoolYears as $schoolYear)
+                                <option value="{{ $schoolYear }}" {{ ($selectedSchoolYear ?? '') === $schoolYear ? 'selected' : '' }}>
+                                    {{ $schoolYear }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <select name="course" class="field-select" style="min-width:220px; height:36px; font-size:12px;">
+                            <option value="">All Courses</option>
+                            @foreach ($course as $courseItem)
+                                <option value="{{ $courseItem->course }}" {{ ($selectedCourse ?? '') === $courseItem->course ? 'selected' : '' }}>
+                                    {{ $courseItem->course }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="btn-modal-submit" style="height:36px; padding:0 14px; font-size:12px;">
+                            <i class="fa fa-filter"></i> Filter
+                        </button>
+                        @if (!empty($selectedCourse) || !empty($selectedSchoolYear))
+                            <a href="{{ url('/MOA') }}" class="btn-modal-close" style="height:36px; padding:0 14px; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                                <i class="fa fa-times"></i> Clear
+                            </a>
+                        @endif
+                    </form>
+                    <div class="count-badge">
+                        <i class="fa fa-building"></i>
+                        {{ $totalCompanies }} {{ $totalCompanies == 1 ? 'company' : 'companies' }}
+                    </div>
                 </div>
             </div>
 
@@ -601,6 +629,7 @@
                             <th>Contact No.</th>
                             <th>Email</th>
                             <th>School Year</th>
+                            <th>Course</th>
                             <th>Students</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -640,6 +669,11 @@
                             <!-- School Year -->
                             <td>
                                 <span style="font-size:13px; color:#555;">{{ $company->school_year }}</span>
+                            </td>
+
+                            <!-- Course -->
+                            <td>
+                                <span style="font-size:13px; color:#555;">{{ $company->course ?: '—' }}</span>
                             </td>
 
                             <!-- Students -->
@@ -770,6 +804,16 @@
                         </div>
                     </div>
 
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Course <span style="color:var(--red);">*</span></label>
+                        <select name="course" id="moaCourseSelect" class="field-select" required>
+                            <option value="" disabled selected>Select course</option>
+                            @foreach ($course as $courseItem)
+                                <option value="{{ $courseItem->course }}">{{ $courseItem->course }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="modal-section"><i class="fa fa-paperclip"></i> MOA Document</div>
 
                     <div class="field-group">
@@ -781,11 +825,12 @@
 
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-user-graduate"></i> Student Names <span style="color:#aaa; font-weight:400;">(Optional, hold Ctrl to select multiple)</span></label>
-                        <select name="student_names[]" class="field-select" multiple style="min-height:100px;">
+                        <select name="student_names[]" id="moaStudentSelect" class="field-select" multiple style="min-height:100px;" disabled>
                             @foreach ($stu as $student)
-                                <option value="{{ $student->full_name }}">{{ $student->full_name }}</option>
+                                <option value="{{ $student->full_name }}" data-course="{{ strtolower(trim($student->course ?? '')) }}">{{ $student->full_name }}</option>
                             @endforeach
                         </select>
+                        <div id="moaStudentHint" style="margin-top:6px; font-size:12px; color:#888;">Select a course first to show matching students.</div>
                     </div>
 
                 </div>
@@ -900,9 +945,9 @@
 
     $(document).ready(function () {
 
-        // DataTable - sorted by hidden ID column desc
+        // DataTable - keep server-side ordering by school year
         $('#companyTable').DataTable({
-            order: [[0, 'desc']],
+            order: [],
             columnDefs: [{ targets: 0, visible: false }]
         });
 
@@ -914,6 +959,40 @@
             $('#send-company-name-input').val(companyName);
             $('#send-company-name').text(companyName);
         });
+
+        function filterStudentOptionsByCourse() {
+            const selectedCourse = (($('#moaCourseSelect').val() || '').trim()).toLowerCase();
+            const studentSelect = document.getElementById('moaStudentSelect');
+            const studentHint = document.getElementById('moaStudentHint');
+
+            if (!studentSelect) {
+                return;
+            }
+
+            const hasSelectedCourse = selectedCourse.length > 0;
+            studentSelect.disabled = !hasSelectedCourse;
+
+            if (studentHint) {
+                studentHint.textContent = hasSelectedCourse
+                    ? 'Only students from the selected course are shown.'
+                    : 'Select a course first to show matching students.';
+            }
+
+            Array.from(studentSelect.options).forEach(function (option) {
+                const studentCourse = (option.getAttribute('data-course') || '').trim().toLowerCase();
+                const isMatch = !selectedCourse || studentCourse === selectedCourse;
+
+                option.hidden = !isMatch;
+                option.disabled = !isMatch;
+
+                if (!isMatch) {
+                    option.selected = false;
+                }
+            });
+        }
+
+        $('#moaCourseSelect').on('change', filterStudentOptionsByCourse);
+        filterStudentOptionsByCourse();
 
         // File validation error
         @if ($errors->has('file'))

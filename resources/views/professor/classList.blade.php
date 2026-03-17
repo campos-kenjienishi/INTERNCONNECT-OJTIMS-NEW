@@ -594,11 +594,6 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
-        <a href="{{ url('/professor/upload') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-upload"></i></span>
-            <span class="nav-label">Upload Templates</span>
-            <span class="tooltip-label">Upload Templates</span>
-        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>
@@ -658,10 +653,10 @@
                     <span>Student List</span>
                 </div>
             </div>
-            <button class="btn-back"
-                onclick="window.location.href='{{ url('/professor/class') }}'">
+            <a class="btn-back"
+                href="{{ url('/professor/class') }}">
                 <i class="fa fa-arrow-left"></i> Back to Class
-            </button>
+            </a>
         </div>
         
 
@@ -815,10 +810,10 @@
 
                             <!-- Requirements -->
                             <td>
-                                <button class="btn-view-req"
-                                    onclick="window.location.href='/studentrequire?value={{ $item['student']->full_name }}'">
+                                <a class="btn-view-req"
+                                    href="{{ url('/studentrequire') }}?value={{ urlencode($item['student']->full_name) }}&roomId={{ $course->id }}">
                                     <i class="fa fa-file-alt"></i> Requirements
-                                </button>
+                                </a>
                             </td>
                         </tr>
                         @endforeach

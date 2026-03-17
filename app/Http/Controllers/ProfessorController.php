@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 
 
@@ -36,23 +37,99 @@ public function class()
 
     if (Session::has('loginId')) {
         $data = User::where('id', Session::get('loginId'))->first();
+        $hasUserClassId = Schema::hasColumn('users', 'class_id');
+        $hasUploadClassId = Schema::hasColumn('uploaded_files', 'class_id');
+        $hasScheduleClassId = Schema::hasTable('schedules') && Schema::hasColumn('schedules', 'class_id');
+        $hasClassScheduleDay = Schema::hasColumn('classes', 'schedule_day');
+        $hasClassScheduleTime = Schema::hasColumn('classes', 'schedule_time');
 
         // Get all rooms (classes) where this professor is adviser
         $classrooms = Classes::where('adviser_name', $data->full_name)->get();
 
         // For each room, preload students needing approval and all students
         foreach ($classrooms as $room) {
-            // Students needing approval (status = 0 or 3)
-            $room->needingApproval = User::where('course', $room->course)
-                ->where('status', 0)
-                ->where('adviser_name', $data->full_name)
-                ->get();
+            if ($hasUserClassId) {
+                // Students needing approval (status = 3 = pending)
+                $room->needingApproval = User::where(function ($query) use ($room, $data) {
+                        $query->where('class_id', $room->id);
 
-            // All students in this class/room (status = 1 = approved)
-            $room->students = User::where('course', $room->course)
-                ->where('status', 1)
-                ->where('adviser_name', $data->full_name)
-                ->get();
+                        // Legacy users without class_id are only shown for legacy rooms (no SY set).
+                        if (empty($room->school_year_start) || empty($room->school_year_end)) {
+                            $query->orWhere(function ($legacy) use ($room, $data) {
+                                $legacy->whereNull('class_id')
+                                    ->where('course', $room->course)
+                                    ->where('adviser_name', $data->full_name);
+                            });
+                        }
+                    })
+                    ->where('status', 3)
+                    ->get();
+
+                // All students in this class/room (status = 1 = approved)
+                $room->students = User::where(function ($query) use ($room, $data) {
+                        $query->where('class_id', $room->id);
+
+                        // Legacy users without class_id are only shown for legacy rooms (no SY set).
+                        if (empty($room->school_year_start) || empty($room->school_year_end)) {
+                            $query->orWhere(function ($legacy) use ($room, $data) {
+                                $legacy->whereNull('class_id')
+                                    ->where('course', $room->course)
+                                    ->where('adviser_name', $data->full_name);
+                            });
+                        }
+                    })
+                    ->where('status', 1)
+                    ->get();
+            } else {
+                // Legacy fallback when users.class_id does not exist yet
+                $room->needingApproval = User::where('course', $room->course)
+                    ->where('status', 3)
+                    ->where('adviser_name', $data->full_name)
+                    ->get();
+
+                $room->students = User::where('course', $room->course)
+                    ->where('status', 1)
+                    ->where('adviser_name', $data->full_name)
+                    ->get();
+            }
+
+            if ($hasUploadClassId) {
+                $room->templateFiles = UploadedFile::where('class_id', $room->id)
+                    ->latest()
+                    ->get();
+            } else {
+                // Legacy fallback when uploaded_files.class_id does not exist yet
+                $room->templateFiles = UploadedFile::where('uploader_name', $data->full_name)
+                    ->latest()
+                    ->get();
+            }
+
+            // Room schedule source priority: schedules.class_id -> classes.schedule_* fallback.
+            if ($hasScheduleClassId) {
+                $roomSchedule = Schedule::where('class_id', $room->id)->latest('id')->first();
+                if ($roomSchedule) {
+                    $room->schedule_day = $roomSchedule->schedule_day;
+                    $room->schedule_time = $roomSchedule->schedule_time;
+                }
+            }
+
+            if (!$hasScheduleClassId) {
+                if (!$hasClassScheduleDay) {
+                    $room->schedule_day = null;
+                }
+                if (!$hasClassScheduleTime) {
+                    $room->schedule_time = null;
+                }
+            }
+
+            $room->schedule_slots = !empty($room->schedule_time) ? (int) $room->schedule_time : 1;
+            $room->schedule_parsed = [];
+            if (!empty($room->schedule_day)) {
+                $decodedSchedule = json_decode($room->schedule_day, true);
+                if (is_array($decodedSchedule)) {
+                    $room->schedule_parsed = $decodedSchedule;
+                }
+            }
         }
     }
 
@@ -64,7 +141,7 @@ public function class()
 }
  
     
-public function show($courseName)
+public function show($roomId)
 {
     $data = array();
     
@@ -73,13 +150,33 @@ public function show($courseName)
     }
     
     if($data->status == 0){
-    // Assuming you have logic to retrieve the professor and students data
-    $course = Classes::where('course', $courseName)->first();
+    $course = Classes::find($roomId);
     
+    if (!$course) {
+        return redirect()->back()->with('error', 'Room not found.');
+    }
     
-    
-    $students = User::where('course', $course->course)->where('status', 3)->where('adviser_name', $data->full_name)->get();;
+    if (Schema::hasColumn('users', 'class_id')) {
+        $students = User::where(function ($query) use ($roomId, $course, $data) {
+                $query->where('class_id', $roomId);
 
+                // Legacy users without class_id are only shown for legacy rooms (no SY set).
+                if (empty($course->school_year_start) || empty($course->school_year_end)) {
+                    $query->orWhere(function ($legacy) use ($course, $data) {
+                        $legacy->whereNull('class_id')
+                            ->where('course', $course->course)
+                            ->where('adviser_name', $data->full_name);
+                    });
+                }
+            })
+            ->where('status', 3)
+            ->get();
+    } else {
+        $students = User::where('course', $course->course)
+            ->where('status', 3)
+            ->where('adviser_name', $data->full_name)
+            ->get();
+    }
 
     // Pass the $course and $students variables to the view
     return view('professor.listStudents', compact('course', 'students', 'data'));
@@ -89,6 +186,16 @@ public function show($courseName)
 }
 public function roomCreate(Request $request){
 
+    $request->validate([
+        'room' => 'required|string|max:255',
+        'course' => 'required|string|max:255',
+        'semester' => 'required|string|max:50',
+        'school_year_start' => 'required|integer',
+        'school_year_end' => 'required|integer|gt:school_year_start',
+        'schedule_day' => 'nullable|array',
+        'schedule_day.*' => 'string',
+        'time_slots' => 'nullable|integer|min:1|max:4',
+    ]);
     
     $data=array();
             if(Session::has('loginId')){
@@ -99,12 +206,45 @@ public function roomCreate(Request $request){
 $room =new Classes();
 $room->room = $request->room;
 $room->course = $request->course;
+$room->semester = $request->semester;
+$room->school_year_start = $request->school_year_start;
+$room->school_year_end = $request->school_year_end;
 $room->adviser_name = $data->full_name;
+
+$scheduleDays = $request->input('schedule_day', []);
+$timeSlots = (int) $request->input('time_slots', 1);
+$scheduleData = [];
+
+foreach ($scheduleDays as $day) {
+    for ($i = 1; $i <= $timeSlots; $i++) {
+        $startTime = $request->input($day . '_start_time_' . $i);
+        $endTime = $request->input($day . '_end_time_' . $i);
+
+        if (!empty($startTime) && !empty($endTime)) {
+            $scheduleData[] = [
+                'day' => $day,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+            ];
+        }
+    }
+}
+
+if (Schema::hasColumn('classes', 'schedule_day')) {
+    $room->schedule_day = !empty($scheduleData) ? json_encode($scheduleData) : null;
+}
+if (Schema::hasColumn('classes', 'schedule_time')) {
+    $room->schedule_time = (string) $timeSlots;
+}
 
 
 
 
 $res = $room->save();
+
+if ($res) {
+    $this->syncRoomSchedule($room, $scheduleData, $timeSlots);
+}
 
 if ($res) {
     AuditLogger::log(
@@ -120,8 +260,89 @@ else{
 }
 }
 
+public function roomUpdate(Request $request, $id)
+{
+    $request->validate([
+        'room' => 'required|string|max:255',
+        'course' => 'required|string|max:255',
+        'semester' => 'required|string|max:50',
+        'school_year_start' => 'required|integer',
+        'school_year_end' => 'required|integer|gt:school_year_start',
+        'schedule_day' => 'nullable|array',
+        'schedule_day.*' => 'string',
+        'time_slots' => 'nullable|integer|min:1|max:4',
+    ]);
+
+    $data = null;
+    if (Session::has('loginId')) {
+        $data = User::where('id', Session::get('loginId'))->first();
+    }
+
+    $room = Classes::find($id);
+    if (!$room) {
+        return back()->with('fail', 'Room not found.');
+    }
+
+    $room->room = $request->room;
+    $room->course = $request->course;
+    $room->semester = $request->semester;
+    $room->school_year_start = $request->school_year_start;
+    $room->school_year_end = $request->school_year_end;
+
+    $scheduleData = [];
+    $timeSlots = null;
+    $scheduleDays = $request->input('schedule_day', []);
+    $hasScheduleInput = !empty($scheduleDays);
+
+    if ($hasScheduleInput) {
+        $timeSlots = (int) $request->input('time_slots', 1);
+
+        foreach ($scheduleDays as $day) {
+            for ($i = 1; $i <= $timeSlots; $i++) {
+                $startTime = $request->input($day . '_start_time_' . $i);
+                $endTime = $request->input($day . '_end_time_' . $i);
+
+                if (!empty($startTime) && !empty($endTime)) {
+                    $scheduleData[] = [
+                        'day' => $day,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                    ];
+                }
+            }
+        }
+
+        if (Schema::hasColumn('classes', 'schedule_day')) {
+            $room->schedule_day = !empty($scheduleData) ? json_encode($scheduleData) : null;
+        }
+        if (Schema::hasColumn('classes', 'schedule_time')) {
+            $room->schedule_time = (string) $timeSlots;
+        }
+    }
+
+    $room->save();
+
+    if ($hasScheduleInput && $timeSlots !== null) {
+        $this->syncRoomSchedule($room, $scheduleData, $timeSlots);
+    }
+
+    AuditLogger::log(
+        'Class Room',
+        'update',
+        'Updated room: ' . $room->room . ' for course: ' . $room->course,
+        $data->id ?? null
+    );
+
+    return back()->with('success', 'Room updated successfully!');
+}
+
 public function roomDelete($id)
 {
+    $data = null;
+    if (Session::has('loginId')) {
+        $data = User::where('id', Session::get('loginId'))->first();
+    }
+
     $room = Classes::find($id);
 
     if (!$room) {
@@ -130,6 +351,16 @@ public function roomDelete($id)
     if ($room) {
         $roomName = $room->room;
         $courseName = $room->course;
+
+        // Unassign students from this room before deleting it.
+        if (Schema::hasColumn('users', 'class_id')) {
+            User::where('class_id', $room->id)->update(['class_id' => null]);
+        }
+
+        if (Schema::hasTable('schedules') && Schema::hasColumn('schedules', 'class_id')) {
+            Schedule::where('class_id', $room->id)->delete();
+        }
+
         $room->delete();
         AuditLogger::log(
             'Class Room',
@@ -141,7 +372,31 @@ public function roomDelete($id)
     return response()->json(['success' => true]);
 }
 
-public function show_list($courseName)
+private function syncRoomSchedule($room, array $scheduleData, int $timeSlots): void
+{
+    if (!Schema::hasTable('schedules') || !Schema::hasColumn('schedules', 'class_id')) {
+        return;
+    }
+
+    $academicYear = null;
+    if (!empty($room->school_year_start) && !empty($room->school_year_end)) {
+        $academicYear = $room->school_year_start . '-' . $room->school_year_end;
+    }
+
+    Schedule::updateOrCreate(
+        ['class_id' => $room->id],
+        [
+            'subject_code' => null,
+            'course' => $room->course,
+            'academic_year' => $academicYear,
+            'semester' => $room->semester,
+            'schedule_day' => !empty($scheduleData) ? json_encode($scheduleData) : null,
+            'schedule_time' => (string) $timeSlots,
+        ]
+    );
+}
+
+public function show_list($roomId)
 {
     $data = array();
 
@@ -150,23 +405,38 @@ public function show_list($courseName)
     }
 
     if ($data->status == 0) {
-        // Assuming you have logic to retrieve the professor and students data
-        $course = Classes::where('course', $courseName)->first();
+        $course = Classes::find($roomId);
 
         if (!$course) {
-            // Handle the case where the course doesn't exist
-            return redirect()->back()->with('error', 'Course not found.');
+            return redirect()->back()->with('error', 'Room not found.');
         }
 
-        $students = User::with('studentInfo')
+        $studentsQuery = User::with('studentInfo')
             ->join('students', 'users.studentNum', '=', 'students.studentNum')
-            ->where('users.course', $course->course)
             ->where('users.status', 1)
-            ->where('users.adviser_name', $data->full_name)
             ->orderBy('students.school_year_start', 'desc')
             ->orderBy('students.school_year_end', 'desc')
-            ->select('users.*')
-            ->get();
+            ->select('users.*');
+
+        if (Schema::hasColumn('users', 'class_id')) {
+            $studentsQuery->where(function ($query) use ($roomId, $course, $data) {
+                $query->where('users.class_id', $roomId);
+
+                // Legacy users without class_id are only shown for legacy rooms (no SY set).
+                if (empty($course->school_year_start) || empty($course->school_year_end)) {
+                    $query->orWhere(function ($legacy) use ($course, $data) {
+                        $legacy->whereNull('users.class_id')
+                            ->where('users.course', $course->course)
+                            ->where('users.adviser_name', $data->full_name);
+                    });
+                }
+            });
+        } else {
+            $studentsQuery->where('users.course', $course->course)
+                ->where('users.adviser_name', $data->full_name);
+        }
+
+        $students = $studentsQuery->get();
 
         $studentData = [];
 

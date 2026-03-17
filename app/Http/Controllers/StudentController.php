@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentNotificationMail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 
 class StudentController extends Controller
@@ -97,6 +98,7 @@ class StudentController extends Controller
 
         $sched = []; 
         $class = [];
+        $roomTemplates = collect();
         $course=Courses::all();
        
         
@@ -114,6 +116,44 @@ class StudentController extends Controller
                 $class = Classes::where('adviser_name', $data->adviser_name)
                                ->where('course', $data->course)
                                ->get();
+
+                $hasScheduleClassId = Schema::hasTable('schedules') && Schema::hasColumn('schedules', 'class_id');
+                $hasClassScheduleDay = Schema::hasColumn('classes', 'schedule_day');
+                $hasClassScheduleTime = Schema::hasColumn('classes', 'schedule_time');
+
+                foreach ($class as $room) {
+                    if ($hasScheduleClassId) {
+                        $roomSchedule = Schedule::where('class_id', $room->id)->latest('id')->first();
+                        if ($roomSchedule) {
+                            $room->schedule_day = $roomSchedule->schedule_day;
+                            $room->schedule_time = $roomSchedule->schedule_time;
+                        }
+                    }
+
+                    if (!$hasScheduleClassId) {
+                        if (!$hasClassScheduleDay) {
+                            $room->schedule_day = null;
+                        }
+                        if (!$hasClassScheduleTime) {
+                            $room->schedule_time = null;
+                        }
+                    }
+
+                    $room->schedule_slots = !empty($room->schedule_time) ? (int) $room->schedule_time : 1;
+                    $room->schedule_parsed = [];
+                    if (!empty($room->schedule_day)) {
+                        $decodedSchedule = json_decode($room->schedule_day, true);
+                        if (is_array($decodedSchedule)) {
+                            $room->schedule_parsed = $decodedSchedule;
+                        }
+                    }
+                }
+
+                if (Schema::hasColumn('uploaded_files', 'class_id') && Schema::hasColumn('users', 'class_id') && !empty($data->class_id)) {
+                    $roomTemplates = UploadedFile::where('class_id', $data->class_id)
+                        ->latest()
+                        ->get();
+                }
 
                 $professor = Professor::where('full_name', $data->adviser_name)->with('subjects')->get();
 
@@ -142,13 +182,13 @@ class StudentController extends Controller
         
 
     // Pass the $professor and $students variables to the view
-    return view('students.student_class', compact('data', 'course', 'class', 'announce', 'sched'));
+    return view('students.student_class', compact('data', 'course', 'class', 'announce', 'sched', 'roomTemplates'));
 
 
 }
 
 
-public function join(Request $request,$email)
+public function join(Request $request, $email, $classId)
     {
         $user = User::where('email', $email)->first();
 
@@ -160,6 +200,9 @@ public function join(Request $request,$email)
         // Update user data
 
         $user->status = 3;
+        if (Schema::hasColumn('users', 'class_id')) {
+            $user->class_id = $classId;
+        }
     
         $user->save();
         AuditLogger::log(
@@ -184,6 +227,9 @@ public function join(Request $request,$email)
 
             // Just change the status to "not joined"
             $user->status = 0;
+            if (Schema::hasColumn('users', 'class_id')) {
+                $user->class_id = null;
+            }
 
             $user->save();
             AuditLogger::log(
@@ -205,12 +251,17 @@ public function join(Request $request,$email)
                 $user=User::where('id','=', Session::get('loginId'))->first();
                         }
            $class = Classes::where('adviser_name', $user->adviser_name)->get();
-            // Fetch and display the templates where Uploader_name matches adviser_name
-    $upload = UploadedFile::where(function ($query) use ($user) {
-        $query->where('uploader_name', 'Gina Dela Cruz')
-              ->orWhere('uploader_name', $user->adviser_name);
-    })
-    ->get();
+            // Student download page shows global templates (not room-specific).
+        if (Schema::hasColumn('uploaded_files', 'class_id')) {
+            $upload = UploadedFile::where(function ($query) {
+                    $query->whereNull('class_id')
+                          ->orWhere('class_id', 0);
+                })
+                ->latest()
+                ->get();
+        } else {
+            $upload = UploadedFile::latest()->get();
+        }
 
     // Pass the $professor and $students variables to the view
     return view('students.student_file', compact('data','upload','class','user'));

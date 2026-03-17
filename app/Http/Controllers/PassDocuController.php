@@ -175,7 +175,15 @@ public function removeFile($id)
         $data = [];
 
         $student = User::where('full_name', '=', $value)->first();
-        $course=$student->course;
+        if (!$student) {
+            return back()->with('error', 'Student not found.');
+        }
+
+        $course = $student->course;
+        $roomId = $request->input('roomId');
+        if (empty($roomId) && isset($student->class_id)) {
+            $roomId = $student->class_id;
+        }
        
         
         if (Session::has('loginId')) {
@@ -186,7 +194,7 @@ public function removeFile($id)
                                 ->where('uploadedBy', '=', $value)
                                 ->get();
         
-        return view('professor.studentRequire', compact('data','files', 'value','course'));
+        return view('professor.studentRequire', compact('data','files', 'value','course', 'roomId'));
 
             
             }
@@ -240,6 +248,7 @@ public function removeFile($id)
                 // Retrieve the value from the query parameter
                 $value = $request->input('value');
                 $file = $request->input('file');
+                $roomId = $request->input('roomId');
                 $data = [];
                
                 
@@ -252,7 +261,7 @@ public function removeFile($id)
                                         ->where('fileName', '=', $file)
                                         ->get();
                 
-                return view('professor.requireView', compact('data','files','value','file'));
+                return view('professor.requireView', compact('data','files','value','file','roomId'));
         
                     
                     }
