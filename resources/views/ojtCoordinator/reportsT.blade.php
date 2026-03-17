@@ -89,24 +89,17 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999;
         }
         .sidebar.collapsed .nav-item:hover .tooltip-label { opacity: 1; }
-
-        /* Reports sub-nav */
-        .nav-sub {
-            padding: 4px 0 4px 52px;
-            border-left: 3px solid transparent;
-        }
+        .nav-sub { padding: 4px 0 4px 52px; border-left: 3px solid transparent; }
         .nav-sub-item {
             display: block; padding: 7px 16px;
             color: rgba(255,255,255,0.45); text-decoration: none;
             font-size: 12.5px; font-weight: 500;
             border-left: 2px solid transparent;
-            transition: all 0.2s; border-radius: 0 6px 6px 0;
-            white-space: nowrap;
+            transition: all 0.2s; border-radius: 0 6px 6px 0; white-space: nowrap;
         }
         .nav-sub-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .nav-sub-item.active { color: #fca5a5; border-left-color: #fca5a5; background: rgba(239,68,68,0.08); }
         .sidebar.collapsed .nav-sub { display: none; }
-
         .sidebar-footer { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
 
         /* =============== MAIN =============== */
@@ -147,142 +140,60 @@
         }
         .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
-        .breadcrumb {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 13px; color: #888; margin-top: 6px;
-        }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888; margin-top: 6px; }
         .breadcrumb a { color: var(--red); text-decoration: none; }
         .breadcrumb a:hover { text-decoration: underline; }
         .breadcrumb i { font-size: 10px; }
 
         /* =============== STATS =============== */
-        .stats-row {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px; margin-bottom: 22px;
-        }
-        .stat-card {
-            background: #fff; border-radius: 14px; padding: 18px 20px;
-            display: flex; align-items: center; gap: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04);
-        }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 22px; }
+        .stat-card { background: #fff; border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); }
         .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-        .stat-icon.red    { background: #fee2e2; color: var(--red); }
-        .stat-icon.blue   { background: #dbeafe; color: #2563eb; }
-        .stat-icon.green  { background: #dcfce7; color: #16a34a; }
-        .stat-icon.amber  { background: #fef9c3; color: #ca8a04; }
+        .stat-icon.red   { background: #fee2e2; color: var(--red); }
+        .stat-icon.blue  { background: #dbeafe; color: #2563eb; }
+        .stat-icon.green { background: #dcfce7; color: #16a34a; }
+        .stat-icon.amber { background: #fef9c3; color: #ca8a04; }
         .stat-num  { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
         .stat-name { font-size: 12px; color: #888; margin-top: 3px; }
 
         /* =============== FILTER CARD =============== */
-        .panel-card {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04);
-            overflow: hidden; margin-bottom: 22px;
-        }
-        .panel-card-header {
-            display: flex; align-items: center; gap: 12px;
-            padding: 16px 22px; border-bottom: 1px solid #f0f0f0; background: #fafafa;
-        }
-        .panel-header-icon {
-            width: 36px; height: 36px; border-radius: 9px;
-            background: #fee2e2; display: flex; align-items: center;
-            justify-content: center; color: var(--red); font-size: 14px; flex-shrink: 0;
-        }
+        .panel-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); overflow: hidden; margin-bottom: 22px; }
+        .panel-card-header { display: flex; align-items: center; gap: 12px; padding: 16px 22px; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
+        .panel-header-icon { width: 36px; height: 36px; border-radius: 9px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 14px; flex-shrink: 0; }
         .panel-card-header h2 { font-size: 15px; font-weight: 700; color: #1a1a1a; }
         .panel-card-header p  { font-size: 12px; color: #888; margin-top: 2px; }
         .panel-card-body { padding: 22px; }
-
-        /* Filter fields */
-        .filter-grid {
-            display: grid; grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 16px; align-items: end;
-        }
+        .filter-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; align-items: end; }
         .field-group { display: flex; flex-direction: column; gap: 5px; }
         .field-label { font-size: 12px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 5px; }
         .field-label i { color: var(--red); font-size: 11px; }
-        .field-input, .field-select {
-            width: 100%; background: #fafafa; border: 1.5px solid #e8e8e8;
-            border-radius: 10px; color: #1a1a1a;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            padding: 10px 13px; outline: none; transition: all 0.25s;
-        }
-        .field-input:focus, .field-select:focus {
-            border-color: var(--red); background: #fff;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
-        }
-
-        /* Flatpickr override */
+        .field-input, .field-select { width: 100%; background: #fafafa; border: 1.5px solid #e8e8e8; border-radius: 10px; color: #1a1a1a; font-family: 'Poppins', sans-serif; font-size: 13px; padding: 10px 13px; outline: none; transition: all 0.25s; }
+        .field-input:focus, .field-select:focus { border-color: var(--red); background: #fff; box-shadow: 0 0 0 3px rgba(220,38,38,0.07); }
         .flatpickr-input { font-family: 'Poppins', sans-serif !important; }
         .flatpickr-day.selected { background: var(--red) !important; border-color: var(--red) !important; }
         .flatpickr-day:hover { background: #fee2e2 !important; }
-
-        /* Buttons */
-        .btn-generate {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 11px 22px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 10px; color: #fff;
-            font-family: 'Poppins', sans-serif; font-size: 14px;
-            font-weight: 600; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.25); white-space: nowrap;
-        }
+        .btn-generate { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border: none; border-radius: 10px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 16px rgba(220,38,38,0.25); white-space: nowrap; }
         .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(220,38,38,0.35); }
-
-        .btn-preview {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 20px; border-radius: 10px;
-            background: #fff; border: 1.5px solid #e0e7ff; color: #4f46e5;
-            font-family: 'Poppins', sans-serif; font-size: 13.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
+        .btn-preview { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; background: #fff; border: 1.5px solid #e0e7ff; color: #4f46e5; font-family: 'Poppins', sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-preview:hover { background: #e0e7ff; }
 
         /* =============== TABLE CARD =============== */
-        .table-card {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04); overflow: hidden;
-        }
-        .table-card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; padding: 18px 24px;
-            border-bottom: 1px solid #f0f0f0; background: #fafafa; flex-wrap: wrap;
-        }
+        .table-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); overflow: hidden; }
+        .table-card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid #f0f0f0; background: #fafafa; flex-wrap: wrap; }
         .table-card-header-left { display: flex; align-items: center; gap: 12px; }
-        .header-icon {
-            width: 38px; height: 38px; border-radius: 10px;
-            background: #fee2e2; display: flex; align-items: center;
-            justify-content: center; color: var(--red); font-size: 15px; flex-shrink: 0;
-        }
+        .header-icon { width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 15px; flex-shrink: 0; }
         .table-card-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
         .table-card-header p  { font-size: 12.5px; color: #888; margin-top: 2px; }
-        .count-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #fee2e2; color: var(--red);
-            border-radius: 20px; padding: 5px 14px;
-            font-size: 12.5px; font-weight: 700;
-        }
+        .count-badge { display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 5px 14px; font-size: 12.5px; font-weight: 700; }
 
         /* DataTables */
         .table-card-body .dataTables_wrapper { padding: 16px 22px; font-family: 'Poppins', sans-serif; font-size: 13px; }
         .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
-        .table-card-body table.dataTable thead th {
-            background: #fafafa; color: #555; font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px;
-            border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap;
-        }
-        .table-card-body table.dataTable tbody td {
-            padding: 11px 12px; color: #333;
-            border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle;
-        }
+        .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap; }
+        .table-card-body table.dataTable tbody td { padding: 11px 12px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
-        .dataTables_filter input {
-            border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
-            padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important; outline: none !important;
-        }
+        .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; }
         .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }
         .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; }
         .dataTables_paginate .paginate_button { border-radius: 6px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; }
@@ -291,67 +202,38 @@
 
         /* Cell styles */
         .name-cell { display: flex; align-items: center; gap: 8px; }
-        .name-avatar {
-            width: 30px; height: 30px; border-radius: 50%;
-            background: #fee2e2; display: flex; align-items: center; justify-content: center;
-            color: var(--red); font-size: 11px; font-weight: 700; flex-shrink: 0;
-        }
+        .name-avatar { width: 30px; height: 30px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 11px; font-weight: 700; flex-shrink: 0; }
         .name-text { font-weight: 600; color: #1a1a1a; }
-        .level-badge {
-            display: inline-flex; align-items: center;
-            background: #dbeafe; color: #2563eb;
-            border-radius: 20px; padding: 2px 9px;
-            font-size: 11px; font-weight: 600;
-        }
-        .date-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            background: #f0fdf4; color: #16a34a;
-            border-radius: 20px; padding: 2px 8px;
-            font-size: 11px; font-weight: 600; white-space: nowrap;
-        }
+        .level-badge { display: inline-flex; align-items: center; background: #dbeafe; color: #2563eb; border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
+        .date-badge { display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; color: #16a34a; border-radius: 20px; padding: 2px 8px; font-size: 11px; font-weight: 600; white-space: nowrap; }
 
-        /* =============== MODAL =============== */
-        .modal-content {
-            border-radius: 16px; border: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            font-family: 'Poppins', sans-serif; overflow: hidden;
-        }
-        .modal-header {
-            background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%);
-            border-bottom: none; padding: 20px 24px;
-        }
+        /* =============== PRINT PREVIEW MODAL =============== */
+        .modal-content { border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); font-family: 'Poppins', sans-serif; overflow: hidden; }
+        .modal-header { background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); border-bottom: none; padding: 10px 16px; display: flex; justify-content: flex-end; }
         .modal-title { color: #fff; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
-        .modal-body { padding: 0; background: #fff; max-height: 480px; overflow: auto; }
-        .modal-footer {
-            background: #fafafa; border-top: 1px solid #f0f0f0;
-            padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px;
-        }
-        .btn-modal-close {
-            padding: 9px 20px; background: #f3f4f6;
-            border: 1px solid #e5e5e5; border-radius: 8px; color: #555;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
+        .modal-body { padding: 24px; background: #f0f0f0; max-height: 70vh; overflow-y: auto; }
+        .modal-footer { background: #fafafa; border-top: 1px solid #f0f0f0; padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-modal-close { padding: 9px 20px; background: #f3f4f6; border: 1px solid #e5e5e5; border-radius: 8px; color: #555; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-modal-close:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
-        .btn-modal-print {
-            padding: 9px 24px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 8px; color: #fff;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: all 0.25s;
-            box-shadow: 0 3px 10px rgba(220,38,38,0.2);
-        }
+        .btn-modal-print { padding: 9px 24px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border: none; border-radius: 8px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.25s; box-shadow: 0 3px 10px rgba(220,38,38,0.2); }
         .btn-modal-print:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.3); }
 
-        /* Print preview table inside modal */
-        #printPreviewContent table { width: 100%; border-collapse: collapse; font-family: 'Poppins', sans-serif; font-size: 12px; }
-        #printPreviewContent th {
-            background: #7f0000; color: #fff; padding: 8px 10px;
-            font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; text-align: left;
+        /* Footer */
+        .dashboard-footer {
+            background: #fff; border-top: 1px solid #f0f0f0;
+            color: #888; padding: 18px 28px; font-size: 12.5px; margin-top: auto;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 8px;
         }
-        #printPreviewContent td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; color: #333; }
-        #printPreviewContent tr:hover td { background: #fff5f5; }
+        .dashboard-footer .footer-left { display: flex; align-items: center; gap: 8px; }
+        .dashboard-footer .footer-logo { width: 22px; height: 22px; object-fit: contain; opacity: 0.6; }
+        .dashboard-footer .footer-copy { font-size: 12.5px; color: #aaa; font-weight: 500; }
+        .dashboard-footer .footer-copy span { color: var(--red); font-weight: 600; }
+        .dashboard-footer .footer-links { display: flex; align-items: center; gap: 6px; }
+        .dashboard-footer a { color: #888; text-decoration: none; font-weight: 500; font-size: 12.5px; transition: color 0.2s; }
+        .dashboard-footer a:hover { color: var(--red); }
+        .dashboard-footer .divider { color: #e5e5e5; margin: 0 2px; }
 
         /* Mobile overlay */
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
@@ -367,71 +249,21 @@
             .filter-grid { grid-template-columns: 1fr 1fr; }
         }
 
-        @media (max-width: 560px) {
-            .filter-grid { grid-template-columns: 1fr; }
-        }
-        /* Dashboard Footer */
-.dashboard-footer {
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    color: #888;
-    text-align: center;
-    padding: 18px 28px;
-    font-size: 12.5px;
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
+        @media (max-width: 560px) { .filter-grid { grid-template-columns: 1fr; } }
 
-.dashboard-footer .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+        .level-wrap{
+    display:inline-block;
+    max-width:80px;
+    white-space:normal;
+    word-break:break-word;
+    text-align:center;
+    line-height:1.1;
 }
-
-.dashboard-footer .footer-logo {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    opacity: 0.6;
-}
-
-.dashboard-footer .footer-copy {
-    font-size: 12.5px;
-    color: #aaa;
-    font-weight: 500;
-}
-
-.dashboard-footer .footer-copy span {
-    color: var(--red);
-    font-weight: 600;
-}
-
-.dashboard-footer .footer-links {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.dashboard-footer a {
-    color: #888;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 12.5px;
-    transition: color 0.2s;
-}
-
-.dashboard-footer a:hover {
-    color: var(--red);
-    text-decoration: none;
-}
-
-.dashboard-footer .divider {
-    color: #e5e5e5;
-    margin: 0 2px;
+.level-badge{
+    max-width:110px;
+    white-space:normal;
+    line-height:1.2;
+    text-align:center;
 }
     </style>
 </head>
@@ -496,7 +328,6 @@
             <span class="tooltip-label">MOA</span>
         </a>
 
-        <!-- Reports with sub-nav -->
         <div class="nav-item" style="cursor:default; pointer-events:none;">
             <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
             <span class="nav-label">Reports</span>
@@ -509,13 +340,12 @@
                 <i class="fa fa-calendar-times" style="margin-right:6px; font-size:11px;"></i> Expired MOA
             </a>
         </div>
-        <li>
-    <a href="{{ url('/auditlog') }}" class="nav-item">
+
+        <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-</li>
     </nav>
 
     <div class="sidebar-footer">
@@ -542,7 +372,6 @@
 
     <div class="page-content">
 
-        <!-- Page Header -->
         <div class="page-header">
             <div>
                 <h1>Student OJT <span>Reports</span></h1>
@@ -643,13 +472,15 @@
                         <i class="fa fa-users"></i>
                         {{ count($studentData) }} {{ count($studentData) == 1 ? 'record' : 'records' }}
                     </div>
-                    <button type="button" class="btn-preview" onclick="openPrintPreviewModal()">
+                    {{-- FIX #2: Changed from onclick to id-based handler to prevent double modal --}}
+                    <button type="button" class="btn-preview" id="openPreviewBtn">
                         <i class="fa fa-print"></i> Print Preview
                     </button>
                 </div>
             </div>
 
             <div class="table-card-body">
+                {{-- FIX #1: Only render rows where ojt data actually exists --}}
                 <table id="fileTable" class="display" style="width:100%">
                     <thead>
                         <tr>
@@ -669,53 +500,36 @@
                     </thead>
                     <tbody>
                         @foreach ($studentData as $data)
-                        <tr id="studentRow{{ $loop->index }}">
-                            <!-- Student Name -->
-                            <td>
-                                <div class="name-cell">
-                                    <div class="name-avatar">
-                                        {{ strtoupper(substr($data['student']->full_name, 0, 1)) }}
+                            @if(isset($data['ojt']) && $data['ojt'])
+                            <tr>
+                                <td>
+                                    <div class="name-cell">
+                                        <div class="name-avatar">{{ strtoupper(substr($data['student']->full_name, 0, 1)) }}</div>
+                                        <span class="name-text">{{ $data['student']->full_name }}</span>
                                     </div>
-                                    <span class="name-text">{{ $data['student']->full_name }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display:flex; align-items:center; gap:5px;">
-                                    <i class="fa fa-building" style="color:var(--red); font-size:11px;"></i>
-                                    {{ $data['ojt']->company_name }}
-                                </div>
-                            </td>
-                            <td style="max-width:160px; word-break:break-word; font-size:12.5px; color:#555;">
-                                {{ $data['ojt']->company_address }}
-                            </td>
-                            <td>{{ $data['ojt']->nature_of_bus }}</td>
-                            <td>{{ $data['ojt']->nature_of_link }}</td>
-                            <td>
-                                <span class="level-badge">{{ $data['ojt']->level }}</span>
-                            </td>
-                            <td>
-                                <span class="date-badge">
-                                    <i class="fa fa-calendar-alt"></i>
-                                    {{ $data['ojt']->start_date }}
+                                </td>
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:5px;">
+                                        <i class="fa fa-building" style="color:var(--red); font-size:11px;"></i>
+                                        {{ $data['ojt']->company_name }}
+                                    </div>
+                                </td>
+                                <td style="max-width:160px; word-break:break-word; font-size:12.5px; color:#555;">{{ $data['ojt']->company_address }}</td>
+                                <td>{{ $data['ojt']->nature_of_bus }}</td>
+                                <td>{{ $data['ojt']->nature_of_link }}</td>
+                                <td>
+                                <span class="level-badge">
+                                {{ Str::limit($data['ojt']->level, 15) }}
                                 </span>
-                            </td>
-                            <td>
-                                <span class="date-badge">
-                                    <i class="fa fa-calendar-check"></i>
-                                    {{ $data['ojt']->finish_date }}
-                                </span>
-                            </td>
-                            <td style="white-space:nowrap; color:#555;">
-                                <i class="fa fa-clock" style="color:var(--red); font-size:11px; margin-right:4px;"></i>
-                                {{ $data['ojt']->report_time }}
-                            </td>
-                            <td style="font-weight:600;">{{ $data['ojt']->contact_name }}</td>
-                            <td style="color:#555; font-size:12.5px;">{{ $data['ojt']->contact_position }}</td>
-                            <td style="white-space:nowrap;">
-                                <i class="fa fa-phone" style="color:var(--red); font-size:11px; margin-right:4px;"></i>
-                                {{ $data['ojt']->contact_number }}
-                            </td>
-                        </tr>
+                                </td>
+                                <td><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date }}</span></td>
+                                <td><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date }}</span></td>
+                                <td style="white-space:nowrap; color:#555;"><i class="fa fa-clock" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->report_time }}</td>
+                                <td style="font-weight:600;">{{ $data['ojt']->contact_name }}</td>
+                                <td style="color:#555; font-size:12.5px;">{{ $data['ojt']->contact_position }}</td>
+                                <td style="white-space:nowrap;"><i class="fa fa-phone" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->contact_number }}</td>
+                            </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>
@@ -723,41 +537,41 @@
         </div>
 
     </div>
+
     <footer class="dashboard-footer">
-    <div class="footer-left">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-        <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
-        </span>
-    </div>
-    <div class="footer-links">
-        <a href="https://www.pup.edu.ph/" target="_blank">
-            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
-            PUP Website
-        </a>
-        <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
-        <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
-    </div>
-</footer>
+        <div class="footer-left">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <span class="footer-copy">© 1998–2026 <span>Polytechnic University of the Philippines</span></span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank"><i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i> PUP Website</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        </div>
+    </footer>
 </div>
 
-<!-- =============== PRINT PREVIEW MODAL =============== -->
-<div id="printPreviewModal" class="modal fade" tabindex="-1" aria-hidden="true">
+<!-- =============== PRINT PREVIEW MODAL (single instance) =============== -->
+<div id="printPreviewModal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fa fa-print"></i> Print Preview — Student OJT Information</h5>
+            <div class="modal-header" style="padding:14px 20px;">
+                <h5 class="modal-title" style="visibility:hidden; font-size:0;"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="printPreviewContent"></div>
+            <div class="modal-body">
+                <div id="printPreviewContent" style="background:#fff; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,0.12); overflow:hidden;">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
             <div class="modal-footer">
                 <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-1"></i> Close
+                    <i class="fa fa-times" style="margin-right:5px;"></i> Close
                 </button>
-                <button type="button" onclick="printReport()" class="btn-modal-print">
-                    <i class="fa fa-print me-1"></i> Print
+                <button type="button" id="doPrintBtn" class="btn-modal-print">
+                    <i class="fa fa-print" style="margin-right:5px;"></i> Print / Save as PDF
                 </button>
             </div>
         </div>
@@ -765,24 +579,14 @@
 </div>
 
 <!-- Hidden print iframe -->
-<iframe id="printFrame" style="display:none;"></iframe>
+<iframe id="printFrame" style="display:none; position:absolute; left:-9999px; top:-9999px;"></iframe>
 
-<!-- Hidden email form -->
-<form action="{{ url('/reports/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
-    @csrf
-    <input type="hidden" id="email" name="email" value="{{ $user->email }}">
-    <input type="hidden" id="printContentsInput">
-</form>
-
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    // Sidebar toggle
+    /* ── Sidebar toggle ── */
     const sidebar     = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const menuToggle  = document.getElementById('menuToggle');
@@ -804,59 +608,327 @@
         overlay.classList.remove('active');
     });
 
+    /* ── DataTable ── */
     $(document).ready(function () {
         $('#fileTable').DataTable({ order: [] });
     });
 
-    // Flatpickr
-    flatpickr('.datepicker', {
-        dateFormat: 'Y-m-d',
-        allowInput: true,
+    /* ── Datepicker ── */
+    flatpickr('.datepicker', { dateFormat: 'Y-m-d', allowInput: true });
+
+    /* ══════════════════════════════════════════════
+       BUILD PRINT HTML
+       • Only rows on the CURRENT DataTable page
+       • Table sized to fit A4 landscape — no side-scroll
+    ══════════════════════════════════════════════ */
+    function buildPrintHTML() {
+        const now      = new Date();
+        const dateStr  = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+        const timeStr  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+        const dt = $('#fileTable').DataTable();
+
+        /* ── FIX: get only the rows visible on the CURRENT page ── */
+        const currentPageNodes = dt.rows({ page: 'current' }).nodes();
+        const total            = currentPageNodes.length;
+        const pageInfo         = dt.page.info();
+        const pageNum          = pageInfo.page + 1;        // 1-based
+        const pageCount        = pageInfo.pages;
+
+        const startDate = document.getElementById('start_date').value || '—';
+        const endDate   = document.getElementById('end_date').value   || '—';
+        const course    = document.getElementById('course').value     || '—';
+
+        /* Build table body rows from CURRENT PAGE only */
+        let rowsHTML = '';
+        for (let i = 0; i < currentPageNodes.length; i++) {
+            const tds = currentPageNodes[i].querySelectorAll('td');
+
+            const getName = (idx) => {
+                if (!tds[idx]) return '';
+                const nt = tds[idx].querySelector('.name-text');
+                return nt ? nt.textContent.trim() : tds[idx].textContent.trim();
+            };
+            const get = (idx) => tds[idx] ? tds[idx].textContent.trim() : '';
+
+            /* Global row number = offset + local index + 1 */
+            const rowNum = pageInfo.start + i + 1;
+            const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+
+            rowsHTML += `
+            <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#6b7280; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">${rowNum}</td>
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getName(0)}</td>
+                <td style="padding:7px 6px; font-size:9px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${get(1)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(2)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(3)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(4)}</td>
+                <td style="padding:7px 6px; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">
+                <span style="
+                display:inline-block;
+                background:#dbeafe;
+                color:#1d4ed8;
+                border-radius:4px;
+                padding:2px 4px;
+                font-size:8px;
+                font-weight:700;
+                white-space:normal;
+                word-break:break-word;
+                text-align:center;
+                line-height:1.1;
+                max-width:55px;
+                ">
+                ${get(5)}
+                </span>
+                </td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#059669; font-weight:600; vertical-align:top; white-space:nowrap; border-right:1px solid #e5e7eb;">${get(6)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#059669; font-weight:600; vertical-align:top; white-space:nowrap; border-right:1px solid #e5e7eb;">${get(7)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(8)}</td>
+                <td style="padding:7px 6px; font-size:9px; font-weight:600; color:#111827; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(9)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#6b7280; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(10)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; word-break:break-word;">${get(11)}</td>
+            </tr>`;
+        }
+
+        return `
+        <div style="font-family:'Poppins',Arial,sans-serif; background:#fff;">
+
+            <!-- ══ INSTITUTIONAL HEADER ══ -->
+            <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
+                <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
+                <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
+                    <div style="width:50px; height:50px; background:rgba(255,255,255,0.18); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.25);">
+                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);">
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
+                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Student OJT Information Report</div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus &nbsp;|&nbsp; College of Engineering and Technology</div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
+                            <div style="font-size:18px; font-weight:800; color:#fff; line-height:1;">${total}</div>
+                            <div style="font-size:7.5px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; margin-top:1px;">Page Records</div>
+                        </div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.55); margin-top:4px; text-align:center;">Page ${pageNum} of ${pageCount}</div>
+                    </div>
+                </div>
+                <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
+            </div>
+
+            <!-- ══ META ROW ══ -->
+            <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Date Range:</span>
+                        <strong style="color:#111827;">${startDate} → ${endDate}</strong>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Course:</span>
+                        <strong style="color:#111827;">${course}</strong>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Showing:</span>
+                        <strong style="color:#111827;">${total} student${total !== 1 ? 's' : ''} (Page ${pageNum})</strong>
+                    </div>
+                </div>
+                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
+            </div>
+
+            <!-- ══ SECTION LABEL ══ -->
+            <div style="padding:9px 22px 3px 22px;">
+                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Student Placement Details — Page ${pageNum}</div>
+            </div>
+
+            <!-- ══ MAIN DATA TABLE — table-layout:fixed + % widths = no side scroll ══ -->
+            <div style="padding:4px 22px 0 22px;">
+                <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
+                    <colgroup>
+                        <col style="width:3%;">    <!-- # -->
+                        <col style="width:10%;">   <!-- Student Name -->
+                        <col style="width:9%;">    <!-- Company -->
+                        <col style="width:10%;">   <!-- Address -->
+                        <col style="width:8%;">    <!-- Nat. Business -->
+                        <col style="width:8%;">    <!-- Linkages -->
+                        <col style="width:6%;">    <!-- Level -->
+                        <col style="width:6%;">    <!-- Start -->
+                        <col style="width:6%;">    <!-- End -->
+                        <col style="width:10%;">   <!-- Schedule -->
+                        <col style="width:9%;">    <!-- Contact Person -->
+                        <col style="width:8%;">    <!-- Position -->
+                        <col style="width:7%;">    <!-- Contact No -->
+                    </colgroup>
+                    <thead>
+                        <tr style="background:#7f0000;">
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">#</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Student Name</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Company</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Address</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Nat. Business</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Linkages</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Level</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Start</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">End</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Schedule</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Contact Person</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Position</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; overflow:hidden;">Contact No.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHTML || `<tr><td colspan="13" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ══ SIGNATURE BLOCK ══ -->
+            <div style="padding:18px 22px 12px 22px;">
+                <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+                    <div style="display:flex; justify-content:space-between; gap:24px;">
+                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">OJT COORDINATOR</div>
+                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                        </div>
+                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DEPARTMENT CHAIR / HEAD</div>
+                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                        </div>
+                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DATE</div>
+                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Date Approved / Noted</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ DOCUMENT FOOTER ══ -->
+            <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
+                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                </div>
+                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: OJT-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
+            </div>
+
+        </div>`;
+    }
+
+    /* ══════════════════════════════════════════════
+       FIX #2: Single modal trigger — use Bootstrap
+       modal API directly, not onclick inline attr.
+    ══════════════════════════════════════════════ */
+    const previewModalEl = document.getElementById('printPreviewModal');
+    const previewModal   = new bootstrap.Modal(previewModalEl, { backdrop: 'static', keyboard: true });
+
+    document.getElementById('openPreviewBtn').addEventListener('click', function () {
+        document.getElementById('printPreviewContent').innerHTML = buildPrintHTML();
+        previewModal.show();
     });
 
-    // Print Preview Modal
-    function openPrintPreviewModal() {
-        var tableContent = document.getElementById('fileTable').outerHTML;
-        document.getElementById('printPreviewContent').innerHTML = tableContent;
-        $('#printPreviewModal').modal('show');
+    /* ══════════════════════════════════════════════
+       PRINT
+       FIX #3: @page CSS hides browser header/footer
+       (date & URL shown by browser when printing)
+    ══════════════════════════════════════════════ */
+    document.getElementById('doPrintBtn').addEventListener('click', function () {
+
+    const html = buildPrintHTML();
+
+    const printDoc = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Student OJT Information Report</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+/* ===== FORCE CLEAN PRINT PAGE ===== */
+
+@page{
+    size: A4 landscape;
+    margin: 0;
+}
+
+/* Remove browser spacing */
+html, body{
+    margin:0;
+    padding:0;
+}
+
+/* Printing settings */
+@media print{
+
+    html{
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
-    // Print
-    function printReport() {
-        var tableContent = document.getElementById('fileTable').outerHTML;
-        var printFrame   = document.getElementById('printFrame').contentWindow;
-
-        var printContents = `
-            <html>
-            <head>
-                <title>Student OJT Information Report</title>
-                <style>
-                    @page { size: A4 landscape; margin: 8mm; }
-                    body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 8px; color: #000; margin: 0; padding: 0; }
-                    h1 { text-align: center; font-size: 13px; margin-bottom: 10px; color: #7f0000; }
-                    table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-                    th, td { border: 0.5pt solid #ddd; padding: 3px 4px; word-wrap: break-word; overflow-wrap: break-word; vertical-align: top; }
-                    thead { background-color: #7f0000 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    th { font-size: 7.5px; text-transform: uppercase; font-weight: 700; }
-                    tr:nth-child(even) td { background-color: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    th:nth-child(1) { width: 80px; }
-                    th:nth-child(2) { width: 90px; }
-                    th:nth-child(3) { width: 110px; }
-                    th:nth-child(12) { width: 75px; }
-                </style>
-            </head>
-            <body>
-                <h1>Student OJT Information Report</h1>
-                ` + tableContent + `
-            </body>
-            </html>`;
-
-        printFrame.document.open();
-        printFrame.document.write(printContents);
-        printFrame.document.close();
-        printFrame.focus();
-        setTimeout(function () { printFrame.print(); }, 500);
+    body{
+        margin:10mm 12mm;
+        font-family:'Poppins',Arial,sans-serif;
+        font-size:10px;
+        color:#1a1a1a;
+        background:#ffffff;
     }
+
+}
+
+/* General styling */
+
+*{
+    box-sizing:border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    display:table-header-group;
+}
+
+tfoot{
+    display:table-footer-group;
+}
+
+tr{
+    page-break-inside:avoid;
+}
+
+</style>
+
+</head>
+
+<body>
+
+${html}
+
+<script>
+window.onload = function(){
+    setTimeout(function(){
+        window.print();
+    },700);
+}
+<\/script>
+
+</body>
+</html>`;
+
+    const frame = document.getElementById('printFrame');
+    const fw = frame.contentWindow;
+
+    fw.document.open();
+    fw.document.write(printDoc);
+    fw.document.close();
+});
 </script>
 
 </body>
