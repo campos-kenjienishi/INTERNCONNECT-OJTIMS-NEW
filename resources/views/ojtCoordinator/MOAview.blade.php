@@ -654,8 +654,9 @@
                     </div>
                     <div>
                         @php
-                            $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($company->student_names_display ?? '')))));
-                            $studentCount = $displayStudents->isNotEmpty() ? $displayStudents->count() : count($company->students);
+                            $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($company->student_names_display ?? '')))))->values();
+                            $linkedStudents = $company->students;
+                            $studentCount = $displayStudents->isNotEmpty() ? $displayStudents->count() : $linkedStudents->count();
                         @endphp
                         <h2>Student List</h2>
                         <p>
@@ -677,25 +678,69 @@
                     <div class="student-list">
                         @if ($displayStudents->isNotEmpty())
                             @foreach ($displayStudents as $displayStudent)
-                            <div class="student-card">
-                                <div class="student-card-header">
-                                    <div class="student-avatar">
-                                        {{ strtoupper(substr($displayStudent, 0, 1)) }}
+                                @php $matchedStudent = $linkedStudents->firstWhere('full_name', $displayStudent); @endphp
+                                @if ($matchedStudent)
+                                <div class="student-card">
+                                    <div class="student-card-header">
+                                        <div class="student-avatar">
+                                            {{ strtoupper(substr($matchedStudent->full_name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="student-name">{{ $matchedStudent->full_name }}</div>
+                                            <span class="student-course">{{ $matchedStudent->course }}</span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div class="student-name">{{ $displayStudent }}</div>
-                                        <span class="student-course">{{ $company->course ?: 'Manual entry' }}</span>
-                                    </div>
-                                </div>
 
-                                <div class="student-detail-row">
-                                    <i class="fa fa-keyboard"></i>
-                                    <span>This student was entered manually for this MOA.</span>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-id-card"></i>
+                                        <span><strong>Student No:</strong> {{ $matchedStudent->studentNum }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-envelope"></i>
+                                        <span>{{ $matchedStudent->email }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-birthday-cake"></i>
+                                        <span><strong>DOB:</strong> {{ $matchedStudent->date_of_birth }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-phone"></i>
+                                        <span>{{ $matchedStudent->contact_number }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-map-marker-alt"></i>
+                                        <span>{{ $matchedStudent->address }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-layer-group"></i>
+                                        <span>{{ $matchedStudent->year_and_section }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-chalkboard-teacher"></i>
+                                        <span><strong>Adviser:</strong> {{ $matchedStudent->adviser_name }}</span>
+                                    </div>
                                 </div>
-                            </div>
+                                @else
+                                <div class="student-card">
+                                    <div class="student-card-header">
+                                        <div class="student-avatar">
+                                            {{ strtoupper(substr($displayStudent, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="student-name">{{ $displayStudent }}</div>
+                                            <span class="student-course">{{ $company->course ?: 'Manual entry' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-keyboard"></i>
+                                        <span>This student was entered manually for this MOA.</span>
+                                    </div>
+                                </div>
+                                @endif
                             @endforeach
                         @else
-                            @forelse ($company->students as $student)
+                            @forelse ($linkedStudents as $student)
                             <div class="student-card">
                                 <div class="student-card-header">
                                     <div class="student-avatar">
