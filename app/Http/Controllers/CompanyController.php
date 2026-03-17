@@ -26,6 +26,9 @@ class CompanyController extends Controller
     public function companies(Request $request)
     {
         $user = [];
+        $course = Courses::all();
+        $selectedCourse = $request->query('course');
+        $selectedSchoolYear = $request->query('school_year');
     
         if (Session::has('loginId')) {
             $user = User::where('id', '=', Session::get('loginId'))->first();
@@ -38,6 +41,16 @@ class CompanyController extends Controller
     
         // Retrieve the selected company or companies
         $companies = Company::all(); // Get all companies
+        $schoolYears = Company::whereNotNull('school_year')
+            ->pluck('school_year')
+            ->filter()
+            ->unique()
+            ->sortByDesc(function ($schoolYear) {
+                $normalizedYear = str_replace(' ', '', $schoolYear);
+                $parts = explode('-', $normalizedYear);
+                return (int) ($parts[0] ?? 0);
+            })
+            ->values();
     
         $stu = Student::all();
     
@@ -53,6 +66,23 @@ class CompanyController extends Controller
           
             return $currentYear >= $startYear && $currentYear <= $startYear + 3;
         });
+
+        if (!empty($selectedCourse)) {
+            $companies = $companies->where('course', $selectedCourse);
+        }
+
+        if (!empty($selectedSchoolYear)) {
+            $normalizedSelectedYear = str_replace(' ', '', $selectedSchoolYear);
+            $companies = $companies->filter(function ($company) use ($normalizedSelectedYear) {
+                return str_replace(' ', '', $company->school_year) === $normalizedSelectedYear;
+            });
+        }
+
+        $companies = $companies->sortByDesc(function ($company) {
+            $normalizedYear = str_replace(' ', '', $company->school_year ?? '0-0');
+            $parts = explode('-', $normalizedYear);
+            return (int) ($parts[0] ?? 0);
+        })->values();
     
         $companyNames = $companies->pluck('company_name')->toArray();
     
@@ -61,7 +91,7 @@ class CompanyController extends Controller
             $query->whereIn('company_name', $companyNames);
         })->get();
     
-        return view('ojtCoordinator.companies', compact('companies', 'students', 'user', 'stu'));
+        return view('ojtCoordinator.companies', compact('companies', 'students', 'user', 'stu', 'course', 'selectedCourse', 'schoolYears', 'selectedSchoolYear'));
     }
     
 
@@ -123,6 +153,12 @@ public function companyCreate(Request $request)
             ->withInput();
     }
 
+    if ($data->role == 1) {
+        $request->validate([
+            'course' => 'required|exists:courses,course',
+        ]);
+    }
+
     $expirationDate = now()->addYears(3);
 
     // Create or retrieve the company
@@ -136,6 +172,20 @@ public function companyCreate(Request $request)
     $endYear = $request->input('school_year_end');
     $schoolYear = $startYear . '-' . $endYear; // Combine the start and end years
     $com->school_year = $schoolYear;
+
+    if ($data->role == 0) {
+        $studentCourse = $data->course;
+
+        if (empty($studentCourse)) {
+            $student = Student::where('studentNum', $data->studentNum)->first();
+            $studentCourse = $student->course ?? null;
+        }
+
+        $com->course = $studentCourse;
+    } else {
+        $com->course = $request->input('course');
+    }
+
         $file = $request->file;
     $filename = time() . '.' . $file->getClientOriginalExtension();
     $request->file->move('assets', $filename);
@@ -165,20 +215,33 @@ $res = $fileup->save();
   
 
 
+    // Get student names as an array
+    $studentNames = $request->input('student_names', []);
+
+    // Check the role of the user
+    if ($data->role == 0) {
+        // If the role is 0, set student_names to full_name
+        $studentNames = [$data->full_name];
+    }
+
+    // Find existing students by their names and get their IDs
+    $existingStudents = Student::whereIn('full_name', $studentNames)->get();
+
+    if ($data->role == 1 && !empty($studentNames)) {
+        $mismatchedStudents = $existingStudents->filter(function ($student) use ($com) {
+            return $student->course !== $com->course;
+        });
+
+        if ($mismatchedStudents->isNotEmpty()) {
+            $studentList = $mismatchedStudents->pluck('full_name')->implode(', ');
+            return back()
+                ->withInput()
+                ->with('fail', 'Selected student course does not match the MOA course: ' . $studentList);
+        }
+    }
+
     // Save the company to the database
     if ($com->save()) {
-        // Get student names as an array
-        $studentNames = $request->input('student_names', []);
-
-        // Check the role of the user
-        if ($data->role == 0) {
-            // If the role is 0, set student_names to full_name
-            $studentNames = [$data->full_name];
-            
-        }
-
-        // Find existing students by their names and get their IDs
-        $existingStudents = Student::whereIn('full_name', $studentNames)->get();
 
         // Attach the existing students to the company
         foreach ($existingStudents as $student) {
