@@ -630,64 +630,90 @@
                         <i class="fa fa-users"></i>
                     </div>
                     <div>
+                        @php
+                            $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($company->student_names_display ?? '')))));
+                            $studentCount = $displayStudents->isNotEmpty() ? $displayStudents->count() : count($company->students);
+                        @endphp
                         <h2>Student List</h2>
                         <p>
-                            {{ count($company->students) }}
-                            {{ count($company->students) == 1 ? 'student' : 'students' }}
+                            {{ $studentCount }}
+                            {{ $studentCount == 1 ? 'student' : 'students' }}
                             assigned to this company
                         </p>
                     </div>
                 </div>
                 <div class="panel-card-body">
                     <div class="student-list">
-                        @forelse ($company->students as $student)
-                        <div class="student-card">
-                            <div class="student-card-header">
-                                <div class="student-avatar">
-                                    {{ strtoupper(substr($student->full_name, 0, 1)) }}
+                        @if ($displayStudents->isNotEmpty())
+                            @foreach ($displayStudents as $displayStudent)
+                            <div class="student-card">
+                                <div class="student-card-header">
+                                    <div class="student-avatar">
+                                        {{ strtoupper(substr($displayStudent, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="student-name">{{ $displayStudent }}</div>
+                                        <span class="student-course">{{ $company->course ?: 'Manual entry' }}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="student-name">{{ $student->full_name }}</div>
-                                    <span class="student-course">{{ $student->course }}</span>
-                                </div>
-                            </div>
 
-                            <div class="student-detail-row">
-                                <i class="fa fa-id-card"></i>
-                                <span><strong>Student No:</strong> {{ $student->studentNum }}</span>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-keyboard"></i>
+                                    <span>This student was entered manually for this MOA.</span>
+                                </div>
                             </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-envelope"></i>
-                                <span>{{ $student->email }}</span>
+                            @endforeach
+                        @else
+                            @forelse ($company->students as $student)
+                            <div class="student-card">
+                                <div class="student-card-header">
+                                    <div class="student-avatar">
+                                        {{ strtoupper(substr($student->full_name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="student-name">{{ $student->full_name }}</div>
+                                        <span class="student-course">{{ $student->course }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="student-detail-row">
+                                    <i class="fa fa-id-card"></i>
+                                    <span><strong>Student No:</strong> {{ $student->studentNum }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-envelope"></i>
+                                    <span>{{ $student->email }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-birthday-cake"></i>
+                                    <span><strong>DOB:</strong> {{ $student->date_of_birth }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-phone"></i>
+                                    <span>{{ $student->contact_number }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-map-marker-alt"></i>
+                                    <span>{{ $student->address }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-layer-group"></i>
+                                    <span>{{ $student->year_and_section }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-chalkboard-teacher"></i>
+                                    <span><strong>Adviser:</strong> {{ $student->adviser_name }}</span>
+                                </div>
                             </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-birthday-cake"></i>
-                                <span><strong>DOB:</strong> {{ $student->date_of_birth }}</span>
+                            @empty
+                            <div style="text-align:center; padding:40px 20px; color:#aaa;">
+                                <i class="fa fa-users" style="font-size:40px; margin-bottom:12px; display:block; color:#fecaca;"></i>
+                                <div style="font-size:14px; font-weight:600; color:#888;">No students assigned</div>
+                                <div style="font-size:12.5px; margin-top:4px;">No students are linked to this company yet.</div>
                             </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-phone"></i>
-                                <span>{{ $student->contact_number }}</span>
-                            </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-map-marker-alt"></i>
-                                <span>{{ $student->address }}</span>
-                            </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-layer-group"></i>
-                                <span>{{ $student->year_and_section }}</span>
-                            </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-chalkboard-teacher"></i>
-                                <span><strong>Adviser:</strong> {{ $student->adviser_name }}</span>
-                            </div>
+                            @endforelse
+                        @endif
                         </div>
-                        @empty
-                        <div style="text-align:center; padding:40px 20px; color:#aaa;">
-                            <i class="fa fa-users" style="font-size:40px; margin-bottom:12px; display:block; color:#fecaca;"></i>
-                            <div style="font-size:14px; font-weight:600; color:#888;">No students assigned</div>
-                            <div style="font-size:12.5px; margin-top:4px;">No students are linked to this company yet.</div>
-                        </div>
-                        @endforelse
                     </div>
                 </div>
             </div>
