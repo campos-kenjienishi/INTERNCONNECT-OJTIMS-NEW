@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 
 class CompanyController extends Controller
@@ -215,16 +216,27 @@ $res = $fileup->save();
   
 
 
-    // Get student names as an array
-    $studentNames = $request->input('student_names', []);
+    $selectedStudentNames = $request->input('student_names', []);
+    $manualStudentNames = $request->input('manual_student_names', '');
 
-    // Check the role of the user
+    $parsedManualNames = array_values(array_unique(array_filter(array_map('trim', preg_split('/[\r\n,]+/', (string) $manualStudentNames)))));
+    $studentNames = array_values(array_unique(array_filter(array_map('trim', array_merge($selectedStudentNames, $parsedManualNames)))));
+
     if ($data->role == 0) {
-        // If the role is 0, set student_names to full_name
         $studentNames = [$data->full_name];
     }
 
-    // Find existing students by their names and get their IDs
+    $hasStudentDisplayColumn = Schema::hasColumn('companies', 'student_names_display');
+
+    if ($hasStudentDisplayColumn) {
+        $com->student_names_display = implode(', ', $studentNames);
+    } elseif ($data->role == 1 && !empty($manualStudentNames)) {
+        return back()
+            ->withInput()
+            ->with('fail', 'Manual student names cannot be saved yet. Please add column companies.student_names_display first.');
+    }
+
+    // Find existing students by their names and get their IDs (for optional linking only)
     $existingStudents = Student::whereIn('full_name', $studentNames)->get();
 
     if ($data->role == 1 && !empty($studentNames)) {

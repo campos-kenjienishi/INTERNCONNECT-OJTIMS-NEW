@@ -105,6 +105,7 @@ Route::middleware(['role:0'])->group(function () {
     Route::put('/student/ojtEdit/{studentNum}', [StudentController::class,'ojt_edit']);
     Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
     Route::get('/student/MOA', [CompanyController::class,'companiesup']);
+    Route::post('/student/moa/remove/{id}', [MOAUploadController::class,'studentRemove'])->name('student.moa.remove');
     Route::get('/student/pending', [CompanyController::class,'pending']);
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);

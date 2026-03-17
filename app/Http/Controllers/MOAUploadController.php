@@ -163,6 +163,40 @@ public function printData(Company $company)
     return view('ojtCoordinator.print-data', compact('company'));
 }
 
+public function studentRemove($id)
+{
+    $user = User::where('id', Session::get('loginId'))->first();
+
+    if (!$user) {
+        return redirect()->back()->with('error', 'Unauthorized.');
+    }
+
+    $company = Company::where('id', $id)
+        ->where('uploader_name', $user->full_name)
+        ->first();
+
+    if (!$company) {
+        return redirect()->back()->with('error', 'MOA not found or you do not have permission to remove it.');
+    }
+
+    DB::table('company_student')
+        ->where('company_id', $company->id)
+        ->delete();
+
+    $company->delete();
+
+    AuditLogger::log(
+        'MOA Upload',
+        'Delete',
+        'Student deleted own MOA: ' . $company->company_name,
+        Session::get('loginId') ?? null,
+        ['company_id' => $company->id],
+        null
+    );
+
+    return redirect()->back()->with('success', 'MOA removed successfully.');
+}
+
 
 
 

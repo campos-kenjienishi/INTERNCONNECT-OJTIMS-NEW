@@ -1036,6 +1036,13 @@
                                         onclick="openViewModal1('{{ route('voucher', ['company' => $company->id]) }}')">
                                         <i class="fa fa-receipt"></i> Voucher
                                     </button>
+                                    <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
+                                        onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}')">
+                                        <i class="fa fa-trash"></i> Remove
+                                    </button>
+                                    <form id="student-remove-form-{{ $company->id }}" action="{{ route('student.moa.remove', $company->id) }}" method="POST" style="display:none;">
+                                        @csrf
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -1245,6 +1252,23 @@
             ? this.files[0].name
             : 'Click or drag your notarized MOA file here';
     });
+
+    function confirmStudentRemove(companyId, companyName) {
+        Swal.fire({
+            title: 'Remove MOA?',
+            html: 'This will permanently delete your MOA for <strong>' + companyName + '</strong>.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, remove it',
+            cancelButtonText: 'Cancel',
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                document.getElementById('student-remove-form-' + companyId).submit();
+            }
+        });
+    }
 
     // View modal
     function openViewModal(url) {
