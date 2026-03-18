@@ -25,9 +25,30 @@ use App\Mail\StudentNotificationMail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
+use App\Models\Company; // ADD THIS at the top
 
 class StudentController extends Controller
 {
+public function home()
+{
+    $data = null;
+
+    if (Session::has('loginId')) {
+        $data = User::where('id', Session::get('loginId'))->first();
+    }
+
+    // GET COMPANIES
+    $companies = Company::all();
+
+    // GET FILE COUNT
+    $fileCount = UploadedFile::count();
+
+    return view('students.student_home', [
+        'user' => $data,
+        'companies' => $companies,
+        'fileCount' => $fileCount
+    ]);
+}
     public function student_acc()
     {
        

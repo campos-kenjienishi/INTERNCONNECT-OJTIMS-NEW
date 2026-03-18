@@ -663,6 +663,83 @@
     color: #e5e5e5;
     margin: 0 2px;
 }
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 52px 24px;
+    gap: 14px;
+    text-align: center;
+}
+ 
+.empty-state .empty-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: #fef2f2;
+    border: 1.5px dashed #fca5a5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+ 
+.empty-state p {
+    font-size: 14px;
+    color: #888;
+    font-weight: 500;
+    margin: 0;
+    max-width: 300px;
+    line-height: 1.6;
+}
+ 
+.empty-state .empty-hint {
+    font-size: 12px;
+    color: #bbb;
+    margin-top: 2px;
+}
+ 
+.btn-view-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #fff;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 8px;
+    color: #555;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+}
+ 
+.btn-view-action:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: #fff5f5;
+    text-decoration: none;
+}
+ 
+.template-file-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f3f4f6;
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 12px;
+    color: #555;
+    font-weight: 500;
+}
+
+
     </style>
 </head>
 
@@ -936,52 +1013,72 @@
 
         <!-- Room Templates Table Card -->
         <div class="table-card">
-            <div class="table-card-header">
-                <div class="header-icon"><i class="fa fa-file-download"></i></div>
-                <div>
-                    <h2>Room Templates</h2>
-                    <p>Templates uploaded by your professor for your current room</p>
-                </div>
-            </div>
-            <div class="table-card-body">
-                @if (empty($data->class_id))
-                    <div class="empty-state">
-                        <i class="fa fa-door-closed"></i>
-                        <p>Join a room first to access room-specific templates.</p>
-                    </div>
-                @elseif ($roomTemplates->isEmpty())
-                    <div class="empty-state">
-                        <i class="fa fa-file-alt"></i>
-                        <p>No room templates uploaded yet.</p>
-                    </div>
-                @else
-                    <table class="rooms-table" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Template Name</th>
-                                <th>File</th>
-                                <th>Date Uploaded</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($roomTemplates as $template)
-                                <tr>
-                                    <td>{{ $template->name }}</td>
-                                    <td>{{ $template->file }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($template->created_at)->format('M d, Y h:i A') }}</td>
-                                    <td>
-                                        <a href="{{ url('/download', $template->file) }}" class="btn-view-action">
-                                            <i class="fa fa-download"></i> Download
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
-            </div>
+    <div class="table-card-header">
+        <div class="header-icon"><i class="fa fa-file-download"></i></div>
+        <div>
+            <h2>Room Templates</h2>
+            <p>Templates uploaded by your professor for your current room</p>
         </div>
+    </div>
+    <div class="table-card-body">
+        @if (empty($data->class_id))
+            <div class="empty-state">
+                <div class="empty-icon-wrap">
+                    <i class="fa fa-door-closed"></i>
+                </div>
+                <p>You haven't joined a room yet.</p>
+                <span class="empty-hint">Join a room above to access room-specific templates.</span>
+            </div>
+        @elseif ($roomTemplates->isEmpty())
+            <div class="empty-state">
+                <div class="empty-icon-wrap">
+                    <i class="fa fa-file-alt"></i>
+                </div>
+                <p>No room templates uploaded yet.</p>
+                <span class="empty-hint">Check back later — your adviser hasn't uploaded any templates.</span>
+            </div>
+        @else
+            <table class="rooms-table" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Template Name</th>
+                        <th>File</th>
+                        <th>Date Uploaded</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($roomTemplates as $template)
+                        <tr>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:32px;height:32px;border-radius:8px;background:#fee2e2;display:flex;align-items:center;justify-content:center;color:var(--red);font-size:13px;flex-shrink:0;">
+                                        <i class="fa fa-file-alt"></i>
+                                    </div>
+                                    <span style="font-weight:600;">{{ $template->name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="template-file-badge">
+                                    <i class="fa fa-paperclip"></i>
+                                    {{ $template->file }}
+                                </span>
+                            </td>
+                            <td style="color:#888; font-size:13px;">
+                                {{ \Carbon\Carbon::parse($template->created_at)->format('M d, Y h:i A') }}
+                            </td>
+                            <td>
+                                <a href="{{ url('/download', $template->file) }}" class="btn-view-action">
+                                    <i class="fa fa-download"></i> Download
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    </div>
+</div>
 
         <!-- Announcements Table Card -->
         <div class="table-card">

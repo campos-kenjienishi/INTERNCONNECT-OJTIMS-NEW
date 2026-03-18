@@ -138,24 +138,14 @@
         }
         .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
-        .breadcrumb {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 13px; color: #888; margin-top: 6px;
-        }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888; margin-top: 6px; }
         .breadcrumb a { color: var(--red); text-decoration: none; }
         .breadcrumb a:hover { text-decoration: underline; }
         .breadcrumb i { font-size: 10px; }
 
         /* =============== STATS =============== */
-        .stats-row {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px; margin-bottom: 22px;
-        }
-        .stat-card {
-            background: #fff; border-radius: 14px; padding: 18px 20px;
-            display: flex; align-items: center; gap: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04);
-        }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 22px; }
+        .stat-card { background: #fff; border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); }
         .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
         .stat-icon.red    { background: #fee2e2; color: var(--red); }
         .stat-icon.blue   { background: #dbeafe; color: #2563eb; }
@@ -165,114 +155,43 @@
         .stat-name { font-size: 12px; color: #888; margin-top: 3px; }
 
         /* =============== FILTER CARD =============== */
-        .panel-card {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04);
-            overflow: hidden; margin-bottom: 22px;
-        }
-        .panel-card-header {
-            display: flex; align-items: center; gap: 12px;
-            padding: 16px 22px; border-bottom: 1px solid #f0f0f0; background: #fafafa;
-        }
-        .panel-header-icon {
-            width: 36px; height: 36px; border-radius: 9px;
-            background: #fee2e2; display: flex; align-items: center;
-            justify-content: center; color: var(--red); font-size: 14px; flex-shrink: 0;
-        }
+        .panel-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); overflow: hidden; margin-bottom: 22px; }
+        .panel-card-header { display: flex; align-items: center; gap: 12px; padding: 16px 22px; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
+        .panel-header-icon { width: 36px; height: 36px; border-radius: 9px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 14px; flex-shrink: 0; }
         .panel-card-header h2 { font-size: 15px; font-weight: 700; color: #1a1a1a; }
         .panel-card-header p  { font-size: 12px; color: #888; margin-top: 2px; }
         .panel-card-body { padding: 22px; }
-
-        /* Filter fields */
-        .filter-grid {
-            display: grid; grid-template-columns: 1fr 1fr auto;
-            gap: 16px; align-items: end;
-        }
+        .filter-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end; }
         .field-group { display: flex; flex-direction: column; gap: 5px; }
         .field-label { font-size: 12px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 5px; }
         .field-label i { color: var(--red); font-size: 11px; }
-        .field-input, .field-select {
-            width: 100%; background: #fafafa; border: 1.5px solid #e8e8e8;
-            border-radius: 10px; color: #1a1a1a;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            padding: 10px 13px; outline: none; transition: all 0.25s;
-        }
-        .field-input:focus, .field-select:focus {
-            border-color: var(--red); background: #fff;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
-        }
-
-        /* Year row */
+        .field-input, .field-select { width: 100%; background: #fafafa; border: 1.5px solid #e8e8e8; border-radius: 10px; color: #1a1a1a; font-family: 'Poppins', sans-serif; font-size: 13px; padding: 10px 13px; outline: none; transition: all 0.25s; }
+        .field-input:focus, .field-select:focus { border-color: var(--red); background: #fff; box-shadow: 0 0 0 3px rgba(220,38,38,0.07); }
         .year-row { display: flex; align-items: center; gap: 8px; }
         .year-row span { font-weight: 700; color: #aaa; flex-shrink: 0; font-size: 14px; }
         .year-row .field-select { flex: 1; }
-
-        .btn-generate {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 11px 22px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 10px; color: #fff;
-            font-family: 'Poppins', sans-serif; font-size: 14px;
-            font-weight: 600; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.25); white-space: nowrap;
-        }
+        .btn-generate { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border: none; border-radius: 10px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 16px rgba(220,38,38,0.25); white-space: nowrap; }
         .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(220,38,38,0.35); }
-
-        .btn-preview {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 20px; border-radius: 10px;
-            background: #fff; border: 1.5px solid #e0e7ff; color: #4f46e5;
-            font-family: 'Poppins', sans-serif; font-size: 13.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
+        .btn-preview { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; background: #fff; border: 1.5px solid #e0e7ff; color: #4f46e5; font-family: 'Poppins', sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-preview:hover { background: #e0e7ff; }
 
         /* =============== TABLE CARD =============== */
-        .table-card {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04); overflow: hidden;
-        }
-        .table-card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; padding: 18px 24px;
-            border-bottom: 1px solid #f0f0f0; background: #fafafa; flex-wrap: wrap;
-        }
+        .table-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); overflow: hidden; }
+        .table-card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid #f0f0f0; background: #fafafa; flex-wrap: wrap; }
         .table-card-header-left { display: flex; align-items: center; gap: 12px; }
-        .header-icon {
-            width: 38px; height: 38px; border-radius: 10px;
-            background: #fee2e2; display: flex; align-items: center;
-            justify-content: center; color: var(--red); font-size: 15px; flex-shrink: 0;
-        }
+        .header-icon { width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 15px; flex-shrink: 0; }
         .table-card-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
         .table-card-header p  { font-size: 12.5px; color: #888; margin-top: 2px; }
-        .count-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #fee2e2; color: var(--red);
-            border-radius: 20px; padding: 5px 14px;
-            font-size: 12.5px; font-weight: 700;
-        }
+        .count-badge { display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 5px 14px; font-size: 12.5px; font-weight: 700; }
 
         /* DataTables */
         .table-card-body .dataTables_wrapper { padding: 16px 22px; font-family: 'Poppins', sans-serif; font-size: 13px; }
         .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
-        .table-card-body table.dataTable thead th {
-            background: #fafafa; color: #555; font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px;
-            border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap;
-        }
-        .table-card-body table.dataTable tbody td {
-            padding: 12px 12px; color: #333;
-            border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle;
-        }
+        .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap; }
+        .table-card-body table.dataTable tbody td { padding: 12px 12px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
-        .dataTables_filter input {
-            border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
-            padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important; outline: none !important;
-        }
+        .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; }
         .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }
         .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; }
         .dataTables_paginate .paginate_button { border-radius: 6px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; }
@@ -281,66 +200,33 @@
 
         /* Cell styles */
         .company-cell { display: flex; align-items: center; gap: 9px; }
-        .company-avatar {
-            width: 32px; height: 32px; border-radius: 9px;
-            background: #fee2e2; display: flex; align-items: center; justify-content: center;
-            color: var(--red); font-size: 13px; flex-shrink: 0;
-        }
+        .company-avatar { width: 32px; height: 32px; border-radius: 9px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 13px; flex-shrink: 0; }
         .company-name-text { font-weight: 600; color: #1a1a1a; font-size: 13px; }
+        .expired-badge { display: inline-flex; align-items: center; gap: 5px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; }
+        .school-year-badge { display: inline-flex; align-items: center; gap: 5px; background: #fef9c3; color: #ca8a04; border-radius: 20px; padding: 3px 10px; font-size: 11.5px; font-weight: 600; }
 
-        .expired-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: #fef2f2; color: #dc2626;
-            border: 1px solid #fecaca;
-            border-radius: 20px; padding: 3px 10px;
-            font-size: 11px; font-weight: 600;
-        }
-
-        .school-year-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: #fef9c3; color: #ca8a04;
-            border-radius: 20px; padding: 3px 10px;
-            font-size: 11.5px; font-weight: 600;
-        }
-
-        /* =============== MODAL =============== */
-        .modal-content {
-            border-radius: 16px; border: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            font-family: 'Poppins', sans-serif; overflow: hidden;
-        }
-        .modal-header {
-            background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%);
-            border-bottom: none; padding: 20px 24px;
-        }
-        .modal-title { color: #fff; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        /* =============== PRINT PREVIEW MODAL =============== */
+        .modal-content { border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); font-family: 'Poppins', sans-serif; overflow: hidden; }
+        /* Slim header — no title, just close button */
+        .modal-header { background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); border-bottom: none; padding: 10px 16px; display: flex; justify-content: flex-end; }
         .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
-        .modal-body { padding: 0; background: #fff; max-height: 480px; overflow: auto; }
-        .modal-footer {
-            background: #fafafa; border-top: 1px solid #f0f0f0;
-            padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px;
-        }
-        .btn-modal-close {
-            padding: 9px 20px; background: #f3f4f6;
-            border: 1px solid #e5e5e5; border-radius: 8px; color: #555;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
+        .modal-body { padding: 24px; background: #f0f0f0; max-height: 70vh; overflow-y: auto; }
+        .modal-footer { background: #fafafa; border-top: 1px solid #f0f0f0; padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-modal-close { padding: 9px 20px; background: #f3f4f6; border: 1px solid #e5e5e5; border-radius: 8px; color: #555; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-modal-close:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
-        .btn-modal-print {
-            padding: 9px 24px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 8px; color: #fff;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: all 0.25s;
-            box-shadow: 0 3px 10px rgba(220,38,38,0.2);
-        }
+        .btn-modal-print { padding: 9px 24px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border: none; border-radius: 8px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.25s; box-shadow: 0 3px 10px rgba(220,38,38,0.2); }
         .btn-modal-print:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.3); }
 
-        #printPreviewContent table { width: 100%; border-collapse: collapse; font-family: 'Poppins', sans-serif; font-size: 12px; }
-        #printPreviewContent th { background: #7f0000; color: #fff; padding: 8px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
-        #printPreviewContent td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; color: #333; }
-        #printPreviewContent tr:hover td { background: #fff5f5; }
+        /* Footer */
+        .dashboard-footer { background: #fff; border-top: 1px solid #f0f0f0; color: #888; padding: 18px 28px; font-size: 12.5px; margin-top: auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+        .dashboard-footer .footer-left { display: flex; align-items: center; gap: 8px; }
+        .dashboard-footer .footer-logo { width: 22px; height: 22px; object-fit: contain; opacity: 0.6; }
+        .dashboard-footer .footer-copy { font-size: 12.5px; color: #aaa; font-weight: 500; }
+        .dashboard-footer .footer-copy span { color: var(--red); font-weight: 600; }
+        .dashboard-footer .footer-links { display: flex; align-items: center; gap: 6px; }
+        .dashboard-footer a { color: #888; text-decoration: none; font-weight: 500; font-size: 12.5px; transition: color 0.2s; }
+        .dashboard-footer a:hover { color: var(--red); }
+        .dashboard-footer .divider { color: #e5e5e5; margin: 0 2px; }
 
         /* Mobile overlay */
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
@@ -355,69 +241,6 @@
             .stats-row { grid-template-columns: 1fr 1fr; }
             .filter-grid { grid-template-columns: 1fr; }
         }
-        /* Dashboard Footer */
-.dashboard-footer {
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    color: #888;
-    text-align: center;
-    padding: 18px 28px;
-    font-size: 12.5px;
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-logo {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    opacity: 0.6;
-}
-
-.dashboard-footer .footer-copy {
-    font-size: 12.5px;
-    color: #aaa;
-    font-weight: 500;
-}
-
-.dashboard-footer .footer-copy span {
-    color: var(--red);
-    font-weight: 600;
-}
-
-.dashboard-footer .footer-links {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.dashboard-footer a {
-    color: #888;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 12.5px;
-    transition: color 0.2s;
-}
-
-.dashboard-footer a:hover {
-    color: var(--red);
-    text-decoration: none;
-}
-
-.dashboard-footer .divider {
-    color: #e5e5e5;
-    margin: 0 2px;
-}
     </style>
 </head>
 
@@ -481,7 +304,6 @@
             <span class="tooltip-label">MOA</span>
         </a>
 
-        <!-- Reports with sub-nav -->
         <div class="nav-item" style="cursor:default; pointer-events:none;">
             <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
             <span class="nav-label">Reports</span>
@@ -494,13 +316,12 @@
                 <i class="fa fa-calendar-times" style="margin-right:6px; font-size:11px;"></i> Expired MOA
             </a>
         </div>
-        <li>
-    <a href="{{ url('/auditlog') }}" class="nav-item">
+
+        <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-</li>
     </nav>
 
     <div class="sidebar-footer">
@@ -527,7 +348,6 @@
 
     <div class="page-content">
 
-        <!-- Page Header -->
         <div class="page-header">
             <div>
                 <h1>Expired <span>MOA Report</span></h1>
@@ -587,8 +407,6 @@
                 <form action="{{ route('reports.generate') }}" method="post">
                     @csrf
                     <div class="filter-grid">
-
-                        <!-- School Year -->
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year</label>
                             <div class="year-row">
@@ -604,8 +422,6 @@
                                 </select>
                             </div>
                         </div>
-
-                        <!-- Course -->
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
                             <select class="field-select" id="course" name="course" required>
@@ -614,15 +430,12 @@
                                 @endforeach
                             </select>
                         </div>
-
-                        <!-- Generate -->
                         <div class="field-group">
                             <label class="field-label" style="opacity:0;">Action</label>
                             <button type="submit" class="btn-generate">
                                 <i class="fa fa-file-alt"></i> Generate
                             </button>
                         </div>
-
                     </div>
                 </form>
             </div>
@@ -643,7 +456,7 @@
                         <i class="fa fa-building"></i>
                         {{ $totalExpired }} {{ $totalExpired == 1 ? 'company' : 'companies' }}
                     </div>
-                    <button type="button" class="btn-preview" onclick="openPrintPreviewModal()">
+                    <button type="button" class="btn-preview" id="openPreviewBtn">
                         <i class="fa fa-print"></i> Print Preview
                     </button>
                 </div>
@@ -667,52 +480,36 @@
                         @foreach ($companies as $company)
                         <tr>
                             <td style="display:none;">{{ $company->id }}</td>
-
-                            <!-- Company Name -->
                             <td>
                                 <div class="company-cell">
-                                    <div class="company-avatar">
-                                        <i class="fa fa-building"></i>
-                                    </div>
+                                    <div class="company-avatar"><i class="fa fa-building"></i></div>
                                     <span class="company-name-text">{{ $company->company_name }}</span>
                                 </div>
                             </td>
-
-                            <!-- Address -->
                             <td style="max-width:160px; word-break:break-word; font-size:12.5px; color:#555;">
                                 <i class="fa fa-map-marker-alt" style="color:var(--red); font-size:10px; margin-right:4px;"></i>
                                 {{ $company->company_address }}
                             </td>
-
-                            <!-- Representative -->
                             <td>
                                 <div style="display:flex; align-items:center; gap:5px;">
                                     <i class="fa fa-user-tie" style="color:var(--red); font-size:11px;"></i>
                                     <span style="font-weight:600;">{{ $company->company_rep }}</span>
                                 </div>
                             </td>
-
-                            <!-- Contact No -->
                             <td style="white-space:nowrap;">
                                 <i class="fa fa-phone" style="color:var(--red); font-size:10px; margin-right:4px;"></i>
                                 {{ $company->companyNo ?: '—' }}
                             </td>
-
-                            <!-- Email -->
                             <td style="font-size:12.5px;">
                                 <i class="fa fa-envelope" style="color:var(--red); font-size:10px; margin-right:4px;"></i>
                                 {{ $company->company_email ?: '—' }}
                             </td>
-
-                            <!-- School Year -->
                             <td>
                                 <span class="school-year-badge">
                                     <i class="fa fa-calendar-alt" style="font-size:10px;"></i>
                                     {{ $company->school_year }}
                                 </span>
                             </td>
-
-                            <!-- Status -->
                             <td>
                                 <span class="expired-badge">
                                     <i class="fa fa-times-circle" style="font-size:10px;"></i> Expired
@@ -726,41 +523,41 @@
         </div>
 
     </div>
+
     <footer class="dashboard-footer">
-    <div class="footer-left">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-        <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
-        </span>
-    </div>
-    <div class="footer-links">
-        <a href="https://www.pup.edu.ph/" target="_blank">
-            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
-            PUP Website
-        </a>
-        <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
-        <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
-    </div>
-</footer>
+        <div class="footer-left">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <span class="footer-copy">© 1998–2026 <span>Polytechnic University of the Philippines</span></span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank"><i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i> PUP Website</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        </div>
+    </footer>
 </div>
 
 <!-- =============== PRINT PREVIEW MODAL =============== -->
-<div id="printPreviewModal" class="modal fade" tabindex="-1" aria-hidden="true">
+<div id="printPreviewModal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fa fa-print"></i> Print Preview — Expired MOA Report</h5>
+                <h5 class="modal-title" style="visibility:hidden; font-size:0;"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="printPreviewContent"></div>
+            <div class="modal-body">
+                <div id="printPreviewContent" style="background:#fff; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,0.12); overflow:hidden;">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
             <div class="modal-footer">
                 <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-1"></i> Close
+                    <i class="fa fa-times" style="margin-right:5px;"></i> Close
                 </button>
-                <button type="button" onclick="printReport()" class="btn-modal-print">
-                    <i class="fa fa-print me-1"></i> Print
+                <button type="button" id="doPrintBtn" class="btn-modal-print">
+                    <i class="fa fa-print" style="margin-right:5px;"></i> Print / Save as PDF
                 </button>
             </div>
         </div>
@@ -768,16 +565,15 @@
 </div>
 
 <!-- Hidden print iframe -->
-<iframe id="printFrame" style="display:none;"></iframe>
+<iframe id="printFrame" style="display:none; position:absolute; left:-9999px; top:-9999px;"></iframe>
 
-<!-- Hidden email form -->
+<!-- Hidden email form (preserved) -->
 <form id="sendEmailForm" action="{{ url('/reportsExpired/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
     @csrf
     <input type="hidden" id="courseInput" name="course" value="{{ $course }}">
-    <input type="hidden" id="emailInput" name="email" value="{{ $user->email }}">
+    <input type="hidden" id="emailInput"  name="email"  value="{{ $user->email }}">
 </form>
 
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -785,7 +581,7 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    // Sidebar toggle
+    /* ── Sidebar toggle ── */
     const sidebar     = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const menuToggle  = document.getElementById('menuToggle');
@@ -801,12 +597,12 @@
             mainContent.classList.toggle('expanded');
         }
     });
-
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
     });
 
+    /* ── DataTable ── */
     $(document).ready(function () {
         $('#companyTable').DataTable({
             order: [[0, 'desc']],
@@ -814,66 +610,273 @@
         });
     });
 
-    // Dynamic end year based on start year
+    /* ── Dynamic end year ── */
     document.addEventListener('DOMContentLoaded', function () {
-        const startYearSelect = document.getElementById('school_year_start');
-        const endYearSelect   = document.getElementById('school_year_end');
+        const startSel = document.getElementById('school_year_start');
+        const endSel   = document.getElementById('school_year_end');
 
-        function updateEndYearOptions() {
-            const selectedStart = parseInt(startYearSelect.value);
-            endYearSelect.innerHTML = '<option value="">End Year</option>';
-            if (!selectedStart) return;
-            for (let year = selectedStart + 1; year <= selectedStart + 10; year++) {
-                const opt = document.createElement('option');
-                opt.value = year;
-                opt.textContent = year;
-                endYearSelect.appendChild(opt);
+        function updateEndYears() {
+            const sy = parseInt(startSel.value);
+            endSel.innerHTML = '<option value="">End Year</option>';
+            if (!isNaN(sy)) {
+                for (let y = sy + 1; y <= sy + 10; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y; opt.textContent = y;
+                    endSel.appendChild(opt);
+                }
             }
         }
-
-        updateEndYearOptions();
-        startYearSelect.addEventListener('change', updateEndYearOptions);
+        updateEndYears();
+        startSel.addEventListener('change', updateEndYears);
     });
 
-    // Print Preview Modal
-    function openPrintPreviewModal() {
-        var tableContent = document.getElementById('companyTable').outerHTML;
-        document.getElementById('printPreviewContent').innerHTML = tableContent;
-        $('#printPreviewModal').modal('show');
+    /* ══════════════════════════════════════════════
+       BUILD PRINT HTML — branded Expired MOA layout
+       • Matches Student OJT Info print style exactly
+       • Reads CURRENT DataTable page rows only
+       • Icon-safe get() strips Font Awesome glyphs
+       • @page margin:0 removes browser date/URL
+    ══════════════════════════════════════════════ */
+    function buildPrintHTML() {
+        const now      = new Date();
+        const dateStr  = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+        const timeStr  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+        const dt               = $('#companyTable').DataTable();
+        const currentPageNodes = dt.rows({ page: 'current' }).nodes();
+        const total            = currentPageNodes.length;
+        const pageInfo         = dt.page.info();
+        const pageNum          = pageInfo.page + 1;
+        const pageCount        = pageInfo.pages;
+
+        const syStart = document.getElementById('school_year_start').value || '—';
+        const syEnd   = document.getElementById('school_year_end').value   || '—';
+        const course  = document.getElementById('course').value            || '—';
+        const syLabel = (syStart !== '—' && syEnd !== '—') ? syStart + ' – ' + syEnd : '—';
+
+        /* ── Icon-safe text extractor ──
+           Skips <i> Font Awesome nodes so glyphs don't
+           bleed into the printed cell content.         */
+        const getClean = (td) => {
+            if (!td) return '';
+            let text = '';
+            td.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    text += node.textContent;
+                } else if (node.nodeName !== 'I') {
+                    node.childNodes.forEach(inner => {
+                        if (inner.nodeType === Node.TEXT_NODE) text += inner.textContent;
+                        else if (inner.nodeName !== 'I') text += inner.textContent;
+                    });
+                }
+            });
+            return text.trim();
+        };
+
+        /* Column map (td[0]=id hidden, td[1..7] = visible columns):
+           td[0] id  td[1] Company  td[2] Address  td[3] Rep
+           td[4] Contact  td[5] Email  td[6] School Year  td[7] Status */
+        let rowsHTML = '';
+        for (let i = 0; i < currentPageNodes.length; i++) {
+            const tds    = currentPageNodes[i].querySelectorAll('td');
+            const rowNum = pageInfo.start + i + 1;
+            const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+
+            const company   = tds[1] ? (tds[1].querySelector('.company-name-text')?.textContent.trim() || getClean(tds[1])) : '';
+            const address   = getClean(tds[2]);
+            const rep       = getClean(tds[3]);
+            const contact   = getClean(tds[4]);
+            const email     = getClean(tds[5]);
+            const schoolYr  = getClean(tds[6]);
+
+            rowsHTML += `
+            <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
+                <td style="padding:7px 6px; font-size:9px; font-weight:700; color:#6b7280; text-align:center; vertical-align:top; border-right:1px solid #e5e7eb;">${rowNum}</td>
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${company}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${address}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${rep}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${contact}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${email}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${schoolYr}</td>
+                <td style="padding:7px 6px; vertical-align:top; text-align:center;">
+                    <span style="display:inline-block; background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:4px; padding:1px 7px; font-size:8px; font-weight:700;">Expired</span>
+                </td>
+            </tr>`;
+        }
+
+        return `
+        <div style="font-family:'Poppins',Arial,sans-serif; background:#fff;">
+
+            <!-- HEADER -->
+            <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
+                <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
+                <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
+                    <div style="width:50px; height:50px; background:rgba(255,255,255,0.18); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.25);">
+                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);">
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
+                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Expired MOA Report — Partner Companies</div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus &nbsp;|&nbsp; College of Engineering and Technology</div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
+                            <div style="font-size:18px; font-weight:800; color:#fff; line-height:1;">${total}</div>
+                            <div style="font-size:7.5px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; margin-top:1px;">Page Records</div>
+                        </div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.55); margin-top:4px; text-align:center;">Page ${pageNum} of ${pageCount}</div>
+                    </div>
+                </div>
+                <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
+            </div>
+
+            <!-- META ROW -->
+            <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">School Year:</span>
+                        <strong style="color:#111827;">${syLabel}</strong>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Course:</span>
+                        <strong style="color:#111827;">${course}</strong>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Showing:</span>
+                        <strong style="color:#111827;">${total} compan${total !== 1 ? 'ies' : 'y'} (Page ${pageNum})</strong>
+                    </div>
+                </div>
+                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
+            </div>
+
+            <!-- SECTION LABEL -->
+            <div style="padding:9px 22px 3px 22px;">
+                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Expired MOA Details — Page ${pageNum}</div>
+            </div>
+
+            <!-- DATA TABLE — table-layout:fixed + % widths = no side scroll -->
+            <div style="padding:4px 22px 0 22px;">
+                <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
+                    <colgroup>
+                        <col style="width:3%;">   <!-- # -->
+                        <col style="width:18%;">  <!-- Company -->
+                        <col style="width:18%;">  <!-- Address -->
+                        <col style="width:13%;">  <!-- Rep -->
+                        <col style="width:11%;">  <!-- Contact -->
+                        <col style="width:18%;">  <!-- Email -->
+                        <col style="width:10%;">  <!-- School Year -->
+                        <col style="width:9%;">   <!-- Status -->
+                    </colgroup>
+                    <thead>
+                        <tr style="background:#7f0000;">
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">#</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Company Name</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Address</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Representative</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Contact No.</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Email</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">School Year</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHTML || `<tr><td colspan="8" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SIGNATURE BLOCK -->
+            <div style="padding:18px 22px 12px 22px;">
+                <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+                    <div style="display:flex; justify-content:space-between; gap:24px;">
+                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">OJT COORDINATOR</div>
+                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                        </div>
+                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DEPARTMENT CHAIR / HEAD</div>
+                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                        </div>
+                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DATE</div>
+                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Date Approved / Noted</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOCUMENT FOOTER -->
+            <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
+                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                </div>
+                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-EXP-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
+            </div>
+
+        </div>`;
     }
 
-    // Print
-    function printReport() {
-        var tableContent = document.getElementById('companyTable').outerHTML;
-        var printFrame   = document.getElementById('printFrame').contentWindow;
+    /* ── Modal (single instance, no double-trigger) ── */
+    const previewModalEl = document.getElementById('printPreviewModal');
+    const previewModal   = new bootstrap.Modal(previewModalEl, { backdrop: 'static', keyboard: true });
 
-        var printContents = `
-            <html>
-            <head>
-                <title>Expired MOA Report</title>
-                <style>
-                    @page { size: A4 landscape; margin: 10mm; }
-                    body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 9px; color: #000; margin: 0; padding: 0; }
-                    h1 { text-align: center; font-size: 14px; margin-bottom: 12px; color: #7f0000; }
-                    table { border-collapse: collapse; width: 100%; }
-                    th, td { border: 0.5pt solid #ddd; padding: 4px 5px; word-wrap: break-word; vertical-align: top; }
-                    thead { background-color: #7f0000 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    th { font-size: 8px; text-transform: uppercase; font-weight: 700; }
-                    tr:nth-child(even) td { background-color: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                </style>
-            </head>
-            <body>
-                <h1>Expired MOA Report</h1>
-                ` + tableContent + `
-            </body>
-            </html>`;
+    document.getElementById('openPreviewBtn').addEventListener('click', function () {
+        document.getElementById('printPreviewContent').innerHTML = buildPrintHTML();
+        previewModal.show();
+    });
 
-        printFrame.document.open();
-        printFrame.document.write(printContents);
-        printFrame.document.close();
-        printFrame.focus();
-        setTimeout(function () { printFrame.print(); }, 500);
-    }
+    /* ── Print
+       @page { margin: 0 } removes browser date/title/URL.
+       Body padding restores the visual spacing.          ── */
+    document.getElementById('doPrintBtn').addEventListener('click', function () {
+        const html = buildPrintHTML();
+
+        const printDoc = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Expired MOA Report — InternConnect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        html, body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        body {
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+            font-size: 10px; color: #1a1a1a; background: #fff;
+            padding: 10mm 12mm;
+        }
+        table { border-collapse: collapse; width: 100%; }
+        thead { display: table-header-group; }
+        tfoot { display: table-footer-group; }
+        tr    { page-break-inside: avoid; }
+    </style>
+</head>
+<body>${html}</body>
+</html>`;
+
+        const frame = document.getElementById('printFrame');
+        const fw    = frame.contentWindow;
+        fw.document.open();
+        fw.document.write(printDoc);
+        fw.document.close();
+        fw.focus();
+        setTimeout(function () { fw.print(); }, 900);
+    });
 </script>
 
 </body>

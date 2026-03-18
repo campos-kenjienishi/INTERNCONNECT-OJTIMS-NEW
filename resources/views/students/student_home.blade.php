@@ -683,7 +683,7 @@
             <div class="stat-card">
                 <div class="stat-icon blue"><i class="fa fa-building"></i></div>
                 <div class="stat-info">
-                    <div class="stat-num">{{ count($companies) }}</div>
+                    <div class="stat-num">{{ count($companies ?? []) }}</div>
                     <div class="stat-name">Partner Companies</div>
                 </div>
             </div>

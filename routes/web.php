@@ -93,7 +93,7 @@ Route::middleware(['role:1'])->group(function () {
 // ─── STUDENT (role 0) ───────────────────────────────────────────────
 
 Route::middleware(['role:0'])->group(function () {
-    Route::get('/student/home',[AuthController::class,'student_home'])->name('student_home');
+    Route::get('/student/home', [StudentController::class, 'home'])->name('student_home');
     Route::get('student/login',[AuthController::class, 'logout']);
     Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
     Route::put('/student/edit/{email}', [StudentController::class,'edit']);

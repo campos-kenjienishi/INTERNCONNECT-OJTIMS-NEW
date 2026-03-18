@@ -342,16 +342,20 @@
         }
 
         /* Remove button */
-        .btn-remove {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 7px 14px;
-            background: #fff; border: 1.5px solid #e8e8e8;
-            border-radius: 8px; color: #888;
-            font-family: 'Poppins', sans-serif; font-size: 12.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.25s;
-        }
+.btn-remove {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    border: none; border-radius: 8px; color: #fff;
+    font-family: 'Poppins', sans-serif; font-size: 12.5px;
+    font-weight: 600; cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 3px 10px rgba(220,38,38,0.25);
+}
 
-        .btn-remove:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
+.btn-remove:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(220,38,38,0.35);
+}
 
         /* =============== MODAL =============== */
         .modal-content {

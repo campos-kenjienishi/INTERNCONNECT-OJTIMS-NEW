@@ -16,13 +16,37 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --red:        #dc2626;
-            --red-dark:   #991b1b;
-            --red-deeper: #7f0000;
-            --sidebar-w:  260px;
-            --sidebar-w-collapsed: 70px;
-            --topbar-h:   64px;
-        }
+    --red:        #dc2626;
+    --red-dark:   #991b1b;
+    --red-deeper: #7f0000;
+    --sidebar-w:  260px;
+    --sidebar-w-collapsed: 70px;
+    --topbar-h:   64px;
+
+    --btn-approval-bg:   #0ea5e9;
+    --btn-approval-dark: #0284c7;
+    --btn-approval-glow: rgba(14,165,233,0.25);
+
+    --btn-students-bg:   #8b5cf6;
+    --btn-students-dark: #7c3aed;
+    --btn-students-glow: rgba(139,92,246,0.25);
+
+    --btn-template-bg:   #f59e0b;
+    --btn-template-dark: #d97706;
+    --btn-template-glow: rgba(245,158,11,0.25);
+
+    --btn-announce-bg:   #10b981;
+    --btn-announce-dark: #059669;
+    --btn-announce-glow: rgba(16,185,129,0.25);
+
+    --btn-edit-bg:       #64748b;
+    --btn-edit-dark:     #475569;
+    --btn-edit-glow:     rgba(100,116,139,0.25);
+
+    --btn-remove-bg:     #dc2626;
+    --btn-remove-dark:   #b91c1c;
+    --btn-remove-glow:   rgba(220,38,38,0.25);
+}
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -524,6 +548,52 @@
     color: #e5e5e5;
     margin: 0 2px;
 }
+.btn-action {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 13px; border: none; border-radius: 7px; color: #fff;
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.22s; white-space: nowrap;
+    text-decoration: none; line-height: 1.4;
+}
+.btn-action:hover { transform: translateY(-1px); color: #fff; text-decoration: none; }
+.btn-action:active { transform: translateY(0); }
+
+.btn-approval {
+    background: linear-gradient(135deg, var(--btn-approval-bg), var(--btn-approval-dark));
+    box-shadow: 0 3px 10px var(--btn-approval-glow);
+}
+.btn-approval:hover { box-shadow: 0 6px 18px var(--btn-approval-glow); }
+
+.btn-students {
+    background: linear-gradient(135deg, var(--btn-students-bg), var(--btn-students-dark));
+    box-shadow: 0 3px 10px var(--btn-students-glow);
+}
+.btn-students:hover { box-shadow: 0 6px 18px var(--btn-students-glow); }
+
+.btn-template {
+    background: linear-gradient(135deg, var(--btn-template-bg), var(--btn-template-dark));
+    box-shadow: 0 3px 10px var(--btn-template-glow);
+}
+.btn-template:hover { box-shadow: 0 6px 18px var(--btn-template-glow); }
+
+.btn-announce {
+    background: linear-gradient(135deg, var(--btn-announce-bg), var(--btn-announce-dark));
+    box-shadow: 0 3px 10px var(--btn-announce-glow);
+}
+.btn-announce:hover { box-shadow: 0 6px 18px var(--btn-announce-glow); }
+
+.btn-edit {
+    background: linear-gradient(135deg, var(--btn-edit-bg), var(--btn-edit-dark));
+    box-shadow: 0 3px 10px var(--btn-edit-glow);
+}
+.btn-edit:hover { box-shadow: 0 6px 18px var(--btn-edit-glow); }
+
+.btn-remove {
+    background: linear-gradient(135deg, var(--btn-remove-bg), var(--btn-remove-dark));
+    box-shadow: 0 3px 10px var(--btn-remove-glow);
+}
+.btn-remove:hover { box-shadow: 0 6px 18px var(--btn-remove-glow); }
+
     </style>
 </head>
 
@@ -713,20 +783,20 @@
                             </td>
                             <td>
                                 <a href="{{ url('/professor/listStudents', $room->id) }}"
-                                   class="btn-view-action">
-                                    <i class="fa fa-eye"></i> View
-                                </a>
+                                    class="btn-action btn-approval">
+                                        <i class="fa fa-eye"></i> View
+                                    </a>
                             </td>
                             <td>
                                 <a href="{{ url('/professor/classList', $room->id) }}"
-                                   class="btn-view-action">
+                                class="btn-action btn-students">
                                     <i class="fa fa-users"></i> View
                                 </a>
                             </td>
                             <td>
-                                <button type="button" class="btn-view-action"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#templateModal{{ $loop->index }}">
+                                <button type="button" class="btn-action btn-template"
+                                data-bs-toggle="modal"
+                                data-bs-target="#templateModal{{ $loop->index }}">
                                     <i class="fa fa-file-upload"></i>
                                     {{ $room->templateFiles->count() > 0 ? 'Manage (' . $room->templateFiles->count() . ')' : 'Upload' }}
                                 </button>
@@ -789,9 +859,9 @@
                                 </div>
                             </td>
                             <td>
-                                <button type="button" class="btn-announce"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#announcementModal{{ $loop->index }}">
+                                <button type="button" class="btn-action btn-announce"
+                                data-bs-toggle="modal"
+                                data-bs-target="#announcementModal{{ $loop->index }}">
                                     <i class="fa fa-bullhorn"></i> Add
                                 </button>
 
@@ -839,10 +909,10 @@
                                 <!-- End Announcement Modal -->
                             </td>
                             <td>
-                                <button class="btn-view-action" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ $room->id }}">
+                                <button class="btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ $room->id }}">
                                     <i class="fa fa-edit"></i> Edit
                                 </button>
-                                <button class="btn-remove-room" data-id="{{ $room->id }}">
+                                <button class="btn-action btn-remove btn-remove-room" data-id="{{ $room->id }}">
                                     <i class="fa fa-trash"></i> Remove
                                 </button>
 
