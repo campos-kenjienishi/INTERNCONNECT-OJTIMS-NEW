@@ -674,47 +674,70 @@
         const course   = document.getElementById('courseSelect').value      || '—';
         const syLabel  = (syStart !== '—' && syEnd !== '—') ? syStart + ' – ' + syEnd : '—';
 
-        /* Build rows from current page only.
-           Column map (after DataTables hides col 0):
-           visible[0]=Company  visible[1]=Address  visible[2]=Rep
-           visible[3]=Contact  visible[4]=Email    visible[5]=SY
-           visible[6]=Status
-           We read the raw <td> nodes (col 0 hidden by DT but still in DOM). */
-        let rowsHTML = '';
-        for (let i = 0; i < currentPageNodes.length; i++) {
-            const tds  = currentPageNodes[i].querySelectorAll('td');
-            // td[0]=id(hidden)  td[1]=Company  td[2]=Address  td[3]=Rep
-            // td[4]=Contact     td[5]=Email     td[6]=SY       td[7]=Status
-
-            /* get() skips <i> icon nodes and reads only text nodes,
-               so Font Awesome glyphs don't bleed into the output */
-            const get = (idx) => {
-                if (!tds[idx]) return '';
+            /* Build rows from current page only. */
+            let rowsHTML = '';
+            for (let i = 0; i < currentPageNodes.length; i++) {
+                const tds  = currentPageNodes[i].querySelectorAll('td');
+            const getCompany = () => {
+                const cn = Array.from(tds).find(td => td.querySelector('.company-name-text'));
+                return cn ? cn.querySelector('.company-name-text').textContent.trim() : '';
+            };
+            const getAddress = () => {
+                const addr = Array.from(tds).find(td => td.querySelector('[class*="fa-map-marker"]'));
+                if (!addr) return '';
                 let text = '';
-                tds[idx].childNodes.forEach(node => {
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        text += node.textContent;
-                    } else if (node.nodeName !== 'I') {
-                        /* For wrapper divs (address, rep, etc.) recurse one level */
-                        node.childNodes.forEach(inner => {
-                            if (inner.nodeType === Node.TEXT_NODE) text += inner.textContent;
-                            else if (inner.nodeName !== 'I') text += inner.textContent;
-                        });
-                    }
+                addr.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
+                    else if (node.nodeName !== 'I') text += node.textContent;
                 });
                 return text.trim();
             };
-            const getCompany = () => {
-                if (!tds[1]) return '';
-                const cn = tds[1].querySelector('.company-name-text');
-                return cn ? cn.textContent.trim() : tds[1].textContent.trim();
+            const getRep = () => {
+                const rep = Array.from(tds).find(td => td.querySelector('[class*="fa-user-tie"]'));
+                if (!rep) return '';
+                let text = '';
+                rep.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
+                    else if (node.nodeName !== 'I') text += node.textContent;
+                });
+                return text.trim();
+            };
+            const getContact = () => {
+                const contact = Array.from(tds).find(td => td.querySelector('[class*="fa-phone"]'));
+                if (!contact) return '';
+                let text = '';
+                contact.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
+                    else if (node.nodeName !== 'I') text += node.textContent;
+                });
+                return text.trim();
+            };
+            const getEmail = () => {
+                const email = Array.from(tds).find(td => td.querySelector('[class*="fa-envelope"]'));
+                if (!email) return '';
+                let text = '';
+                email.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
+                    else if (node.nodeName !== 'I') text += node.textContent;
+                });
+                return text.trim();
+            };
+            const getSY = () => {
+                const sy = Array.from(tds).find(td => td.querySelector('[class*="fa-calendar"]'));
+                if (!sy) return '';
+                let text = '';
+                sy.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
+                    else if (node.nodeName !== 'I') text += node.textContent;
+                });
+                return text.trim();
             };
             const getStatus = () => {
-                if (!tds[7]) return '';
-                const b = tds[7].querySelector('.badge-active, .badge-expired');
-                return b ? b.textContent.trim() : tds[7].textContent.trim();
+                const status = Array.from(tds).find(td => td.querySelector('.badge-active, .badge-expired'));
+                return status ? status.querySelector('.badge-active, .badge-expired').textContent.trim() : '';
             };
-            const isActive  = tds[7] && tds[7].querySelector('.badge-active');
+            const statusTd = Array.from(tds).find(td => td.querySelector('.badge-active, .badge-expired'));
+            const isActive = statusTd && statusTd.querySelector('.badge-active');
             const statusBadge = isActive
                 ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Active</span>`
                 : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Expired</span>`;
@@ -726,11 +749,11 @@
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
                 <td style="padding:7px 6px; font-size:9px; font-weight:700; color:#6b7280; text-align:center; vertical-align:top; border-right:1px solid #e5e7eb;">${rowNum}</td>
                 <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getCompany()}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${get(2)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${get(3)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${get(4)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${get(5)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${get(6)}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getAddress()}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getRep()}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getContact()}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getEmail()}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${getSY()}</td>
                 <td style="padding:7px 6px; vertical-align:top; text-align:center;">${statusBadge}</td>
             </tr>`;
         }
