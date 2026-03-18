@@ -722,7 +722,7 @@
                     </div>
                 @endif
 
-                <form action="{{ url('/student/ojtEdit', $data->studentNum) }}" method="post">
+                <form action="{{ url('/student/ojtEdit', $studentNum ?? ($data->studentNum ?? '')) }}" method="post">
                     @csrf
                     @method('PUT')
 
@@ -733,33 +733,33 @@
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-building"></i> Company Name</label>
                             <input class="field-input" type="text" name="company_name"
-                                value="{{ $user->company_name }}" placeholder="Enter company name">
+                                value="{{ old('company_name', optional($user)->company_name) }}" placeholder="Enter company name">
                         </div>
 
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-map-marker-alt"></i> Company Address</label>
                             <input class="field-input" type="text" name="company_address"
-                                value="{{ $user->company_address }}" placeholder="Enter company address">
+                                value="{{ old('company_address', optional($user)->company_address) }}" placeholder="Enter company address">
                         </div>
 
                         <div class="field-group full-width">
                             <label class="field-label"><i class="fa fa-briefcase"></i> Nature of Business</label>
                             <span class="field-hint">e.g. Educational Institution, Government Agency, Telecommunication, Travel Agency, Hotel and Hospitality Service, Food Service, BPOs, NGOs, POS, etc.</span>
                             <input class="field-input" type="text" name="nature_of_bus"
-                                value="{{ $user->nature_of_bus }}" placeholder="Enter nature of business">
+                                value="{{ old('nature_of_bus', optional($user)->nature_of_bus) }}" placeholder="Enter nature of business">
                         </div>
 
                         <div class="field-group full-width">
                             <label class="field-label"><i class="fa fa-network-wired"></i> Nature of Networking or Linkages</label>
                             <span class="field-hint">Please indicate if: Academic Linkages, Benefactors, Research and Extension Linkage, Educational and Cultural Exchange, Government Agencies Partners, National/Institutional Membership, Non-Government Organizations Partners, OJT/Training Stations, etc.</span>
                             <input class="field-input" type="text" name="nature_of_link"
-                                value="{{ $user->nature_of_link }}" placeholder="Enter nature of networking or linkages">
+                                value="{{ old('nature_of_link', optional($user)->nature_of_link) }}" placeholder="Enter nature of networking or linkages">
                         </div>
 
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-globe"></i> Level</label>
                             <input class="field-input" type="text" name="level"
-                                value="{{ $user->level }}" placeholder="e.g. International, National, Regional, Local">
+                                value="{{ old('level', optional($user)->level) }}" placeholder="e.g. International, National, Regional, Local">
                         </div>
                     </div>
 
@@ -769,18 +769,18 @@
                     <div class="form-grid">
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-calendar-check"></i> Start Date</label>
-                            <input class="field-input" type="date" name="start_date" value="{{ $user->start_date }}">
+                            <input class="field-input" type="date" name="start_date" value="{{ old('start_date', optional($user)->start_date) }}">
                         </div>
 
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-calendar-times"></i> End Date</label>
-                            <input class="field-input" type="date" name="finish_date" value="{{ $user->finish_date }}">
+                            <input class="field-input" type="date" name="finish_date" value="{{ old('finish_date', optional($user)->finish_date) }}">
                         </div>
 
                         <div class="field-group full-width">
                             <label class="field-label"><i class="fa fa-clock"></i> Reporting Time</label>
                             <input class="field-input" type="text" name="report_time" id="report_time"
-                                value="{{ $user->report_time }}" placeholder="e.g. 9:00 am - 6:00 pm (Monday - Friday)">
+                                value="{{ old('report_time', optional($user)->report_time) }}" placeholder="e.g. 9:00 am - 6:00 pm (Monday - Friday)">
                         </div>
                     </div>
 
@@ -791,19 +791,19 @@
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-user-tie"></i> Contact Name</label>
                             <input class="field-input" type="text" name="contact_name"
-                                value="{{ $user->contact_name }}" placeholder="Enter contact name">
+                                value="{{ old('contact_name', optional($user)->contact_name) }}" placeholder="Enter contact name">
                         </div>
 
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-id-badge"></i> Position of Contact</label>
                             <input class="field-input" type="text" name="contact_position"
-                                value="{{ $user->contact_position }}" placeholder="Enter contact's position">
+                                value="{{ old('contact_position', optional($user)->contact_position) }}" placeholder="Enter contact's position">
                         </div>
 
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-phone"></i> Contact Number</label>
                             <input class="field-input" type="text" name="contact_number"
-                                value="{{ $user->contact_number }}" placeholder="Enter contact number">
+                                value="{{ old('contact_number', optional($user)->contact_number) }}" placeholder="Enter contact number">
                         </div>
                     </div>
 

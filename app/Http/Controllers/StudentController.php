@@ -361,13 +361,17 @@ public function ojtInformation()
         $data=User::where('id','=', Session::get('loginId'))->first();
                 }
                 $studentNum = $data->studentNum;
-                $user = null;
 
-                if (!empty($studentNum)) {
-                    $user = OJTInformation::firstOrCreate(['studentNum' => $studentNum]);
+                if (empty($studentNum) && !empty($data->id)) {
+                    $studentProfile = Student::where('user_id', $data->id)->first();
+                    $studentNum = $studentProfile->studentNum ?? null;
                 }
 
-    return view('students.ojtinfo', compact('data','course','user'));
+                $user = !empty($studentNum)
+                    ? OJTInformation::firstOrCreate(['studentNum' => $studentNum])
+                    : new OJTInformation();
+
+    return view('students.ojtinfo', compact('data','course','user', 'studentNum'));
 
 }
 public function ojt_edit(Request $request,$studentNum)
@@ -380,6 +384,11 @@ public function ojt_edit(Request $request,$studentNum)
                     }
     
         $resolvedStudentNum = $data->studentNum;
+
+        if (empty($resolvedStudentNum) && !empty($data->id)) {
+            $studentProfile = Student::where('user_id', $data->id)->first();
+            $resolvedStudentNum = $studentProfile->studentNum ?? null;
+        }
 
         if (empty($resolvedStudentNum)) {
             return back()->with('fail', 'Student number is missing for this account.');
