@@ -283,6 +283,15 @@
         }
         .btn-print:hover { background: #fef3c7; }
 
+        .btn-remove {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 5px 11px; border-radius: 7px;
+            background: #fff; border: 1.5px solid #fecaca; color: #dc2626;
+            font-family: 'Poppins', sans-serif; font-size: 11.5px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-remove:hover { background: #fee2e2; }
+
         /* =============== MODAL =============== */
         .modal-content {
             border-radius: 16px; border: none;
@@ -678,11 +687,20 @@
 
                             <!-- Students -->
                             <td>
-                                @forelse ($company->students as $student)
-                                    <span class="student-pill">{{ $student->full_name }}</span>
-                                @empty
-                                    <span style="color:#aaa; font-size:12px;">—</span>
-                                @endforelse
+                                @php
+                                    $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($company->student_names_display ?? '')))));
+                                @endphp
+                                @if ($displayStudents->isNotEmpty())
+                                    @foreach ($displayStudents as $displayStudent)
+                                        <span class="student-pill">{{ $displayStudent }}</span>
+                                    @endforeach
+                                @else
+                                    @forelse ($company->students as $student)
+                                        <span class="student-pill">{{ $student->full_name }}</span>
+                                    @empty
+                                        <span style="color:#aaa; font-size:12px;">—</span>
+                                    @endforelse
+                                @endif
                             </td>
 
                             <!-- Status -->
@@ -722,6 +740,16 @@
                                         onclick="openViewModal('{{ route('print-data', ['company' => $company->id]) }}')">
                                         <i class="fa fa-print"></i> Print
                                     </button>
+
+                                    <!-- Remove -->
+                                    <button type="button" class="btn-remove"
+                                        onclick="confirmRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}')">
+                                        <i class="fa fa-trash"></i> Remove
+                                    </button>
+
+                                    <form id="remove-form-{{ $company->id }}" action="{{ url('/moa/remove/' . $company->id) }}" method="POST" style="display:none;">
+                                        @csrf
+                                    </form>
 
                                 </div>
                             </td>
@@ -825,12 +853,33 @@
 
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-user-graduate"></i> Student Names <span style="color:#aaa; font-weight:400;">(Optional, hold Ctrl to select multiple)</span></label>
+                        <input
+                            id="moaStudentSearch"
+                            class="field-input"
+                            type="text"
+                            placeholder="Search student name"
+                            style="margin-bottom:8px;"
+                            disabled
+                        >
                         <select name="student_names[]" id="moaStudentSelect" class="field-select" multiple style="min-height:100px;" disabled>
                             @foreach ($stu as $student)
                                 <option value="{{ $student->full_name }}" data-course="{{ strtolower(trim($student->course ?? '')) }}">{{ $student->full_name }}</option>
                             @endforeach
                         </select>
                         <div id="moaStudentHint" style="margin-top:6px; font-size:12px; color:#888;">Select a course first to show matching students.</div>
+                    </div>
+
+                    <div class="field-group" style="margin-top:10px;">
+                        <label class="field-label"><i class="fa fa-keyboard"></i> Manual Student Input <span style="color:#aaa; font-weight:400;">(Optional, comma or new line separated)</span></label>
+                        <textarea
+                            id="manualStudentInput"
+                            name="manual_student_names"
+                            class="field-input"
+                            rows="3"
+                            placeholder="Type student names separated by comma or new line"
+                            style="resize:vertical; min-height:88px;"
+                        ></textarea>
+                        <div style="font-size:12px; color:#888; margin-top:8px;">Use this for students without accounts. Input is also shown in the MOA list.</div>
                     </div>
 
                 </div>
@@ -962,7 +1011,9 @@
 
         function filterStudentOptionsByCourse() {
             const selectedCourse = (($('#moaCourseSelect').val() || '').trim()).toLowerCase();
+            const searchQuery = (($('#moaStudentSearch').val() || '').trim()).toLowerCase();
             const studentSelect = document.getElementById('moaStudentSelect');
+            const studentSearch = document.getElementById('moaStudentSearch');
             const studentHint = document.getElementById('moaStudentHint');
 
             if (!studentSelect) {
@@ -971,6 +1022,9 @@
 
             const hasSelectedCourse = selectedCourse.length > 0;
             studentSelect.disabled = !hasSelectedCourse;
+            if (studentSearch) {
+                studentSearch.disabled = !hasSelectedCourse;
+            }
 
             if (studentHint) {
                 studentHint.textContent = hasSelectedCourse
@@ -980,7 +1034,9 @@
 
             Array.from(studentSelect.options).forEach(function (option) {
                 const studentCourse = (option.getAttribute('data-course') || '').trim().toLowerCase();
-                const isMatch = !selectedCourse || studentCourse === selectedCourse;
+                const matchesCourse = !selectedCourse || studentCourse === selectedCourse;
+                const matchesSearch = !searchQuery || option.value.toLowerCase().includes(searchQuery);
+                const isMatch = matchesCourse && matchesSearch;
 
                 option.hidden = !isMatch;
                 option.disabled = !isMatch;
@@ -991,7 +1047,11 @@
             });
         }
 
-        $('#moaCourseSelect').on('change', filterStudentOptionsByCourse);
+        $('#moaCourseSelect').on('change', function () {
+            $('#moaStudentSearch').val('');
+            filterStudentOptionsByCourse();
+        });
+        $('#moaStudentSearch').on('input', filterStudentOptionsByCourse);
         filterStudentOptionsByCourse();
 
         // File validation error
@@ -1005,6 +1065,23 @@
         @endif
 
     });
+
+    function confirmRemove(companyId, companyName) {
+        Swal.fire({
+            title: 'Remove MOA?',
+            html: 'This will permanently delete <strong>' + companyName + '</strong> and all associated data.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, remove it',
+            cancelButtonText: 'Cancel',
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                document.getElementById('remove-form-' + companyId).submit();
+            }
+        });
+    }
 
     // Print functions
     function openViewModal(routeUrl) {

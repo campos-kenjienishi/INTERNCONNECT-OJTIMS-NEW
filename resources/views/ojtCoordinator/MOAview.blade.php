@@ -266,6 +266,29 @@
             padding-right: 4px;
         }
 
+        .student-search-wrap { margin-bottom: 12px; }
+        .student-search-input {
+            width: 100%;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .student-search-input:focus {
+            border-color: #fca5a5;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+        }
+        .student-no-match {
+            display: none;
+            text-align: center;
+            padding: 22px 16px;
+            color: #888;
+            font-size: 12.5px;
+        }
+
         .student-list::-webkit-scrollbar { width: 4px; }
         .student-list::-webkit-scrollbar-thumb { background: #fecaca; border-radius: 10px; }
 
@@ -630,64 +653,146 @@
                         <i class="fa fa-users"></i>
                     </div>
                     <div>
+                        @php
+                            $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($company->student_names_display ?? '')))))->values();
+                            $linkedStudents = $company->students;
+                            $studentCount = $displayStudents->isNotEmpty() ? $displayStudents->count() : $linkedStudents->count();
+                        @endphp
                         <h2>Student List</h2>
                         <p>
-                            {{ count($company->students) }}
-                            {{ count($company->students) == 1 ? 'student' : 'students' }}
+                            {{ $studentCount }}
+                            {{ $studentCount == 1 ? 'student' : 'students' }}
                             assigned to this company
                         </p>
                     </div>
                 </div>
                 <div class="panel-card-body">
+                    <div class="student-search-wrap">
+                        <input
+                            type="text"
+                            id="studentSearchInput"
+                            class="student-search-input"
+                            placeholder="Search assigned students by name"
+                        >
+                    </div>
                     <div class="student-list">
-                        @forelse ($company->students as $student)
-                        <div class="student-card">
-                            <div class="student-card-header">
-                                <div class="student-avatar">
-                                    {{ strtoupper(substr($student->full_name, 0, 1)) }}
-                                </div>
-                                <div>
-                                    <div class="student-name">{{ $student->full_name }}</div>
-                                    <span class="student-course">{{ $student->course }}</span>
-                                </div>
-                            </div>
+                        @if ($displayStudents->isNotEmpty())
+                            @foreach ($displayStudents as $displayStudent)
+                                @php $matchedStudent = $linkedStudents->firstWhere('full_name', $displayStudent); @endphp
+                                @if ($matchedStudent)
+                                <div class="student-card">
+                                    <div class="student-card-header">
+                                        <div class="student-avatar">
+                                            {{ strtoupper(substr($matchedStudent->full_name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="student-name">{{ $matchedStudent->full_name }}</div>
+                                            <span class="student-course">{{ $matchedStudent->course }}</span>
+                                        </div>
+                                    </div>
 
-                            <div class="student-detail-row">
-                                <i class="fa fa-id-card"></i>
-                                <span><strong>Student No:</strong> {{ $student->studentNum }}</span>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-id-card"></i>
+                                        <span><strong>Student No:</strong> {{ $matchedStudent->studentNum }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-envelope"></i>
+                                        <span>{{ $matchedStudent->email }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-birthday-cake"></i>
+                                        <span><strong>DOB:</strong> {{ $matchedStudent->date_of_birth }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-phone"></i>
+                                        <span>{{ $matchedStudent->contact_number }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-map-marker-alt"></i>
+                                        <span>{{ $matchedStudent->address }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-layer-group"></i>
+                                        <span>{{ $matchedStudent->year_and_section }}</span>
+                                    </div>
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-chalkboard-teacher"></i>
+                                        <span><strong>Adviser:</strong> {{ $matchedStudent->adviser_name }}</span>
+                                    </div>
+                                </div>
+                                @else
+                                <div class="student-card">
+                                    <div class="student-card-header">
+                                        <div class="student-avatar">
+                                            {{ strtoupper(substr($displayStudent, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="student-name">{{ $displayStudent }}</div>
+                                            <span class="student-course">{{ $company->course ?: 'Manual entry' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="student-detail-row">
+                                        <i class="fa fa-keyboard"></i>
+                                        <span>This student was entered manually for this MOA.</span>
+                                    </div>
+                                </div>
+                                @endif
+                            @endforeach
+                        @else
+                            @forelse ($linkedStudents as $student)
+                            <div class="student-card">
+                                <div class="student-card-header">
+                                    <div class="student-avatar">
+                                        {{ strtoupper(substr($student->full_name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="student-name">{{ $student->full_name }}</div>
+                                        <span class="student-course">{{ $student->course }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="student-detail-row">
+                                    <i class="fa fa-id-card"></i>
+                                    <span><strong>Student No:</strong> {{ $student->studentNum }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-envelope"></i>
+                                    <span>{{ $student->email }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-birthday-cake"></i>
+                                    <span><strong>DOB:</strong> {{ $student->date_of_birth }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-phone"></i>
+                                    <span>{{ $student->contact_number }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-map-marker-alt"></i>
+                                    <span>{{ $student->address }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-layer-group"></i>
+                                    <span>{{ $student->year_and_section }}</span>
+                                </div>
+                                <div class="student-detail-row">
+                                    <i class="fa fa-chalkboard-teacher"></i>
+                                    <span><strong>Adviser:</strong> {{ $student->adviser_name }}</span>
+                                </div>
                             </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-envelope"></i>
-                                <span>{{ $student->email }}</span>
+                            @empty
+                            <div style="text-align:center; padding:40px 20px; color:#aaa;">
+                                <i class="fa fa-users" style="font-size:40px; margin-bottom:12px; display:block; color:#fecaca;"></i>
+                                <div style="font-size:14px; font-weight:600; color:#888;">No students assigned</div>
+                                <div style="font-size:12.5px; margin-top:4px;">No students are linked to this company yet.</div>
                             </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-birthday-cake"></i>
-                                <span><strong>DOB:</strong> {{ $student->date_of_birth }}</span>
-                            </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-phone"></i>
-                                <span>{{ $student->contact_number }}</span>
-                            </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-map-marker-alt"></i>
-                                <span>{{ $student->address }}</span>
-                            </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-layer-group"></i>
-                                <span>{{ $student->year_and_section }}</span>
-                            </div>
-                            <div class="student-detail-row">
-                                <i class="fa fa-chalkboard-teacher"></i>
-                                <span><strong>Adviser:</strong> {{ $student->adviser_name }}</span>
-                            </div>
+                            @endforelse
+                        @endif
+                        <div id="studentNoMatch" class="student-no-match">
+                            No assigned student matched your search.
                         </div>
-                        @empty
-                        <div style="text-align:center; padding:40px 20px; color:#aaa;">
-                            <i class="fa fa-users" style="font-size:40px; margin-bottom:12px; display:block; color:#fecaca;"></i>
-                            <div style="font-size:14px; font-weight:600; color:#888;">No students assigned</div>
-                            <div style="font-size:12.5px; margin-top:4px;">No students are linked to this company yet.</div>
                         </div>
-                        @endforelse
                     </div>
                 </div>
             </div>
@@ -759,6 +864,30 @@
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
     });
+
+    const studentSearchInput = document.getElementById('studentSearchInput');
+    if (studentSearchInput) {
+        studentSearchInput.addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            const cards = Array.from(document.querySelectorAll('.student-list .student-card'));
+            let visibleCount = 0;
+
+            cards.forEach(function (card) {
+                const nameEl = card.querySelector('.student-name');
+                const studentName = (nameEl ? nameEl.textContent : '').toLowerCase();
+                const isVisible = !query || studentName.includes(query);
+                card.style.display = isVisible ? '' : 'none';
+                if (isVisible) {
+                    visibleCount++;
+                }
+            });
+
+            const noMatchEl = document.getElementById('studentNoMatch');
+            if (noMatchEl) {
+                noMatchEl.style.display = (cards.length > 0 && visibleCount === 0) ? 'block' : 'none';
+            }
+        });
+    }
 </script>
 
 </body>
