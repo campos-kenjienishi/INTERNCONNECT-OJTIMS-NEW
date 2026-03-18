@@ -412,7 +412,7 @@ public function show_list($roomId)
         }
 
         $studentsQuery = User::with('studentInfo')
-            ->join('students', 'users.studentNum', '=', 'students.studentNum')
+            ->join('students', 'users.id', '=', 'students.user_id')
             ->where('users.status', 1)
             ->orderBy('students.school_year_start', 'desc')
             ->orderBy('students.school_year_end', 'desc')
@@ -426,14 +426,14 @@ public function show_list($roomId)
                 if (empty($course->school_year_start) || empty($course->school_year_end)) {
                     $query->orWhere(function ($legacy) use ($course, $data) {
                         $legacy->whereNull('users.class_id')
-                            ->where('users.course', $course->course)
-                            ->where('users.adviser_name', $data->full_name);
+                            ->where('students.course', $course->course)
+                            ->where('students.adviser_name', $data->full_name);
                     });
                 }
             });
         } else {
-            $studentsQuery->where('users.course', $course->course)
-                ->where('users.adviser_name', $data->full_name);
+            $studentsQuery->where('students.course', $course->course)
+                ->where('students.adviser_name', $data->full_name);
         }
 
         $students = $studentsQuery->get();

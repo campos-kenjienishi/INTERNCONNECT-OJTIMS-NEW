@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Professor;
+use App\Models\Student;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Helpers\AuditLogger;
@@ -46,12 +47,6 @@ class AccountInfo extends Controller
         $user->last_name = $request->last_name;
         $user->full_name = $user->first_name . ' ' . $user->last_name;
         $user->suffix = $request->suffix;
-        $user->address = $request->address;
-        $user->contact_number = $request->contact_number;
-        $user->date_of_birth = $request->date_of_birth;
-        $user->course = $request->course;
-        $user->year_and_section = $request->year_and_section;
-        $user->studentNum = $request->studentNum;
         $user->email = $request->email;
     
         // Update professor data
@@ -71,12 +66,6 @@ class AccountInfo extends Controller
                 'last_name' => $user->last_name,
                 'full_name' => $user->full_name,
                 'suffix' => $user->suffix,
-                'address' => $user->address,
-                'contact_number' => $user->contact_number,
-                'date_of_birth' => $user->date_of_birth,
-                'course' => $user->course,
-                'year_and_section' => $user->year_and_section,
-                'studentNum' => $user->studentNum,
                 'email' => $user->email
             ]
         );
@@ -143,15 +132,24 @@ class AccountInfo extends Controller
         $user->last_name = $request->last_name;
         $user->full_name = $user->first_name . ' ' . $user->last_name;
         $user->suffix = $request->suffix;
-        $user->address = $request->address;
-        $user->contact_number = $request->contact_number;
-        $user->date_of_birth = $request->date_of_birth;
-        $user->course = $request->course;
-        $user->year_and_section = $request->year_and_section;
-        $user->studentNum = $request->studentNum;
         $user->email = $request->email;
+
+        $student = Student::where('user_id', $user->id)->first();
+
+        if (!$student) {
+            $student = new Student();
+            $student->user_id = $user->id;
+        }
+
+        $student->address = $request->address;
+        $student->contact_number = $request->contact_number;
+        $student->date_of_birth = $request->date_of_birth;
+        $student->course = $request->course;
+        $student->year_and_section = $request->year_and_section;
+        $student->studentNum = $request->studentNum;
+        $student->adviser_name = $request->adviser_name ?: $student->adviser_name;
     
-        
+        $student->save();
         $user->save();
         AuditLogger::log(
             'AccountInfo',
@@ -165,12 +163,12 @@ class AccountInfo extends Controller
                 'last_name' => $user->last_name,
                 'full_name' => $user->full_name,
                 'suffix' => $user->suffix,
-                'address' => $user->address,
-                'contact_number' => $user->contact_number,
-                'date_of_birth' => $user->date_of_birth,
-                'course' => $user->course,
-                'year_and_section' => $user->year_and_section,
-                'studentNum' => $user->studentNum,
+                'address' => $student->address,
+                'contact_number' => $student->contact_number,
+                'date_of_birth' => $student->date_of_birth,
+                'course' => $student->course,
+                'year_and_section' => $student->year_and_section,
+                'studentNum' => $student->studentNum,
                 'email' => $user->email
             ]
         );    

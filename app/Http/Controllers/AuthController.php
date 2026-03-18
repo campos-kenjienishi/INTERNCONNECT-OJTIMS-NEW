@@ -57,25 +57,18 @@ class AuthController extends Controller
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
-        $user->studentNum = $request->studentNum;
-        $user->course= $request->course;
-        $user->year_and_section= $request->year_and_section;
-        $user->adviser_name = $request->adviser_name;
         $user->password = Hash::make($request->password);
         $user->full_name = $user->first_name . ' ' . $user->last_name;
-        $student->studentNum =  $user->studentNum;
-        $studentE->first_name =$user->first_name;
-        $studentE->last_name =$user->last_name;
-        $studentE->email =$user->email;
-        $studentE->studentNum =$user->studentNum;
-        $studentE->course = $user->course;
-        $studentE->year_and_section =$user->year_and_section;
+        $student->studentNum =  $request->studentNum;
+        $studentE->studentNum =$request->studentNum;
+        $studentE->course = $request->course;
+        $studentE->year_and_section =$request->year_and_section;
         $studentE->school_year_start = $request->academic_year_start;
         $studentE->school_year_end   = $request->academic_year_end;
-        $studentE->adviser_name =$user->adviser_name;
-        $studentE->full_name = $user->full_name;
+        $studentE->adviser_name =$request->adviser_name;
 
         $res = $user->save();
+        $studentE->user_id = $user->id;
         $student->save();
         $studentE->save();
         
@@ -222,9 +215,12 @@ class AuthController extends Controller
         $professor->full_name = $user->full_name;
 
         Mail::to($user->email)->send(new TemporaryPasswordNotification($temporaryPassword));
-
-        $professor->save();
         $res = $user->save();
+
+        if ($res) {
+            $professor->user_id = $user->id;
+            $professor->save();
+        }
 
         if($res){
             $professor->subjects()->syncWithoutDetaching([$subject->id]);
@@ -273,17 +269,23 @@ public function student_home()
 
         $data = [];
         $userName = ''; // Initialize with an empty string
+        $loginId = Session::get('loginId');
         $sixMonthsAgo = Carbon::now()->subMonths(6);
         
-        if (Session::has('loginId')) {
-            $data = User::where('id', '=', Session::get('loginId'))->first();
+        if ($loginId) {
+            $data = User::where('id', '=', $loginId)->first();
             $userName = $data->full_name;
         }
     
         $roleCount = User::where('role', 0)
-        ->where(function ($query) use ($userName) {
-            $query->where('adviser_name', $userName)
-                ->orWhere('id', Session::get('loginId')); // Include the logged-in professor in the count
+        ->where(function ($query) use ($userName, $loginId) {
+            $query->whereHas('studentInfo', function ($studentQuery) use ($userName) {
+                $studentQuery->where('adviser_name', $userName);
+            });
+
+            if (!empty($loginId)) {
+                $query->orWhere('id', $loginId); // Keep original behavior.
+            }
         })
         ->where('created_at', '>=', $sixMonthsAgo)
         ->count();

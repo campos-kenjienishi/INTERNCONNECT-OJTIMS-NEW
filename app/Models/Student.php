@@ -12,6 +12,11 @@ class Student extends Model
 {
     use HasFactory;
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'company_student', 'student_id', 'company_id');
@@ -21,6 +26,47 @@ class Student extends Model
     {
         return $this->belongsTo(Professor::class, 'adviser_name', 'full_name');
     }
+
+    protected function getNameAttributeFromUser(string $column, $fallback = null)
+    {
+        $user = $this->relationLoaded('user') ? $this->user : $this->user()->first();
+        if (!$user) {
+            return $fallback;
+        }
+
+        return $user->{$column} ?? $fallback;
+    }
+
+    public function getFirstNameAttribute($value)
+    {
+        return $this->getNameAttributeFromUser('first_name', $value);
+    }
+
+    public function getMiddleNameAttribute($value)
+    {
+        return $this->getNameAttributeFromUser('middle_name', $value);
+    }
+
+    public function getLastNameAttribute($value)
+    {
+        return $this->getNameAttributeFromUser('last_name', $value);
+    }
+
+    public function getSuffixAttribute($value)
+    {
+        return $this->getNameAttributeFromUser('suffix', $value);
+    }
+
+    public function getFullNameAttribute($value)
+    {
+        return $this->getNameAttributeFromUser('full_name', $value);
+    }
+
+    public function getEmailAttribute($value)
+    {
+        return $this->getNameAttributeFromUser('email', $value);
+    }
+
     public function uploadPhoto(Request $request, $email)
 {
     $request->validate([
@@ -28,10 +74,8 @@ class Student extends Model
     ]);
 
     // 1. Update the Student model
-    $student = Student::where('email', $email)->firstOrFail();
-    
-    // 2. Find the corresponding User model
-    $user = User::where('email', $email)->first();
+    $user = User::where('email', $email)->firstOrFail();
+    $student = Student::where('user_id', $user->id)->firstOrFail();
 
     // Delete old photo if it exists
     if ($student->profile_photo && Storage::disk('public')->exists($student->profile_photo)) {
@@ -45,10 +89,8 @@ class Student extends Model
     $student->profile_photo = $path;
     $student->save();
 
-    if ($user) {
-        $user->profile_photo = $path; // Ensure 'profile_photo' column exists in users table too!
-        $user->save();
-    }
+    $user->profile_photo = $path; // Ensure 'profile_photo' column exists in users table too!
+    $user->save();
 
     return redirect()->back()->with('success', 'Profile photo updated successfully!');
 }

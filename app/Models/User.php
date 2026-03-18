@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Storage;  // ← Add this line
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -45,22 +46,74 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // In User.php
     public function studentInfo()
     {
-        return $this->hasOne(Student::class, 'studentNum', 'studentNum');
+        return $this->hasOne(Student::class, 'user_id', 'id');
     }
+
+    public function professorInfo(): HasOne
+    {
+        return $this->hasOne(Professor::class, 'user_id', 'id');
+    }
+
+    protected function getStudentAttributeFromProfile(string $column, $fallback)
+    {
+        if ((int) $this->role !== 0) {
+            return $fallback;
+        }
+
+        $profile = $this->relationLoaded('studentInfo') ? $this->studentInfo : $this->studentInfo()->first();
+        if (!$profile) {
+            return $fallback;
+        }
+
+        return $profile->{$column} ?? $fallback;
+    }
+
+    public function getStudentNumAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('studentNum', $value);
+    }
+
+    public function getDateOfBirthAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('date_of_birth', $value);
+    }
+
+    public function getContactNumberAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('contact_number', $value);
+    }
+
+    public function getAddressAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('address', $value);
+    }
+
+    public function getYearAndSectionAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('year_and_section', $value);
+    }
+
+    public function getCourseAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('course', $value);
+    }
+
+    public function getAdviserNameAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('adviser_name', $value);
+    }
+
     public function uploadPhoto(Request $request, $email)
 {
     $request->validate([
         'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
-    // 1. Update the Student model
-    $student = Student::where('email', $email)->firstOrFail();
-    
-    // 2. Find the corresponding User model
-    $user = User::where('email', $email)->first();
+    // 1. Resolve user then linked student profile
+    $user = User::where('email', $email)->firstOrFail();
+    $student = Student::where('user_id', $user->id)->firstOrFail();
 
     // Delete old photo if it exists
     if ($student->profile_photo && Storage::disk('public')->exists($student->profile_photo)) {
@@ -74,10 +127,8 @@ class User extends Authenticatable
     $student->profile_photo = $path;
     $student->save();
 
-    if ($user) {
-        $user->profile_photo = $path; // Ensure 'profile_photo' column exists in users table too!
-        $user->save();
-    }
+    $user->profile_photo = $path; // Ensure 'profile_photo' column exists in users table too!
+    $user->save();
 
     return redirect()->back()->with('success', 'Profile photo updated successfully!');
 }

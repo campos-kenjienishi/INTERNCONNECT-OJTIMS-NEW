@@ -66,6 +66,9 @@ public function home()
     {
         // Check if the user exists
     $user = User::where('email', $email)->first();
+        if (!$user) {
+            return back()->with('error', 'User not found.');
+        }
  
 
 
@@ -75,32 +78,27 @@ public function home()
                 $user->last_name = $request->last_name;
                 $user->full_name = $user->first_name . ' ' . $user->last_name;
                 $user->suffix = $request->suffix;
-                $user->address = $request->address;
-                $user->contact_number = $request->contact_number;
-                $user->date_of_birth = $request->date_of_birth;
-                $user->course = $request->course;
-                $user->year_and_section = $request->year_and_section;
-                $user->studentNum = $request->studentNum;
                 $user->email = $request->email;
 
 
     
             // Check if the student exists and update its data
-            $student = Student::where('email', $email)->first();
+            $student = Student::where('user_id', $user->id)->first();
+
+            if (!$student) {
+                $student = new Student();
+                $student->user_id = $user->id;
+            }
      
                 
-                $student->first_name = $user->first_name;
-                $student->middle_name = $user->middle_name;
-                $student->last_name = $user->last_name;
-                $student->full_name = $user->full_name;
-                $student->suffix = $user->suffix ;
-                $student->address = $user->address;
-                $student->contact_number = $user->contact_number;
-                $student->date_of_birth = $user->date_of_birth;
-                $student->course = $user->course;
-                $student->year_and_section = $user->year_and_section;
-                $student->studentNum = $user->studentNum;
-                $student->email = $user->email;
+                $student->address = $request->address;
+                $student->contact_number = $request->contact_number;
+                $student->date_of_birth = $request->date_of_birth;
+                $student->course = $request->course;
+                $student->year_and_section = $request->year_and_section;
+                $student->studentNum = $request->studentNum;
+                $student->adviser_name = $request->adviser_name ?: $student->adviser_name;
+                $student->user_id = $user->id;
                 $student->save();
                 $user->save();
                 AuditLogger::log(
@@ -224,6 +222,10 @@ public function join(Request $request, $email, $classId)
         if (Schema::hasColumn('users', 'class_id')) {
             $user->class_id = $classId;
         }
+
+        if (Schema::hasColumn('students', 'class_id')) {
+            Student::where('user_id', $user->id)->update(['class_id' => $classId]);
+        }
     
         $user->save();
         AuditLogger::log(
@@ -250,6 +252,10 @@ public function join(Request $request, $email, $classId)
             $user->status = 0;
             if (Schema::hasColumn('users', 'class_id')) {
                 $user->class_id = null;
+            }
+
+            if (Schema::hasColumn('students', 'class_id')) {
+                Student::where('user_id', $user->id)->update(['class_id' => null]);
             }
 
             $user->save();
