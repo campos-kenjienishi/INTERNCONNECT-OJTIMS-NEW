@@ -57,6 +57,21 @@ public function home()
         if(Session::has('loginId')){
 
             $data=User::where('id','=', Session::get('loginId'))->first();
+
+            if ($data) {
+                $studentProfile = Student::where('user_id', $data->id)->first();
+
+                if ($studentProfile) {
+                    // Ensure student profile values are always shown from students table.
+                    $data->studentNum = $studentProfile->studentNum;
+                    $data->course = $studentProfile->course;
+                    $data->year_and_section = $studentProfile->year_and_section;
+                    $data->adviser_name = $studentProfile->adviser_name;
+                    $data->address = $studentProfile->address;
+                    $data->contact_number = $studentProfile->contact_number;
+                    $data->date_of_birth = $studentProfile->date_of_birth;
+                }
+            }
                     }
 
 	    return view('students.student_account', compact('data','course'));
@@ -168,7 +183,7 @@ public function home()
                     }
                 }
 
-                if (Schema::hasColumn('uploaded_files', 'class_id') && Schema::hasColumn('users', 'class_id') && !empty($data->class_id)) {
+                if (Schema::hasColumn('uploaded_files', 'class_id') && Schema::hasColumn('students', 'class_id') && !empty($data->class_id)) {
                     $roomTemplates = UploadedFile::where('class_id', $data->class_id)
                         ->latest()
                         ->get();
@@ -219,10 +234,6 @@ public function join(Request $request, $email, $classId)
         // Update user data
 
         $user->status = 3;
-        if (Schema::hasColumn('users', 'class_id')) {
-            $user->class_id = $classId;
-        }
-
         if (Schema::hasColumn('students', 'class_id')) {
             Student::where('user_id', $user->id)->update(['class_id' => $classId]);
         }
@@ -250,10 +261,6 @@ public function join(Request $request, $email, $classId)
 
             // Just change the status to "not joined"
             $user->status = 0;
-            if (Schema::hasColumn('users', 'class_id')) {
-                $user->class_id = null;
-            }
-
             if (Schema::hasColumn('students', 'class_id')) {
                 Student::where('user_id', $user->id)->update(['class_id' => null]);
             }

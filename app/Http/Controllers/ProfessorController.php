@@ -37,7 +37,6 @@ public function class()
 
     if (Session::has('loginId')) {
         $data = User::where('id', Session::get('loginId'))->first();
-        $hasUserClassId = Schema::hasColumn('users', 'class_id');
         $hasUploadClassId = Schema::hasColumn('uploaded_files', 'class_id');
         $hasScheduleClassId = Schema::hasTable('schedules') && Schema::hasColumn('schedules', 'class_id');
         $hasClassScheduleDay = Schema::hasColumn('classes', 'schedule_day');
@@ -48,50 +47,35 @@ public function class()
 
         // For each room, preload students needing approval and all students
         foreach ($classrooms as $room) {
-            if ($hasUserClassId) {
-                // Students needing approval (status = 3 = pending)
-                $room->needingApproval = User::where(function ($query) use ($room, $data) {
-                        $query->where('class_id', $room->id);
+            $room->needingApproval = User::where('status', 3)
+                ->whereHas('studentInfo', function ($query) use ($room, $data) {
+                    $query->where('class_id', $room->id);
 
-                        // Legacy users without class_id are only shown for legacy rooms (no SY set).
-                        if (empty($room->school_year_start) || empty($room->school_year_end)) {
-                            $query->orWhere(function ($legacy) use ($room, $data) {
-                                $legacy->whereNull('class_id')
-                                    ->where('course', $room->course)
-                                    ->where('adviser_name', $data->full_name);
-                            });
-                        }
-                    })
-                    ->where('status', 3)
-                    ->get();
+                    // Legacy students without class_id are only shown for legacy rooms (no SY set).
+                    if (empty($room->school_year_start) || empty($room->school_year_end)) {
+                        $query->orWhere(function ($legacy) use ($room, $data) {
+                            $legacy->whereNull('class_id')
+                                ->where('course', $room->course)
+                                ->where('adviser_name', $data->full_name);
+                        });
+                    }
+                })
+                ->get();
 
-                // All students in this class/room (status = 1 = approved)
-                $room->students = User::where(function ($query) use ($room, $data) {
-                        $query->where('class_id', $room->id);
+            $room->students = User::where('status', 1)
+                ->whereHas('studentInfo', function ($query) use ($room, $data) {
+                    $query->where('class_id', $room->id);
 
-                        // Legacy users without class_id are only shown for legacy rooms (no SY set).
-                        if (empty($room->school_year_start) || empty($room->school_year_end)) {
-                            $query->orWhere(function ($legacy) use ($room, $data) {
-                                $legacy->whereNull('class_id')
-                                    ->where('course', $room->course)
-                                    ->where('adviser_name', $data->full_name);
-                            });
-                        }
-                    })
-                    ->where('status', 1)
-                    ->get();
-            } else {
-                // Legacy fallback when users.class_id does not exist yet
-                $room->needingApproval = User::where('course', $room->course)
-                    ->where('status', 3)
-                    ->where('adviser_name', $data->full_name)
-                    ->get();
-
-                $room->students = User::where('course', $room->course)
-                    ->where('status', 1)
-                    ->where('adviser_name', $data->full_name)
-                    ->get();
-            }
+                    // Legacy students without class_id are only shown for legacy rooms (no SY set).
+                    if (empty($room->school_year_start) || empty($room->school_year_end)) {
+                        $query->orWhere(function ($legacy) use ($room, $data) {
+                            $legacy->whereNull('class_id')
+                                ->where('course', $room->course)
+                                ->where('adviser_name', $data->full_name);
+                        });
+                    }
+                })
+                ->get();
 
             if ($hasUploadClassId) {
                 $room->templateFiles = UploadedFile::where('class_id', $room->id)
@@ -156,27 +140,20 @@ public function show($roomId)
         return redirect()->back()->with('error', 'Room not found.');
     }
     
-    if (Schema::hasColumn('users', 'class_id')) {
-        $students = User::where(function ($query) use ($roomId, $course, $data) {
-                $query->where('class_id', $roomId);
+    $students = User::where('status', 3)
+        ->whereHas('studentInfo', function ($query) use ($roomId, $course, $data) {
+            $query->where('class_id', $roomId);
 
-                // Legacy users without class_id are only shown for legacy rooms (no SY set).
-                if (empty($course->school_year_start) || empty($course->school_year_end)) {
-                    $query->orWhere(function ($legacy) use ($course, $data) {
-                        $legacy->whereNull('class_id')
-                            ->where('course', $course->course)
-                            ->where('adviser_name', $data->full_name);
-                    });
-                }
-            })
-            ->where('status', 3)
-            ->get();
-    } else {
-        $students = User::where('course', $course->course)
-            ->where('status', 3)
-            ->where('adviser_name', $data->full_name)
-            ->get();
-    }
+            // Legacy students without class_id are only shown for legacy rooms (no SY set).
+            if (empty($course->school_year_start) || empty($course->school_year_end)) {
+                $query->orWhere(function ($legacy) use ($course, $data) {
+                    $legacy->whereNull('class_id')
+                        ->where('course', $course->course)
+                        ->where('adviser_name', $data->full_name);
+                });
+            }
+        })
+        ->get();
 
     // Pass the $course and $students variables to the view
     return view('professor.listStudents', compact('course', 'students', 'data'));
@@ -353,8 +330,8 @@ public function roomDelete($id)
         $courseName = $room->course;
 
         // Unassign students from this room before deleting it.
-        if (Schema::hasColumn('users', 'class_id')) {
-            User::where('class_id', $room->id)->update(['class_id' => null]);
+        if (Schema::hasColumn('students', 'class_id')) {
+            Student::where('class_id', $room->id)->update(['class_id' => null]);
         }
 
         if (Schema::hasTable('schedules') && Schema::hasColumn('schedules', 'class_id')) {
@@ -418,23 +395,18 @@ public function show_list($roomId)
             ->orderBy('students.school_year_end', 'desc')
             ->select('users.*');
 
-        if (Schema::hasColumn('users', 'class_id')) {
-            $studentsQuery->where(function ($query) use ($roomId, $course, $data) {
-                $query->where('users.class_id', $roomId);
+        $studentsQuery->where(function ($query) use ($roomId, $course, $data) {
+            $query->where('students.class_id', $roomId);
 
-                // Legacy users without class_id are only shown for legacy rooms (no SY set).
-                if (empty($course->school_year_start) || empty($course->school_year_end)) {
-                    $query->orWhere(function ($legacy) use ($course, $data) {
-                        $legacy->whereNull('users.class_id')
-                            ->where('students.course', $course->course)
-                            ->where('students.adviser_name', $data->full_name);
-                    });
-                }
-            });
-        } else {
-            $studentsQuery->where('students.course', $course->course)
-                ->where('students.adviser_name', $data->full_name);
-        }
+            // Legacy students without class_id are only shown for legacy rooms (no SY set).
+            if (empty($course->school_year_start) || empty($course->school_year_end)) {
+                $query->orWhere(function ($legacy) use ($course, $data) {
+                    $legacy->whereNull('students.class_id')
+                        ->where('students.course', $course->course)
+                        ->where('students.adviser_name', $data->full_name);
+                });
+            }
+        });
 
         $students = $studentsQuery->get();
 

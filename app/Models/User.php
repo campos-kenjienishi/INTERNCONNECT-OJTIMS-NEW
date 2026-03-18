@@ -105,6 +105,11 @@ class User extends Authenticatable
         return $this->getStudentAttributeFromProfile('adviser_name', $value);
     }
 
+    public function getClassIdAttribute($value)
+    {
+        return $this->getStudentAttributeFromProfile('class_id', $value);
+    }
+
     public function uploadPhoto(Request $request, $email)
 {
     $request->validate([
