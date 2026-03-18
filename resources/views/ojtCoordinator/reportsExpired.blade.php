@@ -673,21 +673,44 @@
             return text.trim();
         };
 
-        /* Column map (td[0]=id hidden, td[1..7] = visible columns):
-           td[0] id  td[1] Company  td[2] Address  td[3] Rep
-           td[4] Contact  td[5] Email  td[6] School Year  td[7] Status */
+        /* Build rows from current page only using icon-based selectors */
         let rowsHTML = '';
         for (let i = 0; i < currentPageNodes.length; i++) {
             const tds    = currentPageNodes[i].querySelectorAll('td');
             const rowNum = pageInfo.start + i + 1;
             const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
 
-            const company   = tds[1] ? (tds[1].querySelector('.company-name-text')?.textContent.trim() || getClean(tds[1])) : '';
-            const address   = getClean(tds[2]);
-            const rep       = getClean(tds[3]);
-            const contact   = getClean(tds[4]);
-            const email     = getClean(tds[5]);
-            const schoolYr  = getClean(tds[6]);
+            const getCompany = () => {
+                const cn = Array.from(tds).find(td => td.querySelector('.company-name-text'));
+                return cn ? cn.querySelector('.company-name-text').textContent.trim() : '';
+            };
+            const getAddress = () => {
+                const addr = Array.from(tds).find(td => td.querySelector('[class*="fa-map-marker"]'));
+                return addr ? getClean(addr) : '';
+            };
+            const getRep = () => {
+                const rep = Array.from(tds).find(td => td.querySelector('[class*="fa-user-tie"]'));
+                return rep ? getClean(rep) : '';
+            };
+            const getContact = () => {
+                const contact = Array.from(tds).find(td => td.querySelector('[class*="fa-phone"]'));
+                return contact ? getClean(contact) : '';
+            };
+            const getEmail = () => {
+                const email = Array.from(tds).find(td => td.querySelector('[class*="fa-envelope"]'));
+                return email ? getClean(email) : '';
+            };
+            const getSY = () => {
+                const sy = Array.from(tds).find(td => td.querySelector('[class*="fa-calendar"]'));
+                return sy ? getClean(sy) : '';
+            };
+
+            const company   = getCompany();
+            const address   = getAddress();
+            const rep       = getRep();
+            const contact   = getContact();
+            const email     = getEmail();
+            const schoolYr  = getSY();
 
             rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
