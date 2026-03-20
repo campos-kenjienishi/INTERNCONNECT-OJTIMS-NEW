@@ -801,5 +801,6 @@
         setInterval(updateDate, 60000);
     </script>
 
-    </body>
+    <script src="{{ asset('assets/js/voice-input.js') }}"></script>
+</body>
     </html>

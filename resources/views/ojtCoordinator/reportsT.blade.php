@@ -918,7 +918,6 @@ window.onload = function(){
     },700);
 }
 <\/script>
-
 </body>
 </html>`;
 
@@ -931,5 +930,6 @@ window.onload = function(){
 });
 </script>
 
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

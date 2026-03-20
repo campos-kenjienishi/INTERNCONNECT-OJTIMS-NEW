@@ -1375,5 +1375,6 @@
     flatpickr('.datepicker', { dateFormat: 'Y-m-d' });
 </script>
 
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
