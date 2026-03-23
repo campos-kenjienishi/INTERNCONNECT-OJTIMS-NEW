@@ -87,6 +87,10 @@ class AuthController extends Controller
     }
 
     public function loginUser(Request $request){
+        if (config('services.idp.enabled')) {
+            return redirect()->route('login.external');
+        }
+
         $request->validate([
             
             'email'=>'required',

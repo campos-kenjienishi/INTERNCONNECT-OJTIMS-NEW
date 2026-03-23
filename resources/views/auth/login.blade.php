@@ -67,57 +67,72 @@
                 <p>Sign in to your InternConnect Account</p>
             </div>
 
-            <form action="{{route('login-user')}}" method="post">
-                @csrf
+            @if(Session::has('success'))
+                <div class="alert alert-success">{{ Session::get('success') }}</div>
+            @endif
+            @if(Session::has('fail'))
+                <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+            @endif
 
-                @if(Session::has('success'))
-                    <div class="alert alert-success">{{ Session::get('success') }}</div>
-                @endif
-                @if(Session::has('fail'))
-                    <div class="alert alert-danger">{{ Session::get('fail') }}</div>
-                @endif
+            {{-- IdP fallback warning removed --}}
 
-                <div class="field-group">
-                    <label class="form-label">E-mail Address</label>
-                    <div class="input-wrap">
-                        <i class="fa fa-envelope i-icon"></i>
-                        <input type="text" placeholder="Enter your email" name="email" value="{{ old('email') }}" autocomplete="email">
-                    </div>
-                    <span class="text-danger">@error('email') {{ $message }} @enderror</span>
-                </div>
-
-                <div class="field-group">
-                    <label class="form-label">Password</label>
-                    <div class="input-wrap">
-                        <i class="fa fa-lock i-icon"></i>
-                        <input type="password" placeholder="Enter your password" name="password" autocomplete="current-password" required id="id_password">
-                        <i class="far fa-eye toggle-pw" id="togglePassword"></i>
-                    </div>
-                    <span class="text-danger">@error('password') {{ $message }} @enderror</span>
-                </div>
-
+            @if(config('services.idp.enabled'))
                 <div class="terms-wrap">
                     <div class="terms-text">
-                        By signing in, you agree to our
-                        <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> and
-                        <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
+                        Authentication is managed by our Identity Provider. Use external sign-in to continue.
                     </div>
                 </div>
 
                 <div class="btn-wrap">
-                    <button type="submit" class="btn-login">
-                        <i class="fa fa-sign-in-alt me-2"></i> Sign In
-                    </button>
+                    <a href="{{ route('login.external') }}" class="btn-login text-decoration-none d-inline-flex align-items-center justify-content-center">
+                        <i class="fa fa-sign-in-alt me-2"></i> Sign In With Identity Provider
+                    </a>
                 </div>
+            @else
+                <form action="{{ route('login-user') }}" method="post">
+                    @csrf
 
-                <div class="footer-wrap">
-                    <div class="footer-links">
-                        <a href="forgot"><i class="fa fa-key"></i> Forgot Password?</a>
-                        <a href="registration"><i class="fa fa-user-plus"></i> Create Account</a>
+                    <div class="field-group">
+                        <label class="form-label">E-mail Address</label>
+                        <div class="input-wrap">
+                            <i class="fa fa-envelope i-icon"></i>
+                            <input type="text" placeholder="Enter your email" name="email" value="{{ old('email') }}" autocomplete="email">
+                        </div>
+                        <span class="text-danger">@error('email') {{ $message }} @enderror</span>
                     </div>
-                </div>
 
-            </form>
+                    <div class="field-group">
+                        <label class="form-label">Password</label>
+                        <div class="input-wrap">
+                            <i class="fa fa-lock i-icon"></i>
+                            <input type="password" placeholder="Enter your password" name="password" autocomplete="current-password" required id="id_password">
+                            <i class="far fa-eye toggle-pw" id="togglePassword"></i>
+                        </div>
+                        <span class="text-danger">@error('password') {{ $message }} @enderror</span>
+                    </div>
+
+                    <div class="terms-wrap">
+                        <div class="terms-text">
+                            By signing in, you agree to our
+                            <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> and
+                            <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
+                        </div>
+                    </div>
+
+                    <div class="btn-wrap">
+                        <button type="submit" class="btn-login">
+                            <i class="fa fa-sign-in-alt me-2"></i> Sign In
+                        </button>
+                    </div>
+
+                    <div class="footer-wrap">
+                        <div class="footer-links">
+                            <a href="forgot"><i class="fa fa-key"></i> Forgot Password?</a>
+                            <a href="registration"><i class="fa fa-user-plus"></i> Create Account</a>
+                        </div>
+                    </div>
+                </form>
+            @endif
         </div>
 
     </div>
@@ -129,15 +144,17 @@
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput  = document.getElementById('id_password');
 
-    togglePassword.addEventListener('click', function () {
-        const isHidden = passwordInput.type === 'password';
-        passwordInput.type = isHidden ? 'text' : 'password';
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-        this.classList.remove('toggled');
-        void this.offsetWidth;
-        this.classList.add('toggled');
-    });
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function () {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+            this.classList.remove('toggled');
+            void this.offsetWidth;
+            this.classList.add('toggled');
+        });
+    }
 </script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

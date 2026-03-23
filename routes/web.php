@@ -15,6 +15,7 @@ use App\Http\Controllers\ForgotPassController;
 use App\Http\Controllers\CoursePerSYController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ApiAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,9 @@ Route::get('/', function () {
 });
 
 Route::get('/login', [AuthController::class,'login'])->name('login');
+Route::get('/auth/login', [ApiAuthController::class, 'loginExternal'])->name('login.external');
+Route::get('/auth/callback', [ApiAuthController::class, 'callbackGet'])->middleware('throttle:10,1')->name('auth.callback.get');
+Route::post('/auth/callback', [ApiAuthController::class, 'callbackPost'])->middleware('throttle:10,1')->name('auth.callback.post');
 Route::get('/registration', [AuthController::class,'registration']);
 Route::post('/register-user', [AuthController::class,'registerUser'])->name('register-user');
 Route::get('/fetch-professors/{semester}/{startYear}/{endYear}', [ProfessorController::class,'fetchProfessors'])->name('fetch.professors');

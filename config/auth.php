@@ -112,4 +112,21 @@ return [
 
     'password_timeout' => 10800,
 
+    /*
+    |--------------------------------------------------------------------------
+    | JWT Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Settings for JWT token generation and validation.
+    |
+    */
+
+    'jwt' => [
+        'secret' => env('AUTH_JWT_SECRET'),
+        'algo' => env('AUTH_JWT_ALGO', 'HS256'),
+        'issuer' => env('AUTH_JWT_ISSUER'),
+        'audience' => env('AUTH_JWT_AUDIENCE'),
+        'azp' => env('AUTH_JWT_AZP'),
+    ],
+
 ];
