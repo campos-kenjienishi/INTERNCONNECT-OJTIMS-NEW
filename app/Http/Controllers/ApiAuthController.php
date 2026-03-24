@@ -185,8 +185,16 @@ class ApiAuthController extends Controller
                 }
                 $user = User::where('email', $email)->first();
                 if (!$user) {
-                    Log::warning('API auth callback(code): user not found', ['email' => $email]);
-                    return redirect('/login')->with('error', 'Authentication failed: user account does not exist in this system.');
+                    Log::warning('API auth callback(code): user not found, redirecting to onboarding', ['email' => $email]);
+                    // Store IdP info in session for onboarding
+                    Session::put('onboarding_idp', [
+                        'first_name' => $meData['first_name'] ?? '',
+                        'middle_name' => $meData['middle_name'] ?? '',
+                        'last_name' => $meData['last_name'] ?? '',
+                        'email' => $email,
+                        'roles' => $roles,
+                    ]);
+                    return redirect()->route('onboarding.show', ['email' => $email]);
                 }
                 Log::info('API auth callback(code): role mapping', [
                     'idp_roles' => $roles,
@@ -254,12 +262,20 @@ class ApiAuthController extends Controller
         }
         $user = User::where('email', $email)->first();
         if (!$user) {
-            Log::warning('API auth callback: user not found', [
+            Log::warning('API auth callback: user not found, redirecting to onboarding', [
                 'email'  => $email,
                 'userId' => $userId,
                 'ip'     => $request->ip(),
             ]);
-            return redirect('/login')->with('error', 'Authentication failed: user account does not exist in this system.');
+            // Store IdP info in session for onboarding
+            Session::put('onboarding_idp', [
+                'first_name' => $payload->first_name ?? '',
+                'middle_name' => $payload->middle_name ?? '',
+                'last_name' => $payload->last_name ?? '',
+                'email' => $email,
+                'roles' => $idpRoles,
+            ]);
+            return redirect()->route('onboarding.show');
         }
         $ojt_role = $this->mapIdpRoleToOjtRole($idpRoles, $user->role ?? '0');
         if ((string) $user->role !== $ojt_role) {

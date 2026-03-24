@@ -16,6 +16,7 @@ use App\Http\Controllers\CoursePerSYController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ApiAuthController;
+use App\Http\Controllers\OnboardingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,10 @@ use App\Http\Controllers\ApiAuthController;
 Route::get('/', function () {
     return view('auth.login');
 });
+
+
+Route::get('/onboarding/{email}', [OnboardingController::class, 'showForm'])->name('onboarding.show');
+Route::post('/onboarding/{email}', [OnboardingController::class, 'store'])->name('onboarding.store');
 
 Route::get('/login', [AuthController::class,'login'])->name('login');
 Route::get('/auth/login', [ApiAuthController::class, 'loginExternal'])->name('login.external');
