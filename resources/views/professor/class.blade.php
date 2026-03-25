@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -290,7 +291,7 @@
         .dataTables_filter input {
             border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
             padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important; outline: none !important;
+            font-size: 13px !important; outline: none !important; color: #333 !important; background: #fff !important;
         }
 
         .dataTables_filter input:focus {
@@ -301,12 +302,20 @@
         .dataTables_length select {
             border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
             padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important;
+            font-size: 13px !important; color: #333 !important; background: #fff !important;
         }
 
+        .dataTables_wrapper { color: #333 !important; }
+        .dataTables_length { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
+        .dataTables_length label { color: #333 !important; font-weight: 500; }
+        .dataTables_filter { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; float: right; }
+        .dataTables_filter label { color: #333 !important; font-weight: 500; }
+        .dataTables_info { color: #555 !important; font-weight: 500 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-top: 10px; }
+        .dataTables_paginate { color: #333 !important; }
         .dataTables_paginate .paginate_button {
             border-radius: 6px !important; font-family: 'Poppins', sans-serif !important;
             font-size: 13px !important; padding: 4px 10px !important;
+            color: #333 !important; background: #f5f5f5 !important; border-color: #ddd !important;
         }
 
         .dataTables_paginate .paginate_button.current {
@@ -594,6 +603,74 @@
 }
 .btn-remove:hover { box-shadow: 0 6px 18px var(--btn-remove-glow); }
 
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* =============== DARK MODE =============== */
+        body.dark-mode { background: #1a1a1a; color: #e0e0e0; }
+        body.dark-mode .topbar { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
+        body.dark-mode .page-header h1 { color: #fff; }
+        body.dark-mode .table-card { background: #2a2a2a; border: 1px solid #3a3a3a; }
+        body.dark-mode .table-card-header { background: #3a3a3a; border-bottom: 1px solid #3a3a3a; }
+        body.dark-mode .table-card-header h2 { color: #fff; }
+        body.dark-mode .table-card-header p { color: #999; }
+        body.dark-mode .room-count-badge { background: rgba(220,38,38,0.2) !important; color: #ff6b6b !important; }
+        body.dark-mode .table-card-body table.dataTable thead th { background: #3a3a3a; color: #e0e0e0; border-bottom: 1px solid #555; }
+        body.dark-mode .table-card-body table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid #2a2a2a; }
+        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
+        body.dark-mode .dataTables_wrapper { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_length { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; }
+        body.dark-mode .dataTables_length label { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_length select { background: #2a2a2a !important; color: #e0e0e0 !important; border-color: #555 !important; }
+        body.dark-mode .dataTables_filter { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; float: right; }
+        body.dark-mode .dataTables_filter label { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_filter input { background: #2a2a2a !important; color: #e0e0e0 !important; border-color: #555 !important; }
+        body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
+        body.dark-mode .dataTables_info { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; }
+        body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !important; border-color: #555 !important; color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_paginate .paginate_button:hover { background: rgba(220,38,38,0.2) !important; border-color: var(--red) !important; color: #ff6b6b !important; }
+        body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
+        body.dark-mode .dataTables_paginate .paginate_button.disabled { color: #777 !important; }
+        body.dark-mode .dashboard-footer { background: #2a2a2a; border-top: 1px solid #3a3a3a; color: #999; }
+        body.dark-mode .dashboard-footer a { color: #999; }
+        body.dark-mode .dashboard-footer a:hover { color: var(--red); }
+        body.dark-mode .dashboard-footer .divider { color: #555; }
+
     </style>
 </head>
 
@@ -666,6 +743,9 @@
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa fa-bars"></i>
+            </button>
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
+                <i class="fa fa-moon" id="darkmodeIcon"></i>
             </button>
             <span class="topbar-title">
                 On-the-Job Training <span>Information Management System</span>
@@ -1006,8 +1086,8 @@
         </div>
 
     </div>
-    <footer class="dashboard-footer">
-    <div class="footer-left">
+   <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
             © 1998–2026 <span>Polytechnic University of the Philippines</span>
@@ -1385,6 +1465,7 @@
 
     });
 </script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
 </body>
 </html>

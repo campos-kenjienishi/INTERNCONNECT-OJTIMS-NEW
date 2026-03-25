@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -363,6 +364,118 @@
             .topbar-title { display: none; }
             .stats-row { grid-template-columns: 1fr 1fr; }
         }
+
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Dark mode for all students tables */
+        html.dark-mode .table-card,
+        body.dark-mode .table-card {
+            background: #1a1a1a !important;
+            border-color: #2a2a2a !important;
+        }
+
+        html.dark-mode .table-card-body table.dataTable thead th,
+        body.dark-mode .table-card-body table.dataTable thead th {
+            background: #252525 !important; 
+            color: #e8e8e8 !important;
+            border-bottom-color: #2a2a2a !important;
+            border-top-color: #2a2a2a !important;
+        }
+
+        html.dark-mode .table-card-body table.dataTable tbody td,
+        body.dark-mode .table-card-body table.dataTable tbody td {
+            color: #e8e8e8 !important;
+            border-bottom-color: #2a2a2a !important;
+        }
+
+        html.dark-mode .table-card-body table.dataTable tbody tr:hover td,
+        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { 
+            background: rgba(220, 38, 38, 0.1) !important; 
+        }
+
+        html.dark-mode .dataTables_filter input,
+        body.dark-mode .dataTables_filter input {
+            background: #252525 !important;
+            color: #e8e8e8 !important;
+            border-color: #3a3a3a !important;
+        }
+
+        html.dark-mode .dataTables_length select,
+        body.dark-mode .dataTables_length select {
+            background: #252525 !important;
+            color: #e8e8e8 !important;
+            border-color: #3a3a3a !important;
+        }
+
+        html.dark-mode .dataTables_info,
+        body.dark-mode .dataTables_info {
+            color: #a0a0a0 !important;
+        }
+
+        html.dark-mode .dataTables_paginate .paginate_button,
+        body.dark-mode .dataTables_paginate .paginate_button {
+            background: #252525 !important;
+            border-color: #3a3a3a !important;
+            color: #e8e8e8 !important;
+        }
+
+        html.dark-mode .dataTables_paginate .paginate_button:not(.disabled):hover,
+        body.dark-mode .dataTables_paginate .paginate_button:not(.disabled):hover {
+            background: #3a3a3a !important;
+            border-color: #4a4a4a !important;
+        }
+
+        html.dark-mode .table-card-header,
+        body.dark-mode .table-card-header {
+            background: #252525 !important;
+            border-bottom-color: #2a2a2a !important;
+        }
+
+        html.dark-mode .table-card-header h2,
+        body.dark-mode .table-card-header h2 {
+            color: #e8e8e8 !important;
+        }
+
+        html.dark-mode .table-card-header p,
+        body.dark-mode .table-card-header p {
+            color: #a0a0a0 !important;
+        }
     </style>
 </head>
 
@@ -435,6 +548,9 @@
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa fa-bars"></i>
+            </button>
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
+                <i class="fa fa-moon" id="darkmodeIcon"></i>
             </button>
             <span class="topbar-title">
                 On-the-Job Training <span>Information Management System</span>
@@ -611,6 +727,7 @@
         overlay.classList.remove('active');
     });
 </script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
 </body>
 </html>

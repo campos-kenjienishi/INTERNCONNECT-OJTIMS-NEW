@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
@@ -215,10 +216,17 @@
         .table-card-body table.dataTable tbody td { padding: 14px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13.5px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
-        .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; }
+        .dataTables_wrapper { color: #333 !important; }
+        .dataTables_length { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
+        .dataTables_length label { color: #333 !important; font-weight: 500; }
+        .dataTables_filter { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; float: right; }
+        .dataTables_filter label { color: #333 !important; font-weight: 500; }
+        .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; color: #333 !important; background: #fff !important; }
         .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }
-        .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; }
-        .dataTables_paginate .paginate_button { border-radius: 6px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; }
+        .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; color: #333 !important; background: #fff !important; }
+        .dataTables_info { color: #555 !important; font-weight: 500 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-top: 10px; }
+        .dataTables_paginate { color: #333 !important; }
+        .dataTables_paginate .paginate_button { border-radius: 6px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; color: #333 !important; background: #f5f5f5 !important; border-color: #ddd !important; }
         .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
         .dataTables_paginate .paginate_button:hover { background: #fee2e2 !important; border-color: #fecaca !important; color: var(--red) !important; }
 
@@ -226,11 +234,17 @@
         .company-cell { display: flex; align-items: center; gap: 10px; }
         .company-icon-box { width: 34px; height: 34px; border-radius: 9px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 13px; flex-shrink: 0; }
         .company-name-text { font-weight: 600; color: #1a1a1a; }
+        .company-name-cell { color: #1a1a1a !important; }
 
         /* Status badges */
         .badge-active { display: inline-flex; align-items: center; gap: 5px; background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
         .badge-expired { display: inline-flex; align-items: center; gap: 5px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
         .badge-active i, .badge-expired i { font-size: 10px; }
+
+        /* Dark mode status badges */
+        body.dark-mode .badge-active { background: rgba(22,163,74,0.2); color: #4ade80; }
+        body.dark-mode .badge-expired { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+        body.dark-mode .table-card-body table.dataTable thead th { background: #3a3a3a; color: #e0e0e0; border-bottom: 1px solid #555; }
 
         /* =============== PRINT PREVIEW MODAL =============== */
         .modal-content { border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); font-family: 'Poppins', sans-serif; overflow: hidden; }
@@ -270,6 +284,64 @@
             .stats-row { grid-template-columns: 1fr 1fr; }
             .year-range-wrap { flex-wrap: wrap; }
         }
+
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Dark mode DataTables */
+        body.dark-mode .dataTables_wrapper { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_length { background: #3a3a3a !important; color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_length label { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_length select { background: #2a2a2a !important; color: #e0e0e0 !important; border-color: #555 !important; }
+        body.dark-mode .dataTables_filter { background: #3a3a3a !important; color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_filter label { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_filter input { background: #2a2a2a !important; color: #e0e0e0 !important; border-color: #555 !important; }
+        body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
+        body.dark-mode .dataTables_info { background: #3a3a3a !important; color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !important; border-color: #555 !important; color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_paginate .paginate_button:hover { background: rgba(220,38,38,0.2) !important; border-color: var(--red) !important; color: #ff6b6b !important; }
+        body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
+        body.dark-mode .dataTables_paginate .paginate_button.disabled { color: #777 !important; }
+        body.dark-mode .company-name-cell { color: #fff !important; }
+        body.dark-mode .table-card-body table.dataTable tbody td.company-name-cell { color: #fff !important; }
+        body.dark-mode .moa-count-badge { background: rgba(220,38,38,0.2) !important; color: #ff6b6b !important; }
+        body.dark-mode .table-card-body table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid #2a2a2a; }
+        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
     </style>
 </head>
 
@@ -339,6 +411,9 @@
     <div class="topbar">
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle"><i class="fa fa-bars"></i></button>
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
+                <i class="fa fa-moon" id="darkmodeIcon"></i>
+            </button>
             <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
         </div>
         <div class="topbar-right">
@@ -495,7 +570,7 @@
                         @endphp
                         <tr>
                             <td>{{ $company->id }}</td>
-                            <td>
+                            <td class="company-name-cell">
                                 <div class="company-cell">
                                     <div class="company-icon-box"><i class="fa fa-building"></i></div>
                                     <span class="company-name-text">{{ $company->company_name }}</span>
@@ -547,19 +622,24 @@
 
     </div>
 
-    <footer class="dashboard-footer">
-        <div class="footer-left">
-            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-            <span class="footer-copy">© 1998–2026 <span>Polytechnic University of the Philippines</span></span>
-        </div>
-        <div class="footer-links">
-            <a href="https://www.pup.edu.ph/" target="_blank"><i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i> PUP Website</a>
-            <span class="divider">|</span>
-            <a href="{{ url('/terms') }}">Terms of Use</a>
-            <span class="divider">|</span>
-            <a href="{{ url('/privacy') }}">Privacy Statement</a>
-        </div>
-    </footer>
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+        <span class="footer-copy">
+            © 1998–2026 <span>Polytechnic University of the Philippines</span>
+        </span>
+    </div>
+    <div class="footer-links">
+        <a href="https://www.pup.edu.ph/" target="_blank">
+            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+            PUP Website
+        </a>
+        <span class="divider">|</span>
+        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <span class="divider">|</span>
+        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+    </div>
+</footer>
 </div>
 
 <!-- =============== PRINT PREVIEW MODAL =============== -->
@@ -949,6 +1029,7 @@
         });
     }
 </script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
 </body>
 </html>

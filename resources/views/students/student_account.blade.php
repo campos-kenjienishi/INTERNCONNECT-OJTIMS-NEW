@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -152,6 +153,45 @@
         }
 
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
+
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            transform: translateY(-2px);
+        }
+
         .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
         .topbar-title span { color: var(--red); font-weight: 600; }
 
@@ -611,6 +651,72 @@
     color: #e5e5e5;
     margin: 0 2px;
 }
+/* ===== DARK MODE ===== */
+body.dark-mode { background: #000000; color: #e0e0e0; }
+body.dark-mode .main-content { background: #000000; }
+body.dark-mode .sidebar { box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
+body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
+body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
+body.dark-mode .topbar-title { color: #999; }
+body.dark-mode .topbar-badge { background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.3); color: #ff6b6b; }
+body.dark-mode .page-content { background: #000000; }
+body.dark-mode .page-header h1 { color: #fff; }
+body.dark-mode .breadcrumb { color: #999; }
+
+/* Profile Card */
+body.dark-mode .profile-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+body.dark-mode .profile-name { color: #fff; }
+body.dark-mode .profile-role { color: rgba(255,255,255,0.5); }
+body.dark-mode .profile-info-label { color: #888; }
+body.dark-mode .profile-info-value { color: #fff; }
+body.dark-mode .profile-info-row { border-bottom-color: rgba(255,255,255,0.05); }
+body.dark-mode .btn-change-pass { background: #3a3a3a; border-color: #4a4a4a; color: #e0e0e0; }
+body.dark-mode .btn-change-pass:hover { background: rgba(220,38,38,0.15); border-color: rgba(220,38,38,0.3); color: #ff6b6b; }
+
+/* Form Card */
+body.dark-mode .form-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+body.dark-mode .form-card-header { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
+body.dark-mode .form-card-header h2 { color: #fff; }
+body.dark-mode .form-card-header p { color: #999; }
+body.dark-mode .form-card-body { background: #2a2a2a; }
+body.dark-mode .section-title { color: #ff6b6b; }
+body.dark-mode .section-title::after { background: rgba(220,38,38,0.2); }
+
+/* Form Elements */
+body.dark-mode .field-label { color: #e0e0e0; }
+body.dark-mode .field-input, body.dark-mode .field-select { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1.5px solid #4a4a4a !important; }
+body.dark-mode .field-input::placeholder { color: #777; }
+body.dark-mode .field-input:focus, body.dark-mode .field-select:focus { border-color: var(--red) !important; background: #3a3a3a !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
+body.dark-mode .field-input:hover:not(:focus), body.dark-mode .field-select:hover:not(:focus) { border-color: #555 !important; background: #3a3a3a !important; }
+body.dark-mode input[type="date"].field-input { color-scheme: dark; }
+
+/* Form Footer */
+body.dark-mode .form-footer { border-top-color: rgba(255,255,255,0.06); }
+
+/* Alerts */
+body.dark-mode .alert-success { background: rgba(34,197,94,0.15); color: #4ade80; }
+body.dark-mode .alert-danger { background: rgba(220,38,38,0.15); color: #ff6b6b; }
+
+/* Modal */
+body.dark-mode .modal-content { background: #1a1a1a; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+body.dark-mode .modal-body { background: #1a1a1a !important; color: #e0e0e0; }
+body.dark-mode .modal-footer { background: #2a2a2a !important; border-top: 1px solid #3a3a3a; }
+body.dark-mode .modal-field-label { color: #e0e0e0; }
+body.dark-mode .pw-input-wrap input { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1.5px solid #4a4a4a !important; }
+body.dark-mode .pw-input-wrap input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
+body.dark-mode .pw-toggle { color: #aaa; }
+body.dark-mode .pw-toggle:hover { color: var(--red); }
+body.dark-mode .btn-modal-close { background: #3a3a3a; color: #e0e0e0; border: 1px solid #3a3a3a; }
+body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); border-color: var(--red); color: #ff6b6b; }
+
+/* Footer */
+body.dark-mode .dashboard-footer { background: #1a1a1a !important; border-top: 1px solid #3a3a3a; color: #999; }
+body.dark-mode .dashboard-footer a { color: #999; }
+body.dark-mode .dashboard-footer a:hover { color: var(--red); }
+body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
+body.dark-mode .dashboard-footer .footer-copy { color: #999; }
+body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
+body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         
     </style>
 </head>
@@ -690,6 +796,9 @@
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa fa-bars"></i>
+            </button>
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
+                <i class="fa fa-moon" id="darkmodeIcon"></i>
             </button>
             <span class="topbar-title">
                 On-the-Job Training <span>Information Management System</span>
@@ -897,8 +1006,8 @@
 
         </div>
     </div>
-    <footer class="dashboard-footer">
-    <div class="footer-left">
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
             © 1998–2026 <span>Polytechnic University of the Philippines</span>
@@ -1027,7 +1136,9 @@
         setupToggle('toggleNew',     'new_password');
         setupToggle('toggleConfirm', 'confirm_password');
     });
+    // Dark mode toggle
+// Dark mode is handled globally by dark-mode.js
 </script>
-
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 </body>
 </html>

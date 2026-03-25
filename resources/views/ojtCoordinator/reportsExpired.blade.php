@@ -27,6 +27,10 @@
 
         body { font-family: 'Poppins', sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
 
+        body.dark-mode { background: #000000; color: #e0e0e0; }
+        body.dark-mode .main-content { background: #000000; }
+        body.dark-mode .sidebar { box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
+
         /* =============== SIDEBAR =============== */
         .sidebar {
             position: fixed; top: 0; left: 0;
@@ -121,24 +125,35 @@
             color: #333; font-size: 18px; transition: all 0.2s;
         }
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
+        .darkmode-toggle { width: 38px; height: 38px; border-radius: 10px; background: #f5f5f5; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #333; font-size: 18px; transition: all 0.2s; }
+        .darkmode-toggle:hover { background: #fee2e2; color: var(--red); }
+        .darkmode-toggle:active { transform: scale(0.95); }
+        body.dark-mode .darkmode-toggle { background: #3a3a3a; border-color: #555; color: #e8e8e8; }
+        body.dark-mode .darkmode-toggle:hover { background: rgba(220,38,38,0.2); color: #ff6b6b; border-color: rgba(220,38,38,0.3); box-shadow: 0 6px 16px rgba(220,38,38,0.3); transform: translateY(-2px); }
         .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
         .topbar-title span { color: var(--red); font-weight: 600; }
+        body.dark-mode .topbar-title { color: #999; }
         .topbar-badge {
             display: flex; align-items: center; gap: 8px;
             background: #fff5f5; border: 1px solid #fecaca;
             border-radius: 20px; padding: 6px 14px;
             font-size: 12.5px; font-weight: 600; color: var(--red-dark);
         }
+        body.dark-mode .topbar-badge { background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.3); color: #ff6b6b; }
 
         /* =============== PAGE =============== */
         .page-content { padding: 28px; flex: 1; }
+        body.dark-mode .page-content { background: #000000; }
         .page-header {
             display: flex; align-items: flex-start; justify-content: space-between;
             margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
         }
         .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
+        body.dark-mode .page-header h1 { color: #fff; }
         .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888; margin-top: 6px; }
+        body.dark-mode .breadcrumb { color: #999; }
+        body.dark-mode .breadcrumb-nav { color: #999; }
         .breadcrumb a { color: var(--red); text-decoration: none; }
         .breadcrumb a:hover { text-decoration: underline; }
         .breadcrumb i { font-size: 10px; }
@@ -230,6 +245,93 @@
 
         /* Mobile overlay */
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+
+/* ===== DARK MODE: COMPREHENSIVE STYLING ===== */
+body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
+body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
+body.dark-mode .page-header h1 { color: #fff; }
+body.dark-mode .breadcrumb { color: #999; }
+
+/* Stat cards */
+body.dark-mode .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+body.dark-mode .stat-num { color: #fff; }
+body.dark-mode .stat-name { color: #999; }
+
+/* Panel cards (Generate Report, Filter cards) */
+body.dark-mode .panel-card { background: #1a1a1a !important; border: 1px solid #3a3a3a !important; box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important; }
+body.dark-mode .panel-card-header { background: #1a1a1a !important; border-bottom: 1px solid #3a3a3a !important; }
+body.dark-mode .panel-card-header h2 { color: #fff !important; }
+body.dark-mode .panel-card-header p { color: #999 !important; }
+body.dark-mode .panel-card-body { color: #e8e8e8 !important; background: #1a1a1a !important; }
+
+/* Table cards */
+body.dark-mode .table-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+body.dark-mode .table-card-header { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
+body.dark-mode .table-card-header h2 { color: #fff; }
+body.dark-mode .table-card-header p { color: #999; }
+body.dark-mode .file-count-badge { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+body.dark-mode .count-badge { background: rgba(220,38,38,0.2) !important; color: #ff6b6b !important; }
+
+/* DataTables */
+body.dark-mode table.dataTable thead th { background: #2a2a2a; color: #aaa; border-bottom: 1px solid #3a3a3a; }
+body.dark-mode table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+body.dark-mode table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
+
+/* DataTables controls */
+body.dark-mode .dataTables_filter input { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
+body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
+body.dark-mode .dataTables_length select { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
+body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !important; border-color: #3a3a3a !important; color: #e0e0e0 !important; }
+body.dark-mode .dataTables_paginate .paginate_button:hover { background: #444 !important; border-color: #444 !important; }
+body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; }
+body.dark-mode .dataTables_info { color: #999 !important; }
+
+/* Form elements */
+body.dark-mode .field-input, body.dark-mode .field-select { background: #3a3a3a; color: #e0e0e0; border: 1px solid #3a3a3a; }
+body.dark-mode .field-input::placeholder { color: #888 !important; }
+body.dark-mode .field-input:focus, body.dark-mode .field-select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
+body.dark-mode .field-label { color: #e0e0e0; }
+
+/* Table cell content */
+body.dark-mode .name-text { color: #fff !important; }
+body.dark-mode .name-avatar { background: rgba(220,38,38,0.3) !important; color: #ff6b6b !important; }
+body.dark-mode .level-badge { background: rgba(37, 99, 235, 0.2) !important; color: #60a5fa !important; }
+body.dark-mode .date-badge { background: rgba(22, 163, 74, 0.2) !important; color: #86efac !important; }
+body.dark-mode .company-address-cell { color: #fff !important; }
+body.dark-mode .company-name-text { color: #fff !important; }
+body.dark-mode .company-cell span { color: #fff !important; }
+body.dark-mode table.dataTable tbody td { color: #fff !important; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+/* Buttons */
+body.dark-mode .btn-download { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+body.dark-mode .btn-remove { border: 1.5px solid rgba(220,38,38,0.3); background: transparent; color: #ff6b6b; }
+body.dark-mode .btn-remove:hover { background: rgba(220,38,38,0.1); }
+body.dark-mode .btn-preview { background: transparent !important; border: 1.5px solid rgba(79, 70, 229, 0.3) !important; color: #818cf8 !important; }
+body.dark-mode .btn-preview:hover { background: rgba(79, 70, 229, 0.1) !important; border-color: rgba(79, 70, 229, 0.5) !important; }
+
+/* Modal */
+body.dark-mode .modal-content { background: #1a1a1a !important; box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important; }
+body.dark-mode .modal-body { background: #1a1a1a !important; color: #e8e8e8 !important; }
+body.dark-mode .modal-footer { background: #2a2a2a; border-top: 1px solid #3a3a3a; }
+body.dark-mode .btn-modal-close { background: #3a3a3a; border: 1px solid #3a3a3a; color: #e0e0e0; }
+body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); border-color: var(--red); color: #ff6b6b; }
+
+/* File dropzone */
+body.dark-mode .file-dropzone { border-color: #3a3a3a; background: #2a2a2a; }
+body.dark-mode .file-dropzone:hover, body.dark-mode .file-dropzone.dragover { border-color: var(--red); background: rgba(220,38,38,0.1); }
+body.dark-mode .file-dropzone-icon { background: rgba(220,38,38,0.2); }
+body.dark-mode .file-dropzone-title { color: #e0e0e0; }
+body.dark-mode .file-dropzone-sub { color: #999; }
+
+/* Footer */
+body.dark-mode .dashboard-footer { background: #1a1a1a; border-top: 1px solid #3a3a3a; color: #999; }
+body.dark-mode .dashboard-footer a { color: #999; }
+body.dark-mode .dashboard-footer a:hover { color: var(--red); }
+body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
+body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
+
+/* Cards */
+body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
         @media (max-width: 900px) {
             .sidebar { width: var(--sidebar-w); transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
@@ -339,6 +441,9 @@
     <div class="topbar">
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle"><i class="fa fa-bars"></i></button>
+            <button class="darkmode-toggle" id="darkmodeToggle">
+                <i class="fa fa-moon"></i>
+            </button>
             <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
         </div>
         <div class="topbar-badge">
@@ -486,7 +591,7 @@
                                     <span class="company-name-text">{{ $company->company_name }}</span>
                                 </div>
                             </td>
-                            <td style="max-width:160px; word-break:break-word; font-size:12.5px; color:#555;">
+                            <td class="company-address-cell" style="max-width:160px; word-break:break-word; font-size:12.5px;">
                                 <i class="fa fa-map-marker-alt" style="color:var(--red); font-size:10px; margin-right:4px;"></i>
                                 {{ $company->company_address }}
                             </td>
@@ -524,19 +629,24 @@
 
     </div>
 
-    <footer class="dashboard-footer">
-        <div class="footer-left">
-            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-            <span class="footer-copy">© 1998–2026 <span>Polytechnic University of the Philippines</span></span>
-        </div>
-        <div class="footer-links">
-            <a href="https://www.pup.edu.ph/" target="_blank"><i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i> PUP Website</a>
-            <span class="divider">|</span>
-            <a href="{{ url('/terms') }}">Terms of Use</a>
-            <span class="divider">|</span>
-            <a href="{{ url('/privacy') }}">Privacy Statement</a>
-        </div>
-    </footer>
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+        <span class="footer-copy">
+            © 1998–2026 <span>Polytechnic University of the Philippines</span>
+        </span>
+    </div>
+    <div class="footer-links">
+        <a href="https://www.pup.edu.ph/" target="_blank">
+            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+            PUP Website
+        </a>
+        <span class="divider">|</span>
+        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <span class="divider">|</span>
+        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+    </div>
+</footer>
 </div>
 
 <!-- =============== PRINT PREVIEW MODAL =============== -->
@@ -600,6 +710,22 @@
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
+    });
+
+    // Dark mode toggle
+    const darkmodeToggle = document.getElementById('darkmodeToggle');
+    const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkmodeToggle.innerHTML = '<i class="fa fa-sun"></i>';
+    }
+
+    darkmodeToggle.addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        darkmodeToggle.innerHTML = isDark ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
     });
 
     /* ── DataTable ── */
