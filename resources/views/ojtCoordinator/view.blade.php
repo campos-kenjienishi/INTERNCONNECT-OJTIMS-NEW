@@ -8,5 +8,6 @@
 </head>
 <body>
     <iframe height="945"  width="1905" src="/assets/{{$data->file}}"></iframe>
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

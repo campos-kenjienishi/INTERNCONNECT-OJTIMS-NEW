@@ -982,6 +982,11 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         @endif
     });
 </script>
+<<<<<<< HEAD
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+=======
+
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+>>>>>>> 55dcc57be4bfadcf1c29acc4b8027a6a09f16ce5
 </body>
 </html>

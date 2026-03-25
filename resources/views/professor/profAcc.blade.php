@@ -1082,5 +1082,6 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
     // Dark mode is handled globally by dark-mode.js
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

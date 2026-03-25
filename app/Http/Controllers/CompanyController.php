@@ -236,8 +236,9 @@ $res = $fileup->save();
             ->with('fail', 'Manual student names cannot be saved yet. Please add column companies.student_names_display first.');
     }
 
-    // Find existing students by their names and get their IDs (for optional linking only)
-    $existingStudents = Student::whereIn('full_name', $studentNames)->get();
+    // Resolve selected student names via users table and map to student profiles via user_id.
+    $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
+    $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
 
     if ($data->role == 1 && !empty($studentNames)) {
         $mismatchedStudents = $existingStudents->filter(function ($student) use ($com) {
@@ -245,7 +246,9 @@ $res = $fileup->save();
         });
 
         if ($mismatchedStudents->isNotEmpty()) {
-            $studentList = $mismatchedStudents->pluck('full_name')->implode(', ');
+            $studentList = $mismatchedStudents->map(function ($student) {
+                return $student->full_name;
+            })->implode(', ');
             return back()
                 ->withInput()
                 ->with('fail', 'Selected student course does not match the MOA course: ' . $studentList);

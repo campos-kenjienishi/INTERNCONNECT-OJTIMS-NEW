@@ -40,5 +40,6 @@
          <h1> {{ $vouchers->filename }}</h1>
         @endforeach
     </div>
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

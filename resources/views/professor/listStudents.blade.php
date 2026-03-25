@@ -970,5 +970,6 @@
     });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

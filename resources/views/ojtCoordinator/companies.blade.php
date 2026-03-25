@@ -1240,5 +1240,6 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

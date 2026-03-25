@@ -203,6 +203,7 @@
         </div> 
     </div>
 </div>
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
 
@@ -450,6 +451,7 @@ $(document).ready(function() {
         </div> 
     </div>
 </div>
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
 

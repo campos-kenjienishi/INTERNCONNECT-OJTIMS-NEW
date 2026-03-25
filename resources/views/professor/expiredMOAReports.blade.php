@@ -1000,7 +1000,8 @@
         tr    { page-break-inside: avoid; }
     </style>
 </head>
-<body>${html}</body>
+<body>${html}
+</body>
 </html>`;
 
         const frame = document.getElementById('printFrame');
@@ -1031,5 +1032,6 @@
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
