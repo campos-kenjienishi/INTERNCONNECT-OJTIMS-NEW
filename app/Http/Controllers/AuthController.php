@@ -8,7 +8,7 @@ use App\Models\Enroll;
 use App\Models\Classes;
 use App\Models\Company;
 use App\Models\Courses;
-Use App\Mail\TemporaryPasswordNotification;
+use App\Mail\TemporaryPasswordNotification;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Schedule;
@@ -25,7 +25,6 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 
-
 class AuthController extends Controller
 {
     public function login(){
@@ -36,20 +35,16 @@ class AuthController extends Controller
         $data=Professor::all();
         $course=Courses::all();
         $schedules = Schedule::with('subject')->get();
-
-    return view('auth.registration', compact('data','course','schedules'));
-        
+        return view('auth.registration', compact('data','course','schedules'));
     }
 
     public function registerUser(Request $request){
-        
         $request->validate([
-            
-                'first_name'=>'required',
-                'last_name'=>'required',
-                'email'=>'required|email|unique:users,email',
-                'studentNum'=>'required',
-                'password'=>'required|min:8|max:12'
+            'first_name'=>'required',
+            'last_name'=>'required',
+            'email'=>'required|email|unique:users,email',
+            'studentNum'=>'required',
+            'password'=>'required|min:8|max:12'
         ]);
         $student = new OJTInformation();
         $user =new User();
@@ -71,7 +66,7 @@ class AuthController extends Controller
         $studentE->user_id = $user->id;
         $student->save();
         $studentE->save();
-        
+
         if($res){
             AuditLogger::log(
                 'Student Account',
@@ -87,70 +82,54 @@ class AuthController extends Controller
     }
 
     public function loginUser(Request $request){
-        if (config('services.idp.enabled')) {
-            return redirect()->route('login.external');
-        }
-
         $request->validate([
-            
             'email'=>'required',
             'password'=>'required'
-                    ]);
-            $user = User::where('email','=',$request->email)->first();
+        ]);
+        $user = User::where('email','=',$request->email)->first();
 
-            if($user){
-                if(Hash::check($request->password, $user->password)){
-                    $request->session()->put('loginId',$user->id);
-                    $request->session()->put('show_terms', true);
-                    if ($user->role == 0) {
-                        return redirect()->route('student_home');
-                    } 
-                    
-                    else if ($user->role == 2) {
-                        return redirect()->route('professor_home');
-                    }
-                    
-                    
-                    
-                    else if($user->role == 1) {
-                       
-                        return redirect('dashboard');
-                    }
-
-                        else {
-                        return redirect('/login');
-                         }
-                    
+        if($user){
+            if(Hash::check($request->password, $user->password)){
+                $request->session()->put('loginId',$user->id);
+                $request->session()->put('show_terms', true);
+                if ($user->role == 0) {
+                    return redirect()->route('student_home');
+                } 
+                else if ($user->role == 2) {
+                    return redirect()->route('professor_home');
                 }
-                else{
-                    return back()->with('fail','Password does not match.');
+                else if($user->role == 1) {
+                    return redirect('dashboard');
                 }
-                
+                else {
+                    return redirect('/login');
+                }
             }
             else{
-                return back()->with('fail','Email is not registered.');
+                return back()->with('fail','Password does not match.');
             }
+        }
+        else{
+            return back()->with('fail','Email is not registered.');
+        }
     }
 
     public function dashboard(){
-
         $sixMonthsAgo = Carbon::now()->subMonths(6);
         $roleCount = User::where('role', 0)
-        ->where('created_at', '>=', $sixMonthsAgo)
-        ->count();
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->count();
         $roleCountP = User::where('role', 2)->count();
-        
+
         $data=array();
-            if(Session::has('loginId')){
+        if(Session::has('loginId')){
+            $data=User::where('id','=', Session::get('loginId'))->first();
+        }
 
-                $data=User::where('id','=', Session::get('loginId'))->first();
-                        }
+        $userName=$data->full_name;
+        $fileCount = UploadedFile::where('uploader_name', $userName)->count();
 
-                        $userName=$data->full_name;
-                        $fileCount = UploadedFile::where('uploader_name', $userName)->count();
-    
         return view('ojtCoordinator.dashboard', compact('data','roleCount','roleCountP','fileCount'));
-    
     }
 
     public function logout(){
@@ -161,21 +140,16 @@ class AuthController extends Controller
         }
     }
 
-
     public function professorTab()
     {
         $user = [];
-    
         if (Session::has('loginId')) {
             $user = User::where('id', Session::get('loginId'))->first();
         }
         $course= Courses::all();
-    
         $data = Professor::with('subjects')->get();
-
         $usersP = User::whereIn('email', $data->pluck('email'))->get();
 
-    
         // Transform the subjects data
         $subjectData = $data->flatMap(function ($professor) {
             return $professor->subjects->map(function ($subject) {
@@ -185,12 +159,11 @@ class AuthController extends Controller
                 ];
             });
         })->toArray();
-    
-        return view('ojtCoordinator.professorTab', compact('data', 'user', 'subjectData','usersP',"course"));
+
+        return view('ojtCoordinator.professorTab', compact('data', 'user', 'subjectData','usersP','course'));
     }
 
     public function professorCreate(Request $request){
-
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -240,102 +213,72 @@ class AuthController extends Controller
             return back()->with('fail','Oh no! Something went wrong.');
         }
     }
-    
-public function student_home()
-{
-    if (Session::has('loginId')) {
-        $user = User::where('id', Session::get('loginId'))->first();
-        
-        if (Schema::hasColumn('uploaded_files', 'class_id')) {
-            $fileCount = UploadedFile::where(function ($query) {
-                    $query->whereNull('class_id')
-                          ->orWhere('class_id', 0);
-                })
-                ->count();
-        } else {
-            $fileCount = UploadedFile::count();
-        }
 
-        // TERMS MODAL LOGIC
-        $showTerms = false;
-        $lastAccepted = Session::get('termsAcceptedTime'); // timestamp of last acceptance
+    public function student_home()
+    {
+        if (Session::has('loginId')) {
+            $user = User::where('id', Session::get('loginId'))->first();
+            if (Schema::hasColumn('uploaded_files', 'class_id')) {
+                $fileCount = UploadedFile::where(function ($query) {
+                        $query->whereNull('class_id')
+                              ->orWhere('class_id', 0);
+                    })
+                    ->count();
+            } else {
+                $fileCount = UploadedFile::count();
+            }
 
-        if (!$lastAccepted || now()->diffInHours($lastAccepted) >= 24) { // 24 hours = 1 day
-            $showTerms = true;
+            // TERMS MODAL LOGIC
+            $showTerms = false;
+            $lastAccepted = Session::get('termsAcceptedTime'); // timestamp of last acceptance
+
+            if (!$lastAccepted || now()->diffInHours($lastAccepted) >= 24) { // 24 hours = 1 day
+                $showTerms = true;
+            }
+            return view('students.student_home', compact('user', 'fileCount', 'showTerms'));
         }
-        
-        return view('students.student_home', compact('user', 'fileCount', 'showTerms'));
+        return redirect()->route('login');
     }
 
-    return redirect()->route('login');
-}
     public function professor_home(){
-
         $data = [];
-        $userName = ''; // Initialize with an empty string
+        $userName = '';
         $loginId = Session::get('loginId');
         $sixMonthsAgo = Carbon::now()->subMonths(6);
-        
         if ($loginId) {
             $data = User::where('id', '=', $loginId)->first();
             $userName = $data->full_name;
         }
-    
         $roleCount = User::where('role', 0)
-        ->where(function ($query) use ($userName, $loginId) {
-            $query->whereHas('studentInfo', function ($studentQuery) use ($userName) {
-                $studentQuery->where('adviser_name', $userName);
-            });
-
-            if (!empty($loginId)) {
-                $query->orWhere('id', $loginId); // Keep original behavior.
-            }
-        })
-        ->where('created_at', '>=', $sixMonthsAgo)
-        ->count();
-    
+            ->where(function ($query) use ($userName, $loginId) {
+                $query->whereHas('studentInfo', function ($studentQuery) use ($userName) {
+                    $studentQuery->where('adviser_name', $userName);
+                });
+                if (!empty($loginId)) {
+                    $query->orWhere('id', $loginId);
+                }
+            })
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->count();
         $fileCount = UploadedFile::all()->count();
-
-
-        // Get the current year
         $currentYear = now()->year;
-    
-        // Retrieve the selected company or companies
-        $companies = Company::all(); // Get all companies
-    
+        $companies = Company::all();
         $stu = Student::all();
-    
-        // Filter companies based on the start year of "school_year"
         $companies = $companies->filter(function ($company) use ($currentYear) {
-            // Extract the start year from the "school_year" format
             list($startYear, $endYear) = explode('-', $company->school_year);
-    
-            // Convert them to integers
             $startYear = (int) $startYear;
             $endYear = (int) $endYear;
-    
-          
             return $currentYear >= $startYear && $currentYear <= $startYear + 3;
         });
-    
         $companyNames = $companies->pluck('company_name')->toArray();
-    
         return view('professor.home', compact('companies','data', 'roleCount', 'fileCount'));
+    }
 
-            
-            }
-
-
-
-public function pending(){
-
-    $data=array();
+    public function pending(){
+        $data=array();
         if(Session::has('loginId')){
-
             $data=User::where('id','=', Session::get('loginId'))->first();
-                    }
-    return view('students.pending', compact('data'));
-}
-
-     
+        }
+        return view('students.pending', compact('data'));
+    }
 }
