@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,6 +30,10 @@
             color: #1a1a1a;
             min-height: 100vh;
         }
+
+        body.dark-mode { background: #000000; color: #e0e0e0; }
+        body.dark-mode .main-content { background: #000000; }
+        body.dark-mode .sidebar { box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
 
         /* =============== SIDEBAR =============== */
         .sidebar {
@@ -136,6 +141,12 @@
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
+        body.dark-mode .topbar {
+            background: #1a1a1a !important;
+            border-bottom: 1px solid #3a3a3a !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important;
+        }
+
         .topbar-left { display: flex; align-items: center; gap: 16px; }
 
         .menu-toggle {
@@ -146,8 +157,67 @@
         }
 
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
+
+        body.dark-mode .menu-toggle {
+            background: #2a2a2a !important;
+            color: #e8e8e8 !important;
+        }
+
+        body.dark-mode .menu-toggle:hover {
+            background: rgba(220,38,38,0.2) !important;
+            color: #ff6b6b !important;
+        }
+
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2;
+            color: var(--red);
+            border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a !important;
+            border-color: #3a3a3a !important;
+            color: #e8e8e8 !important;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2) !important;
+            color: #ff6b6b !important;
+            border-color: rgba(220,38,38,0.3) !important;
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3) !important;
+            transform: translateY(-2px) !important;
+        }
+
         .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
         .topbar-title span { color: var(--red); font-weight: 600; }
+
+        body.dark-mode .topbar-title {
+            color: #999 !important;
+        }
+
+        body.dark-mode .topbar-title span {
+            color: var(--red) !important;
+        }
 
         .topbar-badge {
             display: flex; align-items: center; gap: 8px;
@@ -156,8 +226,15 @@
             font-size: 12.5px; font-weight: 600; color: var(--red-dark);
         }
 
+        body.dark-mode .topbar-badge {
+            background: rgba(220,38,38,0.15) !important;
+            border: 1px solid rgba(220,38,38,0.3) !important;
+            color: #ff6b6b !important;
+        }
+
         /* =============== PAGE =============== */
         .page-content { padding: 28px; flex: 1; }
+        body.dark-mode .page-content { background: #000000; }
 
         .page-header {
             display: flex; align-items: flex-start;
@@ -167,7 +244,7 @@
 
         .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
-
+        body.dark-mode .page-header h1 { color: #fff; }
         .breadcrumb {
             display: flex; align-items: center; gap: 8px;
             font-size: 13px; color: #888; margin-top: 6px;
@@ -176,6 +253,8 @@
         .breadcrumb a { color: var(--red); text-decoration: none; }
         .breadcrumb a:hover { text-decoration: underline; }
         .breadcrumb i { font-size: 10px; }
+        body.dark-mode .breadcrumb { color: #999; }
+        body.dark-mode .breadcrumb-nav { color: #999; }
 
         .btn-back {
             display: inline-flex; align-items: center; gap: 8px;
@@ -367,6 +446,236 @@
             background: rgba(0,0,0,0.5); z-index: 999;
         }
 
+/* ===== DARK MODE: COMPREHENSIVE STYLING ===== */
+body.dark-mode {
+    background: #000000 !important;
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .main-content {
+    background: #000000 !important;
+}
+
+body.dark-mode .page-content {
+    background: #000000 !important;
+}
+
+body.dark-mode .topbar {
+    background: #1a1a1a !important;
+    border-bottom: 1px solid #3a3a3a !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-mode .menu-toggle {
+    background: #2a2a2a !important;
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .menu-toggle:hover {
+    background: rgba(220,38,38,0.2) !important;
+    color: #ff6b6b !important;
+}
+
+body.dark-mode .page-header h1 {
+    color: #fff !important;
+}
+
+body.dark-mode .breadcrumb {
+    color: #999 !important;
+}
+
+body.dark-mode .breadcrumb a {
+    color: #ff6b6b !important;
+}
+
+body.dark-mode .breadcrumb-nav {
+    color: #999 !important;
+}
+
+/* Panel Cards */
+body.dark-mode .panel-card {
+    background: #1a1a1a !important;
+    border: 1px solid #3a3a3a !important;
+}
+
+body.dark-mode .panel-card-header {
+    background: #1a1a1a !important;
+    border-bottom: 1px solid #3a3a3a !important;
+}
+
+body.dark-mode .panel-card-header h2 {
+    color: #fff !important;
+}
+
+body.dark-mode .panel-card-header p {
+    color: #999 !important;
+}
+
+body.dark-mode .panel-card-body {
+    color: #e8e8e8 !important;
+    background: #1a1a1a !important;
+}
+
+body.dark-mode .panel-header-icon {
+    background: rgba(220,38,38,0.2) !important;
+    color: #ff6b6b !important;
+}
+
+/* Info Items */
+body.dark-mode .info-item {
+    background: #2a2a2a !important;
+    border: 1px solid #3a3a3a !important;
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .info-item-icon {
+    background: rgba(220,38,38,0.2) !important;
+    color: #ff6b6b !important;
+}
+
+body.dark-mode .info-item-label {
+    color: #999 !important;
+}
+
+body.dark-mode .info-item-value {
+    color: #e8e8e8 !important;
+}
+
+/* Student Cards */
+body.dark-mode .student-card {
+    background: #2a2a2a !important;
+    border: 1px solid #3a3a3a !important;
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .student-card:hover {
+    border-color: rgba(220,38,38,0.5) !important;
+    background: rgba(220,38,38,0.1) !important;
+}
+
+body.dark-mode .student-card-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+body.dark-mode .student-avatar {
+    background: rgba(220,38,38,0.3) !important;
+    color: #ff6b6b !important;
+}
+
+body.dark-mode .student-name {
+    color: #fff !important;
+}
+
+body.dark-mode .student-course {
+    background: rgba(124,58,237,0.2) !important;
+    color: #c084fc !important;
+}
+
+body.dark-mode .student-detail-row {
+    color: #999 !important;
+}
+
+body.dark-mode .student-detail-row i {
+    color: #ff6b6b !important;
+}
+
+/* Search Input */
+body.dark-mode .student-search-input {
+    background: #2a2a2a !important;
+    color: #e8e8e8 !important;
+    border: 1.5px solid #3a3a3a !important;
+}
+
+body.dark-mode .student-search-input::placeholder {
+    color: #666 !important;
+}
+
+body.dark-mode .student-search-input:focus {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important;
+}
+
+body.dark-mode .student-list::-webkit-scrollbar-thumb {
+    background: rgba(220,38,38,0.3) !important;
+}
+
+body.dark-mode .student-no-match {
+    color: #999 !important;
+}
+
+/* MOA Viewer */
+body.dark-mode .moa-viewer-card {
+    background: #1a1a1a !important;
+    border: 1px solid #3a3a3a !important;
+}
+
+body.dark-mode .moa-viewer-card iframe {
+    border-color: #3a3a3a !important;
+    background: #2a2a2a !important;
+}
+
+body.dark-mode .moa-viewer-header {
+    background: #1a1a1a !important;
+    border-bottom: 1px solid #3a3a3a !important;
+}
+
+body.dark-mode .moa-viewer-header h3 {
+    color: #fff !important;
+}
+
+body.dark-mode .moa-viewer-header p {
+    color: #999 !important;
+}
+
+/* Footer */
+body.dark-mode .dashboard-footer {
+    background: #1a1a1a !important;
+    border-top: 1px solid #3a3a3a !important;
+    color: #999 !important;
+}
+
+body.dark-mode .dashboard-footer a {
+    color: #999 !important;
+}
+
+body.dark-mode .dashboard-footer a:hover {
+    color: var(--red) !important;
+}
+
+body.dark-mode .dashboard-footer .divider {
+    color: #3a3a3a !important;
+}
+
+body.dark-mode .dashboard-footer .footer-copy span {
+    color: var(--red) !important;
+}
+
+/* General Elements */
+body.dark-mode .card {
+    background: #1a1a1a !important;
+    border: 1px solid #3a3a3a !important;
+}
+
+body.dark-mode .topbar-title {
+    color: #999 !important;
+}
+
+body.dark-mode .topbar-title span {
+    color: var(--red) !important;
+}
+
+body.dark-mode .topbar-badge {
+    background: rgba(220,38,38,0.15) !important;
+    border: 1px solid rgba(220,38,38,0.3) !important;
+    color: #ff6b6b !important;
+}
+
+body.dark-mode .darkmode-toggle {
+    background: #2a2a2a !important;
+    color: #e8e8e8 !important;
+    border-color: #3a3a3a !important;
+}
+
         @media (max-width: 1100px) {
             .detail-grid { grid-template-columns: 1fr; }
         }
@@ -546,6 +855,9 @@
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa fa-bars"></i>
+            </button>
+            <button class="darkmode-toggle" id="darkmodeToggle">
+                <i class="fa fa-moon"></i>
             </button>
             <span class="topbar-title">
                 On-the-Job Training <span>Information Management System</span>
@@ -818,8 +1130,8 @@
         </div>
 
     </div>
-    <footer class="dashboard-footer">
-    <div class="footer-left">
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
             © 1998–2026 <span>Polytechnic University of the Philippines</span>
@@ -844,51 +1156,63 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    const sidebar     = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const menuToggle  = document.getElementById('menuToggle');
-    const overlay     = document.getElementById('sidebarOverlay');
+    // ====== DARK MODE TOGGLE ======
+    // ====== SIDEBAR TOGGLE ======
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar     = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const menuToggle  = document.getElementById('menuToggle');
+        const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+        if (menuToggle && sidebar && mainContent) {
+            menuToggle.addEventListener('click', function () {
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile) {
+                    sidebar.classList.toggle('mobile-open');
+                    overlay.classList.toggle('active');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                }
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', function () {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            });
         }
     });
 
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    });
+    // ====== STUDENT SEARCH ======
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentSearchInput = document.getElementById('studentSearchInput');
+        if (studentSearchInput) {
+            studentSearchInput.addEventListener('input', function () {
+                const query = this.value.trim().toLowerCase();
+                const cards = Array.from(document.querySelectorAll('.student-list .student-card'));
+                let visibleCount = 0;
 
-    const studentSearchInput = document.getElementById('studentSearchInput');
-    if (studentSearchInput) {
-        studentSearchInput.addEventListener('input', function () {
-            const query = this.value.trim().toLowerCase();
-            const cards = Array.from(document.querySelectorAll('.student-list .student-card'));
-            let visibleCount = 0;
+                cards.forEach(function (card) {
+                    const nameEl = card.querySelector('.student-name');
+                    const studentName = (nameEl ? nameEl.textContent : '').toLowerCase();
+                    const isVisible = !query || studentName.includes(query);
+                    card.style.display = isVisible ? '' : 'none';
+                    if (isVisible) {
+                        visibleCount++;
+                    }
+                });
 
-            cards.forEach(function (card) {
-                const nameEl = card.querySelector('.student-name');
-                const studentName = (nameEl ? nameEl.textContent : '').toLowerCase();
-                const isVisible = !query || studentName.includes(query);
-                card.style.display = isVisible ? '' : 'none';
-                if (isVisible) {
-                    visibleCount++;
+                const noMatchEl = document.getElementById('studentNoMatch');
+                if (noMatchEl) {
+                    noMatchEl.style.display = (cards.length > 0 && visibleCount === 0) ? 'block' : 'none';
                 }
             });
-
-            const noMatchEl = document.getElementById('studentNoMatch');
-            if (noMatchEl) {
-                noMatchEl.style.display = (cards.length > 0 && visibleCount === 0) ? 'block' : 'none';
-            }
-        });
-    }
+        }
+    });
 </script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

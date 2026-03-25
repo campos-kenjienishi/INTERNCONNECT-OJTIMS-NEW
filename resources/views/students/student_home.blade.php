@@ -9,6 +9,7 @@
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -38,19 +39,20 @@
         }
 
         body.dark-mode {
-            --bg:           #0f0f0f;
+            --bg:           #0a0a0a;
             --surface:      #1a1a1a;
-            --surface-2:    #222;
+            --surface-2:    #252525;
+            --surface-3:    #303030;
             --border:       #2a2a2a;
-            --border-2:     rgba(255,255,255,0.04);
-            --text-primary: #f0f0f0;
-            --text-secondary: #999;
-            --text-muted:   #666;
+            --border-2:     rgba(255,255,255,0.05);
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --text-muted:   #707070;
             --topbar-bg:    #1a1a1a;
-            --input-border: #333;
-            --row-hover:    rgba(220,38,38,0.07);
+            --input-border: #3a3a3a;
+            --row-hover:    rgba(220,38,38,0.1);
             --toggle-bg:    #2a2a2a;
-            --toggle-color: #f0f0f0;
+            --toggle-color: #e8e8e8;
             --footer-bg:    #1a1a1a;
         }
 
@@ -181,16 +183,45 @@
             background: #fff5f5; border: 1px solid #fecaca;
             border-radius: 20px; padding: 6px 14px;
             font-size: 12.5px; font-weight: 600; color: var(--red);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .topbar-badge {
+            background: rgba(220,38,38,0.15);
+            border-color: rgba(220,38,38,0.3);
+            color: #ff6b6b;
         }
 
         .darkmode-toggle {
             width: 38px; height: 38px; border-radius: 10px;
             background: var(--toggle-bg); border: 1px solid var(--border);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            color: var(--toggle-color); font-size: 16px; transition: all 0.25s; flex-shrink: 0;
+            color: var(--toggle-color); font-size: 16px; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); flex-shrink: 0;
+            transform-origin: center;
         }
 
-        .darkmode-toggle:hover { background: #fee2e2; color: var(--red); border-color: #fecaca; }
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active {
+            transform: scale(0.95);
+        }
+
+        body.dark-mode .darkmode-toggle {
+            background: var(--toggle-bg);
+            border-color: var(--border);
+            color: var(--toggle-color);
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+        }
 
         /* =============== PAGE =============== */
         .page-content { padding: 28px; flex: 1; }
@@ -280,10 +311,15 @@
         .stat-icon.green { background: #dcfce7; color: #16a34a; }
         .stat-icon.amber { background: #fef9c3; color: #ca8a04; }
 
-        body.dark-mode .stat-icon.red   { background: rgba(220,38,38,0.15); }
-        body.dark-mode .stat-icon.blue  { background: rgba(37,99,235,0.15); }
-        body.dark-mode .stat-icon.green { background: rgba(22,163,74,0.15); }
-        body.dark-mode .stat-icon.amber { background: rgba(202,138,4,0.15); }
+        body.dark-mode .stat-icon.red   { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+        body.dark-mode .stat-icon.blue  { background: rgba(37,99,235,0.2); color: #4f96ff; }
+        body.dark-mode .stat-icon.green { background: rgba(22,163,74,0.2); color: #22c55e; }
+        body.dark-mode .stat-icon.amber { background: rgba(202,138,4,0.2); color: #facc15; }
+
+        body.dark-mode .qa-icon.red { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+        body.dark-mode .qa-icon.blue { background: rgba(37,99,235,0.2); color: #4f96ff; }
+        body.dark-mode .qa-icon.green { background: rgba(22,163,74,0.2); color: #22c55e; }
+        body.dark-mode .qa-icon.amber { background: rgba(202,138,4,0.2); color: #facc15; }
 
         .stat-info .stat-num  { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; }
         .stat-info .stat-name { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; }
@@ -311,7 +347,7 @@
             color: var(--red); font-size: 14px;
         }
 
-        body.dark-mode .table-card-header h2 .header-icon { background: rgba(220,38,38,0.15); }
+        body.dark-mode .table-card-header h2 .header-icon { background: rgba(220,38,38,0.2); color: #ff6b6b; }
 
         .table-card-body { padding: 0; overflow-x: auto; }
 
@@ -563,9 +599,158 @@
             .sidebar-overlay.active { display: block; }
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
-            .welcome-banner { flex-direction: column; gap: 12px; }
-            .welcome-icon { display: none; }
+            .hero-section { flex-direction: column; gap: 24px; }
+            .hero-left { width: 100%; }
+            .hero-stats { width: 100%; grid-template-columns: repeat(2, 1fr); }
+            .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: 1fr; }
             .dt-modal { width: 92vw; }
+            .topbar { left: 0; }
+        }
+
+        /* ─────────────────────────────────── 
+           UNIVERSAL DARK MODE ENHANCEMENTS
+        ─────────────────────────────────── */
+        
+        /* Dark mode hero section */
+        body.dark-mode .hero-section {
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
+        }
+
+        body.dark-mode .hero-left h2 { color: #fff; }
+        body.dark-mode .hero-left p { color: rgba(255,255,255,0.9); }
+        body.dark-mode .hero-stat-item {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        body.dark-mode .hero-stat-icon { background: rgba(255,255,255,0.12); }
+        body.dark-mode .hero-stat-num { color: #fff; }
+        body.dark-mode .hero-stat-label { color: rgba(255,255,255,0.8); }
+
+        /* Dark mode quick actions */
+        body.dark-mode .quick-action-card {
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode .quick-action-card::before {
+            background: rgba(220,38,38,0.1);
+        }
+
+        body.dark-mode .qa-content .qa-title { color: var(--text-primary); }
+        body.dark-mode .qa-content .qa-desc { color: var(--text-secondary); }
+        body.dark-mode .quick-action-card:hover .qa-arrow { color: var(--red); }
+
+        /* Dark mode stats cards */
+        body.dark-mode .stat-card {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(220,38,38,0.08) inset;
+        }
+
+        body.dark-mode .stat-card::before {
+            background: rgba(220,38,38,0.08);
+        }
+
+        body.dark-mode .stat-info .stat-num { color: var(--text-primary); }
+        body.dark-mode .stat-info .stat-name { color: var(--text-primary); }
+        body.dark-mode .stat-info .stat-desc { color: var(--text-secondary); }
+
+        /* Dark mode table */
+        body.dark-mode .table-card {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
+        }
+
+        body.dark-mode .table-card-body .dataTables_wrapper { color: var(--text-primary); }
+        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.08); }
+
+        /* Dark mode dataTables pagination */
+        body.dark-mode .dataTables_paginate .paginate_button:hover:not(.current) {
+            background: #fee2e2 !important;
+            color: var(--red) !important;
+        }
+
+        /* Dark mode date badge */
+        body.dark-mode .date-badge {
+            background: linear-gradient(135deg, var(--surface), var(--surface-2));
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        body.dark-mode .date-badge:hover {
+            background: linear-gradient(135deg, rgba(220,38,38,0.15), rgba(220,38,38,0.1));
+            border-color: rgba(220,38,38,0.3);
+        }
+
+        /* Dark mode modal */
+        body.dark-mode .dt-modal {
+            box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        body.dark-mode .cal-nav-btn {
+            background: var(--surface-3);
+            border-color: var(--border);
+        }
+
+        /* Dark mode footer */
+        body.dark-mode .dashboard-footer {
+            background: #121212;
+            border-top-color: #2a2a2a;
+        }
+
+        /* Dark mode topbar */
+        body.dark-mode .topbar {
+            border-bottom-color: var(--border);
+        }
+
+        body.dark-mode .topbar-badge {
+            background: var(--surface-2);
+            color: var(--text-primary);
+        }
+
+        /* Dark mode page header */
+        body.dark-mode .page-header {
+            border-bottom-color: var(--border);
+        }
+
+        body.dark-mode .section-title { color: var(--text-primary); }
+
+        /* Dark mode buttons and inputs */
+        body.dark-mode .dataTables_filter input {
+            border-color: var(--input-border) !important;
+            background: var(--surface) !important;
+            color: var(--text-primary) !important;
+        }
+
+        body.dark-mode .dataTables_filter input::placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        body.dark-mode .dataTables_length select {
+            border-color: var(--input-border) !important;
+            background: var(--surface) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Dark mode page content and general elements */
+        body.dark-mode {
+            scrollbar-color: var(--toggle-bg) transparent;
+        }
+
+        body.dark-mode ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        body.dark-mode ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: var(--toggle-bg);
+            border-radius: 4px;
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: var(--border);
         }
     </style>
 </head>
@@ -640,12 +825,12 @@
     <div class="topbar">
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle"><i class="fa fa-bars"></i></button>
-            <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
-        </div>
-        <div class="topbar-right">
             <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
                 <i class="fa fa-moon" id="darkmodeIcon"></i>
             </button>
+            <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
+        </div>
+        <div class="topbar-right">
             <div class="topbar-badge">
                 <i class="fa fa-graduation-cap"></i> Student Portal
             </div>
@@ -750,21 +935,24 @@
 
     </div>
 
-    <footer class="dashboard-footer">
-        <div class="footer-left">
-            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-            <span class="footer-copy">
-                © 1998–2026 <span>Polytechnic University of the Philippines</span>
-            </span>
-        </div>
-        <div class="footer-links">
-            <a href="https://www.pup.edu.ph/" target="_blank"><i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i> PUP Website</a>
-            <span class="divider">|</span>
-            <a href="{{ url('/terms') }}">Terms of Use</a>
-            <span class="divider">|</span>
-            <a href="{{ url('/privacy') }}">Privacy Statement</a>
-        </div>
-    </footer>
+   <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+        <span class="footer-copy">
+            © 1998–2026 <span>Polytechnic University of the Philippines</span>
+        </span>
+    </div>
+    <div class="footer-links">
+        <a href="https://www.pup.edu.ph/" target="_blank">
+            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+            PUP Website
+        </a>
+        <span class="divider">|</span>
+        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <span class="divider">|</span>
+        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+    </div>
+</footer>
 </div>
 
 <!-- =============================================
@@ -847,21 +1035,9 @@ overlay.addEventListener('click', function () {
     overlay.classList.remove('active');
 });
 
-/* ── Dark Mode ── */
-const darkmodeToggle = document.getElementById('darkmodeToggle');
-const darkmodeIcon   = document.getElementById('darkmodeIcon');
-
-if (localStorage.getItem('darkMode') === 'true') {
-    document.body.classList.add('dark-mode');
-    darkmodeIcon.classList.replace('fa-moon', 'fa-sun');
-}
-
-darkmodeToggle.addEventListener('click', function () {
-    const isDark = document.body.classList.toggle('dark-mode');
-    localStorage.setItem('darkMode', isDark);
-    darkmodeIcon.classList.toggle('fa-moon', !isDark);
-    darkmodeIcon.classList.toggle('fa-sun',  isDark);
-});
+/* ───────────────────────────────────────
+   UNIVERSAL DARK MODE IMPLEMENTATION
+   ─────────────────────────────────────── */
 
 /* ── Live date in badge ── */
 const dateEl = document.getElementById('currentDate');
@@ -1051,6 +1227,7 @@ function renderCalendar(year, month) {
     }
 }
 </script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

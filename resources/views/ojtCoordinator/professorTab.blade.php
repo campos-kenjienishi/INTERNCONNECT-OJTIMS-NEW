@@ -33,6 +33,15 @@
             min-height: 100vh;
         }
 
+        body.dark-mode {
+            background: #000000;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .sidebar {
+            box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+        }
+
         /* =============== SIDEBAR =============== */
         .sidebar {
             position: fixed; top: 0; left: 0;
@@ -129,6 +138,8 @@
             min-height: 100vh; display: flex; flex-direction: column;
         }
 
+        body.dark-mode .main-content { background: #000000; }
+
         .main-content.expanded { margin-left: var(--sidebar-w-collapsed); }
 
         .topbar {
@@ -139,7 +150,15 @@
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
+        body.dark-mode .topbar {
+            background: #252525;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+            border-bottom: 1px solid #3a3a3a;
+        }
+
         .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+        body.dark-mode .topbar-left { color: #e0e0e0; }
 
         .menu-toggle {
             width: 38px; height: 38px; border-radius: 10px;
@@ -148,9 +167,58 @@
             color: #333; font-size: 18px; transition: all 0.2s;
         }
 
+        body.dark-mode .menu-toggle {
+            background: #3a3a3a;
+            color: #e0e0e0;
+        }
+
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
+
+        body.dark-mode .menu-toggle:hover {
+            background: rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            transform: translateY(-2px);
+        }
         .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
         .topbar-title span { color: var(--red); font-weight: 600; }
+
+        body.dark-mode .topbar-title { color: #999; }
 
         .topbar-badge {
             display: flex; align-items: center; gap: 8px;
@@ -159,8 +227,16 @@
             font-size: 12.5px; font-weight: 600; color: var(--red-dark);
         }
 
+        body.dark-mode .topbar-badge {
+            background: rgba(220,38,38,0.15);
+            border: 1px solid rgba(220,38,38,0.3);
+            color: #ff6b6b;
+        }
+
         /* =============== PAGE =============== */
         .page-content { padding: 28px; flex: 1; }
+
+        body.dark-mode .page-content { background: #000000; }
 
         .page-header {
             display: flex; align-items: flex-start;
@@ -171,10 +247,206 @@
         .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
 
+        body.dark-mode .page-header h1 { color: #fff; }
+
         .breadcrumb {
             display: flex; align-items: center; gap: 8px;
             font-size: 13px; color: #888; margin-top: 6px;
         }
+
+        body.dark-mode .breadcrumb { color: #999; }
+
+        /* ===== DARK MODE: STAT CARDS ===== */
+        body.dark-mode .stat-card {
+            background: #2a2a2a; border: 1px solid #3a3a3a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode .stat-icon.red    { background: rgba(220,38,38,0.2); }
+        body.dark-mode .stat-icon.blue   { background: rgba(37,99,235,0.2); color: #60a5fa; }
+        body.dark-mode .stat-icon.green  { background: rgba(22,163,74,0.2); color: #4ade80; }
+        body.dark-mode .stat-icon.purple { background: rgba(124,58,237,0.2); color: #c084fc; }
+
+        body.dark-mode .stat-num  { color: #fff; }
+        body.dark-mode .stat-name { color: #999; }
+
+        /* ===== DARK MODE: TABLE CARDS ===== */
+        body.dark-mode .table-card {
+            background: #2a2a2a; border: 1px solid #3a3a3a;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode .table-card-header {
+            background: #2a2a2a; border-bottom: 1px solid #3a3a3a;
+        }
+
+        body.dark-mode .header-icon {
+            background: rgba(220,38,38,0.2); color: #ff6b6b;
+        }
+
+        body.dark-mode .table-card-header h2 { color: #fff; }
+        body.dark-mode .table-card-header p  { color: #999; }
+
+        body.dark-mode .prof-count-badge {
+            background: rgba(220,38,38,0.15); color: #ff6b6b;
+        }
+
+        /* ===== DARK MODE: DATATABLES ===== */
+        body.dark-mode .table-card-body table.dataTable thead th {
+            background: #2a2a2a; color: #aaa;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        body.dark-mode .table-card-body table.dataTable tbody td {
+            color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.08); }
+
+        body.dark-mode .dataTables_filter input {
+            background: #3a3a3a !important; color: #e0e0e0 !important;
+            border: 1px solid #3a3a3a !important;
+        }
+
+        body.dark-mode .dataTables_filter input::placeholder {
+            color: #777 !important;
+        }
+
+        body.dark-mode .dataTables_filter input:focus {
+            border-color: #ff6b6b !important;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.15) !important;
+        }
+
+        body.dark-mode .dataTables_length select {
+            background: #3a3a3a !important; color: #e0e0e0 !important;
+            border: 1px solid #3a3a3a !important;
+        }
+
+        body.dark-mode .dataTables_paginate .paginate_button {
+            color: #e0e0e0 !important; border: 1px solid #3a3a3a !important;
+        }
+
+        body.dark-mode .dataTables_paginate .paginate_button.current {
+            background: #dc2626 !important; border-color: #dc2626 !important;
+        }
+
+        body.dark-mode .dataTables_paginate .paginate_button:hover {
+            background: rgba(220,38,38,0.15) !important; color: #ff6b6b !important;
+        }
+
+        /* ===== DARK MODE: PROFESSOR CELLS ===== */
+        body.dark-mode .prof-avatar {
+            background: rgba(220,38,38,0.2); color: #ff6b6b;
+        }
+
+        body.dark-mode .prof-name-text { color: #e0e0e0; }
+
+        /* ===== DARK MODE: SUBJECT BADGES ===== */
+        body.dark-mode .subject-code-badge {
+            background: rgba(124,58,237,0.2); color: #c084fc;
+        }
+
+        /* ===== DARK MODE: ACTION BUTTONS ===== */
+        body.dark-mode .btn-edit {
+            background: #3a3a3a; border: 1.5px solid rgba(79,70,229,0.2); color: #60a5fa;
+        }
+
+        body.dark-mode .btn-edit:hover { background: rgba(79,70,229,0.15); }
+
+        body.dark-mode .btn-remove {
+            background: #3a3a3a; border: 1.5px solid rgba(220,38,38,0.2); color: #ff6b6b;
+        }
+
+        body.dark-mode .btn-remove:hover { background: rgba(220,38,38,0.15); }
+
+        /* ===== DARK MODE: MODALS ===== */
+        body.dark-mode .modal-content {
+            background: #2a2a2a;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+        }
+
+        body.dark-mode .modal-body {
+            background: #2a2a2a; color: #e0e0e0;
+        }
+
+        body.dark-mode .modal-body::-webkit-scrollbar-thumb { background: rgba(220,38,38,0.3); }
+
+        body.dark-mode .field-label {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .field-input, body.dark-mode .field-select {
+            background: #3a3a3a; color: #e0e0e0;
+            border: 1.5px solid #3a3a3a;
+        }
+
+        body.dark-mode .field-input::placeholder {
+            color: #777;
+        }
+
+        body.dark-mode .field-input:focus, body.dark-mode .field-select:focus {
+            border-color: #ff6b6b; background: #3a3a3a;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.15);
+        }
+
+        /* ===== DARK MODE: CHECKBOXES ===== */
+        body.dark-mode .checkbox-item {
+            background: #3a3a3a; border: 1.5px solid #3a3a3a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .checkbox-item:has(input:checked) {
+            border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.1);
+            color: #ff6b6b;
+        }
+
+        /* ===== DARK MODE: MODAL SECTIONS ===== */
+        body.dark-mode .modal-section {
+            color: #666; border-bottom: 1px solid #3a3a3a;
+        }
+
+        /* ===== DARK MODE: MODAL FOOTER ===== */
+        body.dark-mode .modal-footer {
+            background: #2a2a2a; border-top: 1px solid #3a3a3a;
+        }
+
+        body.dark-mode .btn-modal-close {
+            background: #3a3a3a; border: 1px solid #3a3a3a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .btn-modal-close:hover {
+            background: rgba(220,38,38,0.15); border-color: rgba(220,38,38,0.3);
+            color: #ff6b6b;
+        }
+
+        body.dark-mode .btn-modal-submit {
+            box-shadow: 0 3px 10px rgba(220,38,38,0.3);
+        }
+
+        body.dark-mode .btn-modal-submit:hover {
+            box-shadow: 0 6px 16px rgba(220,38,38,0.4);
+        }
+
+        /* ===== DARK MODE: DASHBOARD FOOTER ===== */
+        body.dark-mode .dashboard-footer {
+            background: #2a2a2a; border-top: 1px solid rgba(255,255,255,0.08);
+            color: #999;
+        }
+
+        body.dark-mode .dashboard-footer a {
+            color: #999;
+        }
+
+        body.dark-mode .dashboard-footer a:hover {
+            color: #ff6b6b;
+        }
+
+        body.dark-mode .dashboard-footer .divider {
+            color: rgba(255,255,255,0.1);
+        }
+
+        body.dark-mode .breadcrumb { color: #999; }
 
         .breadcrumb a { color: var(--red); text-decoration: none; }
         .breadcrumb a:hover { text-decoration: underline; }
@@ -191,9 +463,17 @@
             box-shadow: 0 4px 16px rgba(220,38,38,0.25);
         }
 
+        body.dark-mode .btn-add {
+            box-shadow: 0 4px 16px rgba(220,38,38,0.4);
+        }
+
         .btn-add:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(220,38,38,0.35);
+        }
+
+        body.dark-mode .btn-add:hover {
+            box-shadow: 0 8px 24px rgba(220,38,38,0.5);
         }
 
         /* Stats row */
@@ -709,6 +989,9 @@
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa fa-bars"></i>
             </button>
+            <button class="darkmode-toggle" id="darkmodeToggle">
+                <i class="fa fa-moon"></i>
+            </button>
             <span class="topbar-title">
                 On-the-Job Training <span>Information Management System</span>
             </span>
@@ -864,8 +1147,8 @@
         </div>
 
     </div>
-    <footer class="dashboard-footer">
-    <div class="footer-left">
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
             © 1998–2026 <span>Polytechnic University of the Philippines</span>
@@ -1145,6 +1428,7 @@
 
     });
 </script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

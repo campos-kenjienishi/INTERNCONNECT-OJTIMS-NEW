@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -208,6 +209,45 @@
         }
 
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
+
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            transform: translateY(-2px);
+        }
+
         .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
         .topbar-title span { color: var(--red); font-weight: 600; }
 
@@ -279,6 +319,17 @@
 
         .stat-num { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
         .stat-name { font-size: 12px; color: #888; margin-top: 3px; }
+
+        /* Dark mode text visibility */
+        html.dark-mode .stat-num,
+        body.dark-mode .stat-num {
+            color: #e8e8e8 !important;
+        }
+
+        html.dark-mode .file-count-badge,
+        body.dark-mode .file-count-badge {
+            color: #e8e8e8 !important;
+        }
 
         /* Table card */
         .table-card {
@@ -665,6 +716,9 @@
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa fa-bars"></i>
             </button>
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
+                <i class="fa fa-moon" id="darkmodeIcon"></i>
+            </button>
             <span class="topbar-title">
                 On-the-Job Training <span>Information Management System</span>
             </span>
@@ -809,8 +863,8 @@
         </div>
 
     </div>
-    <footer class="dashboard-footer">
-    <div class="footer-left">
+   <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
             © 1998–2026 <span>Polytechnic University of the Philippines</span>
@@ -856,7 +910,7 @@
         overlay.classList.remove('active');
     });
 </script>
-
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

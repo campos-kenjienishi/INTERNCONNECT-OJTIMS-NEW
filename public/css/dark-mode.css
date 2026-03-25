@@ -1,0 +1,1410 @@
+/* =====================================
+   UNIVERSAL DARK MODE CSS
+   ===================================== */
+
+/* Define color variables for light mode */
+:root {
+    --bg: #fff;
+    --surface: #f9f9f9;
+    --surface-2: #f0f0f0;
+    --surface-3: #e8e8e8;
+    --border: #e5e5e5;
+    --border-2: rgba(0, 0, 0, 0.05);
+    --text-primary: #1a1a1a;
+    --text-secondary: #666;
+    --text-muted: #999;
+    --topbar-bg: #fff;
+    --input-border: #ddd;
+    --row-hover: rgba(220, 38, 38, 0.08);
+    --toggle-bg: #f0f0f0;
+    --toggle-color: #333;
+    --footer-bg: #f9f9f9;
+    --red: #dc2626;
+}
+
+/* Dark mode color variables */
+html.dark-mode, body.dark-mode {
+    --bg: #000000;
+    --surface: #1a1a1a;
+    --surface-2: #252525;
+    --surface-3: #303030;
+    --border: #2a2a2a;
+    --border-2: rgba(255, 255, 255, 0.05);
+    --text-primary: #e8e8e8;
+    --text-secondary: #a0a0a0;
+    --text-muted: #707070;
+    --topbar-bg: #1a1a1a;
+    --input-border: #3a3a3a;
+    --row-hover: rgba(220, 38, 38, 0.1);
+    --toggle-bg: #2a2a2a;
+    --toggle-color: #e8e8e8;
+    --footer-bg: #1a1a1a;
+}
+
+/* Apply dark mode styling */
+html.dark-mode, body.dark-mode {
+    background-color: var(--bg);
+    color: var(--text-primary);
+}
+
+/* Smooth transition for dark mode toggle */
+html.dark-mode *,
+html.dark-mode *::before,
+html.dark-mode *::after,
+body.dark-mode *,
+body.dark-mode *::before,
+body.dark-mode *::after {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ─────────────────────────────────── 
+   Dark mode for page structure elements
+─────────────────────────────────── */
+
+html.dark-mode body,
+body.dark-mode {
+    background: var(--bg) !important;
+    color: var(--text-primary) !important;
+}
+
+html.dark-mode .page-content,
+body.dark-mode .page-content {
+    background: var(--bg) !important;
+    color: var(--text-primary) !important;
+}
+
+html.dark-mode .main-content,
+body.dark-mode .main-content {
+    background: var(--bg) !important;
+}
+
+/* Dark mode for main container/wrapper sections */
+html.dark-mode .container,
+body.dark-mode .container {
+    background: transparent !important;
+}
+
+html.dark-mode .section,
+html.dark-mode [class*="section"],
+body.dark-mode .section,
+body.dark-mode [class*="section"] {
+    background: transparent !important;
+}
+
+/* Dark mode for card-like containers */
+html.dark-mode .card-wrapper,
+html.dark-mode .form-wrapper,
+html.dark-mode .content-wrapper,
+html.dark-mode .container-fluid,
+body.dark-mode .card-wrapper,
+body.dark-mode .form-wrapper,
+body.dark-mode .content-wrapper,
+body.dark-mode .container-fluid {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+}
+
+/* Dark mode for panel/box elements */
+html.dark-mode .panel,
+html.dark-mode .box,
+html.dark-mode .widget,
+html.dark-mode [class*="panel"],
+html.dark-mode [class*="box"],
+body.dark-mode .panel,
+body.dark-mode .box,
+body.dark-mode .widget,
+body.dark-mode [class*="panel"],
+body.dark-mode [class*="box"] {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+}
+
+/* Dark mode strong contrast elements */
+html.dark-mode .white-bg,
+html.dark-mode .light-bg,
+body.dark-mode .white-bg,
+body.dark-mode .light-bg {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+}
+
+html.dark-mode [style*="background: #fff"],
+html.dark-mode [style*="background:#fff"],
+html.dark-mode [style*="background: white"],
+html.dark-mode [style*="background:white"],
+body.dark-mode [style*="background: #fff"],
+body.dark-mode [style*="background:#fff"],
+body.dark-mode [style*="background: white"],
+body.dark-mode [style*="background:white"] {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Dark mode for hero section */
+html.dark-mode .hero,
+html.dark-mode .banner,
+html.dark-mode .hero-section,
+html.dark-mode .welcome-banner,
+body.dark-mode .hero,
+body.dark-mode .banner,
+body.dark-mode .hero-section,
+body.dark-mode .welcome-banner {
+    background: linear-gradient(135deg, #7f0000 0%, #b91c1c 50%, #dc2626 100%) !important;
+    color: #fff !important;
+}
+
+/* Dark mode for text in headers/sections */
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: var(--text-primary) !important;
+}
+
+html.dark-mode p,
+html.dark-mode span,
+html.dark-mode label,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode label {
+    color: var(--text-primary) !important;
+}
+
+/* Dark mode for form labels */
+html.dark-mode label,
+body.dark-mode label {
+    color: var(--text-secondary) !important;
+}
+
+/* ─────────────────────────────────── 
+   Dark mode custom element overrides
+─────────────────────────────────── */
+
+/* Dark mode form cards */
+html.dark-mode .form-card,
+body.dark-mode .form-card {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    color: #e8e8e8 !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark-mode .form-card-header,
+body.dark-mode .form-card-header {
+    background: #252525 !important;
+    border-color: #2a2a2a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .form-card-body,
+body.dark-mode .form-card-body {
+    background: #1a1a1a !important;
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for content cards in pages */
+html.dark-mode .content-card,
+html.dark-mode .info-card,
+html.dark-mode .page-card,
+body.dark-mode .content-card,
+body.dark-mode .info-card,
+body.dark-mode .page-card {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for breadcrumb and navigation */
+html.dark-mode .breadcrumb,
+body.dark-mode .breadcrumb {
+    background: transparent !important;
+}
+
+html.dark-mode .breadcrumb-item,
+body.dark-mode .breadcrumb-item {
+    color: var(--text-secondary) !important;
+}
+
+html.dark-mode .breadcrumb-item a,
+body.dark-mode .breadcrumb-item a {
+    color: #dc2626 !important;
+}
+
+/* Dark mode fix for info boxes and containers */
+html.dark-mode .info-box,
+html.dark-mode .info-card,
+html.dark-mode .detail-box,
+body.dark-mode .info-box,
+body.dark-mode .info-card,
+body.dark-mode .detail-box {
+    background: var(--surface-2) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Dark mode for specific form elements */
+html.dark-mode .form-group,
+body.dark-mode .form-group {
+    color: var(--text-primary) !important;
+}
+
+html.dark-mode .form-group label,
+body.dark-mode .form-group label {
+    color: var(--text-secondary) !important;
+}
+
+html.dark-mode .form-group small,
+body.dark-mode .form-group small {
+    color: var(--text-muted) !important;
+}
+
+/* Dark mode for field descriptions/helps */
+html.dark-mode .form-text,
+html.dark-mode .help-text,
+html.dark-mode .field-help,
+body.dark-mode .form-text,
+body.dark-mode .help-text,
+body.dark-mode .field-help {
+    color: var(--text-muted) !important;
+}
+
+/* Make sure topbar respects dark mode */
+html.dark-mode .topbar,
+body.dark-mode .topbar {
+    background: var(--topbar-bg) !important;
+    border-color: var(--border) !important;
+}
+
+/* ─────────────────────────────────── 
+   Dark mode for specific page sections
+─────────────────────────────────── */
+
+/* Dark mode for stat cards used across pages */
+html.dark-mode .stat-card,
+body.dark-mode .stat-card {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    color: #e8e8e8 !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark-mode .stat-card:hover,
+body.dark-mode .stat-card:hover {
+    background: #252525 !important;
+}
+
+/* Dark mode for action cards */
+html.dark-mode .action-card,
+html.dark-mode .quick-access-card,
+body.dark-mode .action-card,
+body.dark-mode .quick-access-card {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for data display sections */
+html.dark-mode .data-section,
+html.dark-mode .info-section,
+html.dark-mode .details-section,
+body.dark-mode .data-section,
+body.dark-mode .info-section,
+body.dark-mode .details-section {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+}
+
+/* Dark mode for error/success/warning boxes */
+html.dark-mode .success-box,
+html.dark-mode .error-box,
+html.dark-mode .warning-box,
+html.dark-mode .info-box,
+body.dark-mode .success-box,
+body.dark-mode .error-box,
+body.dark-mode .warning-box,
+body.dark-mode .info-box {
+    background: #252525 !important;
+    border-color: #2a2a2a !important;
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for main content sections with hard-coded white */
+html.dark-mode .content,
+html.dark-mode .page-wrapper,
+html.dark-mode .wrapper,
+body.dark-mode .content,
+body.dark-mode .page-wrapper,
+body.dark-mode .wrapper {
+    background: #0a0a0a !important;
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for table row hover states */
+html.dark-mode .table-card-body table.dataTable tbody tr:hover td,
+body.dark-mode .table-card-body table.dataTable tbody tr:hover td {
+    background: rgba(220, 38, 38, 0.1) !important;
+}
+
+/* Dark mode for status badges/tags */
+html.dark-mode .status-badge,
+html.dark-mode .tag,
+html.dark-mode .label,
+body.dark-mode .status-badge,
+body.dark-mode .tag,
+body.dark-mode .label {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #ff6b6b !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Dark mode for sections with specific styling */
+html.dark-mode [style*="background: white"],
+html.dark-mode [style*="background:white"],
+body.dark-mode [style*="background: white"],
+body.dark-mode [style*="background:white"] {
+    background: #1a1a1a !important;
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for placeholder/empty states */
+html.dark-mode .empty-state,
+html.dark-mode .no-data,
+html.dark-mode .placeholder,
+body.dark-mode .empty-state,
+body.dark-mode .no-data,
+body.dark-mode .placeholder {
+    background: #252525 !important;
+    border-color: #2a2a2a !important;
+}
+
+/* Dark mode for table-card elements */
+html.dark-mode .table-card,
+body.dark-mode .table-card {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark-mode .table-header,
+html.dark-mode .table-title,
+body.dark-mode .table-header,
+body.dark-mode .table-title {
+    background: #252525 !important;
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+/* Dark mode for table card header */
+html.dark-mode .table-card-header,
+body.dark-mode .table-card-header {
+    background: #252525 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .table-card-header h2,
+html.dark-mode .table-card-header p,
+html.dark-mode .table-card-header div,
+html.dark-mode .table-card-header .header-icon,
+body.dark-mode .table-card-header h2,
+body.dark-mode .table-card-header p,
+body.dark-mode .table-card-header div,
+body.dark-mode .table-card-header .header-icon {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .header-icon,
+body.dark-mode .header-icon {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #ff6b6b !important;
+}
+
+/* Dark mode for rooms-table and similar tables */
+html.dark-mode .rooms-table,
+html.dark-mode .rooms-table thead,
+html.dark-mode .rooms-table tbody,
+body.dark-mode .rooms-table,
+body.dark-mode .rooms-table thead,
+body.dark-mode .rooms-table tbody {
+    background: #1a1a1a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .rooms-table thead th,
+html.dark-mode .rooms-table tbody th,
+body.dark-mode .rooms-table thead th,
+body.dark-mode .rooms-table tbody th {
+    background: #252525 !important;
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .rooms-table tbody tr,
+body.dark-mode .rooms-table tbody tr {
+    border-bottom-color: #2a2a2a !important;
+}
+
+html.dark-mode .rooms-table tbody tr:hover,
+body.dark-mode .rooms-table tbody tr:hover {
+    background: rgba(220, 38, 38, 0.1) !important;
+}
+
+html.dark-mode .rooms-table tbody td,
+body.dark-mode .rooms-table tbody td {
+    color: #e8e8e8 !important;
+    background: #1a1a1a !important;
+}
+
+/* Dark mode for table cell backgrounds on hover */
+html.dark-mode .table-card-body table.dataTable tbody tr:hover td,
+body.dark-mode .table-card-body table.dataTable tbody tr:hover td {
+    background: rgba(220, 38, 38, 0.1) !important;
+}
+
+html.dark-mode .rooms-table tbody tr:hover { background: rgba(220, 38, 38, 0.1) !important; }
+
+/* Dark mode for modals */
+html.dark-mode .modal-body,
+body.dark-mode .modal-body {
+    background: #1a1a1a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .modal-header,
+body.dark-mode .modal-header {
+    background: #252525 !important;
+    border-color: #2a2a2a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .modal-footer,
+body.dark-mode .modal-footer {
+    background: #252525 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .modal-content,
+body.dark-mode .modal-content {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+}
+
+/* Dark mode close button */
+html.dark-mode .btn-close,
+body.dark-mode .btn-close {
+    filter: brightness(2) invert(1) !important;
+}
+
+/* Dark mode for DataTables specific styling */
+html.dark-mode .table-card-body table.dataTable thead th,
+body.dark-mode .table-card-body table.dataTable thead th {
+    background: #252525 !important;
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .table-card-body table.dataTable tbody td,
+body.dark-mode .table-card-body table.dataTable tbody td {
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_length select,
+html.dark-mode .dataTables_wrapper .dataTables_filter input,
+body.dark-mode .dataTables_wrapper .dataTables_length select,
+body.dark-mode .dataTables_wrapper .dataTables_filter input {
+    background: #1a1a1a !important;
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+/* Dark mode for announcement info box */
+html.dark-mode .info-announcement,
+html.dark-mode .announcement-header,
+html.dark-mode [class*="announcement"],
+body.dark-mode .info-announcement,
+body.dark-mode .announcement-header,
+body.dark-mode [class*="announcement"] {
+    background: #1a1a1a !important;
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+/* Generic dark mode for all table-like structures */
+html.dark-mode .table-card-header,
+body.dark-mode .table-card-header {
+    background: #252525 !important;
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .table-card-header h2,
+html.dark-mode .table-card-header p,
+body.dark-mode .table-card-header h2,
+body.dark-mode .table-card-header p {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .table-card-body,
+body.dark-mode .table-card-body {
+    background: #1a1a1a !important;
+}
+
+/* Dark mode for footer elements */
+html.dark-mode footer,
+html.dark-mode .footer,
+html.dark-mode .dashboard-footer,
+html.dark-mode .app-footer,
+body.dark-mode footer,
+body.dark-mode .footer,
+body.dark-mode .dashboard-footer,
+body.dark-mode .app-footer {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    color: #a0a0a0 !important;
+}
+
+html.dark-mode footer a,
+html.dark-mode .footer a,
+html.dark-mode .dashboard-footer a,
+html.dark-mode .app-footer a,
+body.dark-mode footer a,
+body.dark-mode .footer a,
+body.dark-mode .dashboard-footer a,
+body.dark-mode .app-footer a {
+    color: #a0a0a0 !important;
+}
+
+html.dark-mode footer a:hover,
+html.dark-mode .footer a:hover,
+html.dark-mode .dashboard-footer a:hover,
+html.dark-mode .app-footer a:hover,
+body.dark-mode footer a:hover,
+body.dark-mode .footer a:hover,
+body.dark-mode .dashboard-footer a:hover,
+body.dark-mode .app-footer a:hover {
+    color: #dc2626 !important;
+}
+
+html.dark-mode footer p,
+html.dark-mode footer span,
+html.dark-mode .footer p,
+html.dark-mode .footer span,
+html.dark-mode .dashboard-footer p,
+html.dark-mode .dashboard-footer span,
+html.dark-mode .app-footer p,
+html.dark-mode .app-footer span,
+body.dark-mode footer p,
+body.dark-mode footer span,
+body.dark-mode .footer p,
+body.dark-mode .footer span,
+body.dark-mode .dashboard-footer p,
+body.dark-mode .dashboard-footer span,
+body.dark-mode .app-footer p,
+body.dark-mode .app-footer span {
+    color: #a0a0a0 !important;
+}
+
+html.dark-mode footer .footer-content,
+html.dark-mode .footer-content,
+body.dark-mode footer .footer-content,
+body.dark-mode .footer-content {
+    background: transparent !important;
+    color: #a0a0a0 !important;
+}
+
+/* Dark mode for copyright text */
+html.dark-mode .copyright,
+html.dark-mode .footer-copy,
+body.dark-mode .copyright,
+body.dark-mode .footer-copy {
+    color: #707070 !important;
+}
+
+/* Dark mode for footer dividers/separators */
+html.dark-mode footer .divider,
+html.dark-mode footer hr,
+html.dark-mode .footer .divider,
+html.dark-mode .footer hr,
+body.dark-mode footer .divider,
+body.dark-mode footer hr,
+body.dark-mode .footer .divider,
+body.dark-mode .footer hr {
+    border-color: #2a2a2a !important;
+}
+
+/* ─────────────────────────────────── 
+   End of dark mode overrides
+─────────────────────────────────── */
+
+html.dark-mode body,
+body.dark-mode {
+    background: var(--bg);
+}
+
+html.dark-mode .topbar,
+body.dark-mode .topbar {
+    background: var(--topbar-bg);
+    border-bottom-color: var(--border);
+}
+
+html.dark-mode .topbar-badge,
+body.dark-mode .topbar-badge {
+    background: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #ff6b6b;
+}
+
+html.dark-mode .sidebar-overlay.active,
+body.dark-mode .sidebar-overlay.active {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Dark mode for buttons */
+html.dark-mode .btn,
+body.dark-mode .btn {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+html.dark-mode .btn:hover,
+body.dark-mode .btn:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+}
+
+html.dark-mode .btn.btn-primary,
+body.dark-mode .btn.btn-primary {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}
+
+html.dark-mode .btn.btn-primary:hover,
+body.dark-mode .btn.btn-primary:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+/* Dark mode for forms and inputs */
+html.dark-mode input,
+html.dark-mode textarea,
+html.dark-mode select,
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+}
+
+html.dark-mode input:focus,
+html.dark-mode textarea:focus,
+html.dark-mode select:focus,
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder,
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* Dark mode for cards */
+html.dark-mode .card,
+body.dark-mode .card {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+html.dark-mode .card-header,
+body.dark-mode .card-header {
+    background: var(--surface-2);
+    border-color: var(--border);
+}
+
+html.dark-mode .card-body,
+body.dark-mode .card-body {
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+/* Dark mode for modals */
+html.dark-mode .modal-content,
+body.dark-mode .modal-content {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+html.dark-mode .modal-header,
+body.dark-mode .modal-header {
+    background: var(--surface-2);
+    border-color: var(--border);
+}
+
+html.dark-mode .modal-body,
+body.dark-mode .modal-body {
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+html.dark-mode .close,
+body.dark-mode .close {
+    color: var(--text-primary);
+}
+
+/* Dark mode for tables */
+html.dark-mode table,
+body.dark-mode table {
+    color: var(--text-primary);
+}
+
+html.dark-mode table.table-striped tbody tr,
+body.dark-mode table.table-striped tbody tr {
+    background: transparent;
+}
+
+html.dark-mode table.table-striped tbody tr:nth-of-type(odd),
+body.dark-mode table.table-striped tbody tr:nth-of-type(odd) {
+    background: var(--surface-2);
+}
+
+html.dark-mode table thead th,
+body.dark-mode table thead th {
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+
+html.dark-mode table tbody td,
+body.dark-mode table tbody td {
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+html.dark-mode table tbody tr:hover,
+body.dark-mode table tbody tr:hover {
+    background: rgba(220, 38, 38, 0.1);
+}
+
+/* DataTables specific */
+html.dark-mode .dataTables_wrapper,
+body.dark-mode .dataTables_wrapper {
+    color: var(--text-primary);
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_filter input,
+body.dark-mode .dataTables_wrapper .dataTables_filter input {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--input-border) !important;
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_filter input:focus,
+body.dark-mode .dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_length select,
+body.dark-mode .dataTables_wrapper .dataTables_length select {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--input-border) !important;
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_info,
+body.dark-mode .dataTables_wrapper .dataTables_info {
+    color: var(--text-secondary) !important;
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button,
+body.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+body.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+    color: #fff !important;
+}
+
+html.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+body.dark-mode .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(220, 38, 38, 0.2) !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+    color: #ff6b6b !important;
+}
+
+/* Dark mode for badges */
+html.dark-mode .badge,
+body.dark-mode .badge {
+    background: rgba(220, 38, 38, 0.2);
+    color: #ff6b6b;
+}
+
+html.dark-mode .badge.badge-primary,
+body.dark-mode .badge.badge-primary {
+    background: rgba(220, 38, 38, 0.2);
+    color: #ff6b6b;
+}
+
+/* Dark mode for alerts */
+html.dark-mode .alert,
+body.dark-mode .alert {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+html.dark-mode .alert-info,
+body.dark-mode .alert-info {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.3);
+    color: #4f96ff;
+}
+
+html.dark-mode .alert-success,
+body.dark-mode .alert-success {
+    background: rgba(22, 163, 74, 0.15);
+    border-color: rgba(22, 163, 74, 0.3);
+    color: #22c55e;
+}
+
+html.dark-mode .alert-warning,
+body.dark-mode .alert-warning {
+    background: rgba(202, 138, 4, 0.15);
+    border-color: rgba(202, 138, 4, 0.3);
+    color: #facc15;
+}
+
+html.dark-mode .alert-danger,
+body.dark-mode .alert-danger {
+    background: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #ff6b6b;
+}
+
+/* Dark mode for links */
+html.dark-mode a,
+body.dark-mode a {
+    color: #ff8080;
+}
+
+html.dark-mode a:hover,
+body.dark-mode a:hover {
+    color: #ffb3b3;
+}
+
+/* Dark mode for lists */
+html.dark-mode ul, 
+html.dark-mode ol,
+body.dark-mode ul, 
+body.dark-mode ol {
+    color: var(--text-primary);
+}
+
+html.dark-mode li,
+body.dark-mode li {
+    color: var(--text-primary);
+}
+
+/* Dark mode for dropdowns */
+html.dark-mode .dropdown-menu,
+body.dark-mode .dropdown-menu {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+html.dark-mode .dropdown-menu .dropdown-item,
+body.dark-mode .dropdown-menu .dropdown-item {
+    color: var(--text-primary);
+}
+
+html.dark-mode .dropdown-menu .dropdown-item:hover,
+body.dark-mode .dropdown-menu .dropdown-item:hover {
+    background: var(--surface-2);
+    color: #dc2626;
+}
+
+/* Dark mode for nav pills/tabs */
+html.dark-mode .nav-pills .nav-link,
+body.dark-mode .nav-pills .nav-link {
+    color: var(--text-secondary);
+}
+
+html.dark-mode .nav-pills .nav-link.active,
+body.dark-mode .nav-pills .nav-link.active {
+    background: #dc2626;
+    color: #fff;
+}
+
+html.dark-mode .nav-tabs,
+body.dark-mode .nav-tabs {
+    border-color: var(--border);
+}
+
+html.dark-mode .nav-tabs .nav-link,
+body.dark-mode .nav-tabs .nav-link {
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+html.dark-mode .nav-tabs .nav-link.active,
+body.dark-mode .nav-tabs .nav-link.active {
+    background: var(--surface);
+    border-color: var(--border) var(--border) var(--surface);
+    color: #dc2626;
+}
+
+/* Dark mode for pagination */
+html.dark-mode .pagination,
+body.dark-mode .pagination {
+    background: transparent;
+}
+
+html.dark-mode .pagination .page-link,
+body.dark-mode .pagination .page-link {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+html.dark-mode .pagination .page-link:hover,
+body.dark-mode .pagination .page-link:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #dc2626;
+}
+
+html.dark-mode .pagination .page-link.active,
+body.dark-mode .pagination .page-link.active {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}
+
+/* Dark mode toggle button styling - Light mode */
+/* Universal button reset for dark mode toggle */
+button.darkmode-toggle {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    background: #f0f0f0 !important;
+    border: 1px solid #ddd !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #333 !important;
+    font-size: 16px !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    flex-shrink: 0 !important;
+    transform-origin: center !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+button.darkmode-toggle:hover {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    border-color: #fecaca !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.2) !important;
+}
+
+button.darkmode-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Dark mode toggle button styling - Dark mode */
+html.dark-mode button.darkmode-toggle,
+body.dark-mode button.darkmode-toggle {
+    background: #2a2a2a !important;
+    border-color: #3a3a3a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode button.darkmode-toggle:hover,
+body.dark-mode button.darkmode-toggle:hover {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #ff6b6b !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+html.dark-mode button.darkmode-toggle:active,
+body.dark-mode button.darkmode-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+.darkmode-toggle {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    background: #f0f0f0 !important;
+    border: 1px solid #ddd !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #333 !important;
+    font-size: 16px !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    flex-shrink: 0 !important;
+    transform-origin: center !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.darkmode-toggle:hover {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    border-color: #fecaca !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.2) !important;
+}
+
+.darkmode-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Dark mode toggle button styling - Dark mode */
+html.dark-mode .darkmode-toggle,
+body.dark-mode .darkmode-toggle {
+    background: #2a2a2a !important;
+    border-color: #3a3a3a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .darkmode-toggle:hover,
+body.dark-mode .darkmode-toggle:hover {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #ff6b6b !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+html.dark-mode .darkmode-toggle:active,
+body.dark-mode .darkmode-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Dark mode for preformatted text */
+html.dark-mode pre,
+body.dark-mode pre {
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+html.dark-mode code,
+body.dark-mode code {
+    background: var(--surface-2);
+    color: #ff8080;
+}
+
+/* Dark mode for blockquotes */
+html.dark-mode blockquote,
+body.dark-mode blockquote {
+    border-left-color: #dc2626;
+    color: var(--text-secondary);
+}
+
+/* Dark mode for progress bars */
+html.dark-mode .progress,
+body.dark-mode .progress {
+    background: var(--surface-2);
+}
+
+html.dark-mode .progress-bar,
+body.dark-mode .progress-bar {
+    background: #dc2626;
+}
+
+/* Dark mode for tooltips */
+html.dark-mode .tooltip-inner,
+body.dark-mode .tooltip-inner {
+    background: var(--surface-2);
+    color: var(--text-primary);
+}
+
+html.dark-mode .bs-tooltip-top .tooltip-arrow::before,
+body.dark-mode .bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: var(--surface-2);
+}
+
+html.dark-mode .bs-tooltip-bottom .tooltip-arrow::before,
+body.dark-mode .bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: var(--surface-2);
+}
+
+html.dark-mode .bs-tooltip-left .tooltip-arrow::before,
+body.dark-mode .bs-tooltip-left .tooltip-arrow::before {
+    border-left-color: var(--surface-2);
+}
+
+html.dark-mode .bs-tooltip-right .tooltip-arrow::before,
+body.dark-mode .bs-tooltip-right .tooltip-arrow::before {
+    border-right-color: var(--surface-2);
+}
+
+/* Dark mode for spinners */
+html.dark-mode .spinner-border,
+body.dark-mode .spinner-border {
+    border-color: rgba(220, 38, 38, 0.25);
+    border-right-color: #dc2626;
+}
+
+/* Dark mode for different elements based on data attributes */
+html.dark-mode [style*="background"],
+body.dark-mode [style*="background"] {
+    /* Handled by inline styles when necessary */
+}
+
+/* Dark mode for stat cards and file count badges */
+html.dark-mode .stat-num,
+body.dark-mode .stat-num,
+html.dark-mode .stat-info .stat-num,
+body.dark-mode .stat-info .stat-num {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .file-count-badge,
+body.dark-mode .file-count-badge {
+    background: rgba(220, 38, 38, 0.15) !important;
+    color: #e8e8e8 !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Dark mode for filter cards */
+html.dark-mode .filter-card,
+body.dark-mode .filter-card {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .filter-card-header,
+body.dark-mode .filter-card-header {
+    background: #252525 !important;
+    border-bottom-color: #2a2a2a !important;
+}
+
+html.dark-mode .filter-card-header h2,
+body.dark-mode .filter-card-header h2 {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .filter-card-header p,
+body.dark-mode .filter-card-header p {
+    color: #a0a0a0 !important;
+}
+
+html.dark-mode .filter-select,
+body.dark-mode .filter-select {
+    background: #252525 !important;
+    border-color: #3a3a3a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .filter-select:focus,
+body.dark-mode .filter-select:focus {
+    background: #252525 !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important;
+}
+
+html.dark-mode .filter-label,
+body.dark-mode .filter-label {
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for table elements */
+html.dark-mode table.dataTable thead th,
+body.dark-mode table.dataTable thead th {
+    background: #252525 !important;
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode table.dataTable tbody td,
+body.dark-mode table.dataTable tbody td {
+    color: #e8e8e8 !important;
+    border-color: #2a2a2a !important;
+}
+
+html.dark-mode .table-card-body table.dataTable thead th,
+body.dark-mode .table-card-body table.dataTable thead th {
+    background: #252525 !important;
+    color: #e8e8e8 !important;
+    border-bottom-color: #2a2a2a !important;
+    border-top-color: #2a2a2a !important;
+}
+
+html.dark-mode .table-card-body table.dataTable tbody td,
+body.dark-mode .table-card-body table.dataTable tbody td {
+    color: #e8e8e8 !important;
+    border-bottom-color: #2a2a2a !important;
+}
+
+html.dark-mode .table-card-body table.dataTable tbody tr:hover td,
+body.dark-mode .table-card-body table.dataTable tbody tr:hover td {
+    background: rgba(220, 38, 38, 0.1) !important;
+}
+
+html.dark-mode .table-card {
+    background: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important;
+}
+
+html.dark-mode .table-card-header,
+body.dark-mode .table-card-header {
+    background: #252525 !important;
+    border-bottom-color: #2a2a2a !important;
+}
+
+html.dark-mode .table-card-header h2,
+body.dark-mode .table-card-header h2 {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .table-card-header p,
+body.dark-mode .table-card-header p {
+    color: #a0a0a0 !important;
+}
+
+html.dark-mode table.dataTable tbody tr:hover td,
+body.dark-mode table.dataTable tbody tr:hover td {
+    background: rgba(220, 38, 38, 0.1) !important;
+}
+
+/* Dark mode for page headers and descriptions */
+html.dark-mode .page-header h1,
+body.dark-mode .page-header h1 {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .breadcrumb,
+body.dark-mode .breadcrumb {
+    color: #a0a0a0 !important;
+}
+
+html.dark-mode .breadcrumb a,
+body.dark-mode .breadcrumb a {
+    color: #ff6b6b !important;
+}
+
+/* Dark mode for section headers and descriptions */
+html.dark-mode .table-card-header h2,
+body.dark-mode .table-card-header h2 {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .table-card-header p,
+body.dark-mode .table-card-header p {
+    color: #a0a0a0 !important;
+}
+
+/* Dark mode for buttons in tables */
+html.dark-mode .btn-view,
+body.dark-mode .btn-view {
+    background: #3a3a3a !important;
+    color: #e8e8e8 !important;
+    border-color: #4a4a4a !important;
+}
+
+html.dark-mode .btn-view:hover,
+body.dark-mode .btn-view:hover {
+    background: #4a4a4a !important;
+    color: #fff !important;
+}
+
+/* Dark mode for DataTables info and pagination */
+html.dark-mode .dataTables_info,
+body.dark-mode .dataTables_info {
+    color: #a0a0a0 !important;
+}
+
+html.dark-mode .dataTables_filter,
+body.dark-mode .dataTables_filter {
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode .dataTables_filter input,
+body.dark-mode .dataTables_filter input {
+    background: #252525 !important;
+    color: #e8e8e8 !important;
+    border-color: #3a3a3a !important;
+}
+
+html.dark-mode .dataTables_paginate .paginate_button,
+body.dark-mode .dataTables_paginate .paginate_button {
+    background: #252525 !important;
+    border-color: #3a3a3a !important;
+    color: #e8e8e8 !important;
+}
+
+/* Force dark background on table rows and cells for visibility */
+html.dark-mode table.dataTable tbody tr,
+body.dark-mode table.dataTable tbody tr {
+    background-color: #1a1a1a !important;
+}
+
+html.dark-mode table.dataTable tbody td,
+body.dark-mode table.dataTable tbody td {
+    background-color: #1a1a1a !important;
+    color: #e8e8e8 !important;
+}
+
+html.dark-mode table.dataTable tbody tr:hover,
+body.dark-mode table.dataTable tbody tr:hover {
+    background-color: rgba(220, 38, 38, 0.1) !important;
+}
+
+html.dark-mode table.dataTable tbody tr:hover td,
+body.dark-mode table.dataTable tbody tr:hover td {
+    background-color: rgba(220, 38, 38, 0.1) !important;
+    color: #e8e8e8 !important;
+}
+
+/* Dark mode for badge elements */
+html.dark-mode .course-badge,
+body.dark-mode .course-badge {
+    background: #3a2a6a !important;
+    color: #e0d5ff !important;
+}
+
+html.dark-mode .section-badge,
+body.dark-mode .section-badge {
+    background: #1e3a8a !important;
+    color: #bfdbfe !important;
+}
+
+html.dark-mode .sy-badge,
+body.dark-mode .sy-badge {
+    background: #1b4332 !important;
+    color: #bbf7d0 !important;
+}

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -212,6 +213,45 @@
         }
 
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
+
+        .darkmode-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .darkmode-toggle:hover {
+            background: #fee2e2; color: var(--red); border-color: #fecaca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
+        }
+
+        .darkmode-toggle:active { transform: scale(0.95); }
+
+        body.dark-mode .darkmode-toggle {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .darkmode-toggle:hover {
+            background: rgba(220,38,38,0.2);
+            color: #ff6b6b;
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            transform: translateY(-2px);
+        }
+
         .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
         .topbar-title span { color: var(--red); font-weight: 600; }
 
@@ -243,6 +283,7 @@
         .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
 
+        /* ── CLICKABLE DATE BADGE ── */
         .date-badge {
             font-size: 12.5px;
             color: #888;
@@ -250,6 +291,378 @@
             border: 1px solid #e5e5e5;
             border-radius: 8px;
             padding: 6px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            user-select: none;
+        }
+
+        body.dark-mode .date-badge {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e0e0e0;
+        }
+
+        .date-badge:hover {
+            border-color: #d0d0d0;
+            color: #666;
+        }
+
+        body.dark-mode .date-badge:hover {
+            border-color: #444;
+            color: #fff;
+        }
+
+        .date-badge i { font-size: 11px; }
+        .date-badge .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #16a34a;
+            animation: pulse-green 1.8s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50%       { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        /* =============================================
+           DATE & TIME MODAL
+        ============================================= */
+        .dt-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .dt-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .dt-modal {
+            background: #fff;
+            border-radius: 22px;
+            width: 360px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transform: scale(0.88) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        body.dark-mode .dt-modal {
+            background: #1a1a1a;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+        }
+
+        .dt-overlay.open .dt-modal {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* Modal gradient header */
+        .dt-modal-header {
+            background: linear-gradient(135deg, #7f0000 0%, #b91c1c 45%, #dc2626 100%);
+            padding: 20px 22px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dt-modal-header::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            pointer-events: none;
+        }
+
+        .dt-modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            pointer-events: none;
+        }
+
+        .dt-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dt-header-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dt-close-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .dt-close-btn:hover { background: rgba(255,255,255,0.25); }
+
+        /* Live clock inside modal header */
+        .dt-clock-display {
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dt-time-big {
+            font-size: 42px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -1px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dt-time-big .colon {
+            animation: blink-colon 1s step-end infinite;
+            display: inline-block;
+            margin: 0 1px;
+        }
+
+        @keyframes blink-colon {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.15; }
+        }
+
+        .dt-time-ampm {
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.7);
+            margin-left: 6px;
+            align-self: flex-end;
+            margin-bottom: 6px;
+        }
+
+        .dt-date-sub {
+            font-size: 12.5px;
+            color: rgba(255,255,255,0.65);
+            margin-top: 4px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Analog clock */
+        .dt-analog-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 16px 0 8px;
+        }
+
+        .analog-clock {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #fafafa;
+            border: 3px solid #e5e5e5;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.08), 0 4px 18px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .analog-clock {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.3);
+        }
+
+        /* Hour markers */
+        .clock-mark {
+            position: absolute;
+            width: 2px;
+            border-radius: 2px;
+            background: #888;
+        }
+
+        body.dark-mode .clock-mark {
+            background: #666;
+        }
+
+        /* Center dot */
+        .clock-center {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--red);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 0 0 2px #fff;
+        }
+
+        body.dark-mode .clock-center {
+            box-shadow: 0 0 0 2px #2a2a2a;
+        }
+
+        /* Hands */
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .hour-hand   { width: 3.5px; height: 28px; background: #333; margin-left: -1.75px; }
+        .minute-hand { width: 2.5px; height: 36px; background: #333; margin-left: -1.25px; }
+        .second-hand { width: 1.5px; height: 40px; background: var(--red); margin-left: -0.75px; }
+
+        body.dark-mode .hour-hand   { background: #e0e0e0; }
+        body.dark-mode .minute-hand { background: #e0e0e0; }
+
+        /* Calendar */
+        .dt-calendar { padding: 0 18px 18px; }
+
+        .cal-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 2px;
+        }
+
+        .cal-nav-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .cal-nav-btn:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: var(--red);
+        }
+
+        body.dark-mode .cal-nav-btn {
+            background: #3a3a3a;
+            border-color: #555;
+            color: #999;
+        }
+
+        body.dark-mode .cal-nav-btn:hover {
+            background: rgba(220,38,38,0.2);
+            border-color: var(--red);
+            color: #ff6b6b;
+        }
+
+        .cal-month-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        body.dark-mode .cal-month-label { color: #fff; }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .cal-day-name {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            padding: 4px 0 6px;
+        }
+
+        body.dark-mode .cal-day-name { color: #999; }
+
+        .cal-day {
+            text-align: center;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #1a1a1a;
+            padding: 7px 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            line-height: 1;
+        }
+
+        body.dark-mode .cal-day { color: #e0e0e0; }
+
+        .cal-day:hover:not(.empty):not(.today) {
+            background: #fafafa;
+            color: var(--red);
+        }
+
+        body.dark-mode .cal-day:hover:not(.empty):not(.today) {
+            background: #3a3a3a;
+        }
+
+        .cal-day.empty  { cursor: default; color: transparent; }
+        .cal-day.other-month { color: #aaa; }
+        body.dark-mode .cal-day.other-month { color: #666; }
+
+        .cal-day.today {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: #fff !important;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(220,38,38,0.35);
+        }
+
+        .cal-day.selected:not(.today) {
+            background: #fee2e2;
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        body.dark-mode .cal-day.selected:not(.today) {
+            background: rgba(220,38,38,0.2);
         }
 
         /* Welcome banner */
@@ -431,6 +844,7 @@
             font-size: 13px !important;
             outline: none !important;
             transition: border-color 0.2s !important;
+            color: #333 !important; background: #fff !important;
         }
 
         .dataTables_filter input:focus {
@@ -444,13 +858,22 @@
             padding: 4px 8px !important;
             font-family: 'Poppins', sans-serif !important;
             font-size: 13px !important;
+            color: #333 !important; background: #fff !important;
         }
 
+        .dataTables_wrapper { color: #333 !important; }
+        .dataTables_length { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
+        .dataTables_length label { color: #333 !important; font-weight: 500; }
+        .dataTables_filter { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; float: right; }
+        .dataTables_filter label { color: #333 !important; font-weight: 500; }
+        .dataTables_info { color: #555 !important; font-weight: 500 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-top: 10px; }
+        .dataTables_paginate { color: #333 !important; }
         .dataTables_paginate .paginate_button {
             border-radius: 6px !important;
             font-family: 'Poppins', sans-serif !important;
             font-size: 13px !important;
             padding: 4px 10px !important;
+            color: #333 !important; background: #f5f5f5 !important; border-color: #ddd !important;
         }
 
         .dataTables_paginate .paginate_button.current {
@@ -573,6 +996,36 @@
     color: #e5e5e5;
     margin: 0 2px;
 }
+
+        /* =============== DARK MODE =============== */
+        body.dark-mode { background: #1a1a1a; color: #e0e0e0; }
+        body.dark-mode .topbar { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
+        body.dark-mode .page-header h1 { color: #fff; }
+        body.dark-mode .table-card { background: #2a2a2a; border: 1px solid #3a3a3a; }
+        body.dark-mode .table-card-header { background: #3a3a3a; border-bottom: 1px solid #3a3a3a; }
+        body.dark-mode .table-card-header h2 { color: #fff; }
+        body.dark-mode .table-card-header p { color: #999; }
+        body.dark-mode .company-count-badge { background: rgba(220,38,38,0.2) !important; color: #ff6b6b !important; }
+        body.dark-mode .table-card-body table.dataTable thead th { background: #3a3a3a; color: #e0e0e0; border-bottom: 1px solid #555; }
+        body.dark-mode .table-card-body table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid #2a2a2a; }
+        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
+        body.dark-mode .dataTables_wrapper { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_length { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; }
+        body.dark-mode .dataTables_length label { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_length select { background: #2a2a2a !important; color: #e0e0e0 !important; border-color: #555 !important; }
+        body.dark-mode .dataTables_filter { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; float: right; }
+        body.dark-mode .dataTables_filter label { color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_filter input { background: #2a2a2a !important; color: #e0e0e0 !important; border-color: #555 !important; }
+        body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
+        body.dark-mode .dataTables_info { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; }
+        body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !important; border-color: #555 !important; color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_paginate .paginate_button:hover { background: rgba(220,38,38,0.2) !important; border-color: var(--red) !important; color: #ff6b6b !important; }
+        body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
+        body.dark-mode .dataTables_paginate .paginate_button.disabled { color: #777 !important; }
+        body.dark-mode .dashboard-footer { background: #2a2a2a; border-top: 1px solid #3a3a3a; color: #999; }
+        body.dark-mode .dashboard-footer a { color: #999; }
+        body.dark-mode .dashboard-footer a:hover { color: var(--red); }
+        body.dark-mode .dashboard-footer .divider { color: #555; }
     </style>
 </head>
 
@@ -646,6 +1099,9 @@
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa fa-bars"></i>
             </button>
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
+                <i class="fa fa-moon" id="darkmodeIcon"></i>
+            </button>
             <span class="topbar-title">
                 On-the-Job Training <span>Information Management System</span>
             </span>
@@ -664,7 +1120,12 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1>Home <span>Dashboard</span></h1>
-            <div class="date-badge" id="currentDate"></div>
+            <!-- Clickable date badge -->
+            <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
+                <span class="pulse-dot"></span>
+                <i class="fa fa-calendar-alt"></i>
+                <span id="currentDate"></span>
+            </div>
         </div>
 
         <!-- Welcome Banner -->
@@ -783,8 +1244,8 @@
         </div>
 
     </div>
-    <footer class="dashboard-footer">
-    <div class="footer-left">
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
             © 1998–2026 <span>Polytechnic University of the Philippines</span>
@@ -837,8 +1298,224 @@
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
     });
-</script>
 
+    /* ══════════════════════════════════════════════
+       DATE & TIME MODAL
+    ══════════════════════════════════════════════ */
+
+    const dtOverlay  = document.getElementById('dtOverlay') || createDTModal();
+    const dtCloseBtn = document.getElementById('dtCloseBtn');
+    const dateBadge  = document.getElementById('dateBadge');
+
+    function createDTModal() {
+        const html = `
+        <div class="dt-overlay" id="dtOverlay">
+            <div class="dt-modal" id="dtModal">
+                <div class="dt-modal-header">
+                    <div class="dt-header-top">
+                        <span class="dt-header-title"><i class="fa fa-clock" style="margin-right:6px;"></i>Date & Time</span>
+                        <button class="dt-close-btn" id="dtCloseBtn"><i class="fa fa-times"></i></button>
+                    </div>
+                    <div class="dt-clock-display">
+                        <div class="dt-time-big">
+                            <span id="dtHours">00</span>
+                            <span class="colon">:</span>
+                            <span id="dtMinutes">00</span>
+                            <span class="colon">:</span>
+                            <span id="dtSeconds">00</span>
+                            <span class="dt-time-ampm" id="dtAmPm">AM</span>
+                        </div>
+                        <div class="dt-date-sub" id="dtDateSub"></div>
+                    </div>
+                </div>
+                <div class="dt-analog-wrap">
+                    <div class="analog-clock" id="analogClock">
+                        <div class="clock-center"></div>
+                        <div class="hand hour-hand" id="hourHand"></div>
+                        <div class="hand minute-hand" id="minuteHand"></div>
+                        <div class="hand second-hand" id="secondHand"></div>
+                    </div>
+                </div>
+                <div class="dt-calendar">
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" id="calPrev"><i class="fa fa-chevron-left"></i></button>
+                        <span class="cal-month-label" id="calMonthLabel"></span>
+                        <button class="cal-nav-btn" id="calNext"><i class="fa fa-chevron-right"></i></button>
+                    </div>
+                    <div class="cal-grid" id="calGrid"></div>
+                </div>
+            </div>
+        </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', html);
+        return document.getElementById('dtOverlay');
+    }
+
+    /* Open / Close */
+    if (dateBadge) {
+        dateBadge.addEventListener('click', function () {
+            dtOverlay.classList.add('open');
+            startClock();
+            renderCalendar(calViewYear, calViewMonth);
+        });
+    }
+
+    function closeModal() {
+        dtOverlay.classList.remove('open');
+        stopClock();
+    }
+
+    if (dtCloseBtn) {
+        dtCloseBtn.addEventListener('click', closeModal);
+    }
+    dtOverlay.addEventListener('click', function (e) {
+        if (e.target === dtOverlay) closeModal();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    /* ── Digital Clock ── */
+    let clockRAF = null;
+
+    function startClock() {
+        function tick() {
+            const now  = new Date();
+            let   h    = now.getHours();
+            const m    = now.getMinutes();
+            const s    = now.getSeconds();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+
+            document.getElementById('dtHours').textContent   = String(h).padStart(2,'0');
+            document.getElementById('dtMinutes').textContent = String(m).padStart(2,'0');
+            document.getElementById('dtSeconds').textContent = String(s).padStart(2,'0');
+            document.getElementById('dtAmPm').textContent    = ampm;
+            document.getElementById('dtDateSub').textContent =
+                now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+            /* ── Analog hands ── */
+            const secDeg  = s * 6;
+            const minDeg  = m * 6 + s * 0.1;
+            const hourDeg = (h % 12) * 30 + m * 0.5;
+
+            document.getElementById('secondHand').style.transform = `rotate(${secDeg}deg)`;
+            document.getElementById('minuteHand').style.transform = `rotate(${minDeg}deg)`;
+            document.getElementById('hourHand').style.transform   = `rotate(${hourDeg}deg)`;
+
+            clockRAF = requestAnimationFrame(tick);
+        }
+        tick();
+    }
+
+    function stopClock() {
+        if (clockRAF) { cancelAnimationFrame(clockRAF); clockRAF = null; }
+    }
+
+    /* ── Build hour tick marks ── */
+    (function buildMarks() {
+        const clock = document.getElementById('analogClock');
+        if (!clock) return;
+        for (let i = 0; i < 12; i++) {
+            const mark = document.createElement('div');
+            mark.className = 'clock-mark';
+            const angle  = i * 30;
+            mark.style.cssText = `
+                position: absolute;
+                width:  ${i % 3 === 0 ? 2.5 : 1.5}px;
+                height: ${i % 3 === 0 ? 8 : 5}px;
+                background: currentColor;
+                border-radius: 2px;
+                top: 4px;
+                left: calc(50% - ${i % 3 === 0 ? 1.25 : 0.75}px);
+                transform-origin: center 53px;
+                transform: rotate(${angle}deg);
+            `;
+            clock.appendChild(mark);
+        }
+    })();
+
+    /* ── Calendar ── */
+    const MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+    const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+    const today       = new Date();
+    let calViewYear   = today.getFullYear();
+    let calViewMonth  = today.getMonth();
+    let selectedDay   = today.getDate();
+
+    const calPrev = document.getElementById('calPrev');
+    const calNext = document.getElementById('calNext');
+
+    if (calPrev) {
+        calPrev.addEventListener('click', function () {
+            calViewMonth--;
+            if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+            renderCalendar(calViewYear, calViewMonth);
+        });
+    }
+
+    if (calNext) {
+        calNext.addEventListener('click', function () {
+            calViewMonth++;
+            if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+            renderCalendar(calViewYear, calViewMonth);
+        });
+    }
+
+    function renderCalendar(year, month) {
+        document.getElementById('calMonthLabel').textContent = `${MONTHS[month]} ${year}`;
+
+        const grid      = document.getElementById('calGrid');
+        grid.innerHTML  = '';
+
+        /* Day-name headers */
+        DAYS.forEach(d => {
+            const el = document.createElement('div');
+            el.className   = 'cal-day-name';
+            el.textContent = d;
+            grid.appendChild(el);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        /* Empty leading cells */
+        for (let i = 0; i < firstDay; i++) {
+            const el = document.createElement('div');
+            el.className = 'cal-day empty';
+            grid.appendChild(el);
+        }
+
+        /* Day cells */
+        for (let d = 1; d <= daysInMonth; d++) {
+            const el = document.createElement('div');
+            el.className   = 'cal-day';
+            el.textContent = d;
+
+            const isToday  = d === today.getDate() &&
+                             month === today.getMonth() &&
+                             year  === today.getFullYear();
+            const isSel    = d === selectedDay &&
+                             month === calViewMonth &&
+                             year  === calViewYear;
+
+            if (isToday) el.classList.add('today');
+            else if (isSel) el.classList.add('selected');
+
+            el.addEventListener('click', function () {
+                selectedDay  = d;
+                calViewYear  = year;
+                calViewMonth = month;
+                renderCalendar(year, month);
+            });
+
+            grid.appendChild(el);
+        }
+    }
+</script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
