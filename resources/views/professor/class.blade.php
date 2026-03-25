@@ -16,6 +16,29 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* Smaller font for table and action buttons */
+        .table-card-body table {
+            font-size: 13px;
+        }
+        .table-card-body table th,
+        .table-card-body table td {
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        .btn-action, .btn-edit, .btn-remove, .btn-template, .btn-announce {
+            font-size: 12px !important;
+            padding: 7px 14px !important;
+        }
+        .btn-action i, .btn-edit i, .btn-remove i, .btn-template i, .btn-announce i {
+            font-size: 13px !important;
+        }
+        .modal-field-label, .modal-field-input, .modal-field-select, .modal-field-textarea {
+            font-size: 13px !important;
+        }
+        .room-name-text {
+            font-size: 13px !important;
+        }
+
         :root {
     --red:        #dc2626;
     --red-dark:   #991b1b;

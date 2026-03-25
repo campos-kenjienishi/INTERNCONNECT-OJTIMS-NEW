@@ -1212,9 +1212,19 @@
                         </div>
                     </div>
 
+
+                    <div class="modal-section"><i class="fa fa-lock"></i> Set Password</div>
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-lock"></i> Password</label>
+                        <input class="field-input" type="password" name="password" placeholder="Enter password" required minlength="8">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-check-circle"></i> Confirm Password</label>
+                        <input class="field-input" type="password" name="password_confirmation" placeholder="Re-enter password" required minlength="8">
+                    </div>
                     <div class="field-group">
                         <small style="color:#666;display:block;margin-top:4px;">
-                            Temporary password will be generated automatically and sent to the professor email.
+                            The coordinator sets the password. Please share it securely with the professor.
                         </small>
                     </div>
 

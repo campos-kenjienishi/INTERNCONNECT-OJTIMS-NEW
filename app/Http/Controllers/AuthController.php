@@ -8,7 +8,6 @@ use App\Models\Enroll;
 use App\Models\Classes;
 use App\Models\Company;
 use App\Models\Courses;
-use App\Mail\TemporaryPasswordNotification;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Schedule;
@@ -170,9 +169,8 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'subject_code' => 'required|string|max:255',
             'subject_description' => 'required|string|max:255',
+            'password' => 'required|string|min:8|confirmed',
         ]);
-
-        $temporaryPassword = Str::random(8);
 
         $user = new User();
         $professor = new Professor();
@@ -185,13 +183,12 @@ class AuthController extends Controller
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->full_name = $user->first_name . ' ' . $user->last_name;
-        $user->password = Hash::make($temporaryPassword);
+        $user->password = Hash::make($request->password);
         $user->role = 2;
 
         $professor->email = $request->email;
         $professor->full_name = $user->full_name;
 
-        Mail::to($user->email)->send(new TemporaryPasswordNotification($temporaryPassword));
         $res = $user->save();
 
         if ($res) {
@@ -245,9 +242,27 @@ class AuthController extends Controller
         $userName = '';
         $loginId = Session::get('loginId');
         $sixMonthsAgo = Carbon::now()->subMonths(6);
+        $class = [];
         if ($loginId) {
             $data = User::where('id', '=', $loginId)->first();
             $userName = $data->full_name;
+            // Get all rooms (classes) where this professor is adviser
+            $class = Classes::where('adviser_name', $userName)->get();
+            // For each room, preload students
+            foreach ($class as $room) {
+                $room->students = User::where('status', 1)
+                    ->whereHas('studentInfo', function ($query) use ($room, $data) {
+                        $query->where('class_id', $room->id);
+                        if (empty($room->school_year_start) || empty($room->school_year_end)) {
+                            $query->orWhere(function ($legacy) use ($room, $data) {
+                                $legacy->whereNull('class_id')
+                                    ->where('course', $room->course)
+                                    ->where('adviser_name', $data->full_name);
+                            });
+                        }
+                    })
+                    ->get();
+            }
         }
         $roleCount = User::where('role', 0)
             ->where(function ($query) use ($userName, $loginId) {
@@ -271,7 +286,7 @@ class AuthController extends Controller
             return $currentYear >= $startYear && $currentYear <= $startYear + 3;
         });
         $companyNames = $companies->pluck('company_name')->toArray();
-        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount'));
+        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount', 'class'));
     }
 
     public function pending(){
