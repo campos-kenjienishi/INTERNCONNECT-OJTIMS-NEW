@@ -94,6 +94,19 @@
     function normalizeSpokenSymbols(text) {
         var normalized = " " + text + " ";
 
+        // Suffix normalization (spoken to written)
+        var suffixReplacements = [
+            { pattern: /\s+junior\s+/gi, value: " Jr " },
+            { pattern: /\s+senior\s+/gi, value: " Sr " },
+            { pattern: /\s+the\s+second\s+|\s+second\s+/gi, value: " II " },
+            { pattern: /\s+the\s+third\s+|\s+third\s+/gi, value: " III " },
+            { pattern: /\s+the\s+fourth\s+|\s+fourth\s+/gi, value: " IV " },
+            { pattern: /\s+the\s+fifth\s+|\s+fifth\s+/gi, value: " V " }
+        ];
+        suffixReplacements.forEach(function (item) {
+            normalized = normalized.replace(item.pattern, item.value);
+        });
+
         var replacements = [
             { pattern: /\s+at\s+sign\s+/gi, value: " @ " },
             { pattern: /\s+forward\s+slash\s+/gi, value: " / " },
