@@ -796,7 +796,7 @@
                 </div>
             </div>
             <button class="btn-add-room" data-bs-toggle="modal" data-bs-target="#addRoomModal">
-                <i class="fa fa-plus"></i> Add New Room
+                <i class="fa fa-plus"></i> Add New Class
             </button>
         </div>
 
