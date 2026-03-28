@@ -617,7 +617,7 @@
 
         <!-- Students Table Card -->
         <div class="table-card">
-            <div class="table-card-header">
+            <div class="table-card-header" style="flex-wrap: wrap; gap: 16px;">
                 <div class="table-card-header-left">
                     <div class="header-icon"><i class="fa fa-users"></i></div>
                     <div>
@@ -625,6 +625,15 @@
                         <p>All enrolled OJT students and their subject codes</p>
                     </div>
                 </div>
+                <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
+                    <label for="course" style="margin-bottom:0; font-size:13px; font-weight:600;">Filter by Course:</label>
+                    <select name="course" id="course" class="form-select" style="width:auto; min-width:160px;" onchange="this.form.submit()">
+                        <option value="">All Courses</option>
+                        @foreach($course as $c)
+                            <option value="{{ $c->course }}" {{ request('course') == $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
+                        @endforeach
+                    </select>
+                </form>
                 <div class="student-count-badge">
                     <i class="fa fa-user-graduate"></i>
                     {{ count($studentData) }} {{ count($studentData) == 1 ? 'student' : 'students' }}
