@@ -572,10 +572,16 @@ public function allStudents()
     // Get the current date and subtract 6 months
     $sixMonthsAgo = Carbon::now()->subMonths(6);
 
+    $selectedCourse = request('course');
     $students = User::where('role', 0)
-                ->where('adviser_name', $user->full_name)
-                ->where('created_at', '>=', $sixMonthsAgo) // Add condition for created_at
-                ->get();
+        ->whereHas('studentInfo', function ($query) use ($user, $selectedCourse) {
+            $query->where('adviser_name', $user->full_name);
+            if ($selectedCourse) {
+                $query->where('course', $selectedCourse);
+            }
+        })
+        ->where('created_at', '>=', $sixMonthsAgo)
+        ->get();
     $studentData = [];
     
     // Initialize subject data array outside the loop

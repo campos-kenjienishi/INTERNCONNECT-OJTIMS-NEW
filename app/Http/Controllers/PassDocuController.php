@@ -39,21 +39,24 @@ class PassDocuController extends Controller
             $userName = $data->full_name;
         }
 
-        // Fetch all file categories, no filter
-        $files = FileCategory::all();
+        // Fetch only file categories created by this professor
+        $professor = Professor::where('user_id', $data->id)->first();
+        $files = $professor ? FileCategory::where('professor_id', $professor->id)->get() : collect();
 
         return view('professor.fileCategory', compact('data', 'userName', 'files'));
     }
 
 
-     public function fileCategory(Request $request){
-        
-        
-        $files =new FileCategory();
+    public function fileCategory(Request $request){
+        $files = new FileCategory();
         $files->fileName = $request->fileName;
         $files->uploadedBy = $request->uploadedBy;
+        // Attach professor_id
+        $user = User::where('id', Session::get('loginId'))->first();
+        $professor = Professor::where('user_id', $user->id)->first();
+        $files->professor_id = $professor ? $professor->id : null;
         $res = $files->save();
-        
+
         if($res){
             AuditLogger::log(
                 'FileCategory',
@@ -61,7 +64,7 @@ class PassDocuController extends Controller
                 'Added new file category: ' . $files->fileName,
                 Session::get('loginId') ?? null,
                 null,
-                ['fileName' => $files->fileName, 'uploadedBy' => $files->uploadedBy]
+                ['fileName' => $files->fileName, 'uploadedBy' => $files->uploadedBy, 'professor_id' => $files->professor_id]
             );
             return back()->with('success','You have added the course successfully!');
         }
@@ -100,8 +103,10 @@ class PassDocuController extends Controller
             $user = User::where('id', '=', Session::get('loginId'))->first();
         }
 
-        // Fetch all file categories added by professors
-        $fileCategories = FileCategory::all();
+        // Fetch only file categories from student's professor
+        $student = Student::where('user_id', $user->id)->first();
+        $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
+        $fileCategories = $professor ? FileCategory::where('professor_id', $professor->id)->get() : collect();
 
         // Student's own uploaded files
         $data = FileRequirement::where('uploadedBy', '=', $user->full_name)->get();

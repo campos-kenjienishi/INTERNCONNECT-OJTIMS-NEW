@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class FileCategory extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['fileName', 'uploadedBy', 'professor_id'];
+
+    public function professor()
+    {
+        return $this->belongsTo(Professor::class, 'professor_id');
+    }
 }

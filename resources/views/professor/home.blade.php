@@ -29,6 +29,8 @@
             background: #f5f5f5;
             color: #1a1a1a;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* =============== SIDEBAR =============== */
@@ -1029,6 +1031,7 @@
     </style>
 </head>
 
+
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -1115,7 +1118,7 @@
     </div>
 
     <!-- Page Content -->
-    <div class="page-content">
+    <div class="page-content" style="flex:1 0 auto;">
 
         <!-- Page Header -->
         <div class="page-header">
@@ -1154,101 +1157,80 @@
                     <i class="fa fa-chalkboard"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-num">{{ isset($classCount) ? $classCount : '—' }}</div>
+                    <div class="stat-num">{{ isset($class) ? count($class) : (isset($classrooms) ? count($classrooms) : 0) }}</div>
                     <div class="stat-name">Active Classes</div>
                 </div>
             </a>
-
-            <a href="{{ url('/reportsExpiredProf') }}" class="stat-card">
-                <div class="stat-icon amber">
-                    <i class="fa fa-file-contract"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-num">MOA</div>
-                    <div class="stat-name">Partner Agreements</div>
-                </div>
-            </a>
         </div>
 
-        <!-- Companies Table -->
-        <div class="table-card">
+        <!-- Students by Class/Section -->
+        <div class="table-card" style="margin-top:32px;">
             <div class="table-card-header">
                 <h2>
-                    <div class="header-icon"><i class="fa fa-building"></i></div>
-                    Partner Companies
+                    <div class="header-icon"><i class="fa fa-users"></i></div>
+                    Students by Class/Section
                 </h2>
-                <div class="company-count-badge">
-                    <i class="fa fa-building"></i>
-                    {{ count($companies) }} {{ count($companies) == 1 ? 'company' : 'companies' }}
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <select id="courseFilter" style="border-radius:8px;padding:6px 12px;font-size:13px;">
+                        <option value="">All Courses</option>
+                        @if(isset($class))
+                            @foreach($class->pluck('course')->unique() as $course)
+                                <option value="{{ $course }}">{{ $course }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                    <select id="classFilter" style="border-radius:8px;padding:6px 12px;font-size:13px;">
+                        <option value="">All Classes</option>
+                        @if(isset($class))
+                            @foreach($class as $room)
+                                <option value="{{ $room->room }}">{{ $room->room }}</option>
+                            @endforeach
+                        @endif
+                    </select>
                 </div>
             </div>
-
-            <div class="table-card-body">
-
-                <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                <script>
-                    $(document).ready(function () {
-                        $('#companyTable').DataTable({
-                            "order": [[0, 'desc']],
-                            "columnDefs": [
-                                { "targets": 0, "visible": false }
-                            ]
-                        });
-                    });
-                </script>
-
-                <table id="companyTable" class="display" style="width:100%">
+            <div class="table-card-body" style="padding: 0;">
+                <div style="overflow-x:auto;">
+                <table id="studentsTable" class="display" style="width:100%;">
                     <thead>
                         <tr>
-                            <th>id</th>
-                            <th>Company Name</th>
-                            <th>Address</th>
-                            <th>Contact No.</th>
+                            <th>Student Name</th>
                             <th>Email</th>
+                            <th>Course</th>
+                            <th>Class/Section</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($companies as $company)
-                        <tr>
-                            <td>{{ $company->id }}</td>
-                            <td>
-                                <div class="company-cell">
-                                    <div class="company-icon"><i class="fa fa-building"></i></div>
-                                    <span class="company-name-text">{{ $company->company_name }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <i class="fa fa-map-marker-alt" style="color:var(--red);font-size:12px;"></i>
-                                    {{ $company->company_address }}
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <i class="fa fa-phone" style="color:var(--red);font-size:12px;"></i>
-                                    {{ $company->companyNo }}
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <i class="fa fa-envelope" style="color:var(--red);font-size:12px;"></i>
-                                    {{ $company->company_email }}
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
+                        @if(isset($class) && count($class) > 0)
+                            @foreach($class as $room)
+                                @if(isset($room->students) && count($room->students) > 0)
+                                    @foreach($room->students as $student)
+                                        <tr data-course="{{ $room->course }}" data-class="{{ $room->room }}">
+                                            <td>{{ $student->full_name }}</td>
+                                            <td>{{ $student->email }}</td>
+                                            <td>{{ $room->course }}</td>
+                                            <td>{{ $room->room }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            @endforeach
+                        @endif
                     </tbody>
                 </table>
-
+                </div>
+                @if(!(isset($class) && count($class) > 0))
+                    <div style="color:#888; font-size:13px; padding:18px;">No classes found.</div>
+                @endif
             </div>
         </div>
 
-    </div>
-    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+
+<!-- Dashboard Footer (restored, only at the bottom) -->
+<footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
     <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            &copy; 1998–{{ date('Y') }} <span>Polytechnic University of the Philippines</span>
         </span>
     </div>
     <div class="footer-links">
@@ -1266,6 +1248,34 @@
 
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    var table = $('#studentsTable').DataTable({
+        "paging": true,
+        "info": false,
+        "lengthChange": false,
+        "pageLength": 8,
+        "order": [[0, 'asc']],
+        "language": {
+            "emptyTable": "No students to display"
+        }
+    });
+
+    $('#courseFilter').on('change', function() {
+        var val = $(this).val();
+        table.column(2).search(val ? '^' + $.fn.dataTable.util.escapeRegex(val) + '$' : '', true, false).draw();
+        $('#classFilter').val('');
+    });
+    $('#classFilter').on('change', function() {
+        var val = $(this).val();
+        table.column(3).search(val ? '^' + $.fn.dataTable.util.escapeRegex(val) + '$' : '', true, false).draw();
+        $('#courseFilter').val('');
+    });
+});
+</script>
 
 <script>
     // Current date
@@ -1310,61 +1320,19 @@
     function createDTModal() {
         const html = `
         <div class="dt-overlay" id="dtOverlay">
-            <div class="dt-modal" id="dtModal">
-                <div class="dt-modal-header">
-                    <div class="dt-header-top">
-                        <span class="dt-header-title"><i class="fa fa-clock" style="margin-right:6px;"></i>Date & Time</span>
-                        <button class="dt-close-btn" id="dtCloseBtn"><i class="fa fa-times"></i></button>
-                    </div>
-                    <div class="dt-clock-display">
-                        <div class="dt-time-big">
-                            <span id="dtHours">00</span>
-                            <span class="colon">:</span>
-                            <span id="dtMinutes">00</span>
-                            <span class="colon">:</span>
-                            <span id="dtSeconds">00</span>
-                            <span class="dt-time-ampm" id="dtAmPm">AM</span>
-                        </div>
-                        <div class="dt-date-sub" id="dtDateSub"></div>
-                    </div>
-                </div>
-                <div class="dt-analog-wrap">
-                    <div class="analog-clock" id="analogClock">
-                        <div class="clock-center"></div>
-                        <div class="hand hour-hand" id="hourHand"></div>
-                        <div class="hand minute-hand" id="minuteHand"></div>
-                        <div class="hand second-hand" id="secondHand"></div>
-                    </div>
-                </div>
-                <div class="dt-calendar">
-                    <div class="cal-nav">
-                        <button class="cal-nav-btn" id="calPrev"><i class="fa fa-chevron-left"></i></button>
-                        <span class="cal-month-label" id="calMonthLabel"></span>
-                        <button class="cal-nav-btn" id="calNext"><i class="fa fa-chevron-right"></i></button>
-                    </div>
-                    <div class="cal-grid" id="calGrid"></div>
-                </div>
-            </div>
-        </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', html);
-        return document.getElementById('dtOverlay');
-    }
 
-    /* Open / Close */
-    if (dateBadge) {
-        dateBadge.addEventListener('click', function () {
-            dtOverlay.classList.add('open');
-            startClock();
-            renderCalendar(calViewYear, calViewMonth);
-        });
-    }
-
-    function closeModal() {
-        dtOverlay.classList.remove('open');
-        stopClock();
-    }
-
+            <!-- Dashboard Footer (restored) -->
+            <footer class="dashboard-footer">
+                <div class="footer-left">
+                    <span class="footer-logo"><img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP Logo" style="height:18px;vertical-align:middle;margin-right:8px;opacity:0.8;"></span>
+                    <span class="footer-copy">&copy; 1998–{{ date('Y') }} <strong>Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                    <span class="divider">|</span>
+                    <span class="footer-links">
+                        <a href="https://www.pup.edu.ph/terms/" target="_blank">Terms</a> ·
+                        <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy</a>
+                    </span>
+                </div>
+            </footer>
     if (dtCloseBtn) {
         dtCloseBtn.addEventListener('click', closeModal);
     }
@@ -1399,9 +1367,9 @@
             const minDeg  = m * 6 + s * 0.1;
             const hourDeg = (h % 12) * 30 + m * 0.5;
 
-            document.getElementById('secondHand').style.transform = `rotate(${secDeg}deg)`;
-            document.getElementById('minuteHand').style.transform = `rotate(${minDeg}deg)`;
-            document.getElementById('hourHand').style.transform   = `rotate(${hourDeg}deg)`;
+            document.getElementById('secondHand').style.transform = 'rotate(' + secDeg + 'deg)';
+            document.getElementById('minuteHand').style.transform = 'rotate(' + minDeg + 'deg)';
+            document.getElementById('hourHand').style.transform   = 'rotate(' + hourDeg + 'deg)';
 
             clockRAF = requestAnimationFrame(tick);
         }
@@ -1422,15 +1390,14 @@
             const angle  = i * 30;
             mark.style.cssText = `
                 position: absolute;
-                width:  ${i % 3 === 0 ? 2.5 : 1.5}px;
-                height: ${i % 3 === 0 ? 8 : 5}px;
+                width:  ' + (i % 3 === 0 ? 2.5 : 1.5) + 'px;
+                height: ' + (i % 3 === 0 ? 8 : 5) + 'px;
                 background: currentColor;
                 border-radius: 2px;
                 top: 4px;
-                left: calc(50% - ${i % 3 === 0 ? 1.25 : 0.75}px);
+                left: calc(50% - ' + (i % 3 === 0 ? 1.25 : 0.75) + 'px);
                 transform-origin: center 53px;
-                transform: rotate(${angle}deg);
-            `;
+                transform: rotate(' + angle + 'deg);';
             clock.appendChild(mark);
         }
     })();
@@ -1465,7 +1432,7 @@
     }
 
     function renderCalendar(year, month) {
-        document.getElementById('calMonthLabel').textContent = `${MONTHS[month]} ${year}`;
+        document.getElementById('calMonthLabel').textContent = MONTHS[month] + ' ' + year;
 
         const grid      = document.getElementById('calGrid');
         grid.innerHTML  = '';
