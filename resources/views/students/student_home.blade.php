@@ -9,7 +9,6 @@
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -25,6 +24,7 @@
             --bg:           #f5f5f5;
             --surface:      #fff;
             --surface-2:    #fafafa;
+            --surface-3:    #f0f0f0;
             --border:       #f0f0f0;
             --border-2:     rgba(0,0,0,0.04);
             --text-primary: #1a1a1a;
@@ -53,7 +53,7 @@
             --row-hover:    rgba(220,38,38,0.1);
             --toggle-bg:    #2a2a2a;
             --toggle-color: #e8e8e8;
-            --footer-bg:    #1a1a1a;
+            --footer-bg:    #121212;
         }
 
         body {
@@ -174,6 +174,7 @@
         }
 
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
+
         .topbar-title { font-size: 13.5px; font-weight: 500; color: var(--text-secondary); }
         .topbar-title span { color: var(--red); font-weight: 600; }
         .topbar-right { display: flex; align-items: center; gap: 10px; }
@@ -196,8 +197,8 @@
             width: 38px; height: 38px; border-radius: 10px;
             background: var(--toggle-bg); border: 1px solid var(--border);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            color: var(--toggle-color); font-size: 16px; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); flex-shrink: 0;
-            transform-origin: center;
+            color: var(--toggle-color); font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); flex-shrink: 0;
         }
 
         .darkmode-toggle:hover {
@@ -206,15 +207,7 @@
             box-shadow: 0 6px 16px rgba(220,38,38,0.2);
         }
 
-        .darkmode-toggle:active {
-            transform: scale(0.95);
-        }
-
-        body.dark-mode .darkmode-toggle {
-            background: var(--toggle-bg);
-            border-color: var(--border);
-            color: var(--toggle-color);
-        }
+        .darkmode-toggle:active { transform: scale(0.95); }
 
         body.dark-mode .darkmode-toggle:hover {
             background: rgba(220,38,38,0.2);
@@ -234,7 +227,7 @@
         .page-header h1 { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
 
-        /* ── CLICKABLE DATE BADGE ── */
+        /* Date badge */
         .date-badge {
             font-size: 12.5px; color: var(--text-secondary);
             background: var(--surface); border: 1px solid var(--border);
@@ -248,6 +241,11 @@
             background: #fee2e2; border-color: #fecaca;
             color: var(--red); transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(220,38,38,0.12);
+        }
+
+        body.dark-mode .date-badge:hover {
+            background: rgba(220,38,38,0.15);
+            border-color: rgba(220,38,38,0.3);
         }
 
         .date-badge i { font-size: 11px; }
@@ -303,7 +301,7 @@
             text-decoration: none;
         }
 
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); text-decoration: none; }
 
         .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
         .stat-icon.red   { background: #fee2e2; color: var(--red); }
@@ -311,72 +309,207 @@
         .stat-icon.green { background: #dcfce7; color: #16a34a; }
         .stat-icon.amber { background: #fef9c3; color: #ca8a04; }
 
-        body.dark-mode .stat-icon.red   { background: rgba(220,38,38,0.2); color: #ff6b6b; }
-        body.dark-mode .stat-icon.blue  { background: rgba(37,99,235,0.2); color: #4f96ff; }
-        body.dark-mode .stat-icon.green { background: rgba(22,163,74,0.2); color: #22c55e; }
-        body.dark-mode .stat-icon.amber { background: rgba(202,138,4,0.2); color: #facc15; }
-
-        body.dark-mode .qa-icon.red { background: rgba(220,38,38,0.2); color: #ff6b6b; }
-        body.dark-mode .qa-icon.blue { background: rgba(37,99,235,0.2); color: #4f96ff; }
-        body.dark-mode .qa-icon.green { background: rgba(22,163,74,0.2); color: #22c55e; }
-        body.dark-mode .qa-icon.amber { background: rgba(202,138,4,0.2); color: #facc15; }
+        body.dark-mode .stat-icon.red   { background: rgba(220,38,38,0.2);  color: #ff6b6b; }
+        body.dark-mode .stat-icon.blue  { background: rgba(37,99,235,0.2);  color: #4f96ff; }
+        body.dark-mode .stat-icon.green { background: rgba(22,163,74,0.2);  color: #22c55e; }
+        body.dark-mode .stat-icon.amber { background: rgba(202,138,4,0.2);  color: #facc15; }
 
         .stat-info .stat-num  { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; }
         .stat-info .stat-name { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; }
 
-        /* =============== TABLE CARD =============== */
-        .content-grid { display: grid; grid-template-columns: 1fr; gap: 22px; }
-
-        .table-card {
-            background: var(--surface); border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid var(--border-2);
-            overflow: hidden; transition: background 0.3s;
+        /* =============== DASHBOARD GRID =============== */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 22px;
+            align-items: start;
         }
 
-        .table-card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 20px 24px; border-bottom: 1px solid var(--border);
+        .dash-right-col { display: flex; flex-direction: column; gap: 22px; }
+
+        /* =============== PANEL CARD =============== */
+        .panel-card {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-2);
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        .panel-card-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
             transition: border-color 0.3s;
         }
 
-        .table-card-header h2 { font-size: 16px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
-
-        .table-card-header h2 .header-icon {
-            width: 32px; height: 32px; border-radius: 8px; background: #fee2e2;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--red); font-size: 14px;
+        .panel-header-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: #fee2e2; display: flex;
+            align-items: center; justify-content: center;
+            color: var(--red); font-size: 14px; flex-shrink: 0;
         }
 
-        body.dark-mode .table-card-header h2 .header-icon { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+        body.dark-mode .panel-header-icon { background: rgba(220,38,38,0.2); color: #ff6b6b; }
 
-        .table-card-body { padding: 0; overflow-x: auto; }
+        .panel-card-header h2 { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+        .panel-card-header p  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
-        .table-card-body .dataTables_wrapper { padding: 16px 20px; font-family: 'Poppins', sans-serif; font-size: 13.5px; color: var(--text-primary); }
-        .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
+        /* =============== QUICK ACTIONS =============== */
+        .quick-actions-wrap { padding: 8px 0; }
 
-        .table-card-body table.dataTable thead th { background: var(--surface-2); color: var(--text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; border-bottom: 1px solid var(--border); border-top: none; transition: background 0.3s; }
-        .table-card-body table.dataTable tbody td { padding: 12px 14px; color: var(--text-primary); border-bottom: 1px solid var(--border); font-size: 13.5px; transition: color 0.3s; }
-        .table-card-body table.dataTable tbody tr:hover td { background: var(--row-hover); }
-        .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
+        .qa-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            text-decoration: none; color: var(--text-primary);
+            transition: all 0.2s;
+        }
 
-        .dataTables_filter input { border: 1px solid var(--input-border) !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; transition: border-color 0.2s !important; background: var(--surface) !important; color: var(--text-primary) !important; }
-        .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }
-        .dataTables_length select { border: 1px solid var(--input-border) !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; background: var(--surface) !important; color: var(--text-primary) !important; }
-        .dataTables_info { color: var(--text-secondary) !important; }
-        .dataTables_paginate .paginate_button { border-radius: 6px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; padding: 4px 10px !important; color: var(--text-primary) !important; }
-        .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
-        .dataTables_paginate .paginate_button:hover { background: #fee2e2 !important; border-color: #fecaca !important; color: var(--red) !important; }
+        .qa-item:hover {
+            background: #fff5f5;
+            padding-left: 26px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        body.dark-mode .qa-item:hover { background: rgba(220,38,38,0.08); }
+
+        .qa-icon-wrap {
+            width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; flex-shrink: 0; transition: all 0.2s;
+        }
+
+        .qa-icon-wrap.red    { background: #fee2e2; color: var(--red); }
+        .qa-icon-wrap.blue   { background: #dbeafe; color: #2563eb; }
+        .qa-icon-wrap.green  { background: #dcfce7; color: #16a34a; }
+        .qa-icon-wrap.purple { background: #ede9fe; color: #7c3aed; }
+        .qa-icon-wrap.amber  { background: #fef9c3; color: #ca8a04; }
+
+        body.dark-mode .qa-icon-wrap.red    { background: rgba(220,38,38,0.2);  color: #ff6b6b; }
+        body.dark-mode .qa-icon-wrap.blue   { background: rgba(37,99,235,0.2);  color: #4f96ff; }
+        body.dark-mode .qa-icon-wrap.green  { background: rgba(22,163,74,0.2);  color: #22c55e; }
+        body.dark-mode .qa-icon-wrap.purple { background: rgba(124,58,237,0.2); color: #a78bfa; }
+        body.dark-mode .qa-icon-wrap.amber  { background: rgba(202,138,4,0.2);  color: #facc15; }
+
+        .qa-text { flex: 1; }
+        .qa-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+        .qa-desc  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .qa-arrow { color: var(--text-muted); font-size: 11px; transition: all 0.2s; }
+        .qa-item:hover .qa-arrow { color: var(--red); transform: translateX(3px); }
+
+        /* =============== MILESTONE / JOURNEY =============== */
+        .milestone-wrap { padding: 20px; }
+
+        .milestone-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            margin-bottom: 20px; position: relative;
+        }
+
+        .milestone-item:last-child { margin-bottom: 0; }
+
+        .milestone-dot {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--surface-3); color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; flex-shrink: 0; border: 2px solid var(--border);
+            transition: all 0.3s; position: relative; z-index: 1;
+        }
+
+        .milestone-line {
+            position: absolute; left: 15px; top: 34px;
+            width: 2px; height: calc(100% + 6px);
+            background: var(--border); z-index: 0;
+        }
+
+        .milestone-item.done .milestone-dot {
+            background: #dcfce7; color: #16a34a; border-color: #16a34a;
+        }
+
+        .milestone-item.done .milestone-line { background: #16a34a; }
+
+        .milestone-item.active .milestone-dot {
+            background: #fee2e2; color: var(--red); border-color: var(--red);
+            box-shadow: 0 0 0 4px rgba(220,38,38,0.15);
+            animation: pulse-red 2s ease-in-out infinite;
+        }
+
+        body.dark-mode .milestone-item.done .milestone-dot  { background: rgba(22,163,74,0.2); color: #22c55e; border-color: #22c55e; }
+        body.dark-mode .milestone-item.active .milestone-dot { background: rgba(220,38,38,0.2); color: #ff6b6b; border-color: var(--red); }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(220,38,38,0.15); }
+            50%       { box-shadow: 0 0 0 8px rgba(220,38,38,0.05); }
+        }
+
+        .milestone-text { padding-top: 5px; }
+        .milestone-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+        .milestone-sub   { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        /* =============== TIPS =============== */
+        .tips-wrap { padding: 8px 20px 16px; }
+
+        .tip-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tip-item:last-child { border-bottom: none; }
+
+        .tip-icon {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: #fef9c3; color: #ca8a04;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; flex-shrink: 0; margin-top: 1px;
+        }
+
+        body.dark-mode .tip-icon { background: rgba(202,138,4,0.2); color: #facc15; }
+
+        .tip-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; padding-top: 4px; }
+
+        /* =============== ANNOUNCEMENTS =============== */
+        .announcement-item {
+            display: flex; gap: 14px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .announcement-item:last-child { border-bottom: none; }
+        .announcement-item:hover { background: var(--surface-2); }
+
+        .ann-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--red); flex-shrink: 0; margin-top: 5px;
+        }
+
+        .ann-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .ann-date  { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
+        .ann-body  { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+        .empty-ann {
+            padding: 32px 20px; text-align: center;
+            color: var(--text-muted); font-size: 13px;
+        }
+
+        .empty-ann i { font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4; }
 
         /* =============== FOOTER =============== */
         .dashboard-footer {
             background: var(--footer-bg); border-top: 1px solid var(--border);
-            color: var(--text-secondary); text-align: center; padding: 18px 28px;
+            color: var(--text-secondary);
+            padding: 18px 28px;
             font-size: 12.5px; margin-top: auto;
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: 8px; transition: background 0.3s, border-color 0.3s;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; gap: 6px;
+            transition: background 0.3s, border-color 0.3s;
         }
 
-        .dashboard-footer .footer-left { display: flex; align-items: center; gap: 8px; }
+        .dashboard-footer .footer-inner { display: flex; align-items: center; gap: 8px; }
         .dashboard-footer .footer-logo { width: 22px; height: 22px; object-fit: contain; opacity: 0.6; }
         .dashboard-footer .footer-copy { font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
         .dashboard-footer .footer-copy span { color: var(--red); font-weight: 600; }
@@ -385,9 +518,7 @@
         .dashboard-footer a:hover { color: var(--red); }
         .dashboard-footer .divider { color: var(--border); margin: 0 2px; }
 
-        /* =============================================
-           DATE & TIME MODAL
-        ============================================= */
+        /* =============== DATE-TIME MODAL =============== */
         .dt-overlay {
             position: fixed; inset: 0;
             background: rgba(0,0,0,0.5);
@@ -398,14 +529,11 @@
             transition: opacity 0.3s ease;
         }
 
-        .dt-overlay.open {
-            opacity: 1; pointer-events: all;
-        }
+        .dt-overlay.open { opacity: 1; pointer-events: all; }
 
         .dt-modal {
             background: var(--surface);
-            border-radius: 22px;
-            width: 360px;
+            border-radius: 22px; width: 360px;
             box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.05);
             overflow: hidden;
             transform: scale(0.88) translateY(20px);
@@ -413,12 +541,8 @@
             opacity: 0;
         }
 
-        .dt-overlay.open .dt-modal {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
+        .dt-overlay.open .dt-modal { transform: scale(1) translateY(0); opacity: 1; }
 
-        /* Modal gradient header */
         .dt-modal-header {
             background: linear-gradient(135deg, #7f0000 0%, #b91c1c 45%, #dc2626 100%);
             padding: 20px 22px 16px;
@@ -431,21 +555,8 @@
             background: rgba(255,255,255,0.06); pointer-events: none;
         }
 
-        .dt-modal-header::after {
-            content: ''; position: absolute; bottom: -30px; left: 20px;
-            width: 100px; height: 100px; border-radius: 50%;
-            background: rgba(255,255,255,0.04); pointer-events: none;
-        }
-
-        .dt-header-top {
-            display: flex; align-items: center; justify-content: space-between;
-            position: relative; z-index: 1;
-        }
-
-        .dt-header-title {
-            font-size: 13px; font-weight: 600;
-            color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px;
-        }
+        .dt-header-top { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
+        .dt-header-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; }
 
         .dt-close-btn {
             width: 28px; height: 28px; border-radius: 8px;
@@ -456,10 +567,7 @@
 
         .dt-close-btn:hover { background: rgba(255,255,255,0.25); }
 
-        /* Live clock inside modal header */
-        .dt-clock-display {
-            margin-top: 10px; position: relative; z-index: 1;
-        }
+        .dt-clock-display { margin-top: 10px; position: relative; z-index: 1; }
 
         .dt-time-big {
             font-size: 42px; font-weight: 800; color: #fff;
@@ -467,80 +575,32 @@
             display: flex; align-items: center; gap: 4px;
         }
 
-        .dt-time-big .colon {
-            animation: blink-colon 1s step-end infinite;
-            display: inline-block; margin: 0 1px;
-        }
+        .dt-time-big .colon { animation: blink-colon 1s step-end infinite; display: inline-block; margin: 0 1px; }
 
-        @keyframes blink-colon {
-            0%, 100% { opacity: 1; }
-            50%       { opacity: 0.15; }
-        }
+        @keyframes blink-colon { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
 
-        .dt-time-ampm {
-            font-size: 14px; font-weight: 700;
-            color: rgba(255,255,255,0.7); margin-left: 6px;
-            align-self: flex-end; margin-bottom: 6px;
-        }
+        .dt-time-ampm { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.7); margin-left: 6px; align-self: flex-end; margin-bottom: 6px; }
+        .dt-date-sub  { font-size: 12.5px; color: rgba(255,255,255,0.65); margin-top: 4px; font-weight: 500; }
 
-        .dt-date-sub {
-            font-size: 12.5px; color: rgba(255,255,255,0.65);
-            margin-top: 4px; font-weight: 500; letter-spacing: 0.3px;
-        }
-
-        /* Analog clock */
-        .dt-analog-wrap {
-            display: flex; justify-content: center;
-            padding: 16px 0 8px;
-        }
+        .dt-analog-wrap { display: flex; justify-content: center; padding: 16px 0 8px; }
 
         .analog-clock {
             width: 110px; height: 110px; border-radius: 50%;
-            background: var(--surface-2);
-            border: 3px solid var(--border);
+            background: var(--surface-2); border: 3px solid var(--border);
             position: relative;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.08), 0 4px 18px rgba(0,0,0,0.1);
         }
 
-        body.dark-mode .analog-clock {
-            border-color: #333;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.3);
-        }
-
-        /* Hour markers */
-        .clock-mark {
-            position: absolute; width: 2px; border-radius: 2px;
-            background: var(--text-muted);
-            left: 50%; transform-origin: bottom center;
-        }
-
-        /* Center dot */
-        .clock-center {
-            position: absolute; width: 10px; height: 10px; border-radius: 50%;
-            background: var(--red);
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 10;
-            box-shadow: 0 0 0 2px var(--surface);
-        }
-
-        /* Hands */
-        .hand {
-            position: absolute; bottom: 50%; left: 50%;
-            transform-origin: bottom center;
-            border-radius: 4px 4px 0 0;
-        }
-
+        .clock-mark { position: absolute; width: 2px; border-radius: 2px; background: var(--text-muted); left: 50%; transform-origin: bottom center; }
+        .clock-center { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--red); top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; box-shadow: 0 0 0 2px var(--surface); }
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 4px 4px 0 0; }
         .hour-hand   { width: 3.5px; height: 28px; background: var(--text-primary); margin-left: -1.75px; }
         .minute-hand { width: 2.5px; height: 36px; background: var(--text-primary); margin-left: -1.25px; }
         .second-hand { width: 1.5px; height: 40px; background: var(--red); margin-left: -0.75px; }
 
-        /* Calendar */
         .dt-calendar { padding: 0 18px 18px; }
 
-        .cal-nav {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 2px;
-        }
+        .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 2px; }
 
         .cal-nav-btn {
             width: 30px; height: 30px; border-radius: 8px;
@@ -550,47 +610,23 @@
         }
 
         .cal-nav-btn:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
-
-        .cal-month-label {
-            font-size: 14px; font-weight: 700; color: var(--text-primary);
-        }
-
-        .cal-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-        }
-
-        .cal-day-name {
-            text-align: center; font-size: 10px; font-weight: 700;
-            color: var(--text-muted); text-transform: uppercase;
-            padding: 4px 0 6px;
-        }
-
-        .cal-day {
-            text-align: center; font-size: 12.5px; font-weight: 500;
-            color: var(--text-primary); padding: 7px 4px;
-            border-radius: 8px; cursor: pointer; transition: all 0.15s;
-            line-height: 1;
-        }
-
+        .cal-month-label { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .cal-day-name { text-align: center; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; padding: 4px 0 6px; }
+        .cal-day { text-align: center; font-size: 12.5px; font-weight: 500; color: var(--text-primary); padding: 7px 4px; border-radius: 8px; cursor: pointer; transition: all 0.15s; line-height: 1; }
         .cal-day:hover:not(.empty):not(.today) { background: var(--surface-2); color: var(--red); }
         .cal-day.empty  { cursor: default; color: transparent; }
         .cal-day.other-month { color: var(--text-muted); }
+        .cal-day.today { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff !important; font-weight: 700; box-shadow: 0 3px 10px rgba(220,38,38,0.35); }
+        .cal-day.selected:not(.today) { background: #fee2e2; color: var(--red); font-weight: 700; }
 
-        .cal-day.today {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            color: #fff !important; font-weight: 700;
-            box-shadow: 0 3px 10px rgba(220,38,38,0.35);
-        }
+        /* =============== SIDEBAR OVERLAY =============== */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
 
-        .cal-day.selected:not(.today) {
-            background: #fee2e2; color: var(--red); font-weight: 700;
-        }
-
-        /* Sidebar overlay */
-        .sidebar-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); z-index: 999;
+        /* =============== RESPONSIVE =============== */
+        @media (max-width: 1100px) {
+            .dash-grid { grid-template-columns: 1fr; }
+            .dash-right-col { gap: 22px; }
         }
 
         @media (max-width: 900px) {
@@ -599,158 +635,14 @@
             .sidebar-overlay.active { display: block; }
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
-            .hero-section { flex-direction: column; gap: 24px; }
-            .hero-left { width: 100%; }
-            .hero-stats { width: 100%; grid-template-columns: repeat(2, 1fr); }
-            .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
-            .stats-grid { grid-template-columns: 1fr; }
+            .topbar-title { display: none; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
             .dt-modal { width: 92vw; }
-            .topbar { left: 0; }
+            .welcome-icon { display: none; }
         }
 
-        /* ─────────────────────────────────── 
-           UNIVERSAL DARK MODE ENHANCEMENTS
-        ─────────────────────────────────── */
-        
-        /* Dark mode hero section */
-        body.dark-mode .hero-section {
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
-        }
-
-        body.dark-mode .hero-left h2 { color: #fff; }
-        body.dark-mode .hero-left p { color: rgba(255,255,255,0.9); }
-        body.dark-mode .hero-stat-item {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        body.dark-mode .hero-stat-icon { background: rgba(255,255,255,0.12); }
-        body.dark-mode .hero-stat-num { color: #fff; }
-        body.dark-mode .hero-stat-label { color: rgba(255,255,255,0.8); }
-
-        /* Dark mode quick actions */
-        body.dark-mode .quick-action-card {
-            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-        }
-
-        body.dark-mode .quick-action-card::before {
-            background: rgba(220,38,38,0.1);
-        }
-
-        body.dark-mode .qa-content .qa-title { color: var(--text-primary); }
-        body.dark-mode .qa-content .qa-desc { color: var(--text-secondary); }
-        body.dark-mode .quick-action-card:hover .qa-arrow { color: var(--red); }
-
-        /* Dark mode stats cards */
-        body.dark-mode .stat-card {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(220,38,38,0.08) inset;
-        }
-
-        body.dark-mode .stat-card::before {
-            background: rgba(220,38,38,0.08);
-        }
-
-        body.dark-mode .stat-info .stat-num { color: var(--text-primary); }
-        body.dark-mode .stat-info .stat-name { color: var(--text-primary); }
-        body.dark-mode .stat-info .stat-desc { color: var(--text-secondary); }
-
-        /* Dark mode table */
-        body.dark-mode .table-card {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
-        }
-
-        body.dark-mode .table-card-body .dataTables_wrapper { color: var(--text-primary); }
-        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.08); }
-
-        /* Dark mode dataTables pagination */
-        body.dark-mode .dataTables_paginate .paginate_button:hover:not(.current) {
-            background: #fee2e2 !important;
-            color: var(--red) !important;
-        }
-
-        /* Dark mode date badge */
-        body.dark-mode .date-badge {
-            background: linear-gradient(135deg, var(--surface), var(--surface-2));
-            border-color: var(--border);
-            color: var(--text-primary);
-        }
-
-        body.dark-mode .date-badge:hover {
-            background: linear-gradient(135deg, rgba(220,38,38,0.15), rgba(220,38,38,0.1));
-            border-color: rgba(220,38,38,0.3);
-        }
-
-        /* Dark mode modal */
-        body.dark-mode .dt-modal {
-            box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
-        }
-
-        body.dark-mode .cal-nav-btn {
-            background: var(--surface-3);
-            border-color: var(--border);
-        }
-
-        /* Dark mode footer */
-        body.dark-mode .dashboard-footer {
-            background: #121212;
-            border-top-color: #2a2a2a;
-        }
-
-        /* Dark mode topbar */
-        body.dark-mode .topbar {
-            border-bottom-color: var(--border);
-        }
-
-        body.dark-mode .topbar-badge {
-            background: var(--surface-2);
-            color: var(--text-primary);
-        }
-
-        /* Dark mode page header */
-        body.dark-mode .page-header {
-            border-bottom-color: var(--border);
-        }
-
-        body.dark-mode .section-title { color: var(--text-primary); }
-
-        /* Dark mode buttons and inputs */
-        body.dark-mode .dataTables_filter input {
-            border-color: var(--input-border) !important;
-            background: var(--surface) !important;
-            color: var(--text-primary) !important;
-        }
-
-        body.dark-mode .dataTables_filter input::placeholder {
-            color: var(--text-muted) !important;
-        }
-
-        body.dark-mode .dataTables_length select {
-            border-color: var(--input-border) !important;
-            background: var(--surface) !important;
-            color: var(--text-primary) !important;
-        }
-
-        /* Dark mode page content and general elements */
-        body.dark-mode {
-            scrollbar-color: var(--toggle-bg) transparent;
-        }
-
-        body.dark-mode ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        body.dark-mode ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        body.dark-mode ::-webkit-scrollbar-thumb {
-            background: var(--toggle-bg);
-            border-radius: 4px;
-        }
-
-        body.dark-mode ::-webkit-scrollbar-thumb:hover {
-            background: var(--border);
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -822,11 +714,12 @@
 <!-- =============== MAIN CONTENT =============== -->
 <div class="main-content" id="mainContent">
 
+    <!-- Topbar -->
     <div class="topbar">
         <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle"><i class="fa fa-bars"></i></button>
             <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
-                <i class="fa fa-moon" id="darkmodeIcon"></i>
+                <i class="fa fa-moon"></i>
             </button>
             <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
         </div>
@@ -837,11 +730,12 @@
         </div>
     </div>
 
+    <!-- Page Content -->
     <div class="page-content">
 
+        <!-- Page Header -->
         <div class="page-header">
             <h1>Home <span>Dashboard</span></h1>
-            <!-- Clickable date badge -->
             <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
                 <span class="pulse-dot"></span>
                 <i class="fa fa-calendar-alt"></i>
@@ -849,6 +743,7 @@
             </div>
         </div>
 
+        <!-- Welcome Banner -->
         <div class="welcome-banner">
             <div class="welcome-text">
                 <h2>Welcome back, {{ $user->first_name }}! 👋</h2>
@@ -857,6 +752,7 @@
             <div class="welcome-icon">🎓</div>
         </div>
 
+        <!-- Stats Row -->
         <div class="stats-grid">
             <a href="{{ url('/student/files') }}" class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-cloud-download-alt"></i></div>
@@ -881,37 +777,201 @@
             </a>
         </div>
 
-        <!-- Partner Companies section removed for students -->
+        <!-- Main Dashboard Grid -->
+        <div class="dash-grid">
+
+            <!-- LEFT: Quick Actions + Announcements -->
+            <div style="display:flex; flex-direction:column; gap:22px;">
+
+                <!-- Quick Actions -->
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div class="panel-header-icon"><i class="fa fa-bolt"></i></div>
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Jump to the most important sections</p>
+                        </div>
+                    </div>
+                    <div class="quick-actions-wrap">
+                        <a href="{{ url('/student/ojtinfo') }}" class="qa-item">
+                            <div class="qa-icon-wrap red"><i class="fa fa-layer-group"></i></div>
+                            <div class="qa-text">
+                                <div class="qa-title">OJT Information</div>
+                                <div class="qa-desc">View your OJT details & status</div>
+                            </div>
+                            <i class="fa fa-chevron-right qa-arrow"></i>
+                        </a>
+                        <a href="{{ url('/student/class') }}" class="qa-item">
+                            <div class="qa-icon-wrap blue"><i class="fa fa-clipboard"></i></div>
+                            <div class="qa-text">
+                                <div class="qa-title">My Class</div>
+                                <div class="qa-desc">View your class & professor</div>
+                            </div>
+                            <i class="fa fa-chevron-right qa-arrow"></i>
+                        </a>
+                        <a href="{{ url('/student/files') }}" class="qa-item">
+                            <div class="qa-icon-wrap green"><i class="fa fa-download"></i></div>
+                            <div class="qa-text">
+                                <div class="qa-title">Downloadable Files</div>
+                                <div class="qa-desc">Get templates & forms</div>
+                            </div>
+                            <i class="fa fa-chevron-right qa-arrow"></i>
+                        </a>
+                        <a href="{{ url('/student/MOA') }}" class="qa-item">
+                            <div class="qa-icon-wrap purple"><i class="fa fa-file-alt"></i></div>
+                            <div class="qa-text">
+                                <div class="qa-title">MOA</div>
+                                <div class="qa-desc">Memorandum of Agreement</div>
+                            </div>
+                            <i class="fa fa-chevron-right qa-arrow"></i>
+                        </a>
+                        <a href="{{ url('/student/requirements') }}" class="qa-item" style="border-bottom:none;">
+                            <div class="qa-icon-wrap amber"><i class="fa fa-cloud-upload-alt"></i></div>
+                            <div class="qa-text">
+                                <div class="qa-title">Requirements</div>
+                                <div class="qa-desc">Submit & track your documents</div>
+                            </div>
+                            <i class="fa fa-chevron-right qa-arrow"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Announcements -->
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div class="panel-header-icon"><i class="fa fa-bullhorn"></i></div>
+                        <div>
+                            <h2>Announcements</h2>
+                            <p>Latest updates from your coordinator</p>
+                        </div>
+                    </div>
+                    @if(isset($announcements) && count($announcements) > 0)
+                        @foreach($announcements as $ann)
+                        <div class="announcement-item">
+                            <div class="ann-dot"></div>
+                            <div>
+                                <div class="ann-title">{{ $ann->title }}</div>
+                                <div class="ann-date">{{ \Carbon\Carbon::parse($ann->created_at)->format('M d, Y') }}</div>
+                                <div class="ann-body">{{ Str::limit($ann->content, 120) }}</div>
+                            </div>
+                        </div>
+                        @endforeach
+                    @else
+                        <div class="empty-ann">
+                            <i class="fa fa-bell-slash"></i>
+                            No announcements yet. Check back later.
+                        </div>
+                    @endif
+                </div>
+
+            </div>
+
+            <!-- RIGHT: Journey + Tips -->
+            <div class="dash-right-col">
+
+                <!-- OJT Journey -->
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div class="panel-header-icon"><i class="fa fa-chart-line"></i></div>
+                        <div>
+                            <h2>OJT Journey</h2>
+                            <p>Your internship milestones</p>
+                        </div>
+                    </div>
+                    <div class="milestone-wrap">
+                        <div class="milestone-item done">
+                            <div class="milestone-dot"><i class="fa fa-check"></i></div>
+                            <div class="milestone-line"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Account Created</div>
+                                <div class="milestone-sub">You're registered in the system</div>
+                            </div>
+                        </div>
+                        <div class="milestone-item active">
+                            <div class="milestone-dot"><i class="fa fa-circle"></i></div>
+                            <div class="milestone-line"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Submit Requirements</div>
+                                <div class="milestone-sub">Upload your required documents</div>
+                            </div>
+                        </div>
+                        <div class="milestone-item">
+                            <div class="milestone-dot"><i class="fa fa-file-signature"></i></div>
+                            <div class="milestone-line"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">MOA Signing</div>
+                                <div class="milestone-sub">Agreement with your company</div>
+                            </div>
+                        </div>
+                        <div class="milestone-item">
+                            <div class="milestone-dot"><i class="fa fa-flag"></i></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">OJT Completion</div>
+                                <div class="milestone-sub">Finish your internship hours</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Helpful Tips -->
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <div class="panel-header-icon"><i class="fa fa-lightbulb"></i></div>
+                        <div>
+                            <h2>Helpful Tips</h2>
+                            <p>Make the most of your OJT</p>
+                        </div>
+                    </div>
+                    <div class="tips-wrap">
+                        <div class="tip-item">
+                            <div class="tip-icon"><i class="fa fa-clock"></i></div>
+                            <div class="tip-text">Submit your requirements before the deadline to avoid delays in your OJT approval.</div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon"><i class="fa fa-file-alt"></i></div>
+                            <div class="tip-text">Download all necessary templates from the Files section early to stay prepared.</div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon"><i class="fa fa-user-tie"></i></div>
+                            <div class="tip-text">Keep your OJT Information updated with your company details and supervisor.</div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon"><i class="fa fa-bell"></i></div>
+                            <div class="tip-text">Check the Announcements section regularly for important updates from your coordinator.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
     </div>
 
-   <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
-    <div style="display:flex; align-items:center; gap:8px;">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-        <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
-        </span>
-    </div>
-    <div class="footer-links">
-        <a href="https://www.pup.edu.ph/" target="_blank">
-            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
-            PUP Website
-        </a>
-        <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
-        <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
-    </div>
-</footer>
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="footer-inner">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <span class="footer-copy">
+                © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            </span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank">
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                PUP Website
+            </a>
+            <span class="divider">|</span>
+            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        </div>
+    </footer>
+
 </div>
 
-<!-- =============================================
-     DATE & TIME MODAL
-============================================= -->
+<!-- =============== DATE & TIME MODAL =============== -->
 <div class="dt-overlay" id="dtOverlay">
     <div class="dt-modal" id="dtModal">
-
-        <!-- Gradient header with digital clock -->
         <div class="dt-modal-header">
             <div class="dt-header-top">
                 <span class="dt-header-title"><i class="fa fa-clock" style="margin-right:6px;"></i>Date & Time</span>
@@ -929,19 +989,14 @@
                 <div class="dt-date-sub" id="dtDateSub"></div>
             </div>
         </div>
-
-        <!-- Analog clock -->
         <div class="dt-analog-wrap">
             <div class="analog-clock" id="analogClock">
-                <!-- Hour markers injected by JS -->
                 <div class="clock-center"></div>
                 <div class="hand hour-hand"   id="hourHand"></div>
                 <div class="hand minute-hand" id="minuteHand"></div>
                 <div class="hand second-hand" id="secondHand"></div>
             </div>
         </div>
-
-        <!-- Calendar -->
         <div class="dt-calendar">
             <div class="cal-nav">
                 <button class="cal-nav-btn" id="calPrev"><i class="fa fa-chevron-left"></i></button>
@@ -950,7 +1005,6 @@
             </div>
             <div class="cal-grid" id="calGrid"></div>
         </div>
-
     </div>
 </div>
 
@@ -958,227 +1012,189 @@
     @include('students.terms_modal')
 @endif
 
-<script src="{{ url('/assets/js/main.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-/* ── Sidebar toggle ── */
-const sidebar     = document.getElementById('sidebar');
-const mainContent = document.getElementById('mainContent');
-const menuToggle  = document.getElementById('menuToggle');
-const overlay     = document.getElementById('sidebarOverlay');
+    /* ── Sidebar toggle ── */
+    const sidebar     = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const menuToggle  = document.getElementById('menuToggle');
+    const overlay     = document.getElementById('sidebarOverlay');
 
-menuToggle.addEventListener('click', function () {
-    const isMobile = window.innerWidth <= 900;
-    if (isMobile) {
-        sidebar.classList.toggle('mobile-open');
-        overlay.classList.toggle('active');
-    } else {
-        sidebar.classList.toggle('collapsed');
-        mainContent.classList.toggle('expanded');
-    }
-});
-
-overlay.addEventListener('click', function () {
-    sidebar.classList.remove('mobile-open');
-    overlay.classList.remove('active');
-});
-
-/* ───────────────────────────────────────
-   UNIVERSAL DARK MODE IMPLEMENTATION
-   ─────────────────────────────────────── */
-
-/* ── Live date in badge ── */
-const dateEl = document.getElementById('currentDate');
-function updateBadgeDate() {
-    const now = new Date();
-    dateEl.textContent = now.toLocaleDateString('en-US', {
-        weekday: 'short', year: 'numeric', month: 'long', day: 'numeric'
-    });
-}
-updateBadgeDate();
-setInterval(updateBadgeDate, 60000);
-
-/* ══════════════════════════════════════════════
-   DATE & TIME MODAL
-══════════════════════════════════════════════ */
-
-const dtOverlay  = document.getElementById('dtOverlay');
-const dtCloseBtn = document.getElementById('dtCloseBtn');
-const dateBadge  = document.getElementById('dateBadge');
-
-/* Open / Close */
-dateBadge.addEventListener('click', function () {
-    dtOverlay.classList.add('open');
-    startClock();
-    renderCalendar(calViewYear, calViewMonth);
-});
-
-function closeModal() {
-    dtOverlay.classList.remove('open');
-    stopClock();
-}
-
-dtCloseBtn.addEventListener('click', closeModal);
-dtOverlay.addEventListener('click', function (e) {
-    if (e.target === dtOverlay) closeModal();
-});
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeModal();
-});
-
-/* ── Digital Clock ── */
-let clockRAF = null;
-
-function startClock() {
-    function tick() {
-        const now  = new Date();
-        let   h    = now.getHours();
-        const m    = now.getMinutes();
-        const s    = now.getSeconds();
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
-
-        document.getElementById('dtHours').textContent   = String(h).padStart(2,'0');
-        document.getElementById('dtMinutes').textContent = String(m).padStart(2,'0');
-        document.getElementById('dtSeconds').textContent = String(s).padStart(2,'0');
-        document.getElementById('dtAmPm').textContent    = ampm;
-        document.getElementById('dtDateSub').textContent =
-            now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-
-        /* ── Analog hands ── */
-        const secDeg  = s * 6;
-        const minDeg  = m * 6 + s * 0.1;
-        const hourDeg = (h % 12) * 30 + m * 0.5;
-
-        document.getElementById('secondHand').style.transform = `rotate(${secDeg}deg)`;
-        document.getElementById('minuteHand').style.transform = `rotate(${minDeg}deg)`;
-        document.getElementById('hourHand').style.transform   = `rotate(${hourDeg}deg)`;
-
-        clockRAF = requestAnimationFrame(tick);
-    }
-    tick();
-}
-
-function stopClock() {
-    if (clockRAF) { cancelAnimationFrame(clockRAF); clockRAF = null; }
-}
-
-/* ── Build hour tick marks ── */
-(function buildMarks() {
-    const clock = document.getElementById('analogClock');
-    const r = 55; // half of 110px
-    for (let i = 0; i < 12; i++) {
-        const mark = document.createElement('div');
-        mark.className = 'clock-mark';
-        const angle  = i * 30;
-        const isHour = true;
-        mark.style.cssText = `
-            height: ${i % 3 === 0 ? 8 : 5}px;
-            width:  ${i % 3 === 0 ? 2 : 1.5}px;
-            top:    ${r - (i % 3 === 0 ? 8 : 5)}px;
-            left:   calc(50% - ${i % 3 === 0 ? 1 : 0.75}px);
-            transform-origin: bottom center;
-            transform: rotate(${angle}deg) translateY(${-(r - (i % 3 === 0 ? 8 : 5))}px) rotate(0deg);
-            position: absolute;
-        `;
-        // Simpler approach: position via rotation
-        mark.style.cssText = `
-            position: absolute;
-            width:  ${i % 3 === 0 ? 2.5 : 1.5}px;
-            height: ${i % 3 === 0 ? 8 : 5}px;
-            background: var(--text-muted);
-            border-radius: 2px;
-            top: 4px;
-            left: calc(50% - ${i % 3 === 0 ? 1.25 : 0.75}px);
-            transform-origin: bottom center;
-            transform: rotate(${angle}deg) translateY(0);
-        `;
-        /* Fix: use translate to push from center */
-        mark.style.top        = `${r - r + 4}px`;
-        mark.style.left       = `calc(50% - ${i % 3 === 0 ? 1.25 : 0.75}px)`;
-        mark.style.transformOrigin = `center ${r - 4}px`;
-        mark.style.transform  = `rotate(${angle}deg)`;
-        clock.appendChild(mark);
-    }
-})();
-
-/* ── Calendar ── */
-const MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-
-const today       = new Date();
-let calViewYear   = today.getFullYear();
-let calViewMonth  = today.getMonth();
-let selectedDay   = today.getDate();
-
-document.getElementById('calPrev').addEventListener('click', function () {
-    calViewMonth--;
-    if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
-    renderCalendar(calViewYear, calViewMonth);
-});
-
-document.getElementById('calNext').addEventListener('click', function () {
-    calViewMonth++;
-    if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
-    renderCalendar(calViewYear, calViewMonth);
-});
-
-function renderCalendar(year, month) {
-    document.getElementById('calMonthLabel').textContent = `${MONTHS[month]} ${year}`;
-
-    const grid      = document.getElementById('calGrid');
-    grid.innerHTML  = '';
-
-    /* Day-name headers */
-    DAYS.forEach(d => {
-        const el = document.createElement('div');
-        el.className   = 'cal-day-name';
-        el.textContent = d;
-        grid.appendChild(el);
+    menuToggle.addEventListener('click', function () {
+        const isMobile = window.innerWidth <= 900;
+        if (isMobile) {
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
     });
 
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    overlay.addEventListener('click', function () {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    });
 
-    /* Empty leading cells */
-    for (let i = 0; i < firstDay; i++) {
-        const el = document.createElement('div');
-        el.className = 'cal-day empty';
-        grid.appendChild(el);
+    /* ── Dark mode toggle ── */
+    const darkmodeToggle = document.getElementById('darkmodeToggle');
+    const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkmodeToggle.innerHTML = '<i class="fa fa-sun"></i>';
     }
 
-    /* Day cells */
-    for (let d = 1; d <= daysInMonth; d++) {
-        const el = document.createElement('div');
-        el.className   = 'cal-day';
-        el.textContent = d;
+    darkmodeToggle.addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        darkmodeToggle.innerHTML = isDark ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
+    });
 
-        const isToday  = d === today.getDate() &&
-                         month === today.getMonth() &&
-                         year  === today.getFullYear();
-        const isSel    = d === selectedDay &&
-                         month === calViewMonth &&
-                         year  === calViewYear;
-
-        if (isToday) el.classList.add('today');
-        else if (isSel) el.classList.add('selected');
-
-        el.addEventListener('click', function () {
-            selectedDay  = d;
-            calViewYear  = year;
-            calViewMonth = month;
-            renderCalendar(year, month);
+    /* ── Live date badge ── */
+    const dateEl = document.getElementById('currentDate');
+    function updateBadgeDate() {
+        dateEl.textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'short', year: 'numeric', month: 'long', day: 'numeric'
         });
-
-        grid.appendChild(el);
     }
-}
-</script>
-<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+    updateBadgeDate();
+    setInterval(updateBadgeDate, 60000);
 
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+    /* ── Date & Time Modal ── */
+    const dtOverlay  = document.getElementById('dtOverlay');
+    const dtCloseBtn = document.getElementById('dtCloseBtn');
+    const dateBadge  = document.getElementById('dateBadge');
+
+    dateBadge.addEventListener('click', function () {
+        dtOverlay.classList.add('open');
+        startClock();
+        renderCalendar(calViewYear, calViewMonth);
+    });
+
+    function closeModal() {
+        dtOverlay.classList.remove('open');
+        stopClock();
+    }
+
+    dtCloseBtn.addEventListener('click', closeModal);
+    dtOverlay.addEventListener('click', function (e) { if (e.target === dtOverlay) closeModal(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+    /* ── Digital + Analog Clock ── */
+    let clockRAF = null;
+
+    function startClock() {
+        function tick() {
+            const now  = new Date();
+            let   h    = now.getHours();
+            const m    = now.getMinutes();
+            const s    = now.getSeconds();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+
+            document.getElementById('dtHours').textContent   = String(h).padStart(2,'0');
+            document.getElementById('dtMinutes').textContent = String(m).padStart(2,'0');
+            document.getElementById('dtSeconds').textContent = String(s).padStart(2,'0');
+            document.getElementById('dtAmPm').textContent    = ampm;
+            document.getElementById('dtDateSub').textContent =
+                now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+            const secDeg  = s * 6;
+            const minDeg  = m * 6 + s * 0.1;
+            const hourDeg = (h % 12) * 30 + m * 0.5;
+
+            document.getElementById('secondHand').style.transform = `rotate(${secDeg}deg)`;
+            document.getElementById('minuteHand').style.transform = `rotate(${minDeg}deg)`;
+            document.getElementById('hourHand').style.transform   = `rotate(${hourDeg}deg)`;
+
+            clockRAF = requestAnimationFrame(tick);
+        }
+        tick();
+    }
+
+    function stopClock() {
+        if (clockRAF) { cancelAnimationFrame(clockRAF); clockRAF = null; }
+    }
+
+    /* ── Analog clock marks ── */
+    (function buildMarks() {
+        const clock = document.getElementById('analogClock');
+        for (let i = 0; i < 12; i++) {
+            const mark = document.createElement('div');
+            mark.className = 'clock-mark';
+            mark.style.cssText = `
+                position: absolute;
+                width:  ${i % 3 === 0 ? 2.5 : 1.5}px;
+                height: ${i % 3 === 0 ? 8 : 5}px;
+                background: var(--text-muted);
+                border-radius: 2px;
+                top: 4px;
+                left: calc(50% - ${i % 3 === 0 ? 1.25 : 0.75}px);
+                transform-origin: center 51px;
+                transform: rotate(${i * 30}deg);
+            `;
+            clock.appendChild(mark);
+        }
+    })();
+
+    /* ── Calendar ── */
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const today       = new Date();
+    let calViewYear   = today.getFullYear();
+    let calViewMonth  = today.getMonth();
+    let selectedDay   = today.getDate();
+
+    document.getElementById('calPrev').addEventListener('click', function () {
+        calViewMonth--;
+        if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+        renderCalendar(calViewYear, calViewMonth);
+    });
+
+    document.getElementById('calNext').addEventListener('click', function () {
+        calViewMonth++;
+        if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+        renderCalendar(calViewYear, calViewMonth);
+    });
+
+    function renderCalendar(year, month) {
+        document.getElementById('calMonthLabel').textContent = `${MONTHS[month]} ${year}`;
+        const grid = document.getElementById('calGrid');
+        grid.innerHTML = '';
+        DAYS.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'cal-day-name';
+            el.textContent = d;
+            grid.appendChild(el);
+        });
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let i = 0; i < firstDay; i++) {
+            const el = document.createElement('div');
+            el.className = 'cal-day empty';
+            grid.appendChild(el);
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+            const el = document.createElement('div');
+            el.className = 'cal-day';
+            el.textContent = d;
+            const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+            const isSel   = d === selectedDay && month === calViewMonth && year === calViewYear;
+            if (isToday) el.classList.add('today');
+            else if (isSel) el.classList.add('selected');
+            el.addEventListener('click', function () {
+                selectedDay = d; calViewYear = year; calViewMonth = month;
+                renderCalendar(year, month);
+            });
+            grid.appendChild(el);
+        }
+    }
+</script>
+
 </body>
 </html>
