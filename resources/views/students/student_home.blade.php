@@ -1012,12 +1012,7 @@
     @include('students.terms_modal')
 @endif
 
-<<<<<<< HEAD
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-=======
-
-<script src="{{ url('/assets/js/main.js') }}"></script>
->>>>>>> 0c6af076e7dbd634e86ac43d3eee4b738141676f
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
