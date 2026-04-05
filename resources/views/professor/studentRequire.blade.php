@@ -602,6 +602,11 @@
             <span class="nav-label">Maintenance</span>
             <span class="tooltip-label">Maintenance</span>
         </a>
+            <a href="{{ url('/professor/evaluation') }}" class="nav-item{{ request()->is('professor/evaluation*') ? ' active' : '' }}">
+            <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
+            <span class="nav-label">Evaluation</span>
+            <span class="tooltip-label">Evaluation</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">

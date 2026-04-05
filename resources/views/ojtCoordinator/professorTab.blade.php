@@ -969,7 +969,7 @@
             <span class="tooltip-label">Audit Log</span>
         </a>
 </li>
-    </nav>
+</nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/login') }}" class="nav-item">

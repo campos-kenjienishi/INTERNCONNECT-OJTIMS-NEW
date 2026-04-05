@@ -1082,6 +1082,11 @@
             <span class="nav-label">Maintenance</span>
             <span class="tooltip-label">Maintenance</span>
         </a>
+        <a href="{{ url('/professor/evaluation') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
+            <span class="nav-label">Evaluation</span>
+            <span class="tooltip-label">Evaluation</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -1159,6 +1164,16 @@
                 <div class="stat-info">
                     <div class="stat-num">{{ isset($class) ? count($class) : (isset($classrooms) ? count($classrooms) : 0) }}</div>
                     <div class="stat-name">Active Classes</div>
+                </div>
+            </a>
+
+            <a href="{{ url('/professor/evaluation') }}" class="stat-card">
+                <div class="stat-icon red">
+                    <i class="fa fa-star-half-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-num">View</div>
+                    <div class="stat-name">Evaluations</div>
                 </div>
             </a>
         </div>
