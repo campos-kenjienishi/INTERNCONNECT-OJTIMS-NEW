@@ -647,7 +647,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             <span class="tooltip-label">Audit Log</span>
         </a>
 </li>
-    </nav>
+</nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/login') }}" class="nav-item">

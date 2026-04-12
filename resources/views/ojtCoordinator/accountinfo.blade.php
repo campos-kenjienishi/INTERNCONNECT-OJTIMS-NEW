@@ -634,7 +634,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             <span class="tooltip-label">Audit Log</span>
         </a>
 </li>
-    </nav>
+</nav>
     
 
     <div class="sidebar-footer">

@@ -700,6 +700,11 @@
             <span class="nav-label">Requirements</span>
             <span class="tooltip-label">Requirements</span>
         </a>
+        <a href="{{ url('/student/evaluation') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
+            <span class="nav-label">Evaluation</span>
+            <span class="tooltip-label">Evaluation</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -773,6 +778,13 @@
                 <div class="stat-info">
                     <div class="stat-num">Info</div>
                     <div class="stat-name">OJT Information</div>
+                </div>
+            </a>
+            <a href="{{ url('/student/evaluation') }}" class="stat-card">
+                <div class="stat-icon red"><i class="fa fa-star-half-alt"></i></div>
+                <div class="stat-info">
+                    <div class="stat-num">Eval</div>
+                    <div class="stat-name">Supervisor Evaluation</div>
                 </div>
             </a>
         </div>

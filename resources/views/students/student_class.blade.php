@@ -836,6 +836,11 @@
             <span class="nav-label">Requirements</span>
             <span class="tooltip-label">Requirements</span>
         </a>
+            <a href="{{ url('/student/evaluation') }}" class="nav-item{{ request()->is('student/evaluation*') ? ' active' : '' }}">
+            <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
+            <span class="nav-label">Evaluation</span>
+            <span class="tooltip-label">Evaluation</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">

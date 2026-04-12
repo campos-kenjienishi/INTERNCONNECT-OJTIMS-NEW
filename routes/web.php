@@ -8,6 +8,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\PassDocuController;
 use App\Http\Controllers\MOAUploadController;
 use App\Http\Controllers\ProfessorController;
@@ -52,6 +53,11 @@ Route::get('/terms', function () {
 Route::get('/privacy', function () {
     return view('students.privacy');
 });
+
+Route::get('/evaluation/form/{token}', [EvaluationController::class, 'showSupervisorForm'])->name('evaluation.form.show');
+Route::post('/evaluation/form/{token}/review', [EvaluationController::class, 'reviewSupervisorForm'])->name('evaluation.form.review');
+Route::post('/evaluation/form/{token}', [EvaluationController::class, 'submitSupervisorForm'])->name('evaluation.form.submit');
+Route::get('/evaluation/submitted', [EvaluationController::class, 'thankYou'])->name('evaluation.form.thankyou');
 
 // ─── AUTHENTICATED: ANY LOGGED-IN USER ──────────────────────────────
 
@@ -112,6 +118,11 @@ Route::middleware(['role:0'])->group(function () {
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
     Route::post('/remove/filesReq/{id}', [PassDocuController::class,'removeFile']);
+    Route::get('/student/evaluation', [EvaluationController::class, 'studentIndex'])->name('student.evaluation');
+    Route::post('/student/evaluation/send', [EvaluationController::class, 'sendEvaluationForm'])->name('student.evaluation.send');
+    Route::post('/student/evaluation/{requestId}/resend', [EvaluationController::class, 'resendEvaluationForm'])->name('student.evaluation.resend');
+    Route::post('/student/evaluation/{requestId}/cancel', [EvaluationController::class, 'cancelEvaluationForm'])->name('student.evaluation.cancel');
+    Route::get('/student/evaluation/{requestId}', [EvaluationController::class, 'studentShowEvaluation'])->name('student.evaluation.show');
 });
 
 // ─── PROFESSOR (role 2) ─────────────────────────────────────────────
@@ -144,6 +155,13 @@ Route::middleware(['role:2'])->group(function () {
     Route::get('/reportsExpiredProf', [ReportsController::class, 'reportsExpiredProf'])->name('reportsExpiredProf');
     Route::match(['get', 'post'], '/ExpiredMOAReportsProf', [ReportsController::class, 'generateMOAReportProf'])->name('reports.generate.prof');
     Route::post('/professor/template/remove/{id}', [FileController::class, 'removeProfessorTemplate']);
+    Route::get('/professor/evaluation', [EvaluationController::class, 'professorIndex'])->name('professor.evaluation');
+    Route::get('/professor/evaluation/class/{classId}', [EvaluationController::class, 'professorClassList'])->name('professor.evaluation.class');
+    Route::get('/professor/evaluation/export', [EvaluationController::class, 'exportProfessorEvaluation'])->name('professor.evaluation.export');
+    Route::get('/professor/evaluation/print', [EvaluationController::class, 'printProfessorEvaluation'])->name('professor.evaluation.print');
+    Route::get('/professor/evaluation/history/{studentId}', [EvaluationController::class, 'professorStudentHistory'])->name('professor.evaluation.history');
+    Route::put('/professor/evaluation/template/{templateId}', [EvaluationController::class, 'updateTemplate'])->name('professor.evaluation.template.update');
+    Route::get('/professor/evaluation/{requestId}', [EvaluationController::class, 'professorShowEvaluation'])->name('professor.evaluation.show');
 });
 
 // ─── SHARED: ALL AUTHENTICATED USERS (roles 0, 1 & 2) ──────────────

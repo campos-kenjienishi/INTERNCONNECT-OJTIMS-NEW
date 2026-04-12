@@ -761,7 +761,7 @@ body.dark-mode .dashboard-footer .footer-logo {
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-    </nav>
+</nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/login') }}" class="nav-item">

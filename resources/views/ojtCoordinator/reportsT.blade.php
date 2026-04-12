@@ -448,7 +448,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-    </nav>
+</nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/login') }}" class="nav-item">
