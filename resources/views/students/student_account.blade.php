@@ -1069,6 +1069,9 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                         <input type="password" id="new_password" name="new_password" placeholder="Enter new password">
                         <i class="fa fa-eye pw-toggle" id="toggleNew"></i>
                     </div>
+                    <div style="margin-top:8px; margin-bottom:2px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
+                        <strong>Password requirements:</strong> Use 8 to 12 characters and do not share your password.
+                    </div>
                     <span class="text-error">@error('new_password') {{ $message }} @enderror</span>
 
                     <label class="modal-field-label"><i class="fa fa-check-circle"></i> Confirm New Password</label>

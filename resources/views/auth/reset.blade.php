@@ -110,6 +110,9 @@ $email = $_GET['email'] ?? '';
                         <input type="password" placeholder="Enter new password" name="password" id="new_password">
                         <i class="far fa-eye toggle-pw" id="toggleNewPassword"></i>
                     </div>
+                    <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
+                        <strong>Password requirements:</strong> Use at least 8 characters and make it different from your previous password.
+                    </div>
                     <!-- Strength bar -->
                     <div class="strength-wrap">
                         <div class="strength-bar-bg">

@@ -184,6 +184,7 @@
             z-index: 9999 !important;
             pointer-events: all !important;
         }
+
     </style>
 </head>
 
@@ -330,7 +331,7 @@
                             </div>
 
                             <div class="field-group">
-                                <label class="form-label">Password</label>
+                                <label class="form-label">Password <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(8-12 characters)</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-lock i-icon"></i>
                                     <input type="password" placeholder="Create password" name="password"

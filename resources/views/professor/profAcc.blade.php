@@ -1000,6 +1000,9 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                             <i class="fa fa-eye"></i>
                         </button>
                     </div>
+                    <div style="margin-top:8px; margin-bottom:2px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
+                        <strong>Password requirements:</strong> Use 8 to 12 characters and do not share your password.
+                    </div>
                     @error('new_password')
                         <div style="color:var(--red);font-size:12px;margin-top:4px;">{{ $message }}</div>
                     @enderror
