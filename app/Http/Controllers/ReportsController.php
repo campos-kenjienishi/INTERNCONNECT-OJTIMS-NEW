@@ -77,10 +77,29 @@ class ReportsController extends Controller
 
     public function generateReport(Request $request)
     {
+        $startYear = $request->input('start_year');
+        $endYear = $request->input('end_year');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $coursed = $request->input('course');
         $course = Courses::all();
+
+        // Backward compatibility: derive years if legacy date inputs are sent.
+        if (!$startYear && $startDate) {
+            $startYear = Carbon::parse($startDate)->year;
+        }
+        if (!$endYear && $endDate) {
+            $endYear = Carbon::parse($endDate)->year;
+        }
+
+        // Default to a wide range if filter values are missing.
+        $startYear = (int) ($startYear ?: 1900);
+        $endYear = (int) ($endYear ?: 2100);
+
+        if ($endYear < $startYear) {
+            [$startYear, $endYear] = [$endYear, $startYear];
+        }
+
         // Get the current user
         $user = [];
         if (Session::has('loginId')) {
@@ -90,8 +109,11 @@ class ReportsController extends Controller
         // Query users based on criteria
         $students = User::where('role', 0)
                         ->where('status', 1)
-                        ->whereBetween('created_at', [$startDate, $endDate])
-                        ->where('course', $coursed)
+                        ->whereYear('created_at', '>=', $startYear)
+                        ->whereYear('created_at', '<=', $endYear)
+                        ->whereHas('studentInfo', function ($query) use ($coursed) {
+                            $query->where('course', $coursed);
+                        })
                         ->get();
 
 
@@ -199,36 +221,10 @@ public function reportsExpired()
         }
 
         $course = Courses::all();
-    
-        // Get the current year
-        $currentYear = now()->year;
-    
-        // Retrieve the selected company or companies
-        $companies = Company::all(); // Get all companies
-    
-        $stu = Student::all();
-    
-        // Filter companies based on the start year of "school_year"
-        $companies = $companies->filter(function ($company) use ($currentYear) {
-            // Extract the start year from the "school_year" format
-            list($startYear, $endYear) = explode('-', $company->school_year);
-    
-            // Convert them to integers
-            $startYear = (int) $startYear;
-            $endYear = (int) $endYear;
-    
-          
-            return ($currentYear - $startYear) > 3;
-        });
-    
-        $companyNames = $companies->pluck('company_name')->toArray();
-    
-        // Retrieve students under the specified companies using where and get
-        $students = Student::whereHas('companies', function ($query) use ($companyNames) {
-            $query->whereIn('company_name', $companyNames);
-        })->get();
-    
-        return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user', 'stu','course'));
+
+        $companies = Company::all();
+
+        return view('ojtCoordinator.reportsExpired', compact('companies', 'user', 'course'));
     }
 
 
@@ -243,32 +239,18 @@ public function reportsExpired()
     $startYear = $validatedData['school_year_start'];
     $endYear = $validatedData['school_year_end'];
 
-    $schoolYear = $startYear . '-' . $endYear;
     $user = User::find(Session::get('loginId'));
     $course = Courses::all();
-    $currentYear = now()->year;
 
-    // Retrieve the selected company or companies
     $companyy = Company::where(function ($query) use ($startYear, $endYear) {
         $query->where('school_year', '>=', $startYear)
             ->where('school_year', '<=', $endYear);
     })->get();
 
-    $companies = $companyy->filter(function ($company) use ($currentYear, $validatedData) {
-        // Extract the start year from the "school_year" format
-        list($startYear, $endYear) = explode('-', $company->school_year);
-
-        // Convert them to integers
-        $startYear = (int) $startYear;
-        $endYear = (int) $endYear;
-
-        // Check if the difference between current year and start year is greater than 3
-        $isExpired = ($currentYear - $startYear) > 3;
-
-        // Check if the company has students associated with the specified course
+    $companies = $companyy->filter(function ($company) use ($validatedData) {
         $hasStudentsWithCourse = $company->students()->where('course', $validatedData['course'])->exists();
 
-        return $isExpired && $hasStudentsWithCourse;
+        return $hasStudentsWithCourse;
     });
     $companyNames = $companies->pluck('company_name')->toArray();
 
@@ -285,32 +267,26 @@ public function reportsExpired()
 public function sendEmailExpired(Request $request)
 {
     $email = $request->input('email');
-    $user = User::where('email', $email)->first(); // Retrieve the logged-in user
-    $currentYear = now()->year;
+    $course = $request->input('course');
 
-    // Retrieve the selected companies
-    $companies = Company::all()->filter(function ($company) use ($currentYear) {
-        // Extract the start year from the "school_year" format
-        list($startYear, $endYear) = explode('-', $company->school_year);
+    $companies = Company::all();
 
-        // Convert them to integers
-        $startYear = (int) $startYear;
-        $endYear = (int) $endYear;
-
-        // Check if the difference between current year and start year is greater than 3
-        $isExpired = ($currentYear - $startYear) > 3;
-
-        return $isExpired;
-    });
+    if ($course) {
+        $companies = $companies->filter(function ($company) use ($course) {
+            return $company->students()->where('course', $course)->exists();
+        });
+    }
 
     $companyNames = $companies->pluck('company_name')->toArray();
 
-    // Retrieve students under the specified companies
     $students = Student::whereHas('companies', function ($query) use ($companyNames) {
         $query->whereIn('company_name', $companyNames);
-    })->get();
+    })
+    ->when($course, function ($query) use ($course) {
+        $query->where('course', $course);
+    })
+    ->get();
 
-    // Send email with the data
     Mail::to($email)->send(new MOAReportEmail($companies, $students));
 
     return back()->with(['message' => 'Email sent successfully']);

@@ -437,7 +437,7 @@
                 <i class="fa fa-user-graduate" style="margin-right:6px; font-size:11px;"></i> Student OJT Info
             </a>
             <a href="{{ url('/reportsExpired') }}" class="nav-sub-item">
-                <i class="fa fa-calendar-times" style="margin-right:6px; font-size:11px;"></i> Expired MOA
+                <i class="fa fa-file-contract" style="margin-right:6px; font-size:11px;"></i> MOA
             </a>
         </div>
 
@@ -525,7 +525,7 @@
                 <div class="panel-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h2>Generate Report</h2>
-                    <p>Filter by date range and course to generate the OJT report</p>
+                    <p>Filter by year range and course to generate the OJT report</p>
                 </div>
             </div>
             <div class="panel-card-body">
@@ -533,12 +533,19 @@
                     @csrf
                     <div class="filter-grid">
                         <div class="field-group">
-                            <label class="field-label"><i class="fa fa-calendar-alt"></i> Start Date</label>
-                            <input class="field-input datepicker" type="text" id="start_date" name="start_date" placeholder="YYYY-MM-DD" required>
+                            <label class="field-label"><i class="fa fa-calendar-alt"></i> Start Year</label>
+                            <select class="field-select" id="start_year" name="start_year" required>
+                                <option value="">Select Start Year</option>
+                                @for ($year = (date('Y') - 10); $year <= (date('Y') + 10); $year++)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endfor
+                            </select>
                         </div>
                         <div class="field-group">
-                            <label class="field-label"><i class="fa fa-calendar-check"></i> End Date</label>
-                            <input class="field-input datepicker" type="text" id="end_date" name="end_date" placeholder="YYYY-MM-DD" required>
+                            <label class="field-label"><i class="fa fa-calendar-check"></i> End Year</label>
+                            <select class="field-select" id="end_year" name="end_year" required>
+                                <option value="">Select End Year</option>
+                            </select>
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
@@ -734,8 +741,28 @@
         $('#fileTable').DataTable({ order: [] });
     });
 
-    /* ── Datepicker ── */
-    flatpickr('.datepicker', { dateFormat: 'Y-m-d', allowInput: true });
+    /* ── Dynamic end year options ── */
+    document.addEventListener('DOMContentLoaded', function () {
+        const startYear = document.getElementById('start_year');
+        const endYear = document.getElementById('end_year');
+
+        function updateEndYears() {
+            const selectedStartYear = parseInt(startYear.value, 10);
+            endYear.innerHTML = '<option value="">Select End Year</option>';
+
+            if (!isNaN(selectedStartYear)) {
+                for (let year = selectedStartYear; year <= selectedStartYear + 10; year++) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    endYear.appendChild(option);
+                }
+            }
+        }
+
+        updateEndYears();
+        startYear.addEventListener('change', updateEndYears);
+    });
 
     /* ══════════════════════════════════════════════
        BUILD PRINT HTML
@@ -753,8 +780,8 @@
         const pageNum          = pageInfo.page + 1;
         const pageCount        = pageInfo.pages;
 
-        const startDate = document.getElementById('start_date').value || '—';
-        const endDate   = document.getElementById('end_date').value   || '—';
+        const startYear = document.getElementById('start_year').value || '—';
+        const endYear   = document.getElementById('end_year').value   || '—';
         const course    = document.getElementById('course').value     || '—';
 
         let rowsHTML = '';
@@ -835,8 +862,8 @@
                 <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Date Range:</span>
-                        <strong style="color:#111827;">${startDate} → ${endDate}</strong>
+                        <span style="color:#6b7280;">Year Range:</span>
+                        <strong style="color:#111827;">${startYear} → ${endYear}</strong>
                     </div>
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
