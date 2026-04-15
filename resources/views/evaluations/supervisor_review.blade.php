@@ -54,12 +54,10 @@
                 <div class="form-group">
                     <label class="form-label-shell">Signature Proof</label>
                     <div class="summary-card">
-                        @if(\Illuminate\Support\Str::endsWith(strtolower($signatureTempPath), ['.jpg', '.jpeg', '.png']))
-                            <img src="{{ asset('storage/' . $signatureTempPath) }}" alt="Supervisor Signature" style="max-width:100%; width:420px; border:1px solid #ddd; border-radius:10px;">
-                        @else
-                            <a href="{{ asset('storage/' . $signatureTempPath) }}" target="_blank" class="btn-eval btn-eval-outline">
-                                <i class="fa fa-file-pdf"></i> View Uploaded Signature File
-                            </a>
+                        @if(!empty($signaturePreviewDataUri) && str_starts_with($signaturePreviewMime, 'image/'))
+                            <img src="{{ $signaturePreviewDataUri }}" alt="Supervisor Signature" style="max-width:100%; width:420px; border:1px solid #ddd; border-radius:10px;">
+                        @elseif(!empty($signaturePreviewDataUri))
+                            <iframe src="{{ $signaturePreviewDataUri }}" title="Supervisor Signature" style="width:100%; height:420px; border:1px solid #ddd; border-radius:10px; background:#fff;"></iframe>
                         @endif
                         <div class="form-hint" style="margin-top:10px;">{{ $signatureOriginalName }}</div>
                     </div>

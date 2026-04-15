@@ -395,6 +395,7 @@ class EvaluationController extends Controller
         $signatureFile = $request->file('signature_file');
         $signatureTempPath = $signatureFile->store('evaluation-signatures/tmp', 'public');
         $signatureOriginalName = $signatureFile->getClientOriginalName();
+        $signaturePreview = $this->buildSignaturePreviewDataUri($signatureTempPath);
 
         $responses = [];
         foreach ($requestRow->template->items as $item) {
@@ -413,6 +414,8 @@ class EvaluationController extends Controller
             'validated' => $validated,
             'responses' => $responses,
             'signatureTempPath' => $signatureTempPath,
+            'signaturePreviewDataUri' => $signaturePreview['dataUri'],
+            'signaturePreviewMime' => $signaturePreview['mime'],
             'signatureOriginalName' => $signatureOriginalName,
         ]);
     }
@@ -513,6 +516,27 @@ class EvaluationController extends Controller
         return $finalPath;
     }
 
+    protected function buildSignaturePreviewDataUri(?string $path): array
+    {
+        if (empty($path)) {
+            return ['dataUri' => null, 'mime' => null];
+        }
+
+        $normalizedPath = str_replace('\\', '/', (string) $path);
+        if (!Storage::disk('public')->exists($normalizedPath)) {
+            return ['dataUri' => null, 'mime' => null];
+        }
+
+        $absolutePath = storage_path('app/public/' . $normalizedPath);
+        $mime = @mime_content_type($absolutePath) ?: 'application/octet-stream';
+        $content = Storage::disk('public')->get($normalizedPath);
+
+        return [
+            'dataUri' => 'data:' . $mime . ';base64,' . base64_encode($content),
+            'mime' => $mime,
+        ];
+    }
+
     protected function getExpectedSupervisorEmail($student)
     {
         if (!$student) {
@@ -543,9 +567,13 @@ class EvaluationController extends Controller
             return back()->with('error', 'Evaluation is not submitted yet.');
         }
 
+        $signaturePreview = $this->buildSignaturePreviewDataUri($requestRow->evaluation->signature_path);
+
         return view('evaluations.detail', [
             'requestRow' => $requestRow,
             'evaluation' => $requestRow->evaluation,
+            'signaturePreviewDataUri' => $signaturePreview['dataUri'],
+            'signaturePreviewMime' => $signaturePreview['mime'],
             'isProfessorView' => false,
             'backUrl' => '/student/evaluation',
         ]);
@@ -579,9 +607,13 @@ class EvaluationController extends Controller
             return back()->with('error', 'Evaluation is not submitted yet.');
         }
 
+        $signaturePreview = $this->buildSignaturePreviewDataUri($requestRow->evaluation->signature_path);
+
         return view('evaluations.detail', [
             'requestRow' => $requestRow,
             'evaluation' => $requestRow->evaluation,
+            'signaturePreviewDataUri' => $signaturePreview['dataUri'],
+            'signaturePreviewMime' => $signaturePreview['mime'],
             'isProfessorView' => true,
             'backUrl' => '/professor/evaluation/class/' . $class->id,
         ]);
