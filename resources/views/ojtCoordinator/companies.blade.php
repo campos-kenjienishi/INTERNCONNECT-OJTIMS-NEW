@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -586,7 +587,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
-            <span class="sidebar-brand-sub">OJT IMS</span>
+            <span class="sidebar-brand-sub">OJTIMS</span>
         </div>
     </a>
 
@@ -1241,5 +1242,6 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ url('/js/mobile-utils.js') }}"></script>
 </body>
 </html>

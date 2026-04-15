@@ -1609,24 +1609,27 @@ body.dark-mode .dashboard-footer .footer-copy {
     const menuToggle  = document.getElementById('menuToggle');
     const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-    });
+    if(menuToggle) {
+        menuToggle.addEventListener('click', function () {
+            const isMobile = window.innerWidth <= 900;
+            if (isMobile) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        });
+    }
 
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    });
+    if(overlay) {
+        overlay.addEventListener('click', function () {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        });
+    }
 
     $(document).ready(function () {
-
         // DataTable
         $('#fileTable').DataTable({ order: [] });
 
@@ -1707,10 +1710,9 @@ body.dark-mode .dashboard-footer .footer-copy {
                 }
             });
         });
-
     });
 
-    // Report generation
+    // Report generation preview
     function generateReportPreview() {
         var formData = new FormData(document.getElementById('reportForm'));
         $.ajax({
@@ -1728,21 +1730,9 @@ body.dark-mode .dashboard-footer .footer-copy {
             }
         });
     }
-
-    function printReport() {
-        var printContents = document.getElementById("printPreviewContent").innerHTML;
-        var printFrame = document.getElementById("printFrame").contentWindow;
-        printFrame.document.open();
-        printFrame.document.write('<html><head><title>Report</title></head><body>' + printContents + '</body></html>');
-        printFrame.document.close();
-        printFrame.focus();
-        printFrame.print();
-    }
-
-    flatpickr('.datepicker', { dateFormat: 'Y-m-d' });
 </script>
-<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

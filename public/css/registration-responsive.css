@@ -1,0 +1,310 @@
+/* ============================================================
+   REGISTRATION PAGE — RESPONSIVE ONLY CSS
+   File: public/css/registration-responsive.css
+
+   Link in registration.blade.php <head> (LAST, after custom.css):
+   <link rel="stylesheet" href="{{ asset('css/registration-responsive.css') }}">
+
+   ⚠️  Only handles responsiveness.
+       Does NOT change colors, fonts, or design.
+   ============================================================ */
+
+/* ============================================================
+   GLOBAL SAFE DEFAULTS
+   ============================================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ============================================================
+   MAIN WRAPPER
+   ============================================================ */
+.main-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+/* ============================================================
+   LOGIN CONTAINER — side-by-side on desktop (default)
+   ============================================================ */
+.login-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1100px;
+}
+
+.left-panel {
+    flex: 1;
+}
+
+.right-panel {
+    width: 460px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   FIELDS GRID — 2 columns on desktop
+   ============================================================ */
+.fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+}
+
+.field-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Academic year row */
+.year-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.year-row .input-wrap {
+    flex: 1;
+}
+
+.year-sep {
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Steps list on left panel */
+.steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.step-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.step-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.step-text strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+}
+
+/* ============================================================
+   BREAKPOINT: XL — Large Desktops (1280px+)
+   ============================================================ */
+@media (min-width: 1280px) {
+    .login-container {
+        max-width: 1200px;
+    }
+
+    .right-panel {
+        width: 500px;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: 2XL — TV / 4K (1920px+)
+   ============================================================ */
+@media (min-width: 1920px) {
+    .main-wrapper {
+        padding: 40px;
+    }
+
+    .login-container {
+        max-width: 1400px;
+    }
+
+    .right-panel {
+        width: 560px;
+    }
+
+    .hero-heading {
+        font-size: 3.2rem;
+    }
+
+    .hero-desc {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: MD — Tablets / iPad (max 1023px)
+   Left panel hidden, right panel (form) takes full width
+   ============================================================ */
+@media (max-width: 1023px) {
+    .main-wrapper {
+        align-items: flex-start;
+        padding: 16px;
+    }
+
+    .login-container {
+        flex-direction: column;
+        max-width: 720px;
+    }
+
+    /* ✅ HIDE LEFT PANEL COMPLETELY — show form first */
+    .left-panel {
+        display: none;
+    }
+
+    /* ✅ RIGHT PANEL takes full width */
+    .right-panel {
+        width: 100%;
+    }
+
+    /* 2-column grid stays on tablet — enough room */
+    .fields-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: SM — Large Phones (max 767px)
+   ============================================================ */
+@media (max-width: 767px) {
+    .main-wrapper {
+        padding: 12px;
+    }
+
+    .login-container {
+        max-width: 100%;
+    }
+
+    /* Switch to 1 column on phones */
+    .fields-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field-group.full-width {
+        grid-column: 1;
+    }
+
+    /* Prevent iOS zoom on input focus */
+    .input-wrap input,
+    .input-wrap select {
+        font-size: 16px;
+    }
+
+    /* Step indicator — slightly smaller */
+    .step-dot {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+
+    .step-label {
+        font-size: 10px;
+    }
+
+    /* Nav buttons */
+    .nav-btn-row {
+        flex-wrap: wrap;
+    }
+
+    .btn-proceed,
+    .btn-back-step {
+        font-size: 13px;
+        padding: 11px 14px;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: XS — Small Phones (max 479px)
+   e.g. iPhone SE, iPhone XR, small Android phones
+   ============================================================ */
+@media (max-width: 479px) {
+    .main-wrapper {
+        padding: 8px;
+    }
+
+    /* Step line shorter on tiny screens */
+    .step-line {
+        max-width: 40px;
+    }
+
+    .step-dot {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+    .step-label {
+        font-size: 9.5px;
+    }
+
+    .btn-proceed {
+        font-size: 12px;
+        padding: 10px 12px;
+    }
+
+    .btn-back-step {
+        font-size: 12px;
+        padding: 10px 12px;
+    }
+
+    /* Year row fully stacked */
+    .year-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .year-sep {
+        text-align: center;
+    }
+}
+
+/* ============================================================
+   SPECIAL: Phone Landscape Mode
+   ============================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+    .main-wrapper {
+        align-items: flex-start;
+        padding: 8px 16px;
+    }
+
+    /* Left panel stays hidden in landscape too */
+    .left-panel {
+        display: none;
+    }
+
+    .login-container {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .right-panel {
+        width: 100%;
+    }
+
+    .fields-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

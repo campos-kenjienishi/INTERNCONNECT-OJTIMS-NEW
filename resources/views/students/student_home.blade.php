@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/student_home-responsive.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -730,7 +732,8 @@
         </div>
         <div class="topbar-right">
             <div class="topbar-badge">
-                <i class="fa fa-graduation-cap"></i> Student Portal
+                <i class="fa fa-graduation-cap"></i>
+                <span class="badge-label">Student Portal</span>
             </div>
         </div>
     </div>
@@ -1207,6 +1210,6 @@
         }
     }
 </script>
-
+<script src="{{ url('/js/mobile-utils.js') }}"></script>
 </body>
 </html>

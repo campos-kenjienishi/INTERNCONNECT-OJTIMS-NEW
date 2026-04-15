@@ -253,92 +253,68 @@
         /* Mobile overlay */
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
 
-/* ===== DARK MODE: COMPREHENSIVE STYLING ===== */
-body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
-body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
-body.dark-mode .page-header h1 { color: #fff; }
-body.dark-mode .breadcrumb { color: #999; }
-
-/* Stat cards */
-body.dark-mode .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-body.dark-mode .stat-num { color: #fff; }
-body.dark-mode .stat-name { color: #999; }
-
-/* Panel cards (Generate Report, Filter cards) */
-body.dark-mode .panel-card { background: #1a1a1a !important; border: 1px solid #3a3a3a !important; box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important; }
-body.dark-mode .panel-card-header { background: #1a1a1a !important; border-bottom: 1px solid #3a3a3a !important; }
-body.dark-mode .panel-card-header h2 { color: #fff !important; }
-body.dark-mode .panel-card-header p { color: #999 !important; }
-body.dark-mode .panel-card-body { color: #e8e8e8 !important; background: #1a1a1a !important; }
-
-/* Table cards */
-body.dark-mode .table-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
-body.dark-mode .table-card-header { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
-body.dark-mode .table-card-header h2 { color: #fff; }
-body.dark-mode .table-card-header p { color: #999; }
-body.dark-mode .file-count-badge { background: rgba(220,38,38,0.2); color: #ff6b6b; }
-body.dark-mode .count-badge { background: rgba(220,38,38,0.2) !important; color: #ff6b6b !important; }
-
-/* DataTables */
-body.dark-mode table.dataTable thead th { background: #2a2a2a; color: #aaa; border-bottom: 1px solid #3a3a3a; }
-body.dark-mode table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-body.dark-mode table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
-
-/* DataTables controls */
-body.dark-mode .dataTables_filter input { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
-body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
-body.dark-mode .dataTables_length select { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
-body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !important; border-color: #3a3a3a !important; color: #e0e0e0 !important; }
-body.dark-mode .dataTables_paginate .paginate_button:hover { background: #444 !important; border-color: #444 !important; }
-body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; }
-body.dark-mode .dataTables_info { color: #999 !important; }
-
-/* Form elements */
-body.dark-mode .field-input, body.dark-mode .field-select { background: #3a3a3a; color: #e0e0e0; border: 1px solid #3a3a3a; }
-body.dark-mode .field-input::placeholder { color: #888 !important; }
-body.dark-mode .field-input:focus, body.dark-mode .field-select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
-body.dark-mode .field-label { color: #e0e0e0; }
-
-/* Table cell content */
-body.dark-mode .name-text { color: #fff !important; }
-body.dark-mode .name-avatar { background: rgba(220,38,38,0.3) !important; color: #ff6b6b !important; }
-body.dark-mode .level-badge { background: rgba(37, 99, 235, 0.2) !important; color: #60a5fa !important; }
-body.dark-mode .date-badge { background: rgba(22, 163, 74, 0.2) !important; color: #86efac !important; }
-body.dark-mode .report-time-cell { color: #e0e0e0 !important; }
-body.dark-mode .position-cell { color: #e0e0e0 !important; }
-body.dark-mode .company-address-cell { color: #fff !important; }
-
-/* Buttons */
-body.dark-mode .btn-download { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
-body.dark-mode .btn-remove { border: 1.5px solid rgba(220,38,38,0.3); background: transparent; color: #ff6b6b; }
-body.dark-mode .btn-remove:hover { background: rgba(220,38,38,0.1); }
-body.dark-mode .btn-preview { background: transparent !important; border: 1.5px solid rgba(79, 70, 229, 0.3) !important; color: #818cf8 !important; }
-body.dark-mode .btn-preview:hover { background: rgba(79, 70, 229, 0.1) !important; border-color: rgba(79, 70, 229, 0.5) !important; }
-
-/* Modal */
-body.dark-mode .modal-content { background: #1a1a1a !important; box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important; }
-body.dark-mode .modal-body { background: #1a1a1a !important; color: #e8e8e8 !important; }
-body.dark-mode .modal-footer { background: #2a2a2a; border-top: 1px solid #3a3a3a; }
-body.dark-mode .btn-modal-close { background: #3a3a3a; border: 1px solid #3a3a3a; color: #e0e0e0; }
-body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); border-color: var(--red); color: #ff6b6b; }
-body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); }
-
-/* File dropzone */
-body.dark-mode .file-dropzone { border-color: #3a3a3a; background: #2a2a2a; }
-body.dark-mode .file-dropzone:hover, body.dark-mode .file-dropzone.dragover { border-color: var(--red); background: rgba(220,38,38,0.1); }
-body.dark-mode .file-dropzone-icon { background: rgba(220,38,38,0.2); }
-body.dark-mode .file-dropzone-title { color: #e0e0e0; }
-body.dark-mode .file-dropzone-sub { color: #999; }
-
-/* Footer */
-body.dark-mode .dashboard-footer { background: #1a1a1a; border-top: 1px solid #3a3a3a; color: #999; }
-body.dark-mode .dashboard-footer a { color: #999; }
-body.dark-mode .dashboard-footer a:hover { color: var(--red); }
-body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
-body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
-
-/* Cards */
-body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
+        /* ===== DARK MODE: COMPREHENSIVE STYLING ===== */
+        body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
+        body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
+        body.dark-mode .page-header h1 { color: #fff; }
+        body.dark-mode .breadcrumb { color: #999; }
+        body.dark-mode .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        body.dark-mode .stat-num { color: #fff; }
+        body.dark-mode .stat-name { color: #999; }
+        body.dark-mode .panel-card { background: #1a1a1a !important; border: 1px solid #3a3a3a !important; box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important; }
+        body.dark-mode .panel-card-header { background: #1a1a1a !important; border-bottom: 1px solid #3a3a3a !important; }
+        body.dark-mode .panel-card-header h2 { color: #fff !important; }
+        body.dark-mode .panel-card-header p { color: #999 !important; }
+        body.dark-mode .panel-card-body { color: #e8e8e8 !important; background: #1a1a1a !important; }
+        body.dark-mode .table-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+        body.dark-mode .table-card-header { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
+        body.dark-mode .table-card-header h2 { color: #fff; }
+        body.dark-mode .table-card-header p { color: #999; }
+        body.dark-mode .file-count-badge { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+        body.dark-mode .count-badge { background: rgba(220,38,38,0.2) !important; color: #ff6b6b !important; }
+        body.dark-mode table.dataTable thead th { background: #2a2a2a; color: #aaa; border-bottom: 1px solid #3a3a3a; }
+        body.dark-mode table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        body.dark-mode table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
+        body.dark-mode .dataTables_filter input { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
+        body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
+        body.dark-mode .dataTables_length select { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
+        body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !important; border-color: #3a3a3a !important; color: #e0e0e0 !important; }
+        body.dark-mode .dataTables_paginate .paginate_button:hover { background: #444 !important; border-color: #444 !important; }
+        body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; }
+        body.dark-mode .dataTables_info { color: #999 !important; }
+        body.dark-mode .field-input, body.dark-mode .field-select { background: #3a3a3a; color: #e0e0e0; border: 1px solid #3a3a3a; }
+        body.dark-mode .field-input::placeholder { color: #888 !important; }
+        body.dark-mode .field-input:focus, body.dark-mode .field-select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
+        body.dark-mode .field-label { color: #e0e0e0; }
+        body.dark-mode .name-text { color: #fff !important; }
+        body.dark-mode .name-avatar { background: rgba(220,38,38,0.3) !important; color: #ff6b6b !important; }
+        body.dark-mode .level-badge { background: rgba(37, 99, 235, 0.2) !important; color: #60a5fa !important; }
+        body.dark-mode .date-badge { background: rgba(22, 163, 74, 0.2) !important; color: #86efac !important; }
+        body.dark-mode .report-time-cell { color: #e0e0e0 !important; }
+        body.dark-mode .position-cell { color: #e0e0e0 !important; }
+        body.dark-mode .company-address-cell { color: #fff !important; }
+        body.dark-mode .btn-download { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+        body.dark-mode .btn-remove { border: 1.5px solid rgba(220,38,38,0.3); background: transparent; color: #ff6b6b; }
+        body.dark-mode .btn-remove:hover { background: rgba(220,38,38,0.1); }
+        body.dark-mode .btn-preview { background: transparent !important; border: 1.5px solid rgba(79, 70, 229, 0.3) !important; color: #818cf8 !important; }
+        body.dark-mode .btn-preview:hover { background: rgba(79, 70, 229, 0.1) !important; border-color: rgba(79, 70, 229, 0.5) !important; }
+        body.dark-mode .modal-content { background: #1a1a1a !important; box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important; }
+        body.dark-mode .modal-body { background: #1a1a1a !important; color: #e8e8e8 !important; }
+        body.dark-mode .modal-footer { background: #2a2a2a; border-top: 1px solid #3a3a3a; }
+        body.dark-mode .btn-modal-close { background: #3a3a3a; border: 1px solid #3a3a3a; color: #e0e0e0; }
+        body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); border-color: var(--red); color: #ff6b6b; }
+        body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); }
+        body.dark-mode .file-dropzone { border-color: #3a3a3a; background: #2a2a2a; }
+        body.dark-mode .file-dropzone:hover, body.dark-mode .file-dropzone.dragover { border-color: var(--red); background: rgba(220,38,38,0.1); }
+        body.dark-mode .file-dropzone-icon { background: rgba(220,38,38,0.2); }
+        body.dark-mode .file-dropzone-title { color: #e0e0e0; }
+        body.dark-mode .file-dropzone-sub { color: #999; }
+        body.dark-mode .dashboard-footer { background: #1a1a1a; border-top: 1px solid #3a3a3a; color: #999; }
+        body.dark-mode .dashboard-footer a { color: #999; }
+        body.dark-mode .dashboard-footer a:hover { color: var(--red); }
+        body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
+        body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
+        body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
         @media (max-width: 900px) {
             .sidebar { width: var(--sidebar-w); transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
@@ -354,27 +330,49 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         @media (max-width: 560px) { .filter-grid { grid-template-columns: 1fr; } }
 
         .level-wrap{
-    display:inline-block;
-    max-width:80px;
-    white-space:normal;
-    word-break:break-word;
-    text-align:center;
-    line-height:1.1;
-}
-.level-badge{
-    max-width:110px;
-    white-space:normal;
-    line-height:1.2;
-    text-align:center;
-}
+            display:inline-block;
+            max-width:80px;
+            white-space:normal;
+            word-break:break-word;
+            text-align:center;
+            line-height:1.1;
+        }
+        .level-badge{
+            max-width:110px;
+            white-space:normal;
+            line-height:1.2;
+            text-align:center;
+        }
+
+        /* =============== NATIVE CSS PRINT SOLUTION =============== */
+        @media screen {
+            #print-area-wrapper { display: none !important; }
+        }
+        @media print {
+            body > *:not(#print-area-wrapper) { display: none !important; }
+            #print-area-wrapper { display: block !important; width: 100%; }
+
+            body, body.modal-open {
+                overflow: visible !important;
+                height: auto !important;
+                background: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            @page { size: A4 landscape; margin: 5mm; }
+        }
     </style>
 </head>
 
 <body>
 
+<div id="print-area-wrapper"></div>
+
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- =============== SIDEBAR =============== -->
 <div class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
@@ -448,7 +446,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-</nav>
+    </nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/login') }}" class="nav-item">
@@ -459,7 +457,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     </div>
 </div>
 
-<!-- =============== MAIN CONTENT =============== -->
 <div class="main-content" id="mainContent">
 
     <div class="topbar">
@@ -470,8 +467,10 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             </button>
             <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
         </div>
-        <div class="topbar-badge">
-            <i class="fa fa-user-shield"></i> OJT Coordinator
+        <div class="topbar-right">
+            <div class="topbar-badge">
+                <i class="fa fa-user-shield"></i> OJT Coordinator
+            </div>
         </div>
     </div>
 
@@ -490,7 +489,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             </div>
         </div>
 
-        <!-- Stats -->
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-user-graduate"></i></div>
@@ -522,7 +520,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             </div>
         </div>
 
-        <!-- Filter Card -->
         <div class="panel-card">
             <div class="panel-card-header">
                 <div class="panel-header-icon"><i class="fa fa-filter"></i></div>
@@ -562,7 +559,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             </div>
         </div>
 
-        <!-- Table Card -->
         <div class="table-card">
             <div class="table-card-header">
                 <div class="table-card-header-left">
@@ -577,7 +573,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                         <i class="fa fa-users"></i>
                         {{ count($studentData) }} {{ count($studentData) == 1 ? 'record' : 'records' }}
                     </div>
-                    {{-- FIX #2: Changed from onclick to id-based handler to prevent double modal --}}
                     <button type="button" class="btn-preview" id="openPreviewBtn">
                         <i class="fa fa-print"></i> Print Preview
                     </button>
@@ -585,7 +580,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             </div>
 
             <div class="table-card-body">
-                {{-- FIX #1: Only render rows where ojt data actually exists --}}
                 <table id="fileTable" class="display" style="width:100%">
                     <thead>
                         <tr>
@@ -644,26 +638,25 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     </div>
 
     <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
-    <div style="display:flex; align-items:center; gap:8px;">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-        <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
-        </span>
-    </div>
-    <div class="footer-links">
-        <a href="https://www.pup.edu.ph/" target="_blank">
-            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
-            PUP Website
-        </a>
-        <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
-        <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
-    </div>
-</footer>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <span class="footer-copy">
+                © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            </span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank">
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                PUP Website
+            </a>
+            <span class="divider">|</span>
+            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        </div>
+    </footer>
 </div>
 
-<!-- =============== PRINT PREVIEW MODAL (single instance) =============== -->
 <div id="printPreviewModal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -673,8 +666,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             </div>
             <div class="modal-body">
                 <div id="printPreviewContent" style="background:#fff; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,0.12); overflow:hidden;">
-                    <!-- Injected by JS -->
-                </div>
+                    </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
@@ -688,8 +680,11 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     </div>
 </div>
 
-<!-- Hidden print iframe -->
-<iframe id="printFrame" style="display:none; position:absolute; left:-9999px; top:-9999px;"></iframe>
+<form id="sendEmailForm" action="{{ url('/reportsExpired/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
+    @csrf
+    <input type="hidden" id="courseHidden" name="course" value="{{ $course ?? '' }}">
+    <input type="hidden" id="emailHidden"  name="email"  value="{{ $user->email ?? '' }}">
+</form>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -744,8 +739,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
     /* ══════════════════════════════════════════════
        BUILD PRINT HTML
-       • Only rows on the CURRENT DataTable page
-       • Table sized to fit A4 landscape — no side-scroll
     ══════════════════════════════════════════════ */
     function buildPrintHTML() {
         const now      = new Date();
@@ -754,18 +747,16 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
         const dt = $('#fileTable').DataTable();
 
-        /* ── FIX: get only the rows visible on the CURRENT page ── */
         const currentPageNodes = dt.rows({ page: 'current' }).nodes();
         const total            = currentPageNodes.length;
         const pageInfo         = dt.page.info();
-        const pageNum          = pageInfo.page + 1;        // 1-based
+        const pageNum          = pageInfo.page + 1;
         const pageCount        = pageInfo.pages;
 
         const startDate = document.getElementById('start_date').value || '—';
         const endDate   = document.getElementById('end_date').value   || '—';
         const course    = document.getElementById('course').value     || '—';
 
-        /* Build table body rows from CURRENT PAGE only */
         let rowsHTML = '';
         for (let i = 0; i < currentPageNodes.length; i++) {
             const tds = currentPageNodes[i].querySelectorAll('td');
@@ -777,7 +768,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             };
             const get = (idx) => tds[idx] ? tds[idx].textContent.trim() : '';
 
-            /* Global row number = offset + local index + 1 */
             const rowNum = pageInfo.start + i + 1;
             const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
 
@@ -819,7 +809,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         return `
         <div style="font-family:'Poppins',Arial,sans-serif; background:#fff;">
 
-            <!-- ══ INSTITUTIONAL HEADER ══ -->
             <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
                 <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
                 <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
@@ -842,7 +831,6 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
             </div>
 
-            <!-- ══ META ROW ══ -->
             <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
                 <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
@@ -864,29 +852,14 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
             </div>
 
-            <!-- ══ SECTION LABEL ══ -->
             <div style="padding:9px 22px 3px 22px;">
                 <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Student Placement Details — Page ${pageNum}</div>
             </div>
 
-            <!-- ══ MAIN DATA TABLE — table-layout:fixed + % widths = no side scroll ══ -->
             <div style="padding:4px 22px 0 22px;">
                 <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
                     <colgroup>
-                        <col style="width:3%;">    <!-- # -->
-                        <col style="width:10%;">   <!-- Student Name -->
-                        <col style="width:9%;">    <!-- Company -->
-                        <col style="width:10%;">   <!-- Address -->
-                        <col style="width:8%;">    <!-- Nat. Business -->
-                        <col style="width:8%;">    <!-- Linkages -->
-                        <col style="width:6%;">    <!-- Level -->
-                        <col style="width:6%;">    <!-- Start -->
-                        <col style="width:6%;">    <!-- End -->
-                        <col style="width:10%;">   <!-- Schedule -->
-                        <col style="width:9%;">    <!-- Contact Person -->
-                        <col style="width:8%;">    <!-- Position -->
-                        <col style="width:7%;">    <!-- Contact No -->
-                    </colgroup>
+                        <col style="width:3%;">    <col style="width:10%;">   <col style="width:9%;">    <col style="width:10%;">   <col style="width:8%;">    <col style="width:8%;">    <col style="width:6%;">    <col style="width:6%;">    <col style="width:6%;">    <col style="width:10%;">   <col style="width:9%;">    <col style="width:8%;">    <col style="width:7%;">    </colgroup>
                     <thead>
                         <tr style="background:#7f0000;">
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">#</th>
@@ -910,41 +883,40 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 </table>
             </div>
 
-            <!-- ══ SIGNATURE BLOCK ══ -->
-            <div style="padding:18px 22px 12px 22px;">
-                <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
-                    <div style="display:flex; justify-content:space-between; gap:24px;">
-                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">OJT COORDINATOR</div>
-                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
-                        </div>
-                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DEPARTMENT CHAIR / HEAD</div>
-                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
-                        </div>
-                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DATE</div>
-                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Date Approved / Noted</div>
+            <div style="page-break-inside: avoid !important; break-inside: avoid !important; display: table; width: 100%;">
+                <div style="padding:18px 22px 12px 22px;">
+                    <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+                        <div style="display:flex; justify-content:space-between; gap:24px;">
+                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                                <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">OJT COORDINATOR</div>
+                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                            </div>
+                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                                <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DEPARTMENT CHAIR / HEAD</div>
+                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                            </div>
+                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                                <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DATE</div>
+                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Date Approved / Noted</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ══ DOCUMENT FOOTER ══ -->
-            <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
-                <div style="display:flex; align-items:center; gap:6px;">
-                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
-                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
+                        <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                    </div>
+                    <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: OJT-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
                 </div>
-                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: OJT-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
             </div>
 
         </div>`;
     }
 
     /* ══════════════════════════════════════════════
-       FIX #2: Single modal trigger — use Bootstrap
-       modal API directly, not onclick inline attr.
+       Single modal trigger
     ══════════════════════════════════════════════ */
     const previewModalEl = document.getElementById('printPreviewModal');
     const previewModal   = new bootstrap.Modal(previewModalEl, { backdrop: 'static', keyboard: true });
@@ -956,104 +928,21 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
     /* ══════════════════════════════════════════════
        PRINT
-       FIX #3: @page CSS hides browser header/footer
-       (date & URL shown by browser when printing)
+       Native Print via hidden #print-area-wrapper
     ══════════════════════════════════════════════ */
     document.getElementById('doPrintBtn').addEventListener('click', function () {
-
-    const html = buildPrintHTML();
-
-    const printDoc = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Student OJT Information Report</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<style>
-
-/* ===== FORCE CLEAN PRINT PAGE ===== */
-
-@page{
-    size: A4 landscape;
-    margin: 0;
-}
-
-/* Remove browser spacing */
-html, body{
-    margin:0;
-    padding:0;
-}
-
-/* Printing settings */
-@media print{
-
-    html{
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-
-    body{
-        margin:10mm 12mm;
-        font-family:'Poppins',Arial,sans-serif;
-        font-size:10px;
-        color:#1a1a1a;
-        background:#ffffff;
-    }
-
-}
-
-/* General styling */
-
-*{
-    box-sizing:border-box;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-thead{
-    display:table-header-group;
-}
-
-tfoot{
-    display:table-footer-group;
-}
-
-tr{
-    page-break-inside:avoid;
-}
-
-</style>
-
-</head>
-
-<body>
-
-${html}
-
-<script>
-window.onload = function(){
-    setTimeout(function(){
+        // 1. Inject the HTML into the print wrapper
+        document.getElementById('print-area-wrapper').innerHTML = buildPrintHTML();
+        
+        // 2. Trigger the native print dialog
         window.print();
-    },700);
-}
-<\/script>
-</body>
-</html>`;
+        
+        // 3. Clean up memory
+        setTimeout(function() {
+            document.getElementById('print-area-wrapper').innerHTML = '';
+        }, 1000);
+    });
 
-    const frame = document.getElementById('printFrame');
-    const fw = frame.contentWindow;
-
-    fw.document.open();
-    fw.document.write(printDoc);
-    fw.document.close();
-});
 </script>
 
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>

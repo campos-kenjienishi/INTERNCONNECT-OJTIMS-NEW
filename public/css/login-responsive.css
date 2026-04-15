@@ -1,0 +1,239 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ============================================================
+   MAIN WRAPPER — centers the card on all screens
+   ============================================================ */
+.main-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+/* ============================================================
+   LOGIN CONTAINER — side-by-side on desktop (default)
+   ============================================================ */
+.login-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* LEFT PANEL — takes remaining space */
+.left-panel {
+    flex: 1;
+}
+
+/* RIGHT PANEL — fixed width on desktop */
+.right-panel {
+    width: 420px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   BREAKPOINT: XL — Large Desktops (1280px+)
+   ============================================================ */
+@media (min-width: 1280px) {
+    .login-container {
+        max-width: 1200px;
+    }
+
+    .right-panel {
+        width: 460px;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: 2XL — TV / 4K (1920px+)
+   ============================================================ */
+@media (min-width: 1920px) {
+    .main-wrapper {
+        padding: 40px;
+    }
+
+    .login-container {
+        max-width: 1400px;
+    }
+
+    .right-panel {
+        width: 520px;
+    }
+
+    .hero-heading {
+        font-size: 3.5rem;
+    }
+
+    .hero-desc {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: MD — Tablets / iPad (max 1023px)
+   Panels stack: left panel on top, right panel below
+   ============================================================ */
+@media (max-width: 1023px) {
+    .main-wrapper {
+        align-items: flex-start;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    .login-container {
+        flex-direction: column;
+        max-width: 680px;
+    }
+
+    .left-panel {
+        width: 100%;
+        padding-bottom: 24px;
+    }
+
+    /* Hide heavy content to save vertical space */
+    .hero-desc {
+        display: none;
+    }
+
+    .stats-row {
+        display: none;
+    }
+
+    .hero-heading {
+        font-size: 1.6rem;
+        margin-bottom: 0;
+    }
+
+    .logo-wrapper {
+        margin-bottom: 12px;
+    }
+
+    .right-panel {
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: SM — Large Phones (max 767px)
+   ============================================================ */
+@media (max-width: 767px) {
+    .main-wrapper {
+        padding: 12px;
+        padding-top: 16px;
+    }
+
+    .login-container {
+        max-width: 100%;
+    }
+
+    .hero-heading {
+        font-size: 1.3rem;
+    }
+
+    .logo-img {
+        width: 42px;
+        height: 42px;
+    }
+
+    .brand-name {
+        font-size: 1rem;
+    }
+
+    .system-title {
+        font-size: 0.7rem;
+    }
+
+    /* font-size 16px prevents iOS auto-zoom on input focus */
+    .input-wrap input {
+        font-size: 16px;
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+}
+
+/* ============================================================
+   BREAKPOINT: XS — Small Phones (max 479px)
+   e.g. iPhone SE, small Android phones
+   ============================================================ */
+@media (max-width: 479px) {
+    .main-wrapper {
+        padding: 8px;
+        padding-top: 10px;
+    }
+
+    .logo-img {
+        width: 36px;
+        height: 36px;
+    }
+
+    .brand-name {
+        font-size: 0.88rem;
+    }
+
+    .hero-heading {
+        font-size: 1.15rem;
+    }
+
+    .logo-wrapper {
+        gap: 10px;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-login {
+        font-size: 0.88rem;
+    }
+}
+
+/* ============================================================
+   SPECIAL: Phone Landscape Mode
+   When phone is rotated sideways — height is very short
+   ============================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+    .main-wrapper {
+        align-items: flex-start;
+        padding: 8px 16px;
+    }
+
+    /* Go back to side-by-side layout in landscape */
+    .login-container {
+        flex-direction: row;
+        max-width: 100%;
+    }
+
+    .left-panel {
+        padding: 16px 20px;
+    }
+
+    /* Hide everything except logo on very short landscape screens */
+    .hero-heading,
+    .hero-desc,
+    .stats-row {
+        display: none;
+    }
+
+    .logo-wrapper {
+        margin-bottom: 0;
+    }
+
+    .right-panel {
+        width: 360px;
+        flex-shrink: 0;
+    }
+}

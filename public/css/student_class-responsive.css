@@ -1,0 +1,243 @@
+/* ============================================================
+   student_class-responsive.css
+   RESPONSIVE ONLY — Does NOT change desktop design.
+   Place AFTER your inline <style> block.
+   ============================================================ */
+
+/* ─────────────────────────────────────────────
+   LG — 1024px and below
+───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .page-content { padding: 22px !important; }
+    .page-header h1 { font-size: 20px !important; }
+    .topbar-title { font-size: 12px !important; }
+    .table-card-header { padding: 14px 20px !important; }
+    .rooms-table thead th,
+    .rooms-table tbody td { padding: 11px 16px !important; font-size: 13px !important; }
+}
+
+/* ─────────────────────────────────────────────
+   MD — 900px and below (tablets / iPad)
+───────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .topbar { padding: 0 16px !important; }
+    .topbar-badge { font-size: 11.5px !important; padding: 5px 10px !important; }
+    .page-content { padding: 16px !important; }
+    .page-header h1 { font-size: 18px !important; }
+    .table-card { border-radius: 12px !important; margin-bottom: 16px !important; }
+    .table-card-header { padding: 14px 16px !important; gap: 10px !important; }
+    .table-card-header h2 { font-size: 14.5px !important; }
+    .table-card-header p { font-size: 11.5px !important; }
+
+    /* ✅ CRITICAL: Horizontal scroll on ALL table wrappers */
+    .table-card-body {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Rooms table minimum width so columns don't squish */
+    .rooms-table { min-width: 620px !important; }
+
+    .rooms-table thead th { padding: 10px 14px !important; font-size: 11px !important; }
+    .rooms-table tbody td { padding: 12px 14px !important; font-size: 13px !important; }
+
+    .btn-join, .btn-leave, .btn-view, .btn-view-action {
+        font-size: 12px !important; padding: 6px 12px !important;
+    }
+    .status-badge { font-size: 11px !important; padding: 3px 10px !important; }
+    .table-card-body .dataTables_wrapper { padding: 12px 14px !important; font-size: 13px !important; }
+    .dashboard-footer { padding: 14px 16px !important; font-size: 11.5px !important; }
+}
+
+/* ─────────────────────────────────────────────
+   SM — 640px and below (large phones)
+───────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .topbar { padding: 0 12px !important; }
+
+    /* Collapse badge to icon only */
+    .topbar-badge span { display: none !important; }
+    .topbar-badge { padding: 6px 10px !important; border-radius: 50% !important; gap: 0 !important; }
+
+    .page-content { padding: 12px !important; }
+    .page-header h1 { font-size: 16px !important; }
+    .breadcrumb { font-size: 11.5px !important; }
+    .table-card-header { padding: 12px 14px !important; }
+    .table-card-header .header-icon { width: 32px !important; height: 32px !important; font-size: 13px !important; }
+    .table-card-header h2 { font-size: 13.5px !important; }
+
+    /* ✅ Rooms table: enforce scroll, prevent squish */
+    .table-card-body {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .rooms-table {
+        min-width: 560px !important;
+        font-size: 12.5px !important;
+    }
+
+    .rooms-table thead th { padding: 9px 12px !important; font-size: 10.5px !important; }
+    .rooms-table tbody td { padding: 10px 12px !important; font-size: 12.5px !important; }
+
+    /* Action buttons */
+    .btn-join, .btn-leave, .btn-view, .btn-view-action {
+        font-size: 11.5px !important; padding: 5px 10px !important; gap: 4px !important;
+    }
+
+    .template-file-badge { font-size: 11px !important; padding: 2px 7px !important; }
+
+    /* ✅ DataTables (Announcements) — CRITICAL FIX */
+    /* Wrapper must scroll horizontally */
+    .table-card-body .dataTables_wrapper {
+        padding: 10px 12px !important;
+        font-size: 12.5px !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Force the DataTable itself to have a minimum width */
+    .table-card-body table.dataTable {
+        min-width: 520px !important;
+    }
+
+    /* Keep column headers readable */
+    .table-card-body table.dataTable thead th {
+        padding: 9px 12px !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Keep cell content from wrapping too aggressively */
+    .table-card-body table.dataTable tbody td {
+        padding: 10px 12px !important;
+        font-size: 12.5px !important;
+    }
+
+    /* "Announced By" column — keep avatar + name in one line */
+    .table-card-body table.dataTable tbody td > div[style*="display:flex"] {
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+    }
+
+    .dataTables_filter input { font-size: 12px !important; padding: 5px 10px !important; }
+    .dataTables_length select { font-size: 12px !important; }
+
+    /* Empty state */
+    .empty-state { padding: 36px 16px !important; }
+    .empty-state .empty-icon-wrap { width: 52px !important; height: 52px !important; font-size: 20px !important; }
+    .empty-state p { font-size: 13px !important; }
+
+    /* Modal */
+    .modal-header { padding: 16px 18px !important; }
+    .modal-title { font-size: 14.5px !important; }
+    .modal-body { padding: 16px !important; }
+    .modal-detail-row { padding: 10px 0 !important; gap: 10px !important; }
+    .modal-detail-icon { width: 28px !important; height: 28px !important; font-size: 11px !important; }
+    .modal-detail-label { font-size: 10.5px !important; }
+    .modal-detail-value { font-size: 13px !important; }
+    .modal-footer { padding: 12px 16px !important; }
+
+    /* Footer */
+    .dashboard-footer {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        padding: 12px !important;
+        font-size: 11px !important;
+    }
+    .dashboard-footer .footer-links {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 4px !important;
+    }
+}
+
+/* ─────────────────────────────────────────────
+   XS — 480px and below (small phones)
+───────────────────────────────────────────── */
+@media (max-width: 480px) {
+    :root { --topbar-h: 56px !important; }
+
+    .menu-toggle, .darkmode-toggle {
+        width: 34px !important; height: 34px !important; font-size: 15px !important;
+    }
+    .topbar-left { gap: 8px !important; }
+    .page-header h1 { font-size: 15px !important; }
+    .table-card { border-radius: 10px !important; }
+
+    /* ✅ Rooms table — compact but still scrollable */
+    .rooms-table {
+        min-width: 500px !important;
+        font-size: 12px !important;
+    }
+
+    .rooms-table thead th {
+        padding: 8px 10px !important;
+        font-size: 10px !important;
+        letter-spacing: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    .rooms-table tbody td { padding: 9px 10px !important; font-size: 12px !important; }
+
+    /* Stack join + view buttons vertically so they don't overflow the cell */
+    .rooms-table tbody td:last-child {
+        display: table-cell !important;
+    }
+
+    .btn-join, .btn-leave {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 4px !important;
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+        border-radius: 6px !important;
+    }
+
+    .btn-view {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+        border-radius: 6px !important;
+    }
+
+    /* ✅ Announcements DataTable — min-width enforced */
+    .table-card-body table.dataTable {
+        min-width: 480px !important;
+    }
+
+    .table-card-body table.dataTable thead th {
+        padding: 8px 10px !important;
+        font-size: 10.5px !important;
+        white-space: nowrap !important;
+    }
+
+    .table-card-body table.dataTable tbody td {
+        padding: 9px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .empty-state { padding: 28px 12px !important; }
+    .modal-dialog { margin: 8px !important; }
+}
+
+/* ─────────────────────────────────────────────
+   2XL — 1536px and above (large desktops / TVs)
+───────────────────────────────────────────── */
+@media (min-width: 1536px) {
+    .page-content {
+        max-width: 1400px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    .page-header h1 { font-size: 28px !important; }
+    .table-card-header h2 { font-size: 18px !important; }
+    .rooms-table thead th,
+    .rooms-table tbody td { font-size: 14.5px !important; padding: 16px 24px !important; }
+}

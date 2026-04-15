@@ -4,6 +4,7 @@
     <!-- CRITICAL: Prevents white flash -->
     <style>
         html, body { background: #3b0000 !important; }
+        
     </style>
 
     <meta charset="UTF-8">
@@ -14,6 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}">
 
 </head>
 
@@ -157,5 +160,6 @@
     }
 </script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ url('/js/mobile-utils.js') }}"></script>
 </body>
 </html>

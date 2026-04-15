@@ -365,6 +365,46 @@
         body.dark-mode .moa-count-badge { background: rgba(220,38,38,0.2) !important; color: #ff6b6b !important; }
         body.dark-mode .table-card-body table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid #2a2a2a; }
         body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
+
+        /* =============== NATIVE CSS PRINT SOLUTION =============== */
+        @media screen {
+            #print-area-wrapper { display: none !important; }
+        }
+        @media print {
+            /* Hide everything on the page except the print wrapper */
+            body > *:not(#print-area-wrapper) { display: none !important; }
+            
+            /* Show the print wrapper natively */
+            #print-area-wrapper { 
+                display: block !important; 
+                width: 100%; 
+            }
+
+            /* Fix Bootstrap modal bug that cuts off multiple pages */
+            body, body.modal-open {
+                overflow: visible !important;
+                height: auto !important;
+                background: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                /* Add padding here so the content doesn't touch the paper edge */
+                padding: 10mm !important; 
+            }
+
+            /* REMOVE DEFAULT BROWSER HEADERS AND FOOTERS */
+            @page { 
+                margin: 0; 
+            }
+        }
+        /* Custom Status Filter Dropdown */
+        .custom-status-filter {
+            background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; 
+            padding: 4px 8px; font-family: 'Poppins', sans-serif; 
+            outline: none; color: #333; margin-left: 5px;
+        }
+        body.dark-mode .custom-status-filter {
+            background: #2a2a2a; color: #e0e0e0; border-color: #555;
+        }
     </style>
 </head>
 
@@ -372,7 +412,8 @@
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- =============== SIDEBAR =============== -->
+<div id="print-area-wrapper"></div>
+
 <div class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
@@ -433,7 +474,6 @@
     </div>
 </div>
 
-<!-- =============== MAIN CONTENT =============== -->
 <div class="main-content" id="mainContent">
 
     <div class="topbar">
@@ -464,7 +504,6 @@
             </div>
         </div>
 
-        <!-- Filter Card -->
         <div class="filter-card">
             <div class="filter-card-header">
                 <div class="filter-header-icon"><i class="fa fa-filter"></i></div>
@@ -515,7 +554,6 @@
             </form>
         </div>
 
-        <!-- Stats -->
         @php
             $totalMOA   = count($companies);
             $activeMOA  = 0;
@@ -558,7 +596,6 @@
             </div>
         </div>
 
-        <!-- Table Card -->
         <div class="table-card">
             <div class="table-card-header">
                 <div class="table-card-header-left">
@@ -670,7 +707,6 @@
 </footer>
 </div>
 
-<!-- =============== PRINT PREVIEW MODAL =============== -->
 <div id="printPreviewModal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -680,8 +716,7 @@
             </div>
             <div class="modal-body">
                 <div id="printPreviewContent" style="background:#fff; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,0.12); overflow:hidden;">
-                    <!-- Injected by JS -->
-                </div>
+                    </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
@@ -695,14 +730,10 @@
     </div>
 </div>
 
-<!-- Hidden print iframe -->
-<iframe id="printFrame" style="display:none; position:absolute; left:-9999px; top:-9999px;"></iframe>
-
-<!-- Hidden send-email form (preserved) -->
 <form id="sendEmailForm" action="{{ url('/reportsExpired/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
     @csrf
     <input type="hidden" id="courseHidden" name="course" value="{{ $course ?? '' }}">
-    <input type="hidden" id="emailHidden"  name="email"  value="{{ $user->email }}">
+    <input type="hidden" id="emailHidden"  name="email"  value="{{ $user->email ?? '' }}">
 </form>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
@@ -734,9 +765,29 @@
 
     /* ── DataTable ── */
     $(document).ready(function () {
-        $('#companyTable').DataTable({
-            order: [[0, 'desc']],
-            columnDefs: [{ targets: 0, visible: false }]
+        var table = $('#companyTable').DataTable({
+            // Sort by S.Y. Validity (column 6) from latest to oldest
+            order: [[6, 'desc']], 
+            columnDefs: [
+                { targets: 0, visible: false }, // Hide ID column
+                // Disable the sorting dropdown arrows on all visible columns
+                { targets: [1, 2, 3, 4, 5, 6, 7], orderable: false } 
+            ]
+        });
+
+        // Add the custom Status Filter right next to "Show entries"
+        $('.dataTables_length').append(
+            '<label style="margin-left: 20px; font-weight: 500;">Filter Status: ' +
+            '<select id="statusFilter" class="custom-status-filter">' +
+            '<option value="">All MOAs</option>' +
+            '<option value="Active">Active</option>' +
+            '<option value="Expired">Expired</option>' +
+            '</select></label>'
+        );
+
+        // When the user picks "Active" or "Expired", filter the table
+        $('#statusFilter').on('change', function() {
+            table.column(7).search(this.value).draw();
         });
     });
 
@@ -762,8 +813,6 @@
 
     /* ══════════════════════════════════════════════
        BUILD PRINT HTML  — branded MOA layout
-       matching the Coordinator Reports print style.
-       Reads the CURRENT DataTable page rows only.
     ══════════════════════════════════════════════ */
     function buildPrintHTML() {
         const now      = new Date();
@@ -782,10 +831,9 @@
         const course   = document.getElementById('courseSelect').value      || '—';
         const syLabel  = (syStart !== '—' && syEnd !== '—') ? syStart + ' – ' + syEnd : '—';
 
-            /* Build rows from current page only. */
-            let rowsHTML = '';
-            for (let i = 0; i < currentPageNodes.length; i++) {
-                const tds  = currentPageNodes[i].querySelectorAll('td');
+        let rowsHTML = '';
+        for (let i = 0; i < currentPageNodes.length; i++) {
+            const tds  = currentPageNodes[i].querySelectorAll('td');
             const getCompany = () => {
                 const cn = Array.from(tds).find(td => td.querySelector('.company-name-text'));
                 return cn ? cn.querySelector('.company-name-text').textContent.trim() : '';
@@ -868,8 +916,6 @@
 
         return `
         <div style="font-family:'Poppins',Arial,sans-serif; background:#fff;">
-
-            <!-- HEADER -->
             <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
                 <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
                 <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
@@ -891,8 +937,6 @@
                 </div>
                 <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
             </div>
-
-            <!-- META ROW -->
             <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
                 <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
@@ -911,37 +955,33 @@
                         <strong style="color:#111827;">${total} compan${total !== 1 ? 'ies' : 'y'} (Page ${pageNum})</strong>
                     </div>
                 </div>
-                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
+                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr}</div>
             </div>
-
-            <!-- SECTION LABEL -->
             <div style="padding:9px 22px 3px 22px;">
                 <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Partner Company Details — Page ${pageNum}</div>
             </div>
-
-            <!-- DATA TABLE -->
             <div style="padding:4px 22px 0 22px;">
                 <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
                     <colgroup>
-                        <col style="width:3%;">   <!-- # -->
-                        <col style="width:18%;">  <!-- Company -->
-                        <col style="width:18%;">  <!-- Address -->
-                        <col style="width:14%;">  <!-- Rep -->
-                        <col style="width:12%;">  <!-- Contact -->
-                        <col style="width:18%;">  <!-- Email -->
-                        <col style="width:9%;">   <!-- SY -->
-                        <col style="width:8%;">   <!-- Status -->
+                        <col style="width:3%;">
+                        <col style="width:18%;">
+                        <col style="width:18%;">
+                        <col style="width:14%;">
+                        <col style="width:12%;">
+                        <col style="width:18%;">
+                        <col style="width:9%;">
+                        <col style="width:8%;">
                     </colgroup>
                     <thead>
                         <tr style="background:#7f0000;">
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">#</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Company Name</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Address</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Representative</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Contact No.</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Email</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">S.Y. Validity</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center;">Status</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">#</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Company Name</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Address</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Representative</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Contact No.</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Email</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">S.Y. Validity</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:center;">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -950,39 +990,35 @@
                 </table>
             </div>
 
-            <!-- SIGNATURE BLOCK -->
-            <div style="padding:18px 22px 12px 22px;">
-                <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
-                    <div style="display:flex; justify-content:space-between; gap:24px;">
-                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">PROFESSOR</div>
-                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
-                        </div>
-                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DEPARTMENT CHAIR / HEAD</div>
-                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
-                        </div>
-                        <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                            <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DATE</div>
-                            <div style="font-size:8px; color:#6b7280; margin-top:2px;">Date Approved / Noted</div>
+            <div class="keep-together">
+                <div style="padding:18px 22px 12px 22px;">
+                    <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+                        <div style="display:flex; justify-content:space-between; gap:24px;">
+                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                                <div style="font-size:9.5px; font-weight:700; color:#111827;">PROFESSOR</div>
+                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                            </div>
+                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                                <div style="font-size:9.5px; font-weight:700; color:#111827;">DEPARTMENT CHAIR / HEAD</div>
+                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
+                            </div>
+                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
+                                <div style="font-size:9.5px; font-weight:700; color:#111827;">DATE</div>
+                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Date Approved / Noted</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- DOCUMENT FOOTER -->
-            <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
-                <div style="display:flex; align-items:center; gap:6px;">
-                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
-                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
+                        <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                    </div>
+                    <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-RPT-${now.getFullYear()}</span>
                 </div>
-                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
             </div>
-
         </div>`;
-
     }
-
 
     /* ── Modal (single instance, no double-trigger) ── */
     const previewModalEl = document.getElementById('printPreviewModal');
@@ -993,54 +1029,18 @@
         previewModal.show();
     });
 
-    /* ── Print
-       @page { margin: 0 } removes browser date/title/URL.
-       Spacing is restored via body padding instead.        ── */
+    /* ── Print ── */
     document.getElementById('doPrintBtn').addEventListener('click', function () {
-        const html = buildPrintHTML();
-
-        const printDoc = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>MOA Report — InternConnect</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        @page {
-            size: A4 landscape;
-            margin: 0;
-        }
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        html, body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        body {
-            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
-            font-size: 10px; color: #1a1a1a; background: #fff;
-            padding: 10mm 12mm;
-        }
-        table { border-collapse: collapse; width: 100%; }
-        thead { display: table-header-group; }
-        tfoot { display: table-footer-group; }
-        tr    { page-break-inside: avoid; }
-    </style>
-</head>
-<body>${html}
-</body>
-</html>`;
-
-        const frame = document.getElementById('printFrame');
-        const fw    = frame.contentWindow;
-        fw.document.open();
-        fw.document.write(printDoc);
-        fw.document.close();
-        fw.focus();
-        setTimeout(function () { fw.print(); }, 900);
+        // 1. Put the generated HTML into the hidden print wrapper on the main page
+        document.getElementById('print-area-wrapper').innerHTML = buildPrintHTML();
+        
+        // 2. Trigger the native browser print dialog
+        window.print();
+        
+        // 3. Clear the wrapper after printing to free memory
+        setTimeout(function() {
+            document.getElementById('print-area-wrapper').innerHTML = '';
+        }, 1000);
     });
 
     /* ── Send email (preserved from original) ── */
@@ -1059,8 +1059,8 @@
             }
         });
     }
-    </script>
-    <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
-    <script src="{{ asset('assets/js/voice-input.js') }}"></script>
+</script>
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
