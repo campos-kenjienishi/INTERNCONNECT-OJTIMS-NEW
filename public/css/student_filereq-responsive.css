@@ -1,0 +1,22 @@
+/* =============== TABLE HORIZONTAL SCROLL (MOBILE) =============== */
+.table-card-body {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+}
+
+.table-card-body .dataTables_wrapper {
+    min-width: 600px; /* forces scroll before columns crush */
+}
+@media (max-width: 900px) {
+    .table-card-body {
+        /* fade hint on the right edge */
+        background:
+            linear-gradient(to right, #fff 30%, rgba(255,255,255,0)),
+            linear-gradient(to right, rgba(255,255,255,0), #fff 70%) 100% 0,
+            radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.08), transparent),
+            radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.08), transparent) 100% 0;
+        background-repeat: no-repeat;
+        background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+        background-attachment: local, local, scroll, scroll;
+    }
+}

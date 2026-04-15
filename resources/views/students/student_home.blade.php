@@ -624,6 +624,7 @@
 
         /* =============== SIDEBAR OVERLAY =============== */
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .sidebar-overlay.active { display: block; }
 
         /* =============== RESPONSIVE =============== */
         @media (max-width: 1100px) {
@@ -1032,27 +1033,36 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    /* ── Sidebar toggle ── */
     const sidebar     = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const menuToggle  = document.getElementById('menuToggle');
-    const overlay     = document.getElementById('sidebarOverlay');
+const mainContent = document.getElementById('mainContent');
+const menuToggle  = document.getElementById('menuToggle');
+const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
+function openMobileSidebar() {
+    sidebar.classList.add('mobile-open');
+    overlay.style.display = 'block';   // force override the inline display:none
+}
+
+function closeMobileSidebar() {
+    sidebar.classList.remove('mobile-open');
+    overlay.style.display = 'none';
+}
+
+menuToggle.addEventListener('click', function () {
+    const isMobile = window.innerWidth <= 900;
+    if (isMobile) {
+        if (sidebar.classList.contains('mobile-open')) {
+            closeMobileSidebar();
         } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+            openMobileSidebar();
         }
-    });
+    } else {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+});
 
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    });
+overlay.addEventListener('click', closeMobileSidebar);
 
     /* ── Dark mode toggle ── */
     const darkmodeToggle = document.getElementById('darkmodeToggle');

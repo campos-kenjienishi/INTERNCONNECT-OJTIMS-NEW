@@ -1,0 +1,195 @@
+/* =========================================
+   STUDENT MOA RESPONSIVE CSS
+   Mobile-first approach
+========================================= */
+
+/* ===== GLOBAL FIXES ===== */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* ===== MOBILE (DEFAULT <640px) ===== */
+
+/* Sidebar hidden by default on mobile */
+/* ===== MOBILE (DEFAULT <640px) ===== */
+
+/* Sidebar hidden by default on mobile */
+.sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    pointer-events: none; /* FIX: Prevents the invisible box from blocking clicks */
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+.sidebar.mobile-open {
+    transform: translateX(0);
+    pointer-events: auto; /* Re-enables clicks when the menu is opened */
+}
+
+/* Remove sidebar spacing */
+.main-content {
+    margin-left: 0; /* FIX: Removed !important so desktop media queries can override this */
+    transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ... (keep your other mobile/tablet styles the same) ... */
+
+/* ===== LAPTOPS (≥1024px) ===== */
+@media (min-width: 1024px) {
+
+    .sidebar {
+        transform: translateX(0);
+        position: fixed;
+        width: var(--sidebar-w);
+        pointer-events: auto; /* FIX: Ensure the sidebar is clickable on desktop */
+    }
+
+    .main-content {
+        margin-left: var(--sidebar-w);
+    }
+
+    .main-content.expanded {
+        margin-left: var(--sidebar-w-collapsed);
+    }
+
+    .page-content {
+        padding: 24px;
+    }
+}
+/* ===== SMALL DEVICES (≥640px) ===== */
+@media (min-width: 640px) {
+
+    .page-content {
+        padding: 16px;
+    }
+
+    .btn-action {
+        font-size: 12px;
+    }
+}
+
+/* ===== TABLETS (≥768px) ===== */
+@media (min-width: 768px) {
+
+    /* Sidebar still hidden unless opened */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .page-content {
+        padding: 20px;
+    }
+
+    /* Buttons nicer */
+    .action-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .btn-action {
+        width: auto;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    /* Modal back to 2 columns */
+    .modal-body div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Show title again */
+    .topbar-title {
+        display: inline;
+    }
+}
+
+/* ===== LAPTOPS (≥1024px) ===== */
+@media (min-width: 1024px) {
+
+    .sidebar {
+        transform: translateX(0);
+        position: fixed;
+        width: var(--sidebar-w);
+    }
+
+    .main-content {
+        margin-left: var(--sidebar-w);
+    }
+
+    .main-content.expanded {
+        margin-left: var(--sidebar-w-collapsed);
+    }
+
+    .page-content {
+        padding: 24px;
+    }
+}
+
+/* ===== DESKTOP (≥1280px) ===== */
+@media (min-width: 1280px) {
+
+    .page-content {
+        padding: 28px;
+    }
+
+    .table-card {
+        font-size: 14px;
+    }
+}
+
+/* ===== LARGE SCREENS / TV (≥1536px) ===== */
+@media (min-width: 1536px) {
+
+    .page-content {
+        max-width: 1400px;
+        margin: auto;
+    }
+
+    .table-card {
+        font-size: 15px;
+    }
+
+    .topbar {
+        padding: 0 40px;
+    }
+}
+
+.sidebar-overlay {
+    pointer-events: none;
+}
+
+.sidebar-overlay.active {
+    pointer-events: auto;
+}
+.table-card,
+.table-card-body,
+table.dataTable {
+    position: relative;
+    z-index: 1;
+}
+.table-card-body {
+    overflow-x: auto;
+}
+.btn-action {
+    position: relative;
+    z-index: 2;
+}
+.sidebar {
+    z-index: 1000;
+}
+
+.main-content {
+    position: relative;
+    z-index: 1;
+}

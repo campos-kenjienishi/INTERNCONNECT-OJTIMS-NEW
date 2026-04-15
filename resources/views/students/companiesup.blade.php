@@ -228,6 +228,8 @@
             color: #333;
             font-size: 18px;
             transition: all 0.2s;
+            position: relative; /* Add this */
+            z-index: 110;       /* Add this */
         }
 
         .menu-toggle:hover { background: #fee2e2; color: var(--red); }
@@ -246,6 +248,8 @@
             transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
             flex-shrink: 0;
             padding: 0;
+            position: relative; /* Add this */
+            z-index: 110;       /* Add this */
         }
 
         .darkmode-toggle:hover {
@@ -322,6 +326,8 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 16px rgba(220,38,38,0.25);
+            position: relative; /* Add this */
+            z-index: 50;        /* Add this */
         }
 
         .btn-add-moa:hover {
@@ -812,29 +818,37 @@
         .dashboard-footer a:hover { color: var(--red); }
         .dashboard-footer .divider { color: #e5e5e5; margin: 0 2px; }
 
-        /* Mobile overlay */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
+       /* Mobile overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    pointer-events: none; /* Add this to prevent phantom blocking */
+}
 
-        @media (max-width: 900px) {
-            .sidebar {
-                width: var(--sidebar-w);
-                transform: translateX(-100%);
-                transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-            }
-            .sidebar.mobile-open { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
-            .main-content { margin-left: 0 !important; }
-            .page-content { padding: 18px; }
-            .topbar-title { display: none; }
-            .info-banner { flex-direction: column; text-align: center; }
-            .action-buttons { flex-direction: column; align-items: flex-start; }
-        }
+@media (max-width: 900px) {
+    .sidebar {
+        width: var(--sidebar-w);
+        transform: translateX(-100%);
+        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        pointer-events: none; /* Disables clicks when sidebar is hidden */
+    }
+    .sidebar.mobile-open { 
+        transform: translateX(0); 
+        pointer-events: auto; /* Re-enables clicks when open */
+    }
+    .sidebar-overlay.active { 
+        display: block; 
+        pointer-events: auto; /* Re-enables clicks when open */
+    }
+    .main-content { margin-left: 0 !important; }
+    .page-content { padding: 18px; }
+    .topbar-title { display: none; }
+    .info-banner { flex-direction: column; text-align: center; }
+    .action-buttons { flex-direction: column; align-items: flex-start; }
+}
         .school-year-row {
     display: flex;
     align-items: center;
@@ -882,7 +896,7 @@
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
-            <span class="sidebar-brand-sub">OJT IMS</span>
+            <span class="sidebar-brand-sub">OJTIMS</span>
         </div>
     </a>
 
@@ -1010,15 +1024,16 @@
                 </div>
             </div>
 
-            <div class="table-card-body">
+            <div class="table-card-body" style="overflow-x:auto;">
 
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
-                    $(document).ready(function () {
-                        $('#moaTable').DataTable({
-                            "order": [[0, 'asc']]
-                        });
-                    });
+                    $('#moaTable').DataTable({
+                    responsive: true,
+                    scrollX: true,
+                    autoWidth: false,
+                    order: [[0, 'asc']]
+                });
                 </script>
 
                 @if($companies->isEmpty())
@@ -1030,7 +1045,7 @@
                         <p>Click "Add Notarized MOA" to submit your first company MOA.</p>
                     </div>
                 @else
-                <table id="moaTable" class="display" style="width:100%">
+                <table id="moaTable" class="display nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>Company</th>
@@ -1272,27 +1287,36 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    // Sidebar toggle
     const sidebar     = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const menuToggle  = document.getElementById('menuToggle');
-    const overlay     = document.getElementById('sidebarOverlay');
+const mainContent = document.getElementById('mainContent');
+const menuToggle  = document.getElementById('menuToggle');
+const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-    });
+menuToggle.addEventListener('click', function () {
+    const isMobile = window.innerWidth <= 900;
 
-    overlay.addEventListener('click', function () {
+    if (isMobile) {
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('active');
+    } else {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+});
+
+// CLICK OUTSIDE = CLOSE
+overlay.addEventListener('click', function () {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('active');
+});
+
+// ✅ ADD THIS (IMPORTANT FIX)
+window.addEventListener('resize', function () {
+    if (window.innerWidth > 900) {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
-    });
+    }
+});
 
     // File label update
     document.getElementById('moaFileInput').addEventListener('change', function () {
@@ -1356,6 +1380,13 @@
             }
         });
     });
+    document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.view-btn');
+    if (btn) {
+        const url = btn.getAttribute('data-url');
+        openViewModal(url);
+    }
+});
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>

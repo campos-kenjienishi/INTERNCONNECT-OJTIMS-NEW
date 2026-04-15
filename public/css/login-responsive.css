@@ -40,6 +40,7 @@ img {
     flex-shrink: 0;
 }
 
+
 /* ============================================================
    BREAKPOINT: XL — Large Desktops (1280px+)
    ============================================================ */
@@ -235,5 +236,29 @@ img {
     .right-panel {
         width: 360px;
         flex-shrink: 0;
+    }
+}
+/* ============================================================
+   LOGIN SCROLL FIX
+   Add this at the BOTTOM of your existing login-responsive.css
+   Do NOT replace the whole file — just append these lines.
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+    /* Allow the page to scroll naturally on mobile */
+    html, body {
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Allow the wrapper to grow taller than the screen */
+    .main-wrapper {
+        align-items: flex-start !important;
+        height: auto !important;
+        min-height: 100vh !important;
     }
 }
