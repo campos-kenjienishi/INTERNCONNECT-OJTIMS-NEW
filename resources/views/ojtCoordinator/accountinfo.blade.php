@@ -895,6 +895,9 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                                 <i class="fa fa-eye"></i>
                             </button>
                         </div>
+                        <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
+                            <strong>Password requirements:</strong> Use 8 to 12 characters and do not share your password.
+                        </div>
                         @error('new_password')
                             <div class="pw-error">{{ $message }}</div>
                         @enderror

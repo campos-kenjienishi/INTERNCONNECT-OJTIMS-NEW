@@ -104,13 +104,11 @@
             <h2><span class="header-icon"><i class="fa fa-signature"></i></span> Supervisor Signature Proof</h2>
         </div>
         <div class="card-body-shell">
-            @if(!empty($evaluation->signature_path))
-                @if(\Illuminate\Support\Str::endsWith(strtolower($evaluation->signature_path), ['.jpg', '.jpeg', '.png']))
-                    <img src="{{ asset('storage/' . $evaluation->signature_path) }}" alt="Supervisor Signature" style="max-width:100%; width:460px; border:1px solid #ddd; border-radius:10px;">
+            @if(!empty($evaluation->signature_path) && !empty($signaturePreviewDataUri))
+                @if(!empty($signaturePreviewMime) && str_starts_with($signaturePreviewMime, 'image/'))
+                    <img src="{{ $signaturePreviewDataUri }}" alt="Supervisor Signature" style="max-width:100%; width:460px; border:1px solid #ddd; border-radius:10px;">
                 @else
-                    <a href="{{ asset('storage/' . $evaluation->signature_path) }}" target="_blank" class="btn-eval btn-eval-outline">
-                        <i class="fa fa-file-download"></i> View Signature File
-                    </a>
+                    <iframe src="{{ $signaturePreviewDataUri }}" title="Supervisor Signature" style="width:100%; min-height:420px; border:1px solid #ddd; border-radius:10px; background:#fff;"></iframe>
                 @endif
             @else
                 <p class="muted-text">No signature proof uploaded.</p>

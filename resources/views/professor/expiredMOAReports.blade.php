@@ -242,7 +242,7 @@
         .dataTables_wrapper { color: #333 !important; }
         .dataTables_length { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
         .dataTables_length label { color: #333 !important; font-weight: 500; }
-        .dataTables_filter { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; float: right; }
+        .dataTables_filter { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; float: right; }
         .dataTables_filter label { color: #333 !important; font-weight: 500; }
         .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; color: #333 !important; background: #fff !important; }
         .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }

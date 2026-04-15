@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InternConnect - Expired MOA Report</title>
+    <title>InternConnect - MOA Report</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -142,7 +142,7 @@
         body.dark-mode .topbar-badge { background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.3); color: #ff6b6b; }
 
         /* =============== PAGE =============== */
-        .page-content { padding: 28px; flex: 1; }
+        .page-content { padding: 28px; flex: 1; max-width: 1440px; width: 100%; margin: 0 auto; }
         body.dark-mode .page-content { background: #000000; }
         .page-header {
             display: flex; align-items: flex-start; justify-content: space-between;
@@ -209,16 +209,25 @@
         .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; }
         .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }
         .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; }
+        .custom-status-filter {
+            background: #fff; border: 1px solid #e5e5e5; border-radius: 8px;
+            padding: 4px 8px; font-family: 'Poppins', sans-serif;
+            outline: none; color: #333; margin-left: 5px;
+        }
         .dataTables_paginate .paginate_button { border-radius: 6px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; }
         .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
         .dataTables_paginate .paginate_button:hover { background: #fee2e2 !important; border-color: #fecaca !important; color: var(--red) !important; }
 
         /* Cell styles */
-        .company-cell { display: flex; align-items: center; gap: 9px; }
+        .company-cell { display: flex; align-items: center; gap: 10px; }
         .company-avatar { width: 32px; height: 32px; border-radius: 9px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 13px; flex-shrink: 0; }
         .company-name-text { font-weight: 600; color: #1a1a1a; font-size: 13px; }
-        .expired-badge { display: inline-flex; align-items: center; gap: 5px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; }
+        .company-name-cell { color: #1a1a1a !important; }
+        .company-address-cell { max-width: 160px; word-break: break-word; font-size: 12.5px; }
         .school-year-badge { display: inline-flex; align-items: center; gap: 5px; background: #fef9c3; color: #ca8a04; border-radius: 20px; padding: 3px 10px; font-size: 11.5px; font-weight: 600; }
+        .badge-active { display: inline-flex; align-items: center; gap: 5px; background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
+        .badge-expired { display: inline-flex; align-items: center; gap: 5px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
+        .badge-active i, .badge-expired i { font-size: 10px; }
 
         /* =============== PRINT PREVIEW MODAL =============== */
         .modal-content { border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); font-family: 'Poppins', sans-serif; overflow: hidden; }
@@ -245,6 +254,28 @@
 
         /* Mobile overlay */
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+
+        @media screen {
+            #print-area-wrapper { display: none !important; }
+        }
+
+        @media print {
+            body > *:not(#print-area-wrapper) { display: none !important; }
+            #print-area-wrapper { display: block !important; width: 100%; }
+
+            body, body.modal-open {
+                overflow: visible !important;
+                height: auto !important;
+                background: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                padding: 10mm !important;
+            }
+
+            @page {
+                margin: 0;
+            }
+        }
 
 /* ===== DARK MODE: COMPREHENSIVE STYLING ===== */
 body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
@@ -285,6 +316,7 @@ body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !impo
 body.dark-mode .dataTables_paginate .paginate_button:hover { background: #444 !important; border-color: #444 !important; }
 body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; }
 body.dark-mode .dataTables_info { color: #999 !important; }
+    body.dark-mode .custom-status-filter { background: #2a2a2a; color: #e0e0e0; border-color: #555; }
 
 /* Form elements */
 body.dark-mode .field-input, body.dark-mode .field-select { background: #3a3a3a; color: #e0e0e0; border: 1px solid #3a3a3a; }
@@ -349,6 +381,8 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div id="print-area-wrapper"></div>
 
 <!-- =============== SIDEBAR =============== -->
 <div class="sidebar" id="sidebar">
@@ -415,7 +449,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 <i class="fa fa-user-graduate" style="margin-right:6px; font-size:11px;"></i> Student OJT Info
             </a>
             <a href="{{ url('/reportsExpired') }}" class="nav-sub-item active">
-                <i class="fa fa-calendar-times" style="margin-right:6px; font-size:11px;"></i> Expired MOA
+                <i class="fa fa-file-contract" style="margin-right:6px; font-size:11px;"></i> MOA
             </a>
         </div>
 
@@ -455,46 +489,62 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
         <div class="page-header">
             <div>
-                <h1>Expired <span>MOA Report</span></h1>
+                <h1>Memorandum of <span>Agreement</span></h1>
                 <div class="breadcrumb">
                     <a href="{{ url('/dashboard') }}"><i class="fa fa-home"></i> Dashboard</a>
                     <i class="fa fa-chevron-right"></i>
                     <a href="{{ url('/reports') }}">Reports</a>
                     <i class="fa fa-chevron-right"></i>
-                    <span>Expired MOA</span>
+                    <span>MOA</span>
                 </div>
             </div>
         </div>
 
         <!-- Stats -->
-        @php $totalExpired = count($companies); @endphp
+        @php
+            $totalMOA = count($companies);
+            $activeMOA = 0;
+            $expiredMOA = 0;
+
+            foreach ($companies as $company) {
+                $parts = explode('-', $company->school_year ?? '0-0');
+                $startYear = (int) ($parts[0] ?? 0);
+                $difference = now()->year - $startYear;
+
+                if ($difference > 3) {
+                    $expiredMOA++;
+                } else {
+                    $activeMOA++;
+                }
+            }
+        @endphp
         <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-icon red"><i class="fa fa-calendar-times"></i></div>
+                <div class="stat-icon red"><i class="fa fa-file-contract"></i></div>
                 <div>
-                    <div class="stat-num">{{ $totalExpired }}</div>
-                    <div class="stat-name">Expired MOAs</div>
+                    <div class="stat-num">{{ $totalMOA }}</div>
+                    <div class="stat-name">Total MOAs</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon amber"><i class="fa fa-building"></i></div>
+                <div class="stat-icon green"><i class="fa fa-check-circle"></i></div>
                 <div>
-                    <div class="stat-num">{{ $totalExpired }}</div>
-                    <div class="stat-name">Companies Affected</div>
+                    <div class="stat-num">{{ $activeMOA }}</div>
+                    <div class="stat-name">Active</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-file-contract"></i></div>
+                <div class="stat-icon amber"><i class="fa fa-exclamation-circle"></i></div>
                 <div>
-                    <div class="stat-num">MOA</div>
-                    <div class="stat-name">Report Type</div>
+                    <div class="stat-num">{{ $expiredMOA }}</div>
+                    <div class="stat-name">Expired</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon green"><i class="fa fa-calendar-alt"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-building"></i></div>
                 <div>
-                    <div class="stat-num">{{ now()->format('Y') }}</div>
-                    <div class="stat-name">Current Year</div>
+                    <div class="stat-num">{{ $totalMOA }}</div>
+                    <div class="stat-name">Partner Companies</div>
                 </div>
             </div>
         </div>
@@ -504,8 +554,8 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             <div class="panel-card-header">
                 <div class="panel-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
-                    <h2>Generate Report</h2>
-                    <p>Filter expired MOAs by school year and course</p>
+                    <h2>Generate MOA Report</h2>
+                    <p>Filter MOAs by school year and course</p>
                 </div>
             </div>
             <div class="panel-card-body">
@@ -552,14 +602,14 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 <div class="table-card-header-left">
                     <div class="header-icon"><i class="fa fa-calendar-times"></i></div>
                     <div>
-                        <h2>Expired Memorandum of Agreement</h2>
-                        <p>Companies with expired MOA agreements</p>
+                        <h2>MOA Records</h2>
+                        <p>Partner companies with active and expired MOAs</p>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <div class="count-badge">
                         <i class="fa fa-building"></i>
-                        {{ $totalExpired }} {{ $totalExpired == 1 ? 'company' : 'companies' }}
+                        {{ $totalMOA }} {{ $totalMOA == 1 ? 'record' : 'records' }}
                     </div>
                     <button type="button" class="btn-preview" id="openPreviewBtn">
                         <i class="fa fa-print"></i> Print Preview
@@ -583,6 +633,12 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
+                        @php
+                            $parts = explode('-', $company->school_year ?? '0-0');
+                            $startYear = (int) ($parts[0] ?? 0);
+                            $difference = now()->year - $startYear;
+                            $status = $difference > 3 ? 'Expired' : 'Active';
+                        @endphp
                         <tr>
                             <td style="display:none;">{{ $company->id }}</td>
                             <td>
@@ -591,7 +647,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                                     <span class="company-name-text">{{ $company->company_name }}</span>
                                 </div>
                             </td>
-                            <td class="company-address-cell" style="max-width:160px; word-break:break-word; font-size:12.5px;">
+                            <td class="company-address-cell">
                                 <i class="fa fa-map-marker-alt" style="color:var(--red); font-size:10px; margin-right:4px;"></i>
                                 {{ $company->company_address }}
                             </td>
@@ -616,9 +672,11 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                                 </span>
                             </td>
                             <td>
-                                <span class="expired-badge">
-                                    <i class="fa fa-times-circle" style="font-size:10px;"></i> Expired
-                                </span>
+                                @if($status === 'Active')
+                                    <span class="badge-active"><i class="fa fa-circle"></i> Active</span>
+                                @else
+                                    <span class="badge-expired"><i class="fa fa-times-circle"></i> Expired</span>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -674,13 +732,10 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     </div>
 </div>
 
-<!-- Hidden print iframe -->
-<iframe id="printFrame" style="display:none; position:absolute; left:-9999px; top:-9999px;"></iframe>
-
 <!-- Hidden email form (preserved) -->
 <form id="sendEmailForm" action="{{ url('/reportsExpired/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
     @csrf
-    <input type="hidden" id="courseInput" name="course" value="{{ $course }}">
+    <input type="hidden" id="courseInput" name="course" value="">
     <input type="hidden" id="emailInput"  name="email"  value="{{ $user->email }}">
 </form>
 
@@ -730,9 +785,35 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
     /* ── DataTable ── */
     $(document).ready(function () {
-        $('#companyTable').DataTable({
+        if ($.fn.DataTable.isDataTable('#companyTable')) {
+            $('#companyTable').DataTable().destroy();
+        }
+
+        var table = $('#companyTable').DataTable({
             order: [[0, 'desc']],
-            columnDefs: [{ targets: 0, visible: false }]
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            searching: true,
+            info: true,
+            dom: 'lfrtip',
+            columnDefs: [
+                { targets: 0, visible: false },
+                { targets: [1, 2, 3, 4, 5, 6, 7], orderable: false }
+            ]
+        });
+
+        $('.dataTables_length').append(
+            '<label style="margin-left: 20px; font-weight: 500;">Filter Status: ' +
+            '<select id="statusFilter" class="custom-status-filter">' +
+            '<option value="">All MOA</option>' +
+            '<option value="Active">Active MOA</option>' +
+            '<option value="Expired">Expired MOA</option>' +
+            '</select></label>'
+        );
+
+        $('#statusFilter').on('change', function() {
+            table.column(7).search(this.value).draw();
         });
     });
 
@@ -740,6 +821,15 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     document.addEventListener('DOMContentLoaded', function () {
         const startSel = document.getElementById('school_year_start');
         const endSel   = document.getElementById('school_year_end');
+        const courseSelect = document.getElementById('course');
+        const courseInput = document.getElementById('courseInput');
+
+        if (courseSelect && courseInput) {
+            courseInput.value = courseSelect.value;
+            courseSelect.addEventListener('change', function () {
+                courseInput.value = courseSelect.value;
+            });
+        }
 
         function updateEndYears() {
             const sy = parseInt(startSel.value);
@@ -756,8 +846,8 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         startSel.addEventListener('change', updateEndYears);
     });
 
-    /* ══════════════════════════════════════════════
-       BUILD PRINT HTML — branded Expired MOA layout
+     /* ══════════════════════════════════════════════
+         BUILD PRINT HTML — branded MOA layout
        • Matches Student OJT Info print style exactly
        • Reads CURRENT DataTable page rows only
        • Icon-safe get() strips Font Awesome glyphs
@@ -837,6 +927,14 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             const contact   = getContact();
             const email     = getEmail();
             const schoolYr  = getSY();
+            const status = (() => {
+                const parts = schoolYr.split('-');
+                const startYear = parseInt(parts[0] || '0', 10);
+                return (now.getFullYear() - startYear) > 3 ? 'Expired' : 'Active';
+            })();
+            const statusBadge = status === 'Active'
+                ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Active</span>`
+                : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Expired</span>`;
 
             rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
@@ -847,9 +945,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${contact}</td>
                 <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${email}</td>
                 <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${schoolYr}</td>
-                <td style="padding:7px 6px; vertical-align:top; text-align:center;">
-                    <span style="display:inline-block; background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:4px; padding:1px 7px; font-size:8px; font-weight:700;">Expired</span>
-                </td>
+                <td style="padding:7px 6px; vertical-align:top; text-align:center;">${statusBadge}</td>
             </tr>`;
         }
 
@@ -865,7 +961,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     </div>
                     <div style="flex:1;">
                         <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
-                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Expired MOA Report — Partner Companies</div>
+                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">MOA Report — Partner Companies</div>
                         <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus &nbsp;|&nbsp; College of Engineering and Technology</div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
@@ -903,7 +999,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
             <!-- SECTION LABEL -->
             <div style="padding:9px 22px 3px 22px;">
-                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Expired MOA Details — Page ${pageNum}</div>
+                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">MOA Details — Page ${pageNum}</div>
             </div>
 
             <!-- DATA TABLE — table-layout:fixed + % widths = no side scroll -->
@@ -963,7 +1059,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
                     <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                 </div>
-                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-EXP-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
+                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
             </div>
 
         </div>`;
@@ -978,54 +1074,13 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         previewModal.show();
     });
 
-    /* ── Print
-       @page { margin: 0 } removes browser date/title/URL.
-       Body padding restores the visual spacing.          ── */
+    /* ── Print ── */
     document.getElementById('doPrintBtn').addEventListener('click', function () {
-        const html = buildPrintHTML();
-
-        const printDoc = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Expired MOA Report — InternConnect</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        @page {
-            size: A4 landscape;
-            margin: 0;
-        }
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        html, body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        body {
-            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
-            font-size: 10px; color: #1a1a1a; background: #fff;
-            padding: 10mm 12mm;
-        }
-        table { border-collapse: collapse; width: 100%; }
-        thead { display: table-header-group; }
-        tfoot { display: table-footer-group; }
-        tr    { page-break-inside: avoid; }
-    </style>
-</head>
-<body>${html}
-</body>
-</html>`;
-
-        const frame = document.getElementById('printFrame');
-        const fw    = frame.contentWindow;
-        fw.document.open();
-        fw.document.write(printDoc);
-        fw.document.close();
-        fw.focus();
-        setTimeout(function () { fw.print(); }, 900);
+        document.getElementById('print-area-wrapper').innerHTML = buildPrintHTML();
+        window.print();
+        setTimeout(function () {
+            document.getElementById('print-area-wrapper').innerHTML = '';
+        }, 1000);
     });
 </script>
 

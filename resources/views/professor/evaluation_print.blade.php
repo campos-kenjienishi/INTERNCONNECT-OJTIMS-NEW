@@ -38,7 +38,7 @@
                             @php
                                 $latest = ($requestsByStudent[$student->id] ?? collect())->first();
                                 $studentClass = $classrooms->firstWhere('id', optional($student->studentInfo)->class_id);
-                                $status = $latest->status ?? 'not sent';
+                                $status = optional($latest)->status ?? 'not sent';
                                 $badge = $status === 'submitted' ? 'success' : ($status === 'expired' ? 'secondary' : ($status === 'cancelled' ? 'dark' : 'warning'));
                             @endphp
                             <tr>
@@ -46,8 +46,8 @@
                                 <td>{{ $student->full_name }}</td>
                                 <td>{{ $studentClass ? $studentClass->room : '-' }}</td>
                                 <td><span class="badge-like {{ $badge }}">{{ strtoupper($status) }}</span></td>
-                                <td>{{ $latest->supervisor_email ?? '-' }}</td>
-                                <td>{{ optional($latest->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
+                                <td>{{ optional($latest)->supervisor_email ?? '-' }}</td>
+                                <td>{{ optional(optional($latest)->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
                             </tr>
                         @empty
                             <tr>
