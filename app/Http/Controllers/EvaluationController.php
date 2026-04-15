@@ -677,6 +677,19 @@ class EvaluationController extends Controller
 
         $students = $studentsQuery->get();
         $studentIds = $students->pluck('id')->all();
+
+        if (empty($studentIds)) {
+            $filename = 'evaluation-monitoring-' . now()->format('Ymd-His') . '.csv';
+
+            return Response::streamDownload(function () {
+                $handle = fopen('php://output', 'w');
+                fputcsv($handle, ['Student No.', 'Student Name', 'Class ID', 'Latest Status', 'Supervisor Email', 'Sent At', 'Submitted At']);
+                fclose($handle);
+            }, $filename, [
+                'Content-Type' => 'text/csv',
+            ]);
+        }
+
         $requests = OjtEvaluationRequest::with(['evaluation'])
             ->whereIn('student_id', $studentIds)
             ->latest('id')
@@ -696,10 +709,10 @@ class EvaluationController extends Controller
                     optional($student->studentInfo)->studentNum ?: '',
                     $student->full_name,
                     optional($student->studentInfo)->class_id ?: '',
-                    $latest->status ?? 'not sent',
-                    $latest->supervisor_email ?? '',
-                    optional($latest->emailed_at)->format('Y-m-d H:i:s') ?: '',
-                    optional($latest->submitted_at)->format('Y-m-d H:i:s') ?: '',
+                    optional($latest)->status ?? 'not sent',
+                    optional($latest)->supervisor_email ?? '',
+                    optional(optional($latest)->emailed_at)->format('Y-m-d H:i:s') ?: '',
+                    optional(optional($latest)->submitted_at)->format('Y-m-d H:i:s') ?: '',
                 ]);
             }
 
