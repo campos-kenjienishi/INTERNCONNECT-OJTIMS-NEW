@@ -69,6 +69,11 @@ Route::middleware(['auth.session.custom'])->group(function () {
 
 Route::middleware(['role:1'])->group(function () {
     Route::get('/dashboard',[AuthController::class,'dashboard']);
+    Route::get('/analytics',[AuthController::class,'analytics'])->name('analytics');
+    Route::get('/analytics/data',[AuthController::class,'coordinatorAnalyticsData'])->name('coordinator.analytics.data');
+    Route::get('/analytics/drilldown',[AuthController::class,'coordinatorAnalyticsDrilldown'])->name('coordinator.analytics.drilldown');
+    Route::get('/analytics/export/csv',[AuthController::class,'coordinatorAnalyticsExportCsv'])->name('coordinator.analytics.export.csv');
+    Route::get('/analytics/export/pdf',[AuthController::class,'coordinatorAnalyticsExportPdf'])->name('coordinator.analytics.export.pdf');
     Route::get('/professorTab', [AuthController::class,'professorTab']);
     Route::post('/professorCreate', [AuthController::class,'professorCreate'])->name('professorCreate');
     Route::put('/updateProfessor', [ProfessorController::class, 'update'])->name('updateProfessor');
@@ -129,6 +134,11 @@ Route::middleware(['role:0'])->group(function () {
 
 Route::middleware(['role:2'])->group(function () {
     Route::get('/professor/home',[AuthController::class,'professor_home'])->name('professor_home');
+    Route::get('/professor/analytics',[AuthController::class,'professorAnalytics'])->name('professor.analytics');
+    Route::get('/professor/analytics/data',[AuthController::class,'professorAnalyticsData'])->name('professor.analytics.data');
+    Route::get('/professor/analytics/drilldown',[AuthController::class,'professorAnalyticsDrilldown'])->name('professor.analytics.drilldown');
+    Route::get('/professor/analytics/export/csv',[AuthController::class,'professorAnalyticsExportCsv'])->name('professor.analytics.export.csv');
+    Route::get('/professor/analytics/export/pdf',[AuthController::class,'professorAnalyticsExportPdf'])->name('professor.analytics.export.pdf');
     Route::get('/professor/login',[AuthController::class, 'logout']);
     Route::get('/professor/accountinfo', [AccountInfo::class,'profAcc']);
     Route::put('/professor/edit/{id}', [AccountInfo::class,'edit']);

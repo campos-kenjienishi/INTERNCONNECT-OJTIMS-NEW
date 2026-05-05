@@ -1134,6 +1134,11 @@ body.dark-mode .dashboard-footer .footer-copy {
             <span class="nav-label">Reports</span>
             <span class="tooltip-label">Reports</span>
         </a>
+        <a href="{{ url('/analytics') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
+            <span class="nav-label">Analytics</span>
+            <span class="tooltip-label">Analytics</span>
+        </a>
         <li>
     <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>

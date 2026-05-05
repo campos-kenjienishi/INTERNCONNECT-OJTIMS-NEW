@@ -453,6 +453,12 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             </a>
         </div>
 
+        <a href="{{ url('/analytics') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
+            <span class="nav-label">Analytics</span>
+            <span class="tooltip-label">Analytics</span>
+        </a>
+
         <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
