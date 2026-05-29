@@ -18,9 +18,70 @@
     <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}">
 
+    <style>
+        body.auth-centered-page .login-container {
+            max-width: 560px;
+            min-height: auto;
+        }
+
+        body.auth-centered-page .left-panel {
+            display: none !important;
+        }
+
+        body.auth-centered-page .right-panel {
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 620px;
+            padding: 48px 42px;
+            justify-content: center;
+        }
+
+        .auth-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
+        }
+
+        .auth-brand-copy .brand-name {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .auth-brand-copy .system-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 767px) {
+            body.auth-centered-page .right-panel {
+                min-height: auto;
+                padding: 40px 24px;
+            }
+
+            .auth-logo {
+                width: 58px;
+                height: 58px;
+            }
+
+            .auth-brand-copy .brand-name {
+                font-size: 20px;
+            }
+        }
+    </style>
+
 </head>
 
-<body>
+<body class="auth-centered-page">
 <div class="main-wrapper">
     <div class="login-container">
 
@@ -65,6 +126,14 @@
 
         <!-- RIGHT PANEL -->
         <div class="right-panel">
+            <div class="auth-brand">
+                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
+                <div class="auth-brand-copy">
+                    <div class="brand-name">Intern<span>Connect</span> - BETA</div>
+                    <div class="system-title">OJT Information Management System</div>
+                </div>
+            </div>
+
             <div class="login-header">
                 <h2>Welcome Back</h2>
                 <p>Sign in to your InternConnect Account</p>
