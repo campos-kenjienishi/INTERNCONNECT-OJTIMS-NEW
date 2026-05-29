@@ -167,12 +167,13 @@ window.addEventListener('click', function(e) {
             "." + BUTTON_CLASS + "{" +
                 "position:absolute;right:10px;top:50%;transform:translateY(-50%);" +
                 "width:28px;height:28px;border:none;border-radius:999px;" +
-                "background:#f5f5f5;color:#7f0000;cursor:pointer;z-index:5;" +
+                "background:#fffaf7;color:#7f0000;cursor:pointer;z-index:5;" +
                 "display:inline-flex;align-items:center;justify-content:center;" +
-                "font-size:13px;line-height:1;transition:all .2s ease;}",
-            "." + BUTTON_CLASS + ":hover{background:#ffe3e3;}",
+                "font-size:13px;line-height:1;transition:all .2s ease;" +
+                "border:2px solid #7f0000;box-shadow:0 0 0 2px rgba(127,0,0,.12);}",
+            "." + BUTTON_CLASS + ":hover{background:#ffe3e3;border-color:#5f0000;box-shadow:0 0 0 2px rgba(127,0,0,.18);}",
             "." + BUTTON_CLASS + "." + ACTIVE_CLASS + "{" +
-                "background:#7f0000;color:#fff;box-shadow:0 0 0 3px rgba(127,0,0,.2);}",
+                "background:#7f0000;color:#fff;border-color:#4d0000;box-shadow:0 0 0 3px rgba(127,0,0,.28);}",
             "textarea + ." + BUTTON_CLASS + "{top:10px;transform:none;}"
         ].join("");
 
