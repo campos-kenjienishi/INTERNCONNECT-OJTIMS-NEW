@@ -39,6 +39,26 @@
             display: none !important;
         }
 
+        body.auth-centered-page .right-panel .input-wrap input {
+            background: #f7f4ee !important;
+            border: 1px solid #ddd7cb !important;
+            color: #3b0000 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input::placeholder {
+            color: #9a9080 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input:focus {
+            background: #fffdf9 !important;
+            border-color: #cdbfa9 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap .i-icon {
+            color: #ef4444 !important;
+            z-index: 2;
+        }
+
         .auth-brand {
             display: flex;
             flex-direction: column;
@@ -100,7 +120,7 @@
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
                         <div class="brand-name">Intern<span>Connect</span> - BETA</div>
-                        <div class="system-title">OJT Information Management System</div>
+                        <div class="system-title">On-The-Job Training Information Management System</div>
                     </div>
                 </div>
 
@@ -147,7 +167,7 @@
                 <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
                 <div class="auth-brand-copy">
                     <div class="brand-name">Intern<span>Connect</span> - BETA</div>
-                    <div class="system-title">OJT Information Management System</div>
+                    <div class="system-title">On-The-Job Training Information Management System</div>
                 </div>
             </div>
 

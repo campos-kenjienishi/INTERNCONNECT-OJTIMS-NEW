@@ -81,6 +81,28 @@
             overflow-y: visible !important;
         }
 
+        body.auth-centered-page .right-panel .input-wrap input,
+        body.auth-centered-page .right-panel .input-wrap select {
+            background: #f7f4ee !important;
+            border: 1px solid #ddd7cb !important;
+            color: #3b0000 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input::placeholder {
+            color: #9a9080 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input:focus,
+        body.auth-centered-page .right-panel .input-wrap select:focus {
+            background: #fffdf9 !important;
+            border-color: #cdbfa9 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap .i-icon {
+            color: #ef4444 !important;
+            z-index: 2;
+        }
+
         @media (max-width: 767px) {
             .auth-brand { flex-direction: column; align-items: center; text-align: center; }
             body.auth-centered-page .right-panel {
