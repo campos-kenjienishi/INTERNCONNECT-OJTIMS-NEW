@@ -29,13 +29,33 @@ use App\Models\Company; // ADD THIS at the top
 
 class StudentController extends Controller
 {
+private function requireStudentSession()
+{
+    if (!Session::has('loginId')) {
+        return redirect('/login');
+    }
+
+    $user = User::where('id', Session::get('loginId'))->first();
+
+    if (!$user || (string) $user->role !== '0') {
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect('/login');
+    }
+
+    return $user;
+}
+
 public function home()
 {
-    $data = null;
+    $sessionCheck = $this->requireStudentSession();
 
-    if (Session::has('loginId')) {
-        $data = User::where('id', Session::get('loginId'))->first();
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
     }
+
+    $data = $sessionCheck;
 
     // GET COMPANIES
     $companies = Company::all();
@@ -51,13 +71,15 @@ public function home()
 }
     public function student_acc()
     {
+       $sessionCheck = $this->requireStudentSession();
+
+       if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+           return $sessionCheck;
+       }
+
+       $data = $sessionCheck;
        
         $course=Courses::all();
-        $data=array();
-        if(Session::has('loginId')){
-
-            $data=User::where('id','=', Session::get('loginId'))->first();
-
             if ($data) {
                 $studentProfile = Student::where('user_id', $data->id)->first();
 
@@ -72,7 +94,6 @@ public function home()
                     $data->date_of_birth = $studentProfile->date_of_birth;
                 }
             }
-                    }
 
 	    return view('students.student_account', compact('data','course'));
 
@@ -129,6 +150,13 @@ public function home()
 
     public function class()
     {   
+        $sessionCheck = $this->requireStudentSession();
+
+        if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+            return $sessionCheck;
+        }
+
+        $data = $sessionCheck;
 
         $sched = []; 
         $class = [];
@@ -137,11 +165,6 @@ public function home()
        
         
         $announce=[];
-        $data=array();
-            if(Session::has('loginId')){
-
-                $data=User::where('id','=', Session::get('loginId'))->first();
-            }
                          
             $class = [];
 
@@ -361,12 +384,14 @@ public function StuList()
 
 public function ojtInformation()
 {
-    $course=Courses::all();
-    $data=array();
-    if(Session::has('loginId')){
+    $sessionCheck = $this->requireStudentSession();
 
-        $data=User::where('id','=', Session::get('loginId'))->first();
-                }
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
+    }
+
+    $course=Courses::all();
+    $data = $sessionCheck;
                 $studentNum = $data->studentNum;
 
                 if (empty($studentNum) && !empty($data->id)) {

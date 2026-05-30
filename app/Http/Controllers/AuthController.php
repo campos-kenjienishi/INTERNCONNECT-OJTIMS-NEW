@@ -24,12 +24,14 @@ use App\Models\OJTInformation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Helpers\AuditLogger;
+use App\Services\ReportAiInsightService;
 
 class AuthController extends Controller
 {
@@ -96,8 +98,10 @@ class AuthController extends Controller
 
         if($user){
             if(Hash::check($request->password, $user->password)){
+                $request->session()->regenerate();
                 $request->session()->put('loginId',$user->id);
                 $request->session()->put('show_terms', true);
+                Cache::put('active_session_id:' . $user->id, $request->session()->getId(), now()->addHours(8));
                 if ($user->role == 0) {
                     return redirect()->route('student_home');
                 } 
@@ -272,6 +276,16 @@ class AuthController extends Controller
             ];
         })->values();
 
+        $analyticsInsights = $this->buildCoordinatorAnalyticsInsights(
+            $studentStatusAnalytics,
+            $fileStatusAnalytics,
+            $courseAnalytics,
+            $topCompanies,
+            $totalStudents,
+            $partnerCompanies,
+            $placedStudents
+        );
+
         return view('ojtCoordinator.analytics', compact(
             'data',
             'totalStudents',
@@ -289,7 +303,8 @@ class AuthController extends Controller
             'placedStudents',
             'courseAnalytics',
             'topCompanies',
-            'monthlyActivity'
+            'monthlyActivity',
+            'analyticsInsights'
         ));
     }
 
@@ -666,12 +681,18 @@ class AuthController extends Controller
         return $months;
     }
 
-    public function logout(){
-        if(Session::has('loginId')){
-            Session::pull('loginId');
-            Session::forget('termsAccepted');
-            return redirect('login');
+    public function logout(Request $request){
+        $userId = $request->session()->get('loginId');
+        if ($userId) {
+            Cache::forget('active_session_id:' . $userId);
         }
+
+        $request->session()->invalidate();
+        $request->session()->flush();
+        $request->session()->regenerateToken();
+        Cookie::queue(Cookie::forget(config('session.cookie')));
+
+        return redirect('login');
     }
 
     public function professorTab()
@@ -931,6 +952,20 @@ class AuthController extends Controller
             ];
         })->values();
 
+        $analyticsInsights = $this->buildProfessorAnalyticsInsights(
+            $classAnalytics,
+            $requestAnalytics,
+            $totalStudents,
+            $approvedStudents,
+            $pendingApprovals,
+            $submittedRequests,
+            $requestTotal,
+            $filePending,
+            $fileApproved,
+            $fileDenied,
+            $monthlyActivity
+        );
+
         return view('professor.analytics', compact(
             'data',
             'classrooms',
@@ -947,7 +982,8 @@ class AuthController extends Controller
             'filePending',
             'fileApproved',
             'fileDenied',
-            'monthlyActivity'
+            'monthlyActivity',
+            'analyticsInsights'
         ));
     }
 
@@ -1098,5 +1134,103 @@ class AuthController extends Controller
             $data=User::where('id','=', Session::get('loginId'))->first();
         }
         return view('students.pending', compact('data'));
+    }
+
+    protected function buildCoordinatorAnalyticsInsights($studentStatusAnalytics, $fileStatusAnalytics, $courseAnalytics, $topCompanies, int $totalStudents, int $partnerCompanies, int $placedStudents)
+    {
+        $studentStats = collect($studentStatusAnalytics);
+        $fileStats = collect($fileStatusAnalytics);
+        $courseStats = collect($courseAnalytics);
+        $companyStats = collect($topCompanies);
+
+        $approved = (int) ($studentStats->firstWhere('label', 'Approved students')['count'] ?? 0);
+        $pending = (int) ($studentStats->firstWhere('label', 'Pending students')['count'] ?? 0);
+        $pendingFiles = (int) ($fileStats->firstWhere('label', 'Pending files')['count'] ?? 0);
+        $topCourse = $courseStats->sortByDesc('count')->first();
+        $topCompany = $companyStats->sortByDesc('count')->first();
+
+        $highlights = [
+            'Student coverage shows ' . $totalStudents . ' records with ' . $approved . ' approved students.',
+            'Partner coverage includes ' . $partnerCompanies . ' companies and ' . $placedStudents . ' placed students.',
+        ];
+
+        if (!empty($topCourse['label'])) {
+            $highlights[] = 'Largest course group: ' . $topCourse['label'] . ' (' . $topCourse['count'] . ').';
+        }
+
+        if (!empty($topCompany['label'])) {
+            $highlights[] = 'Top partner company: ' . $topCompany['label'] . ' (' . $topCompany['count'] . ' placements).';
+        }
+
+        $watchouts = [];
+        if ($pending > 0) {
+            $watchouts[] = $pending . ' student account' . ($pending === 1 ? '' : 's') . ' still need approval or placement review.';
+        }
+        if ($pendingFiles > 0) {
+            $watchouts[] = $pendingFiles . ' requirement file' . ($pendingFiles === 1 ? '' : 's') . ' are still pending review.';
+        }
+
+        $actions = [
+            'Review pending student approvals before the next intake cycle.',
+            'Check placement balance across top partner companies.',
+            'Use the analytics chart filters to find weak course coverage.'
+        ];
+
+        return app(ReportAiInsightService::class)->summarize('coordinator_analytics', [
+            'total_records' => $totalStudents,
+            'total_companies' => $partnerCompanies,
+            'records_with_ojt' => $placedStudents,
+            'course' => $topCourse['label'] ?? null,
+        ], $highlights, $watchouts, $actions);
+    }
+
+    protected function buildProfessorAnalyticsInsights($classAnalytics, $requestAnalytics, int $totalStudents, int $approvedStudents, int $pendingApprovals, int $submittedRequests, int $requestTotal, int $filePending, int $fileApproved, int $fileDenied, $monthlyActivity)
+    {
+        $classStats = collect($classAnalytics);
+        $requestStats = collect($requestAnalytics);
+        $activityStats = collect($monthlyActivity);
+
+        $topClass = $classStats->sortByDesc('completion')->first();
+        $sent = (int) ($requestStats->firstWhere('label', 'Sent')['count'] ?? 0);
+        $opened = (int) ($requestStats->firstWhere('label', 'Opened')['count'] ?? 0);
+        $pendingFiles = (int) $filePending;
+        $latestMonth = $activityStats->last();
+
+        $highlights = [
+            'Advisee coverage shows ' . $totalStudents . ' students, ' . $approvedStudents . ' approved and ' . $pendingApprovals . ' pending.',
+            'Evaluation flow shows ' . $submittedRequests . ' submitted evaluations out of ' . $requestTotal . ' requests.',
+        ];
+
+        if (!empty($topClass['label'])) {
+            $highlights[] = 'Best completion class: ' . $topClass['label'] . ' at ' . $topClass['completion'] . '%.';
+        }
+
+        if ($latestMonth) {
+            $highlights[] = 'Latest month activity: ' . $latestMonth['sent'] . ' sent and ' . $latestMonth['submitted'] . ' submitted.';
+        }
+
+        $watchouts = [];
+        if ($pendingApprovals > 0) {
+            $watchouts[] = $pendingApprovals . ' student account' . ($pendingApprovals === 1 ? '' : 's') . ' still need approval.';
+        }
+        if ($pendingFiles > 0) {
+            $watchouts[] = $pendingFiles . ' file requirement' . ($pendingFiles === 1 ? '' : 's') . ' are still pending.';
+        }
+        if ($sent > $opened && $opened > 0) {
+            $watchouts[] = 'Some evaluation links were sent but not opened yet, so follow-up may be needed.';
+        }
+
+        $actions = [
+            'Follow up with classes that have low evaluation completion.',
+            'Review pending files alongside student approval status.',
+            'Use monthly activity to time reminders before deadlines.'
+        ];
+
+        return app(ReportAiInsightService::class)->summarize('professor_analytics', [
+            'total_records' => $totalStudents,
+            'records_with_ojt' => $submittedRequests,
+            'missing_ojt' => max(0, $requestTotal - $submittedRequests),
+            'course' => 'Professor advisories',
+        ], $highlights, $watchouts, $actions);
     }
 }

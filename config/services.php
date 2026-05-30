@@ -31,5 +31,17 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'local_ai' => [
+        'endpoint' => env('LOCAL_AI_ENDPOINT', ''),
+        'model' => env('LOCAL_AI_MODEL', 'mistral'),
+    ],
+
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'local'),
+        'model' => env('AI_MODEL', ''),
+        'gemini_endpoint' => env('GEMINI_API_ENDPOINT', ''),
+        'gemini_api_key' => env('GEMINI_API_KEY', ''),
+    ],
+
 
 ];

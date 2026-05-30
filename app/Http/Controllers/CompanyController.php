@@ -24,6 +24,24 @@ use App\Helpers\AuditLogger;
 
 class CompanyController extends Controller
 {
+private function requireStudentSession()
+{
+    if (!Session::has('loginId')) {
+        return redirect('/login');
+    }
+
+    $user = User::where('id', Session::get('loginId'))->first();
+
+    if (!$user || (string) $user->role !== '0') {
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect('/login');
+    }
+
+    return $user;
+}
+
     public function companies(Request $request)
     {
         $user = [];
@@ -113,11 +131,13 @@ class CompanyController extends Controller
 
 public function companiesup(Request $request)
 {
-    $user = array();
+    $sessionCheck = $this->requireStudentSession();
 
-    if (Session::has('loginId')) {
-        $user = User::where('id', '=', Session::get('loginId'))->first();
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
     }
+
+    $user = $sessionCheck;
 
     // Retrieve the companies where the current user is the uploader
     $companies = Company::where('uploader_name', $user->full_name)->get();
@@ -287,11 +307,13 @@ $res = $fileup->save();
 
 public function pending()
 {
-    $user = array();
+    $sessionCheck = $this->requireStudentSession();
 
-    if (Session::has('loginId')) {
-        $user = User::where('id', '=', Session::get('loginId'))->first();
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
     }
+
+    $user = $sessionCheck;
 
     $ojt = OJTInformation::where('studentNum', $user->studentNum)
                         ->where(function($query) {
