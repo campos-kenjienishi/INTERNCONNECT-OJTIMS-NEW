@@ -105,7 +105,10 @@ Route::middleware(['role:1'])->group(function () {
 
 // ─── STUDENT (role 0) ───────────────────────────────────────────────
 
-Route::middleware(['role:0'])->group(function () {
+Route::middleware([
+    \App\Http\Middleware\AuthMiddleware::class,
+    \App\Http\Middleware\RoleMiddleware::class . ':0',
+])->group(function () {
     Route::get('/student/home', [StudentController::class, 'home'])->name('student_home');
     Route::get('student/login',[AuthController::class, 'logout']);
     Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
@@ -122,6 +125,7 @@ Route::middleware(['role:0'])->group(function () {
     Route::get('/student/pending', [CompanyController::class,'pending']);
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
+    Route::get('/student/requirements/view/{id}', [PassDocuController::class,'viewFile']);
     Route::post('/remove/filesReq/{id}', [PassDocuController::class,'removeFile']);
     Route::get('/student/evaluation', [EvaluationController::class, 'studentIndex'])->name('student.evaluation');
     Route::post('/student/evaluation/send', [EvaluationController::class, 'sendEvaluationForm'])->name('student.evaluation.send');
