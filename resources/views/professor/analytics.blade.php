@@ -400,7 +400,7 @@
     </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/login') }}" class="nav-item">
+        <a href="{{ url('/logout') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>
@@ -922,6 +922,50 @@
                 </thead>
                 <tbody id="drilldownTableBody"></tbody>
             </table>
+
+            @if(!empty($analyticsInsights))
+                <div class="panel" style="margin-top:18px; border-left:4px solid #ef4444;">
+                    <div class="panel-head">
+                        <h2>AI Analytics Insight</h2>
+                        <p>Summary generated from the current dashboard metrics</p>
+                    </div>
+                    <div class="panel-body">
+                        <p style="font-size:14px; line-height:1.7; color:#374151; margin-bottom:16px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                                <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
+                                <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                    @forelse(($analyticsInsights['key_findings'] ?? []) as $item)
+                                        <li>{{ $item }}</li>
+                                    @empty
+                                        <li>No key findings available.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                                <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
+                                <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                    @forelse(($analyticsInsights['watchouts'] ?? []) as $item)
+                                        <li>{{ $item }}</li>
+                                    @empty
+                                        <li>No major watchouts detected.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                                <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
+                                <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                    @forelse(($analyticsInsights['recommendations'] ?? []) as $item)
+                                        <li>{{ $item }}</li>
+                                    @empty
+                                        <li>No actions suggested.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid #e5e7eb;">
             <span id="drilldownPaginationInfo" style="font-size:12px;color:#666;"></span>

@@ -62,12 +62,12 @@ Route::get('/evaluation/submitted', [EvaluationController::class, 'thankYou'])->
 // ─── AUTHENTICATED: ANY LOGGED-IN USER ──────────────────────────────
 
 Route::middleware(['auth.session.custom'])->group(function () {
-    Route::get('/logout',[AuthController::class, 'logout']);
+    Route::match(['get', 'post'], '/logout',[AuthController::class, 'logout']);
 });
 
 // ─── OJT COORDINATOR (role 1) ───────────────────────────────────────
 
-Route::middleware(['role:1'])->group(function () {
+Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/dashboard',[AuthController::class,'dashboard']);
     Route::get('/analytics',[AuthController::class,'analytics'])->name('analytics');
     Route::get('/analytics/data',[AuthController::class,'coordinatorAnalyticsData'])->name('coordinator.analytics.data');
@@ -110,7 +110,7 @@ Route::middleware([
     \App\Http\Middleware\RoleMiddleware::class . ':0',
 ])->group(function () {
     Route::get('/student/home', [StudentController::class, 'home'])->name('student_home');
-    Route::get('student/login',[AuthController::class, 'logout']);
+    Route::match(['get', 'post'], 'student/login',[AuthController::class, 'logout']);
     Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
     Route::put('/student/edit/{email}', [StudentController::class,'edit']);
     Route::get('/student/class', [StudentController::class,'class']);
@@ -136,14 +136,14 @@ Route::middleware([
 
 // ─── PROFESSOR (role 2) ─────────────────────────────────────────────
 
-Route::middleware(['role:2'])->group(function () {
+Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::get('/professor/home',[AuthController::class,'professor_home'])->name('professor_home');
     Route::get('/professor/analytics',[AuthController::class,'professorAnalytics'])->name('professor.analytics');
     Route::get('/professor/analytics/data',[AuthController::class,'professorAnalyticsData'])->name('professor.analytics.data');
     Route::get('/professor/analytics/drilldown',[AuthController::class,'professorAnalyticsDrilldown'])->name('professor.analytics.drilldown');
     Route::get('/professor/analytics/export/csv',[AuthController::class,'professorAnalyticsExportCsv'])->name('professor.analytics.export.csv');
     Route::get('/professor/analytics/export/pdf',[AuthController::class,'professorAnalyticsExportPdf'])->name('professor.analytics.export.pdf');
-    Route::get('/professor/login',[AuthController::class, 'logout']);
+    Route::match(['get', 'post'], '/professor/login',[AuthController::class, 'logout']);
     Route::get('/professor/accountinfo', [AccountInfo::class,'profAcc']);
     Route::put('/professor/edit/{id}', [AccountInfo::class,'edit']);
     Route::put('/professor/change_password/{id}', [AccountInfo::class,'change_password']);
@@ -180,7 +180,7 @@ Route::middleware(['role:2'])->group(function () {
 
 // ─── SHARED: ALL AUTHENTICATED USERS (roles 0, 1 & 2) ──────────────
 
-Route::middleware(['role:0,1,2'])->group(function () {
+Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::get('/download/{file}', [FileController::class,'download']);
     Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::post('/announcements', [AnnouncementController::class,'announcement']);
@@ -193,18 +193,18 @@ Route::middleware(['role:0,1,2'])->group(function () {
 
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ── Reports ───────
 
-Route::middleware(['role:1,2'])->group(function () {
+Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
     Route::post('/reportsExpired/send-email', [ReportsController::class, 'sendEmailExpired'])->name('reportsExpired.send.email');
 });
 
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ─────────────────
 
-Route::middleware(['role:1,2'])->group(function () {
+Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
     Route::post('/uploadfile', [FileController::class,'uploadfile']);
     Route::get('/download/req/{file}', [PassDocuController::class,'download']);
 });
 
-Route::middleware(['role:1'])->group(function () {
+Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/uploadpage', [FileController::class, 'show'])->name('uploadpage');
     Route::get('/view/{is}', [FileController::class,'view']);
     Route::post('/remove/{id}', [FileController::class,'remove']);

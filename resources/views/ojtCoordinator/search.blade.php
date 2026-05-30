@@ -89,7 +89,7 @@
 
                 
                 <li>
-                    <a href="{{ url('/login') }}">
+                        <a href="{{ url('/logout') }}">
                         <span class="icon">
                             <ion-icon name="log-out-outline"></ion-icon>
                         </span>
