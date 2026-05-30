@@ -106,7 +106,12 @@ class PassDocuController extends Controller
         // Fetch only file categories from student's professor
         $student = Student::where('user_id', $user->id)->first();
         $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
-        $fileCategories = $professor ? FileCategory::where('professor_id', $professor->id)->get() : collect();
+        $fileCategories = $professor
+            ? FileCategory::where('professor_id', $professor->id)
+                ->get()
+                ->sortBy('fileName', SORT_NATURAL | SORT_FLAG_CASE)
+                ->values()
+            : collect();
 
         // Student's own uploaded files
         $data = FileRequirement::where('uploadedBy', '=', $user->full_name)->get();
