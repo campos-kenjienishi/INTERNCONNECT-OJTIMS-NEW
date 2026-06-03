@@ -1,0 +1,262 @@
+/* ============================================================
+   evaluation-responsive.css
+   RESPONSIVE ONLY — Does NOT change desktop design.
+   
+   Link in evaluation-shell.blade.php <head> (after other css):
+   <link rel="stylesheet" href="{{ asset('css/evaluation-responsive.css') }}">
+   ============================================================ */
+
+/* ─────────────────────────────────────────────
+   LG — 1024px and below (small laptops)
+───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .page-content { padding: 22px !important; }
+    .page-header h1 { font-size: 20px !important; }
+
+    .card-shell .card-header-shell { padding: 16px 20px !important; }
+    .card-shell .card-body-shell { padding: 20px !important; }
+
+    .table-shell thead th,
+    .table-shell tbody td { padding: 11px 12px !important; font-size: 13px !important; }
+}
+
+/* ─────────────────────────────────────────────
+   MD — 900px and below (tablets / iPad)
+   Sidebar becomes a drawer via existing code.
+───────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .topbar { padding: 0 16px !important; }
+    .topbar-badge { font-size: 11.5px !important; padding: 5px 10px !important; }
+
+    .page-content { padding: 16px !important; }
+    .page-header { margin-bottom: 16px !important; }
+    .page-header h1 { font-size: 18px !important; }
+    .page-header .subtext { font-size: 12px !important; }
+
+    /* Cards */
+    .card-shell { border-radius: 12px !important; }
+    .card-shell .card-header-shell { padding: 14px 16px !important; }
+    .card-shell .card-header-shell h2 { font-size: 14.5px !important; }
+    .card-shell .card-body-shell { padding: 16px !important; }
+    .card-shell .card-body-shell.tight { padding: 0 !important; }
+
+    /* Form */
+    .form-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+    .form-control-shell { font-size: 16px !important; } /* prevents iOS zoom */
+    .panel-note { font-size: 12.5px !important; padding: 12px 14px !important; }
+    .flash-alert { font-size: 12.5px !important; padding: 12px 14px !important; }
+
+    /* Buttons */
+    .btn-eval { font-size: 13px !important; padding: 9px 14px !important; }
+    .btn-back { font-size: 13px !important; padding: 9px 16px !important; }
+
+    /* ✅ Table — horizontal scroll so Status/Action columns stay visible */
+    .table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: 12px !important;
+    }
+
+    .table-shell { min-width: 640px !important; }
+
+    .table-shell thead th {
+        padding: 10px 12px !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+    }
+
+    .table-shell tbody td {
+        padding: 12px 12px !important;
+        font-size: 13px !important;
+    }
+
+    .badge-like { font-size: 11px !important; padding: 4px 10px !important; }
+
+    /* Action buttons inside table */
+    .stacked-actions { gap: 6px !important; }
+
+    /* Footer */
+    .dashboard-footer { padding: 14px 16px !important; font-size: 11.5px !important; }
+}
+
+/* ─────────────────────────────────────────────
+   SM — 640px and below (large phones)
+───────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .topbar { padding: 0 12px !important; }
+
+    /* Collapse badge to icon only */
+    .topbar-badge span { display: none !important; }
+    .topbar-badge {
+        padding: 6px 10px !important;
+        border-radius: 50% !important;
+        gap: 0 !important;
+    }
+
+    .page-content { padding: 12px !important; }
+    .page-header h1 { font-size: 16px !important; }
+    .page-header { gap: 8px !important; }
+
+    /* Back to Home button — compact */
+    .btn-back {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        gap: 6px !important;
+    }
+
+    /* Cards */
+    .card-shell .card-header-shell { padding: 12px 14px !important; }
+    .card-shell .card-header-shell h2 { font-size: 13.5px !important; }
+    .card-shell .card-header-shell h2 .header-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 12px !important;
+    }
+    .card-shell .card-body-shell { padding: 14px !important; }
+
+    /* Form */
+    .form-label-shell { font-size: 12.5px !important; }
+    .form-control-shell {
+        font-size: 16px !important; /* iOS zoom prevention */
+        padding: 10px 12px !important;
+    }
+    .form-hint { font-size: 11.5px !important; }
+    .panel-note { font-size: 12px !important; }
+    .flash-alert { font-size: 12px !important; }
+
+    /* Send button — full width on phone */
+    .stacked-actions .btn-eval-primary {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* ✅ Evaluation history table — horizontal scroll */
+    .table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .table-shell { min-width: 580px !important; }
+
+    .table-shell thead th {
+        padding: 9px 10px !important;
+        font-size: 10.5px !important;
+        white-space: nowrap !important;
+    }
+
+    .table-shell tbody td {
+        padding: 10px 10px !important;
+        font-size: 12.5px !important;
+    }
+
+    /* Badges */
+    .badge-like {
+        font-size: 10.5px !important;
+        padding: 3px 8px !important;
+    }
+
+    /* Action buttons in table */
+    .btn-eval {
+        font-size: 11.5px !important;
+        padding: 6px 10px !important;
+        gap: 4px !important;
+    }
+
+    .section-gap { margin-top: 14px !important; }
+
+    /* Footer */
+    .dashboard-footer {
+        padding: 12px !important;
+        font-size: 11px !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    .dashboard-footer .footer-links {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 4px !important;
+    }
+}
+
+/* ─────────────────────────────────────────────
+   XS — 480px and below (small phones)
+   e.g. iPhone SE, small Android phones
+───────────────────────────────────────────── */
+@media (max-width: 480px) {
+    :root { --topbar-h: 56px !important; }
+
+    .menu-toggle, .darkmode-toggle {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 15px !important;
+    }
+
+    .topbar-left { gap: 8px !important; }
+    .page-header h1 { font-size: 15px !important; }
+
+    /* Cards — tightest padding */
+    .card-shell .card-header-shell { padding: 10px 12px !important; }
+    .card-shell .card-body-shell { padding: 12px !important; }
+
+    /* Table minimum width */
+    .table-shell { min-width: 520px !important; }
+
+    .table-shell thead th {
+        padding: 8px 9px !important;
+        font-size: 10px !important;
+    }
+
+    .table-shell tbody td {
+        padding: 9px 9px !important;
+        font-size: 12px !important;
+    }
+
+    /* Stack Resend + Cancel buttons vertically */
+    .stacked-actions {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 5px !important;
+    }
+
+    .stacked-actions .btn-eval {
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center !important;
+        font-size: 11px !important;
+        padding: 6px 8px !important;
+    }
+
+    /* Back button — icon only on very small */
+    .btn-back span { display: none !important; }
+    .btn-back {
+        padding: 9px 12px !important;
+        border-radius: 8px !important;
+    }
+
+    .modal-dialog { margin: 8px !important; }
+}
+
+/* ─────────────────────────────────────────────
+   2XL — 1536px and above (large desktops / TVs)
+───────────────────────────────────────────── */
+@media (min-width: 1536px) {
+    .page-content {
+        max-width: 1400px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .page-header h1 { font-size: 28px !important; }
+
+    .card-shell .card-header-shell h2 { font-size: 18px !important; }
+
+    .table-shell thead th,
+    .table-shell tbody td {
+        font-size: 14.5px !important;
+        padding: 16px 18px !important;
+    }
+
+    .btn-eval { font-size: 15px !important; padding: 12px 20px !important; }
+}

@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/student_home-responsive.css') }}">
+    <script src="{{ url('/assets/js/dark-mode.js') }}"></script> 
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1064,21 +1065,7 @@ menuToggle.addEventListener('click', function () {
 
 overlay.addEventListener('click', closeMobileSidebar);
 
-    /* ── Dark mode toggle ── */
-    const darkmodeToggle = document.getElementById('darkmodeToggle');
-    const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
-
-    if (isDarkMode) {
-        document.body.classList.add('dark-mode');
-        darkmodeToggle.innerHTML = '<i class="fa fa-sun"></i>';
-    }
-
-    darkmodeToggle.addEventListener('click', function () {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-        darkmodeToggle.innerHTML = isDark ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
-    });
+   
 
     /* ── Live date badge ── */
     const dateEl = document.getElementById('currentDate');
