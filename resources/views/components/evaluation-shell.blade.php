@@ -61,6 +61,8 @@
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('css/student_evaluation-responsive.css') }}">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -996,33 +998,39 @@
         {{ $slot }}
     </div>
 
-    <footer class="dashboard-footer{{ $isAuthenticatedShell ? '' : ' public-footer' }}">
-        <div class="footer-left">
-            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
-            <span class="footer-copy">© 1998–2026 <span>Polytechnic University of the Philippines</span></span>
-        </div>
-        <div class="footer-links">
-            <a href="https://www.pup.edu.ph/" target="_blank" rel="noreferrer">PUP Website</a>
-        </div>
-    </footer>
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+        <span class="footer-copy">
+            © 1998–2026 <span>Polytechnic University of the Philippines</span>
+        </span>
+    </div>
+    <div class="footer-links">
+        <a href="https://www.pup.edu.ph/" target="_blank" rel="noreferrer">
+            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+            PUP Website
+        </a>
+        <span class="divider">|</span>
+        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <span class="divider">|</span>
+        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+    </div>
+</footer>
 </div>
 
 <script>
     (function () {
+        // ── Sidebar toggle only ──
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const menuToggle = document.getElementById('menuToggle');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const darkmodeToggle = document.getElementById('darkmodeToggle');
-        const darkmodeIcon = document.getElementById('darkmodeIcon');
 
         if (menuToggle && sidebar && mainContent) {
             menuToggle.addEventListener('click', () => {
                 if (window.innerWidth <= 900) {
                     sidebar.classList.toggle('mobile-open');
-                    if (sidebarOverlay) {
-                        sidebarOverlay.classList.toggle('active');
-                    }
+                    if (sidebarOverlay) sidebarOverlay.classList.toggle('active');
                 } else {
                     sidebar.classList.toggle('collapsed');
                     mainContent.classList.toggle('expanded');
@@ -1034,27 +1042,6 @@
             sidebarOverlay.addEventListener('click', () => {
                 sidebar.classList.remove('mobile-open');
                 sidebarOverlay.classList.remove('active');
-            });
-        }
-
-        if (darkmodeToggle && darkmodeIcon) {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                darkmodeIcon.classList.replace('fa-moon', 'fa-sun');
-            }
-
-            darkmodeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const isDark = document.body.classList.contains('dark-mode');
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                if (isDark) {
-                    darkmodeIcon.classList.remove('fa-moon');
-                    darkmodeIcon.classList.add('fa-sun');
-                } else {
-                    darkmodeIcon.classList.remove('fa-sun');
-                    darkmodeIcon.classList.add('fa-moon');
-                }
             });
         }
     })();
