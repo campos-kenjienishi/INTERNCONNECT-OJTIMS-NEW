@@ -239,6 +239,47 @@
             .stat-num  { font-size: 28px; font-weight: 800; color: #1a1a1a; line-height: 1; }
             .stat-name { font-size: 13px; color: #888; margin-top: 4px; font-weight: 500; }
 
+            /* =============== ANALYTICS =============== */
+            .analytics-section { margin-bottom: 26px; }
+            .analytics-header {
+                display: flex; align-items: flex-end; justify-content: space-between;
+                gap: 12px; margin-bottom: 14px; flex-wrap: wrap;
+            }
+            .analytics-header h2 { font-size: 18px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.3px; }
+            .analytics-header p { font-size: 13px; color: #888; margin-top: 4px; }
+            .analytics-updated {
+                font-size: 12px; color: #666; background: #fff;
+                border: 1px solid #e5e7eb; border-radius: 999px;
+                padding: 8px 12px; white-space: nowrap;
+            }
+            .analytics-grid {
+                display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px; margin-bottom: 24px;
+            }
+            .analytics-card.full-width { grid-column: 1 / -1; }
+            .analytics-list { display: flex; flex-direction: column; gap: 14px; }
+            .analytics-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+            .analytics-item-title { font-size: 13px; font-weight: 600; color: #333; }
+            .analytics-item-meta { font-size: 12px; color: #777; margin-top: 2px; }
+            .analytics-track {
+                width: 100%; height: 10px; border-radius: 999px; background: #edf0f5;
+                overflow: hidden; margin-top: 8px;
+            }
+            .analytics-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+            .analytics-fill.green { background: linear-gradient(90deg, #22c55e, #16a34a); }
+            .analytics-fill.red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+            .analytics-fill.blue { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+            .analytics-fill.amber { background: linear-gradient(90deg, #f59e0b, #d97706); }
+            .analytics-fill.purple { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+            .analytics-fill.teal { background: linear-gradient(90deg, #2dd4bf, #0f766e); }
+            .analytics-month-row { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: start; }
+            .analytics-month-label { font-size: 12px; font-weight: 700; color: #555; padding-top: 3px; }
+            .analytics-bars { display: flex; flex-direction: column; gap: 10px; }
+            .analytics-bar-group { display: flex; align-items: center; gap: 10px; }
+            .analytics-bar-group span { width: 52px; font-size: 11px; color: #777; font-weight: 600; }
+            .analytics-bar { flex: 1; }
+            .analytics-bar .analytics-fill { height: 8px; }
+
             .stat-change {
                 display: inline-flex; align-items: center; gap: 4px;
                 font-size: 11.5px; font-weight: 600; margin-top: 6px;
@@ -917,6 +958,14 @@ body.dark-mode .panel-card-header { background: #2a2a2a; border-bottom: 1px soli
 body.dark-mode .panel-card-header h2 { color: #fff; }
 body.dark-mode .panel-card-header p { color: #999; }
 body.dark-mode .panel-card-footer { background: #2a2a2a !important; border-top: 1px solid #3a3a3a; }
+body.dark-mode .analytics-header h2 { color: #fff; }
+body.dark-mode .analytics-header p { color: #aaa; }
+body.dark-mode .analytics-updated { background: #2a2a2a; border: 1px solid #3a3a3a; color: #e0e0e0; }
+body.dark-mode .analytics-item-title { color: #f3f4f6; }
+body.dark-mode .analytics-item-meta { color: #9ca3af; }
+body.dark-mode .analytics-track { background: #3a3a3a; }
+body.dark-mode .analytics-month-label { color: #d1d5db; }
+body.dark-mode .analytics-bar-group span { color: #9ca3af; }
 
 /* Form fields */
 body.dark-mode .field-label { color: #e0e0e0; }
@@ -1013,6 +1062,11 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 <span class="nav-label">Reports</span>
                 <span class="tooltip-label">Reports</span>
             </a>
+            <a href="{{ url('/analytics') }}" class="nav-item">
+                <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
+                <span class="nav-label">Analytics</span>
+                <span class="tooltip-label">Analytics</span>
+            </a>
             <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
@@ -1022,7 +1076,7 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
     </nav>
 
         <div class="sidebar-footer">
-            <a href="{{ url('/login') }}" class="nav-item">
+            <a href="{{ url('/logout') }}" class="nav-item">
                 <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
                 <span class="nav-label">Log Out</span>
                 <span class="tooltip-label">Log Out</span>
@@ -1216,6 +1270,12 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                                 <i class="fa fa-chart-bar"></i>
                             </div>
                             <span class="quick-link-label">Reports</span>
+                        </a>
+                        <a href="{{ url('/analytics') }}" class="quick-link-item">
+                            <div class="quick-link-icon blue">
+                                <i class="fa fa-chart-line"></i>
+                            </div>
+                            <span class="quick-link-label">Analytics</span>
                         </a>
                     </div>
                 </div>

@@ -19,9 +19,97 @@ $email = $_GET['email'] ?? '';
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
 
+    <style>
+        body.auth-centered-page .login-container {
+            max-width: 560px;
+            min-height: auto;
+        }
+
+        body.auth-centered-page .left-panel {
+            display: none !important;
+        }
+
+        body.auth-centered-page .right-panel {
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 620px;
+            padding: 48px 42px;
+            justify-content: center;
+        }
+
+        body.auth-centered-page .shield-icon-wrap {
+            display: none !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input,
+        body.auth-centered-page .right-panel .input-wrap select {
+            background: #f7f4ee !important;
+            border: 1px solid #ddd7cb !important;
+            color: #3b0000 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input::placeholder {
+            color: #9a9080 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input:focus,
+        body.auth-centered-page .right-panel .input-wrap select:focus {
+            background: #fffdf9 !important;
+            border-color: #cdbfa9 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap .i-icon,
+        body.auth-centered-page .right-panel .input-wrap .toggle-pw {
+            color: #ef4444 !important;
+            z-index: 2;
+        }
+
+        .auth-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
+        }
+
+        .auth-brand-copy .brand-name {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .auth-brand-copy .system-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 767px) {
+            body.auth-centered-page .right-panel {
+                min-height: auto;
+                padding: 40px 24px;
+            }
+
+            .auth-logo {
+                width: 58px;
+                height: 58px;
+            }
+
+            .auth-brand-copy .brand-name {
+                font-size: 20px;
+            }
+        }
+    </style>
+
 </head>
 
-<body>
+<body class="auth-centered-page">
 <div class="main-wrapper">
     <div class="login-container">
 
@@ -79,7 +167,6 @@ $email = $_GET['email'] ?? '';
 
         <!-- RIGHT PANEL -->
         <div class="right-panel">
-
             <!-- Floating shield icon -->
             <div class="shield-icon-wrap">
                 <div class="shield-circle">

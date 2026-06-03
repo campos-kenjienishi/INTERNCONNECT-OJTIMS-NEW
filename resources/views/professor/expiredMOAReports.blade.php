@@ -448,6 +448,11 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
+        <a href="{{ url('/professor/analytics') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
+            <span class="nav-label">Analytics</span>
+            <span class="tooltip-label">Analytics</span>
+        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item active">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>
@@ -466,7 +471,7 @@
     </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/login') }}" class="nav-item">
+        <a href="{{ url('/logout') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>
@@ -595,6 +600,53 @@
                 </div>
             </div>
         </div>
+
+        @if(!empty($reportInsights))
+            <div class="filter-card" style="margin-bottom:22px; border-left:4px solid var(--red);">
+                <div class="filter-card-header">
+                    <div class="filter-header-icon"><i class="fa fa-robot"></i></div>
+                    <div>
+                        <h2>AI Report Insight</h2>
+                        <p>Generated from the current MOA report data</p>
+                    </div>
+                    <div style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:700;">
+                        <i class="fa fa-brain"></i>
+                        {{ !empty($reportInsights['used_local_ai']) ? 'Local AI' : 'Internal Insight' }}
+                    </div>
+                </div>
+                <div class="filter-card-body" style="display:block;">
+                    <p style="font-size:14px; line-height:1.7; color:#333; margin-bottom:16px;">{{ $reportInsights['summary'] ?? 'No AI insight available.' }}</p>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                        <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
+                            <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
+                            <ul style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                                @foreach(($reportInsights['key_findings'] ?? []) as $item)
+                                    <li>{{ $item }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
+                            <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
+                            <ul style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                                @forelse(($reportInsights['watchouts'] ?? []) as $item)
+                                    <li>{{ $item }}</li>
+                                @empty
+                                    <li>No major watchouts detected.</li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
+                            <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
+                            <ul style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                                @foreach(($reportInsights['recommendations'] ?? []) as $item)
+                                    <li>{{ $item }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <div class="table-card">
             <div class="table-card-header">
@@ -1018,6 +1070,7 @@
                 </div>
             </div>
         </div>`;
+
     }
 
     /* ── Modal (single instance, no double-trigger) ── */

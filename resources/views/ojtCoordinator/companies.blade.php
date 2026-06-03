@@ -641,6 +641,11 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             <span class="nav-label">Reports</span>
             <span class="tooltip-label">Reports</span>
         </a>
+        <a href="{{ url('/analytics') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
+            <span class="nav-label">Analytics</span>
+            <span class="tooltip-label">Analytics</span>
+        </a>
         <li>
     <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
@@ -651,7 +656,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/login') }}" class="nav-item">
+        <a href="{{ url('/logout') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>

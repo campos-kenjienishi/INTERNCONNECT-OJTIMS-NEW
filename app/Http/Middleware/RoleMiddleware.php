@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,7 +28,14 @@ class RoleMiddleware
 
         $user = User::where('id', Session::get('loginId'))->first();
 
-        if (!$user || !in_array((string) $user->role, $roles, true)) {
+        if (!$user || Cache::get('active_session_id:' . $user->id) !== $request->session()->getId()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect('/login');
+        }
+
+        if (!in_array((string) $user->role, $roles, true)) {
             return $this->redirectToDashboard($user);
         }
 

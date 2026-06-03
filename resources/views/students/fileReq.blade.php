@@ -539,6 +539,28 @@
             color: var(--red);
         }
 
+        .btn-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: #fff;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 8px;
+            color: #0f766e;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .btn-view:hover {
+            background: #ecfeff;
+            border-color: #a5f3fc;
+            color: #0f766e;
+        }
+
         /* =============== MODAL =============== */
         .modal-content {
             border-radius: 16px;
@@ -837,7 +859,7 @@
     </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/login') }}" class="nav-item">
+        <a href="{{ url('/logout') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>
@@ -947,6 +969,20 @@
                             var fileId = $(this).data('file-id');
                             showRemoveConfirmation(fileId);
                         });
+
+                        $('.view-button').click(function (e) {
+                            e.preventDefault();
+                            var fileUrl = $(this).data('file-url');
+                            var fileName = $(this).data('file-name');
+                            $('#previewFileName').text(fileName);
+                            $('#previewFrame').attr('src', fileUrl);
+                            var previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+                            previewModal.show();
+                        });
+
+                        document.getElementById('previewModal').addEventListener('hidden.bs.modal', function () {
+                            $('#previewFrame').attr('src', 'about:blank');
+                        });
                     });
                 </script>
 
@@ -995,9 +1031,14 @@
                                 <div class="date-sub">{{ \Carbon\Carbon::parse($files->created_at)->format('h:i A') }}</div>
                             </td>
                             <td>
-                                <button class="btn-remove remove-button" data-file-id="{{ $files->id }}">
-                                    <i class="fa fa-trash"></i> Remove
-                                </button>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    <button type="button" class="btn-view view-button" data-file-url="{{ url('/student/requirements/view/' . $files->id) }}" data-file-name="{{ $files->file }}">
+                                        <i class="fa fa-eye"></i> View
+                                    </button>
+                                    <button class="btn-remove remove-button" data-file-id="{{ $files->id }}">
+                                        <i class="fa fa-trash"></i> Remove
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -1082,6 +1123,23 @@
                 </div>
 
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-eye"></i> View Requirement
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:0; background:#f8fafc;">
+                <div id="previewFileName" style="padding:14px 18px; border-bottom:1px solid #e5e7eb; background:#fff; color:#475569; font-size:13px; font-weight:600;"></div>
+                <iframe id="previewFrame" title="Requirement Preview" style="width:100%; height:75vh; border:0; background:#fff;"></iframe>
+            </div>
         </div>
     </div>
 </div>

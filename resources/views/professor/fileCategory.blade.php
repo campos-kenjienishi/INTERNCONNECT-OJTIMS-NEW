@@ -643,6 +643,11 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
+        <a href="{{ url('/professor/analytics') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
+            <span class="nav-label">Analytics</span>
+            <span class="tooltip-label">Analytics</span>
+        </a>
         <a href="{{ url('/reportsExpiredProf') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
             <span class="nav-label">MOA</span>
@@ -661,7 +666,7 @@
     </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/login') }}" class="nav-item">
+        <a href="{{ url('/logout') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>

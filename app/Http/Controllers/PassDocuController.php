@@ -29,6 +29,24 @@ use App\Helpers\AuditLogger;
 
 class PassDocuController extends Controller
 {
+    private function requireStudentSession()
+    {
+        if (!Session::has('loginId')) {
+            return redirect('/login');
+        }
+
+        $user = User::where('id', Session::get('loginId'))->first();
+
+        if (!$user || (string) $user->role !== '0') {
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            return redirect('/login');
+        }
+
+        return $user;
+    }
+
     public function maintainFileCategory() {
         $data = [];
         $userName = '';
@@ -97,16 +115,23 @@ class PassDocuController extends Controller
 
     public function fileReq(Request $request)
     {
-        $user = [];
+        $sessionCheck = $this->requireStudentSession();
 
-        if (Session::has('loginId')) {
-            $user = User::where('id', '=', Session::get('loginId'))->first();
+        if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+            return $sessionCheck;
         }
+
+        $user = $sessionCheck;
 
         // Fetch only file categories from student's professor
         $student = Student::where('user_id', $user->id)->first();
         $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
-        $fileCategories = $professor ? FileCategory::where('professor_id', $professor->id)->get() : collect();
+        $fileCategories = $professor
+            ? FileCategory::where('professor_id', $professor->id)
+                ->get()
+                ->sortBy('fileName', SORT_NATURAL | SORT_FLAG_CASE)
+                ->values()
+            : collect();
 
         // Student's own uploaded files
         $data = FileRequirement::where('uploadedBy', '=', $user->full_name)->get();
@@ -115,6 +140,11 @@ class PassDocuController extends Controller
     }
 
 public function fileReqCreate(Request $request){
+    $sessionCheck = $this->requireStudentSession();
+
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
+    }
    
 
     
@@ -151,6 +181,11 @@ public function fileReqCreate(Request $request){
 
 public function removeFile($id)
     {
+        $sessionCheck = $this->requireStudentSession();
+
+        if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+            return $sessionCheck;
+        }
 
         $data = FileRequirement::find($id);
 
@@ -170,11 +205,30 @@ public function removeFile($id)
         return redirect()->back();
     }
 
+    public function viewFile($id)
+    {
+        $sessionCheck = $this->requireStudentSession();
 
+        if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+            return $sessionCheck;
+        }
 
+        $user = $sessionCheck;
+
+        $fileRequirement = FileRequirement::where('id', $id)
+            ->where('uploadedBy', $user->full_name)
+            ->firstOrFail();
+
+        $filePath = public_path('assets/' . $fileRequirement->file);
+
+        if (!file_exists($filePath)) {
+            return back()->with('error', 'File not found.');
+        }
+
+        return response()->file($filePath);
+    }
 
     public function studentRequirements(Request $request){
-
         // Retrieve the value from the query parameter
         $value = $request->input('value');
         $data = [];

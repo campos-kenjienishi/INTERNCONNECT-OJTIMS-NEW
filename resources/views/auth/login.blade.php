@@ -18,9 +18,182 @@
     <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}">
 
+    <style>
+        body.auth-centered-page .login-container {
+            max-width: 600px;
+            min-height: auto;
+        }
+
+        body.auth-centered-page .main-wrapper {
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        body.auth-centered-page .left-panel {
+            display: none !important;
+        }
+
+        body.auth-centered-page .right-panel {
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 450px;
+            padding: 30px 38px;
+            justify-content: center;
+        }
+
+        .auth-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
+        }
+
+        .auth-brand-copy .brand-name {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .auth-brand-copy .system-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        .auth-brand-copy .system-title,
+        .login-header p {
+            text-transform: none;
+        }
+
+        .login-header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .login-header p {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .field-group {
+            margin-bottom: 16px;
+        }
+
+        .input-wrap input {
+            background: #f7f4ee;
+            border: 1px solid #ddd7cb;
+            color: #3b0000;
+        }
+
+        .input-wrap input::placeholder {
+            color: #9a9080;
+        }
+
+        .input-wrap input:focus {
+            background: #fffdf9;
+            border-color: #cdbfa9;
+        }
+
+        .input-wrap .i-icon {
+            color: #ef4444 !important;
+            z-index: 2;
+        }
+
+        .footer-wrap {
+            margin-top: 8px;
+        }
+
+        .signup-outside {
+            margin-top: 0;
+            text-align: center;
+            width: 100%;
+            max-width: 860px;
+        }
+
+        .signup-outside span {
+            color: #fff;
+        }
+
+        .signup-outside a {
+            color: #fca5a5;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .signup-outside a:hover {
+            text-decoration: underline;
+        }
+
+        .terms-wrap {
+            margin-top: 16px;
+            margin-bottom: 14px;
+        }
+
+        .terms-text {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .terms-text span {
+            display: inline;
+        }
+
+        .terms-line-top {
+            display: block;
+            margin-bottom: 2px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .terms-line-bottom {
+            display: block;
+            color: #fff;
+        }
+
+        .terms-line-bottom a {
+            color: #fca5a5;
+            text-decoration: underline;
+        }
+
+        .terms-line-separator {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .btn-wrap {
+            margin-top: 6px;
+        }
+
+        .btn-login {
+            width: 100%;
+        }
+
+        @media (max-width: 767px) {
+            body.auth-centered-page .right-panel {
+                min-height: auto;
+                padding: 32px 22px;
+            }
+
+            .auth-logo {
+                width: 58px;
+                height: 58px;
+            }
+
+            .auth-brand-copy .brand-name {
+                font-size: 20px;
+            }
+        }
+    </style>
+
 </head>
 
-<body>
+<body class="auth-centered-page">
 <div class="main-wrapper">
     <div class="login-container">
 
@@ -36,7 +209,7 @@
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
                         <div class="brand-name">Intern<span>Connect</span> - BETA</div>
-                        <div class="system-title">OJT Information Management System</div>
+                        <div class="system-title">On-The-Job Training Information Management System</div>
                     </div>
                 </div>
 
@@ -65,9 +238,16 @@
 
         <!-- RIGHT PANEL -->
         <div class="right-panel">
+            <div class="auth-brand">
+                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
+                <div class="auth-brand-copy">
+                    <div class="brand-name">Intern<span>Connect</span> - BETA</div>
+                    <div class="system-title">On-The-Job Training Information Management System</div>
+                </div>
+            </div>
+
             <div class="login-header">
-                <h2>Welcome Back</h2>
-                <p>Sign in to your InternConnect Account</p>
+                <p>Log in to your InternConnect Account</p>
             </div>
 
             @if(Session::has('success'))
@@ -114,30 +294,36 @@
                         <span class="text-danger">@error('password') {{ $message }} @enderror</span>
                     </div>
 
+                    <div class="footer-wrap" style="margin-top: -2px; margin-bottom: 12px; text-align: left;">
+                        <div class="footer-links" style="justify-content: flex-start;">
+                            <a href="forgot"><i class="fa fa-key"></i> Forgot Password?</a>
+                        </div>
+                    </div>
+
                     <div class="terms-wrap">
                         <div class="terms-text">
-                            By signing in, you agree to our
-                            <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> and
-                            <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
+                            <span class="terms-line-top">By using this service, you understood and agree to the PUP Online Services</span>
+                            <span class="terms-line-bottom">
+                                <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> <span class="terms-line-separator">and</span>
+                                <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
+                            </span>
                         </div>
                     </div>
 
                     <div class="btn-wrap">
                         <button type="submit" class="btn-login">
-                            <i class="fa fa-sign-in-alt me-2"></i> Sign In
+                            <i class="fa fa-sign-in-alt me-2"></i> Log in
                         </button>
                     </div>
 
-                    <div class="footer-wrap">
-                        <div class="footer-links">
-                            <a href="forgot"><i class="fa fa-key"></i> Forgot Password?</a>
-                            <a href="registration"><i class="fa fa-user-plus"></i> Create Account</a>
-                        </div>
-                    </div>
                 </form>
             @endif
         </div>
 
+    </div>
+
+    <div class="signup-outside">
+        <span>Don't have an account? </span><a href="registration">Sign up</a>
     </div>
 </div>
 

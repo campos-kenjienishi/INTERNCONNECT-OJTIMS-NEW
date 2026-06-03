@@ -32,6 +32,7 @@
         $sidebarLinks = [
             ['url' => url('/professor/home'), 'icon' => 'fa-home', 'label' => 'Home', 'pattern' => 'professor/home*'],
             ['url' => url('/professor/class'), 'icon' => 'fa-clipboard', 'label' => 'Class', 'pattern' => 'professor/class*'],
+            ['url' => url('/professor/analytics'), 'icon' => 'fa-chart-line', 'label' => 'Analytics', 'pattern' => 'professor/analytics*'],
             ['url' => url('/professor/maintain'), 'icon' => 'fa-cogs', 'label' => 'Maintenance', 'pattern' => 'professor/maintain*'],
             ['url' => url('/professor/evaluation'), 'icon' => 'fa-star-half-alt', 'label' => 'Evaluation', 'pattern' => 'professor/evaluation*'],
         ];
@@ -921,7 +922,7 @@
     </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/login') }}" class="nav-item">
+        <a href="{{ url('/logout') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>

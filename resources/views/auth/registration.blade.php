@@ -5,6 +5,17 @@
         html, body { background: #3b0000 !important; }
     </style>
 
+    <style>
+        /* Compact adjustments only for STEP 2 (Academic Information) */
+        #step2 .fields-grid { gap: 8px 12px; }
+        #step2 .field-group { margin-bottom: 8px; }
+        #step2 .form-label { margin-bottom: 6px; font-size: 13px; }
+        #step2 .input-wrap { margin-bottom: 6px; }
+        #step2 .input-wrap input,
+        #step2 .input-wrap select { padding: 10px 40px; font-size: 14px; }
+        #step2 .nav-btn-row { margin-top: 8px; gap: 8px; }
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Registration</title>
@@ -14,6 +25,101 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
     <link rel="stylesheet" href="{{ asset('css/registration-responsive.css') }}">
+
+    <style>
+        body.auth-centered-page .login-container {
+            max-width: 940px;
+            min-height: auto;
+        }
+
+        body.auth-centered-page .left-panel {
+            display: none !important;
+        }
+
+        body.auth-centered-page .right-panel {
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 620px;
+            padding: 48px 42px;
+            justify-content: center;
+        }
+
+        .auth-brand {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
+            gap: 14px;
+            margin-bottom: 22px;
+            justify-content: flex-start;
+        }
+
+        .auth-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
+        }
+
+        .auth-brand-copy .brand-name {
+            font-size: 24px;
+            margin-bottom: 2px;
+            text-align: left;
+        }
+
+        .auth-brand-copy .system-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Make step connector line wider between step 1 and 2 */
+        .step-line { max-width: 260px !important; }
+
+        /* Ensure registration form doesn't force a scroll — restore original spacing */
+        body.auth-centered-page .right-panel {
+            /* keep the original padding/min-height defined above */
+            overflow-y: visible !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input,
+        body.auth-centered-page .right-panel .input-wrap select {
+            background: #f7f4ee !important;
+            border: 1px solid #ddd7cb !important;
+            color: #3b0000 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input::placeholder {
+            color: #9a9080 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input:focus,
+        body.auth-centered-page .right-panel .input-wrap select:focus {
+            background: #fffdf9 !important;
+            border-color: #cdbfa9 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap .i-icon {
+            color: #ef4444 !important;
+            z-index: 2;
+        }
+
+        @media (max-width: 767px) {
+            .auth-brand { flex-direction: column; align-items: center; text-align: center; }
+            body.auth-centered-page .right-panel {
+                min-height: auto;
+                padding: 40px 24px;
+            }
+
+            .auth-logo {
+                width: 58px;
+                height: 58px;
+            }
+
+            .auth-brand-copy .brand-name {
+                font-size: 20px;
+            }
+        }
+    </style>
 
     <style>
         /* ── Step indicator ── */
@@ -188,7 +294,7 @@
     </style>
 </head>
 
-<body>
+<body class="auth-centered-page">
 <div class="main-wrapper">
     <div class="login-container">
 
@@ -246,6 +352,8 @@
 
         <!-- RIGHT PANEL -->
         <div class="right-panel">
+
+            {{-- header removed as requested --}}
 
             <!-- Step indicator -->
             <div class="step-indicator">

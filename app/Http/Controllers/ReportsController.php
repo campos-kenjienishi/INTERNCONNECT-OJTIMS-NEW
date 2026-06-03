@@ -16,6 +16,7 @@ use App\Mail\PrintContentsEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use App\Helpers\AuditLogger;
+use App\Services\ReportAiInsightService;
 
 class ReportsController extends Controller
 {
@@ -68,8 +69,10 @@ class ReportsController extends Controller
                 'subjects' => $subjectData, // Include subject data here
             ];
         }
+
+        $reportInsights = $this->buildStudentReportInsights($studentData, null);
     
-        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course'));
+        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights'));
 
     }
 
@@ -153,10 +156,12 @@ class ReportsController extends Controller
                                 'subjects' => $subjectData, // Include subject data here
                             ];
                         }
+
+            $reportInsights = $this->buildStudentReportInsights($studentData, $coursed);
                         
     
         // Pass the course variable to the view
-        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course'));
+            return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights'));
     }
 
 
@@ -224,7 +229,9 @@ public function reportsExpired()
 
         $companies = Company::all();
 
-        return view('ojtCoordinator.reportsExpired', compact('companies', 'user', 'course'));
+        $reportInsights = $this->buildMoaReportInsights($companies, $course->first()->course ?? null);
+
+        return view('ojtCoordinator.reportsExpired', compact('companies', 'user', 'course', 'reportInsights'));
     }
 
 
@@ -287,9 +294,11 @@ public function sendEmailExpired(Request $request)
     })
     ->get();
 
+    $reportInsights = $this->buildMoaReportInsights($companies, $course);
+
     Mail::to($email)->send(new MOAReportEmail($companies, $students));
 
-    return back()->with(['message' => 'Email sent successfully']);
+    return back()->with(['message' => 'Email sent successfully', 'reportInsights' => $reportInsights]);
 }
 
 
@@ -328,6 +337,8 @@ public function reportsExpiredProf()
         });
     
         $companyNames = $companies->pluck('company_name')->toArray();
+
+        $reportInsights = $this->buildMoaReportInsights($companies, $courseAll->first()->course ?? null);
     
         // Retrieve students under the specified companies using where and get
         // $students = Student::whereHas('companies', function ($query) use ($companyNames, $course) {
@@ -335,7 +346,7 @@ public function reportsExpiredProf()
         //         ->where('course', $course); // Add condition to filter by course
         // })->get();
     
-        return view('professor.expiredMOAReports', compact('companies', 'user', 'stu','courseAll'));
+        return view('professor.expiredMOAReports', compact('companies', 'user', 'stu','courseAll', 'reportInsights'));
     }
 
 
@@ -384,8 +395,90 @@ public function reportsExpiredProf()
     ->where('course', $validatedData['course'])
     ->get();
 
-    return view('professor.expiredMOAReports', compact('companies', 'students', 'user','courseAll'));
+    $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
+
+    return view('professor.expiredMOAReports', compact('companies', 'students', 'user','courseAll', 'reportInsights'));
 }
+
+    protected function buildStudentReportInsights($studentData, ?string $course = null)
+    {
+        $records = collect($studentData);
+        $recordsWithOjt = $records->filter(function ($row) {
+            return !empty($row['ojt']);
+        });
+
+        $companyNames = $recordsWithOjt->pluck('ojt.company_name')->filter()->unique()->values();
+        $missingOjt = $records->count() - $recordsWithOjt->count();
+
+        $highlights = [
+            'Loaded ' . $records->count() . ' student record' . ($records->count() === 1 ? '' : 's') . '.',
+            'Found ' . $companyNames->count() . ' unique company placement' . ($companyNames->count() === 1 ? '' : 's') . '.',
+        ];
+
+        if ($companyNames->isNotEmpty()) {
+            $highlights[] = 'Top company examples: ' . $companyNames->take(3)->implode(', ') . '.';
+        }
+
+        $watchouts = [];
+        if ($missingOjt > 0) {
+            $watchouts[] = $missingOjt . ' student record' . ($missingOjt === 1 ? '' : 's') . ' still need OJT details before export or print.';
+        }
+
+        $actions = [
+            'Review student placements before generating the final report.',
+            'Use the print preview once the OJT information is complete.',
+        ];
+
+        return app(ReportAiInsightService::class)->summarize('student_ojt_report', [
+            'total_records' => $records->count(),
+            'total_companies' => $companyNames->count(),
+            'records_with_ojt' => $recordsWithOjt->count(),
+            'missing_ojt' => $missingOjt,
+            'course' => $course,
+        ], $highlights, $watchouts, $actions);
+    }
+
+    protected function buildMoaReportInsights($companies, ?string $course = null)
+    {
+        $items = collect($companies);
+        $active = 0;
+        $expired = 0;
+
+        foreach ($items as $company) {
+            $parts = explode('-', (string) ($company->school_year ?? '0-0'));
+            $startYear = (int) ($parts[0] ?? 0);
+            $difference = now()->year - $startYear;
+
+            if ($difference > 3) {
+                $expired++;
+            } else {
+                $active++;
+            }
+        }
+
+        $highlights = [
+            'Loaded ' . $items->count() . ' partner company record' . ($items->count() === 1 ? '' : 's') . '.',
+            'Active agreements: ' . $active . '.',
+            'Expired agreements: ' . $expired . '.',
+        ];
+
+        $watchouts = [];
+        if ($expired > 0) {
+            $watchouts[] = $expired . ' agreement' . ($expired === 1 ? '' : 's') . ' are already outside the preferred validity window.';
+        }
+
+        $actions = [
+            'Prioritize renewal follow-up for expired MOAs.',
+            'Use the report to review active partner coverage by course.',
+        ];
+
+        return app(ReportAiInsightService::class)->summarize('moa_report', [
+            'total_moa' => $items->count(),
+            'active_moa' => $active,
+            'expired_moa' => $expired,
+            'course' => $course,
+        ], $highlights, $watchouts, $actions);
+    }
 
 
 
