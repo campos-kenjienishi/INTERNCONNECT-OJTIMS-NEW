@@ -227,12 +227,34 @@ public function home()
         //    $class = Classes::where('adviser_name', $data->adviser_name)->get();
 
 
+        $classRoomNames = $class->pluck('room')->filter()->values()->all();
+        $coordinatorNames = User::where('role', 1)->pluck('full_name')->filter()->values()->all();
+
         if (!empty($data) && isset($data->status) && $data->status == 1) {
             // User's status is 1, allow access to announcements
-            $announce = Announcements::where(function ($query) use ($data) {
-                $query->where('announcer', 'Gina Dela Cruz')
-                      ->orWhere('announcer', $data->adviser_name);
-            })->get();
+            $announce = Announcements::where(function ($query) use ($data, $classRoomNames, $coordinatorNames) {
+                $query->where('audience', 'all_students')
+                      ->orWhere(function ($legacyCoordinatorQuery) use ($coordinatorNames) {
+                          $legacyCoordinatorQuery->whereNull('audience')
+                                                 ->whereIn('announcer', $coordinatorNames);
+                      })
+                      ->orWhere(function ($classQuery) use ($data) {
+                          $classQuery->where('audience', 'class')
+                                     ->where('target_course', $data->course)
+                                     ->where(function ($roomQuery) use ($classRoomNames) {
+                                         $roomQuery->whereNull('target_room')
+                                                   ->orWhereIn('target_room', $classRoomNames);
+                                     });
+                      })
+                      ->orWhere(function ($legacyClassQuery) use ($data) {
+                          $legacyClassQuery->whereNull('audience')
+                                           ->where('announcer', $data->adviser_name);
+                      })
+                      ->orWhere(function ($courseQuery) use ($data) {
+                          $courseQuery->where('audience', 'course')
+                                      ->where('target_course', $data->course);
+                      });
+            })->latest()->get();
         } else {
             $announce = [];
         }

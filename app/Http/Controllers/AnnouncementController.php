@@ -40,6 +40,9 @@ class AnnouncementController extends Controller
         $data->title=$request->title;
         $data->content=$request->content;
         $data->announcer=$user->full_name;
+    $data->audience = $request->input('audience', 'all_students');
+    $data->target_course = $request->input('course');
+    $data->target_room = $request->input('room');
 
         $data->save();
 

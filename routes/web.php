@@ -126,6 +126,7 @@ Route::middleware([
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
     Route::get('/student/requirements/view/{id}', [PassDocuController::class,'viewFile']);
+    Route::get('/student/requirements/download/{id}', [PassDocuController::class,'downloadStudent']);
     Route::post('/remove/filesReq/{id}', [PassDocuController::class,'removeFile']);
     Route::get('/student/evaluation', [EvaluationController::class, 'studentIndex'])->name('student.evaluation');
     Route::post('/student/evaluation/send', [EvaluationController::class, 'sendEvaluationForm'])->name('student.evaluation.send');

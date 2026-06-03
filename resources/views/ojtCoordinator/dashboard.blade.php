@@ -1191,6 +1191,7 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
 
                     <form method="POST" action="{{ url('/announcements') }}">
                         @csrf
+                        <input type="hidden" name="audience" value="all_students">
                         <div class="panel-card-body">
 
                             <div class="field-group">

@@ -992,6 +992,7 @@
                                             </div>
                                             <form class="announcementForm" method="POST" action="{{ url('/announcements') }}">
                                                 @csrf
+                                                <input type="hidden" name="audience" value="class">
                                                 <input type="hidden" name="course" value="{{ $room->course }}">
                                                 <input type="hidden" name="room"   value="{{ $room->room }}">
                                                 <div class="modal-body">

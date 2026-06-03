@@ -309,6 +309,50 @@
             padding: 3px 10px;
         }
 
+        .file-preview-badge.no-preview {
+            background: #fee2e2;
+            color: var(--red-dark);
+        }
+
+        .btn-download-file {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none; border-radius: 8px; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 12.5px;
+            font-weight: 600; cursor: pointer; transition: all 0.25s;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(37,99,235,0.2);
+        }
+
+        .btn-download-file:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37,99,235,0.3);
+            color: #fff; text-decoration: none;
+        }
+
+        .unsupported-file-message {
+            padding: 44px 24px;
+            text-align: center;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .unsupported-file-message .unsupported-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: #fee2e2; color: var(--red);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; margin: 0 auto 16px;
+        }
+
+        .unsupported-file-message h3 {
+            font-size: 16px; font-weight: 700; color: #333; margin-bottom: 8px;
+        }
+
+        .unsupported-file-message p {
+            font-size: 13.5px; color: #777; margin-bottom: 18px;
+        }
+
         .file-iframe-wrap {
             width: 100%; background: #e8e8e8;
             display: flex; justify-content: center;
@@ -561,13 +605,14 @@
             <div class="viewer-card-body">
 
                 @forelse($files as $fileItem)
+                @php
+                    $ext = strtolower(pathinfo($fileItem->file, PATHINFO_EXTENSION));
+                    $canPreview = in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'txt', 'html', 'htm']);
+                @endphp
                 <div class="file-viewer-wrap">
                     <div class="file-viewer-toolbar">
                         <div class="file-viewer-name">
                             <div class="file-icon-box">
-                                @php
-                                    $ext = strtolower(pathinfo($fileItem->file, PATHINFO_EXTENSION));
-                                @endphp
                                 @if(in_array($ext, ['pdf']))
                                     <i class="fa fa-file-pdf"></i>
                                 @elseif(in_array($ext, ['doc','docx']))
@@ -582,15 +627,34 @@
                             </div>
                             {{ $fileItem->file }}
                         </div>
-                        <span class="file-preview-badge">
-                            <i class="fa fa-eye"></i> Preview
-                        </span>
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <span class="file-preview-badge {{ $canPreview ? '' : 'no-preview' }}">
+                                <i class="fa {{ $canPreview ? 'fa-eye' : 'fa-file-download' }}"></i>
+                                {{ $canPreview ? 'Preview available' : 'No preview available' }}
+                            </span>
+                            <a href="{{ url('/download/req/' . $fileItem->id) }}" class="btn-download-file">
+                                <i class="fa fa-download"></i> Download
+                            </a>
+                        </div>
                     </div>
-                    <div class="file-iframe-wrap">
-                        <iframe src="/assets/{{ $fileItem->file }}"
-                                title="{{ $fileItem->file }}">
-                        </iframe>
-                    </div>
+                    @if($canPreview)
+                        <div class="file-iframe-wrap">
+                            <iframe src="/assets/{{ $fileItem->file }}"
+                                    title="{{ $fileItem->file }}">
+                            </iframe>
+                        </div>
+                    @else
+                        <div class="unsupported-file-message">
+                            <div class="unsupported-icon">
+                                <i class="fa fa-file-excel"></i>
+                            </div>
+                            <h3>This type of file cannot be previewed</h3>
+                            <p>Please download the file to view its contents.</p>
+                            <a href="{{ url('/download/req/' . $fileItem->id) }}" class="btn-download-file">
+                                <i class="fa fa-download"></i> Download to View
+                            </a>
+                        </div>
+                    @endif
                 </div>
                 @empty
                 <div class="empty-state">

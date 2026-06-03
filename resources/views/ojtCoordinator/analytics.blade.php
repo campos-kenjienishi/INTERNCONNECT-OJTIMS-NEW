@@ -621,14 +621,11 @@
             </nav>
 
             <div class="sidebar-footer">
-                <form action="{{ url('/logout') }}" method="post" style="margin:0;">
-                    @csrf
-                    <button type="submit" class="nav-item" style="width:100%; background:none; border:none; text-align:left; padding:0;">
-                        <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
-                        <span class="nav-label">Log Out</span>
-                        <span class="tooltip-label">Log Out</span>
-                    </button>
-                </form>
+                <a href="{{ url('/logout') }}" class="nav-item">
+                    <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
+                    <span class="nav-label">Log Out</span>
+                    <span class="tooltip-label">Log Out</span>
+                </a>
             </div>
         </aside>
 

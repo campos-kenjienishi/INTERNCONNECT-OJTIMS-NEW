@@ -24,7 +24,6 @@ use App\Models\OJTInformation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
@@ -48,20 +47,32 @@ class AuthController extends Controller
 
     public function registerUser(Request $request){
         $request->validate([
-            'first_name'=>'required',
-            'last_name'=>'required',
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[\\p{Lu}][\\p{L}\\s\'\\-]*$/u'],
+            'middle_name' => ['nullable', 'string', 'max:255', 'regex:/^[\\p{Lu}][\\p{L}\\s\'\\-]*$/u'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[\\p{Lu}][\\p{L}\\s\'\\-]*$/u'],
             'email'=>'required|email|unique:users,email',
             'studentNum'=>'required',
             'password'=>'required|min:8|max:12'
+        ], [
+            'first_name.regex' => 'First name must start with a capital letter.',
+            'middle_name.regex' => 'Middle name must start with a capital letter.',
+            'last_name.regex' => 'Last name must start with a capital letter.',
         ]);
         $student = new OJTInformation();
         $user =new User();
         $studentE =new Student();
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
+        $firstName = Str::of($request->first_name)->trim()->lower()->ucfirst()->toString();
+        $middleName = $request->filled('middle_name')
+            ? Str::of($request->middle_name)->trim()->lower()->ucfirst()->toString()
+            : null;
+        $lastName = Str::of($request->last_name)->trim()->lower()->ucfirst()->toString();
+
+        $user->first_name = $firstName;
+        $user->middle_name = $middleName;
+        $user->last_name = $lastName;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
-        $user->full_name = $user->first_name . ' ' . $user->last_name;
+        $user->full_name = trim($firstName . ' ' . ($middleName ? $middleName . ' ' : '') . $lastName);
         $student->studentNum =  $request->studentNum;
         $studentE->studentNum =$request->studentNum;
         $studentE->course = $request->course;
@@ -98,10 +109,14 @@ class AuthController extends Controller
 
         if($user){
             if(Hash::check($request->password, $user->password)){
-                $request->session()->regenerate();
                 $request->session()->put('loginId',$user->id);
                 $request->session()->put('show_terms', true);
-                Cache::put('active_session_id:' . $user->id, $request->session()->getId(), now()->addHours(8));
+                // Store active session id so AuthMiddleware can validate single active session
+                try {
+                    Cache::put('active_session_id:' . $user->id, $request->session()->getId(), now()->addMinutes(config('session.lifetime')));
+                } catch (\Throwable $e) {
+                    // If cache fails for any reason, continue without blocking login
+                }
                 if ($user->role == 0) {
                     return redirect()->route('student_home');
                 } 
@@ -681,18 +696,19 @@ class AuthController extends Controller
         return $months;
     }
 
-    public function logout(Request $request){
-        $userId = $request->session()->get('loginId');
-        if ($userId) {
-            Cache::forget('active_session_id:' . $userId);
+    public function logout(){
+        if(Session::has('loginId')){
+            $id = Session::get('loginId');
+            Session::pull('loginId');
+            Session::forget('termsAccepted');
+            // Clear active session cache on logout
+            try {
+                Cache::forget('active_session_id:' . $id);
+            } catch (\Throwable $e) {
+                // ignore cache errors
+            }
+            return redirect('login');
         }
-
-        $request->session()->invalidate();
-        $request->session()->flush();
-        $request->session()->regenerateToken();
-        Cookie::queue(Cookie::forget(config('session.cookie')));
-
-        return redirect('login');
     }
 
     public function professorTab()

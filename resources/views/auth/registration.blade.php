@@ -393,7 +393,7 @@
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" placeholder="eg. Juan" name="first_name"
-                                        id="first_name" value="{{ old('first_name') }}">
+                                        id="first_name" value="{{ old('first_name') }}" autocapitalize="words" autocomplete="given-name" spellcheck="false">
                                 </div>
                                 <span class="text-danger">@error('first_name') {{ $message }} @enderror</span>
                             </div>
@@ -403,7 +403,7 @@
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" placeholder="eg. Dela" name="middle_name"
-                                        id="middle_name" value="{{ old('middle_name') }}">
+                                        id="middle_name" value="{{ old('middle_name') }}" autocapitalize="words" autocomplete="additional-name" spellcheck="false">
                                 </div>
                                 <span class="text-danger">@error('middle_name') {{ $message }} @enderror</span>
                             </div>
@@ -413,7 +413,7 @@
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" placeholder="eg. Cruz" name="last_name"
-                                        id="last_name" value="{{ old('last_name') }}">
+                                        id="last_name" value="{{ old('last_name') }}" autocapitalize="words" autocomplete="family-name" spellcheck="false">
                                 </div>
                                 <span class="text-danger">@error('last_name') {{ $message }} @enderror</span>
                             </div>
@@ -651,6 +651,53 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function normalizeNameField(fieldId) {
+        const input = document.getElementById(fieldId);
+        if (!input) return;
+
+        const value = input.value.replace(/\s+/g, ' ').trim();
+        if (!value) {
+            input.value = '';
+            return;
+        }
+
+        input.value = value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function isCapitalizedName(value) {
+        const trimmed = value.replace(/\s+/g, ' ').trim();
+        if (!trimmed) {
+            return false;
+        }
+
+        return /^[\p{Lu}][\p{L}\s'\-]*$/u.test(trimmed);
+    }
+
+    function validateCapitalizedNameFields() {
+        const fieldIds = ['first_name', 'middle_name', 'last_name'];
+
+        for (const fieldId of fieldIds) {
+            const input = document.getElementById(fieldId);
+            if (!input) continue;
+
+            const value = input.value.trim();
+            input.setCustomValidity('');
+
+            if (value && !isCapitalizedName(value)) {
+                input.setCustomValidity('Name must start with a capital letter.');
+                input.reportValidity();
+                input.style.borderColor = '#dc2626';
+                input.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                return false;
+            }
+
+            input.style.borderColor = '';
+            input.style.boxShadow = '';
+        }
+
+        return true;
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById('toggleRegPassword').addEventListener('click', function () {
@@ -659,6 +706,31 @@
             this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         });
+
+        const nameFieldIds = ['first_name', 'middle_name', 'last_name'];
+        nameFieldIds.forEach(function (fieldId) {
+            const input = document.getElementById(fieldId);
+            if (!input) return;
+
+            input.addEventListener('input', function () {
+                normalizeNameField(fieldId);
+            });
+
+            input.addEventListener('blur', function () {
+                normalizeNameField(fieldId);
+            });
+        });
+
+        const regForm = document.getElementById('regForm');
+        if (regForm) {
+            regForm.addEventListener('submit', function (event) {
+                nameFieldIds.forEach(normalizeNameField);
+
+                if (!validateCapitalizedNameFields()) {
+                    event.preventDefault();
+                }
+            });
+        }
 
         const startYearSelect   = document.getElementById('academic_year_start');
         const endYearSelect     = document.getElementById('academic_year_end');

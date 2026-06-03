@@ -561,6 +561,69 @@
             color: #0f766e;
         }
 
+        .file-preview-badge.no-preview {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .unsupported-file-message {
+            padding: 44px 24px;
+            text-align: center;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .unsupported-file-message .unsupported-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #fee2e2;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 16px;
+        }
+
+        .unsupported-file-message h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .unsupported-file-message p {
+            font-size: 13.5px;
+            color: #777;
+            margin-bottom: 18px;
+        }
+
+        .btn-download-file {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(37,99,235,0.2);
+        }
+
+        .btn-download-file:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37,99,235,0.3);
+            color: #fff;
+            text-decoration: none;
+        }
+
         /* =============== MODAL =============== */
         .modal-content {
             border-radius: 16px;
@@ -974,14 +1037,33 @@
                             e.preventDefault();
                             var fileUrl = $(this).data('file-url');
                             var fileName = $(this).data('file-name');
+                            var downloadUrl = $(this).data('download-url');
+                            var fileExt = (fileName.split('.').pop() || '').toLowerCase();
+                            var previewable = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'txt', 'html', 'htm'].indexOf(fileExt) !== -1;
+
                             $('#previewFileName').text(fileName);
-                            $('#previewFrame').attr('src', fileUrl);
+                            $('#previewDownloadBtn').attr('href', downloadUrl);
+                            $('#previewDownloadBtnBottom').attr('href', downloadUrl);
+                            if (previewable) {
+                                $('#previewFrame').show().attr('src', fileUrl);
+                                $('#previewFallback').hide();
+                                $('#previewBadge').removeClass('no-preview').html('<i class="fa fa-eye"></i> Preview available');
+                            } else {
+                                $('#previewFrame').hide().attr('src', 'about:blank');
+                                $('#previewFallback').show();
+                                $('#previewBadge').addClass('no-preview').html('<i class="fa fa-file-download"></i> No preview available');
+                            }
                             var previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
                             previewModal.show();
                         });
 
                         document.getElementById('previewModal').addEventListener('hidden.bs.modal', function () {
                             $('#previewFrame').attr('src', 'about:blank');
+                            $('#previewFrame').show();
+                            $('#previewFallback').hide();
+                            $('#previewBadge').removeClass('no-preview').html('<i class="fa fa-eye"></i> Preview available');
+                            $('#previewDownloadBtn').attr('href', '#');
+                            $('#previewDownloadBtnBottom').attr('href', '#');
                         });
                     });
                 </script>
@@ -1032,7 +1114,7 @@
                             </td>
                             <td>
                                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                    <button type="button" class="btn-view view-button" data-file-url="{{ url('/student/requirements/view/' . $files->id) }}" data-file-name="{{ $files->file }}">
+                                    <button type="button" class="btn-view view-button" data-file-url="{{ url('/student/requirements/view/' . $files->id) }}" data-download-url="{{ url('/student/requirements/download/' . $files->id) }}" data-file-name="{{ $files->file }}">
                                         <i class="fa fa-eye"></i> View
                                     </button>
                                     <button class="btn-remove remove-button" data-file-id="{{ $files->id }}">
@@ -1137,8 +1219,19 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" style="padding:0; background:#f8fafc;">
-                <div id="previewFileName" style="padding:14px 18px; border-bottom:1px solid #e5e7eb; background:#fff; color:#475569; font-size:13px; font-weight:600;"></div>
+                <div style="padding:14px 18px; border-bottom:1px solid #e5e7eb; background:#fff; color:#475569; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                    <span id="previewBadge" class="file-preview-badge"><i class="fa fa-eye"></i> Preview available</span>
+                    <a id="previewDownloadBtn" href="#" class="btn-download-file"><i class="fa fa-download"></i> Download</a>
+                </div>
                 <iframe id="previewFrame" title="Requirement Preview" style="width:100%; height:75vh; border:0; background:#fff;"></iframe>
+                <div id="previewFallback" class="unsupported-file-message" style="display:none;">
+                    <div class="unsupported-icon">
+                        <i class="fa fa-file-alt"></i>
+                    </div>
+                    <h3>This type of file cannot be previewed</h3>
+                    <p>Please download the file to view its contents.</p>
+                    <a id="previewDownloadBtnBottom" href="#" class="btn-download-file"><i class="fa fa-download"></i> Download to View</a>
+                </div>
             </div>
         </div>
     </div>

@@ -228,6 +228,29 @@ public function removeFile($id)
         return response()->file($filePath);
     }
 
+    public function downloadStudent($id)
+    {
+        $sessionCheck = $this->requireStudentSession();
+
+        if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+            return $sessionCheck;
+        }
+
+        $user = $sessionCheck;
+
+        $fileRequirement = FileRequirement::where('id', $id)
+            ->where('uploadedBy', $user->full_name)
+            ->firstOrFail();
+
+        $filePath = public_path('assets/' . $fileRequirement->file);
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $fileRequirement->file);
+        }
+
+        return back()->with(['error' => 'File not found.'], 404);
+    }
+
     public function studentRequirements(Request $request){
         // Retrieve the value from the query parameter
         $value = $request->input('value');

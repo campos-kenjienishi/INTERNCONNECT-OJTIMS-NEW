@@ -445,6 +445,25 @@
             background: #f5f3ff; text-decoration: none;
         }
 
+        .btn-apply {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: none; border-radius: 8px; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 12.5px;
+            font-weight: 600; cursor: pointer; transition: all 0.25s;
+            text-decoration: none; box-shadow: 0 3px 10px rgba(220,38,38,0.2);
+        }
+
+        .btn-view.btn-apply:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: none;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            text-decoration: none;
+        }
+
         .btn-download {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 7px 14px;
@@ -714,17 +733,46 @@
 
         <!-- Requirements Table Card -->
         <div class="table-card">
-            <div class="table-card-header">
+                <div class="table-card-header">
                 <div class="table-card-header-left">
                     <div class="header-icon"><i class="fa fa-tasks"></i></div>
                     <div>
-                        <h2>Submitted Requirements</h2>
+                        <h2>
+                            Submitted Requirements
+                            @if(!empty($value))
+                                : <span style="font-weight:700;color:#444;font-size:16px;">{{ $value }}</span>
+                            @endif
+                        </h2>
                         <p>Review, approve or deny student requirement files</p>
                     </div>
                 </div>
-                <div class="req-count-badge">
-                    <i class="fa fa-file-alt"></i>
-                    {{ $totalReq }} {{ $totalReq == 1 ? 'file' : 'files' }}
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <label style="font-size:13px;color:#666;margin-right:6px;">Date</label>
+                        <select id="dateSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:220px;min-width:180px;">
+                            <option value="none">None</option>
+                            <option value="newest" selected>Newest first</option>
+                            <option value="oldest">Oldest first</option>
+                        </select>
+                    </div>
+
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <label style="font-size:13px;color:#666;margin-right:6px;">Name</label>
+                        <select id="nameSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:220px;min-width:180px;">
+                            <option value="none" selected>None</option>
+                            <option value="az">A → Z</option>
+                            <option value="za">Z → A</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <button id="applySort" class="btn-view btn-apply" style="padding:8px 12px;">Apply</button>
+                    </div>
+
+                    <div class="req-count-badge">
+                        <i class="fa fa-file-alt"></i>
+                        {{ $totalReq }} {{ $totalReq == 1 ? 'file' : 'files' }}
+                    </div>
                 </div>
             </div>
 
@@ -733,7 +781,40 @@
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
-                        $('#fileTable').DataTable();
+                        var table = $('#fileTable').DataTable({
+                            order: [[2, 'desc']], // default: newest first (date column)
+                            columnDefs: [
+                                { targets: [2], type: 'date' }
+                            ]
+                        });
+
+                        $('#applySort').on('click', function (e) {
+                            e.preventDefault();
+                            var dateVal = $('#dateSort').val();
+                            var nameVal = $('#nameSort').val();
+                            var ordering = [];
+
+                            // Apply date sort first if selected
+                            if (dateVal === 'newest') {
+                                ordering.push([2, 'desc']);
+                            } else if (dateVal === 'oldest') {
+                                ordering.push([2, 'asc']);
+                            }
+
+                            // Apply name sort second if selected
+                            if (nameVal === 'az') {
+                                ordering.push([1, 'asc']);
+                            } else if (nameVal === 'za') {
+                                ordering.push([1, 'desc']);
+                            }
+
+                            // If no ordering selected, fallback to default
+                            if (ordering.length === 0) {
+                                ordering = [[2, 'desc']];
+                            }
+
+                            table.order(ordering).draw();
+                        });
                     });
                 </script>
 
@@ -769,7 +850,7 @@
                             </td>
 
                             <!-- Date -->
-                            <td>
+                            <td data-order="{{ $file->created_at }}">
                                 <div class="date-main">
                                     {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
                                 </div>
