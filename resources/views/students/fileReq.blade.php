@@ -1207,10 +1207,10 @@
                         <i class="fa fa-paperclip"></i> Choose File
                     </label>
                     <div class="file-upload-zone" id="dropZone">
-                        <input type="file" name="file" required id="fileInput">
+                        <input type="file" name="file" required id="fileInput" accept="application/pdf,.pdf">
                         <div class="upload-icon"><i class="fa fa-cloud-upload-alt"></i></div>
                         <p id="fileLabel">Click or drag a file here to upload</p>
-                        <span>Supported formats: PDF, DOC, DOCX, JPG, PNG</span>
+                        <span>Accepts PDF files only</span>
                     </div>
 
                     <input type="hidden" name="uploadedBy" value="{{ $user->full_name }}">

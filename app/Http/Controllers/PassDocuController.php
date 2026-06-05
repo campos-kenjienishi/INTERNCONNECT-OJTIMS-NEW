@@ -147,8 +147,15 @@ public function fileReqCreate(Request $request){
     if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
         return $sessionCheck;
     }
-   
 
+    $request->validate([
+        'fileName' => 'required|string',
+        'file' => 'required|file|mimes:pdf|max:10240',
+        'uploadedBy' => 'required|string',
+        'adviser' => 'required|string',
+    ], [
+        'file.mimes' => 'Only PDF files are accepted for requirement uploads.',
+    ]);
     
     // Create a new instance of FileRequirement model
     $fileup = new FileRequirement();

@@ -908,7 +908,7 @@
                     </div>
 
                     <div style="display:flex;gap:8px;align-items:center;">
-                        <label style="font-size:13px;color:#666;margin-right:6px;">Name</label>
+                        <label style="font-size:13px;color:#666;margin-right:6px;">Category</label>
                         <select id="nameSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:220px;min-width:180px;">
                             <option value="none" selected>None</option>
                             <option value="az">A → Z</option>
@@ -954,9 +954,9 @@
 
                             // Apply name sort second if selected
                             if (nameVal === 'az') {
-                                ordering.push([1, 'asc']);
+                                ordering.push([0, 'asc']);
                             } else if (nameVal === 'za') {
-                                ordering.push([1, 'desc']);
+                                ordering.push([0, 'desc']);
                             }
 
                             // If no ordering selected, fallback to default
