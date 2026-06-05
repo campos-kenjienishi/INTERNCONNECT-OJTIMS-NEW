@@ -9,6 +9,7 @@ use App\Models\Classes;
 use App\Models\Company;
 use App\Models\Courses;
 Use App\Mail\TemporaryPasswordNotification;
+use App\Mail\RequirementDenied;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Schedule;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\AuditLogger; 
 
@@ -306,21 +308,35 @@ public function removeFile($id)
 
             public function updateDeniedStatus(Request $request, $id)
             {
-                // Validate the request data if needed
+                $validated = $request->validate([
+                    'reason' => 'required|string|max:1000',
+                ]);
         
                 // Find the file requirement by ID
                 $fileRequirement = FileRequirement::findOrFail($id);
         
                 // Update the status based on the request data
                 $fileRequirement->status = 2;
+                if (Schema::hasColumn('file_requirements', 'denial_reason')) {
+                    $fileRequirement->denial_reason = $validated['reason'];
+                }
                 $fileRequirement->save();
+
+                $student = User::where('role', 0)
+                    ->where('full_name', $fileRequirement->uploadedBy)
+                    ->first();
+
+                if ($student && !empty($student->email)) {
+                    Mail::to($student->email)->send(new RequirementDenied($fileRequirement, $validated['reason']));
+                }
+
                 AuditLogger::log(
                     'PassDocu',
                     'Update',
-                    'Denied file: ' . $fileRequirement->fileName,
+                    'Denied file: ' . $fileRequirement->fileName . '. Reason: ' . $validated['reason'],
                     Session::get('loginId') ?? null,
                     ['status' => 0],
-                    ['status' => 2]
+                    ['status' => 2, 'denial_reason' => $validated['reason']]
                 );
                 return back()->with('success', 'You have updated the information successfully!');
             }

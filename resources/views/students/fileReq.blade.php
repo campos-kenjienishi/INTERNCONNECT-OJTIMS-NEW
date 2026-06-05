@@ -512,6 +512,23 @@
         .status-denied   { background: #fee2e2; color: var(--red); }
         .status-pending  { background: #fef9c3; color: #ca8a04; }
 
+        .denial-reason-note {
+            margin-top: 8px;
+            max-width: 280px;
+            color: #7f1d1d;
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: 11.5px;
+            line-height: 1.45;
+        }
+
+        .denial-reason-note i {
+            margin-right: 5px;
+            color: var(--red);
+        }
+
         /* Date cell */
         .date-main { font-size: 13px; color: #444; }
         .date-sub  { font-size: 11.5px; color: #aaa; margin-top: 2px; }
@@ -1102,6 +1119,12 @@
                                     <span class="status-badge status-denied">
                                         <i class="fa fa-times-circle"></i> Denied
                                     </span>
+                                    @if(!empty($files->denial_reason))
+                                        <div class="denial-reason-note">
+                                            <i class="fa fa-comment-alt"></i>
+                                            {{ $files->denial_reason }}
+                                        </div>
+                                    @endif
                                 @elseif ($files->status == 0)
                                     <span class="status-badge status-pending">
                                         <i class="fa fa-clock"></i> Pending

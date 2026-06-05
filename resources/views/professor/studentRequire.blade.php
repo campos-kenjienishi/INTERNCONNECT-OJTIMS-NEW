@@ -430,6 +430,23 @@
             transform: translateY(-1px);
         }
 
+        .denial-reason-note {
+            margin-top: 8px;
+            max-width: 280px;
+            color: #7f1d1d;
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: 11.5px;
+            line-height: 1.45;
+        }
+
+        .denial-reason-note i {
+            margin-right: 5px;
+            color: var(--red);
+        }
+
         .btn-view {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 7px 14px;
@@ -483,6 +500,140 @@
 
         .actions-wrap {
             display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%);
+            border-bottom: none;
+            padding: 20px 24px;
+        }
+
+        .modal-title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
+        .modal-body { padding: 24px; background: #fff; }
+
+        .deny-file-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+
+        .deny-file-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #fee2e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red);
+            font-size: 15px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .deny-file-name { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+        .deny-file-sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+        .reason-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .reason-label i { color: var(--red); font-size: 12px; }
+
+        .reason-textarea {
+            width: 100%;
+            background: #fafafa;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 10px;
+            color: #1a1a1a;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            padding: 12px 14px;
+            outline: none;
+            transition: all 0.25s;
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .reason-textarea:focus {
+            border-color: var(--red);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
+        }
+
+        .modal-footer {
+            background: #fafafa;
+            border-top: 1px solid #f0f0f0;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-modal-close {
+            padding: 9px 20px;
+            background: #f3f4f6;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            color: #555;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-close:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: var(--red);
+        }
+
+        .btn-modal-deny {
+            padding: 9px 24px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 3px 12px rgba(220,38,38,0.2);
+        }
+
+        .btn-modal-deny:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(220,38,38,0.3);
         }
 
         /* Mobile overlay */
@@ -869,6 +1020,12 @@
                                     <span class="badge-denied">
                                         <i class="fa fa-times-circle"></i> Denied
                                     </span>
+                                    @if(!empty($file->denial_reason))
+                                        <div class="denial-reason-note">
+                                            <i class="fa fa-comment-alt"></i>
+                                            {{ $file->denial_reason }}
+                                        </div>
+                                    @endif
                                 @else
                                     <span class="badge-pending">
                                         <i class="fa fa-clock"></i> Pending
@@ -891,14 +1048,15 @@
                                             </button>
                                         </form>
                                         <!-- Deny -->
-                                        <form method="POST"
-                                              action="/update/denied/status/{{ $file->id }}"
-                                              style="display:inline;">
-                                            @csrf
-                                            <button type="submit" class="btn-deny">
-                                                <i class="fa fa-times"></i> Deny
-                                            </button>
-                                        </form>
+                                        <button type="button"
+                                                class="btn-deny open-deny-modal"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#denyRequirementModal"
+                                                data-action="{{ url('/update/denied/status/' . $file->id) }}"
+                                                data-category="{{ $file->fileName }}"
+                                                data-file="{{ $file->file }}">
+                                            <i class="fa fa-times"></i> Deny
+                                        </button>
                                     @endif
 
                                     <!-- View -->
@@ -944,6 +1102,55 @@
 </footer>
 </div>
 
+<!-- =============== DENY REQUIREMENT MODAL =============== -->
+<div class="modal fade" id="denyRequirementModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-times-circle"></i> Reason to Deny
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="denyRequirementForm" method="POST" action="">
+                @csrf
+
+                <div class="modal-body">
+                    <div class="deny-file-banner">
+                        <div class="deny-file-avatar" id="denyRequirementAvatar">
+                            <i class="fa fa-file-alt"></i>
+                        </div>
+                        <div>
+                            <div class="deny-file-name" id="denyRequirementCategory"></div>
+                            <div class="deny-file-sub" id="denyRequirementFile"></div>
+                        </div>
+                    </div>
+
+                    <label class="reason-label">
+                        <i class="fa fa-comment-alt"></i> Reason for Denial
+                    </label>
+                    <textarea class="reason-textarea"
+                              id="denyRequirementReason"
+                              name="reason"
+                              rows="4"
+                              placeholder="Explain why this requirement document is being denied..."
+                              required></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn-modal-deny">
+                        <i class="fa fa-ban me-1"></i> Deny Document
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -969,6 +1176,17 @@
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
+    });
+
+    $(document).on('click', '.open-deny-modal', function () {
+        const action = $(this).data('action');
+        const category = $(this).data('category');
+        const file = $(this).data('file');
+
+        $('#denyRequirementForm').attr('action', action);
+        $('#denyRequirementCategory').text(category || 'Requirement document');
+        $('#denyRequirementFile').text(file || '');
+        $('#denyRequirementReason').val('');
     });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
