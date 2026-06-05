@@ -983,12 +983,14 @@
                         @foreach($files as $file)
                         <tr>
                             <!-- Category -->
-                            <td>
+                            <td data-order="{{ preg_replace('/\D/', '', $file->fileName) }}">
                                 <div class="cat-cell">
                                     <div class="cat-icon-box">
                                         <i class="fa fa-folder"></i>
                                     </div>
-                                    <span class="cat-name-text">{{ $file->fileName }}</span>
+                                    <span class="cat-name-text">
+                                        {{ $file->fileName }}
+                                    </span>
                                 </div>
                             </td>
 
