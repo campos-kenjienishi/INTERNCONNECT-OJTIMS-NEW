@@ -945,18 +945,17 @@
                             var nameVal = $('#nameSort').val();
                             var ordering = [];
 
-                            // Apply date sort first if selected
-                            if (dateVal === 'newest') {
-                                ordering.push([2, 'desc']);
-                            } else if (dateVal === 'oldest') {
-                                ordering.push([2, 'asc']);
-                            }
-
-                            // Apply name sort second if selected
+                            // Category sort is the primary sort when selected.
                             if (nameVal === 'az') {
                                 ordering.push([0, 'asc']);
                             } else if (nameVal === 'za') {
                                 ordering.push([0, 'desc']);
+                            }
+
+                            if (dateVal === 'newest') {
+                                ordering.push([2, 'desc']);
+                            } else if (dateVal === 'oldest') {
+                                ordering.push([2, 'asc']);
                             }
 
                             // If no ordering selected, fallback to default
@@ -983,7 +982,14 @@
                         @foreach($files as $file)
                         <tr>
                             <!-- Category -->
-                            <td data-order="{{ preg_replace('/\D/', '', $file->fileName) }}">
+                            @php
+                                $categorySortKey = preg_replace_callback(
+                                    '/\d+/',
+                                    fn ($match) => str_pad($match[0], 12, '0', STR_PAD_LEFT),
+                                    strtolower($file->fileName ?? '')
+                                );
+                            @endphp
+                            <td data-order="{{ $categorySortKey }}">
                                 <div class="cat-cell">
                                     <div class="cat-icon-box">
                                         <i class="fa fa-folder"></i>

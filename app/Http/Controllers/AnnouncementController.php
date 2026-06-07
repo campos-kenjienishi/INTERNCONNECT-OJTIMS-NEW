@@ -19,6 +19,7 @@ use App\Models\CoursePerSY;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Announcements;
 use App\Helpers\AuditLogger;
@@ -27,22 +28,59 @@ class AnnouncementController extends Controller
 {
     public function announcement(Request $request)
     {
-        
-        $user=array();
-        if(Session::has('loginId')){
+        if (!Session::has('loginId')) {
+            return redirect('/login');
+        }
 
-            $user=User::where('id','=', Session::get('loginId'))->first();
-                    }
+        $user = User::where('id', Session::get('loginId'))->first();
 
+        if (!$user || !in_array((string) $user->role, ['1', '2'], true)) {
+            abort(403, 'Only coordinators and professors can post announcements.');
+        }
 
-        $data=new Announcements();
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'course' => ['nullable', 'string', 'max:255'],
+            'room' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $audience = 'all_students';
+        $targetCourse = null;
+        $targetRoom = null;
+
+        if ((string) $user->role === '2') {
+            $class = Classes::where('adviser_name', $user->full_name)
+                ->where('course', $request->input('course'))
+                ->where('room', $request->input('room'))
+                ->first();
+
+            if (!$class) {
+                abort(403, 'You can only post announcements to your own class.');
+            }
+
+            $audience = 'class';
+            $targetCourse = $class->course;
+            $targetRoom = $class->room;
+        }
+
+        $data = new Announcements();
 
         $data->title=$request->title;
         $data->content=$request->content;
         $data->announcer=$user->full_name;
-    $data->audience = $request->input('audience', 'all_students');
-    $data->target_course = $request->input('course');
-    $data->target_room = $request->input('room');
+
+        if (Schema::hasColumn('announcements', 'audience')) {
+            $data->audience = $audience;
+        }
+
+        if (Schema::hasColumn('announcements', 'target_course')) {
+            $data->target_course = $targetCourse;
+        }
+
+        if (Schema::hasColumn('announcements', 'target_room')) {
+            $data->target_room = $targetRoom;
+        }
 
         $data->save();
 
