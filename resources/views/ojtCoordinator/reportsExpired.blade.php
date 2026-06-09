@@ -513,11 +513,9 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             $expiredMOA = 0;
 
             foreach ($companies as $company) {
-                $parts = explode('-', $company->school_year ?? '0-0');
-                $startYear = (int) ($parts[0] ?? 0);
-                $difference = now()->year - $startYear;
+                $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
 
-                if ($difference > 3) {
+                if (!$validUntil || now()->gt($validUntil)) {
                     $expiredMOA++;
                 } else {
                     $activeMOA++;
@@ -621,11 +619,11 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                                 <select class="field-select" name="school_year_start" id="school_year_start" required>
                                     <option value="">Start Year</option>
                                     @for ($year = (date('Y') - 10); $year <= (date('Y') + 10); $year++)
-                                        <option value="{{ $year }}">{{ $year }}</option>
+                                        <option value="{{ $year }}" {{ (string) request('school_year_start') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
                                     @endfor
                                 </select>
                                 <span>–</span>
-                                <select class="field-select" name="school_year_end" id="school_year_end" required>
+                                <select class="field-select" name="school_year_end" id="school_year_end" data-selected="{{ request('school_year_end') }}" required>
                                     <option value="">End Year</option>
                                 </select>
                             </div>
@@ -634,7 +632,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
                             <select class="field-select" id="course" name="course" required>
                                 @foreach ($course as $c)
-                                <option value="{{ $c->course }}">{{ $c->course }}</option>
+                                <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -680,17 +678,15 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <th>Representative</th>
                             <th>Contact No.</th>
                             <th>Email</th>
-                            <th>School Year</th>
+                            <th>Validity</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
                         @php
-                            $parts = explode('-', $company->school_year ?? '0-0');
-                            $startYear = (int) ($parts[0] ?? 0);
-                            $difference = now()->year - $startYear;
-                            $status = $difference > 3 ? 'Expired' : 'Active';
+                            $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
+                            $status = ($validUntil && now()->lte($validUntil)) ? 'Active' : 'Expired';
                         @endphp
                         <tr>
                             <td style="display:none;">{{ $company->id }}</td>
@@ -721,7 +717,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <td>
                                 <span class="school-year-badge">
                                     <i class="fa fa-calendar-alt" style="font-size:10px;"></i>
-                                    {{ $company->school_year }}
+                                    {{ $validUntil ? $validUntil->format('M d, Y') : 'N/A' }}
                                 </span>
                             </td>
                             <td>
@@ -876,6 +872,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         const endSel   = document.getElementById('school_year_end');
         const courseSelect = document.getElementById('course');
         const courseInput = document.getElementById('courseInput');
+        const selectedEndYear = endSel.dataset.selected || '';
 
         if (courseSelect && courseInput) {
             courseInput.value = courseSelect.value;
@@ -891,6 +888,9 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 for (let y = sy + 1; y <= sy + 10; y++) {
                     const opt = document.createElement('option');
                     opt.value = y; opt.textContent = y;
+                    if (String(y) === selectedEndYear) {
+                        opt.selected = true;
+                    }
                     endSel.appendChild(opt);
                 }
             }
@@ -979,12 +979,11 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             const rep       = getRep();
             const contact   = getContact();
             const email     = getEmail();
-            const schoolYr  = getSY();
-            const status = (() => {
-                const parts = schoolYr.split('-');
-                const startYear = parseInt(parts[0] || '0', 10);
-                return (now.getFullYear() - startYear) > 3 ? 'Expired' : 'Active';
-            })();
+            const validity  = getSY();
+            const parsedValidity = Date.parse(validity);
+            const status = !Number.isNaN(parsedValidity) && parsedValidity >= now.getTime()
+                ? 'Active'
+                : 'Expired';
             const statusBadge = status === 'Active'
                 ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Active</span>`
                 : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Expired</span>`;
@@ -997,7 +996,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 <td style="padding:7px 6px; font-size:8.5px; color:#374151; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${rep}</td>
                 <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${contact}</td>
                 <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${email}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${schoolYr}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${validity}</td>
                 <td style="padding:7px 6px; vertical-align:top; text-align:center;">${statusBadge}</td>
             </tr>`;
         }
@@ -1065,7 +1064,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                         <col style="width:13%;">  <!-- Rep -->
                         <col style="width:11%;">  <!-- Contact -->
                         <col style="width:18%;">  <!-- Email -->
-                        <col style="width:10%;">  <!-- School Year -->
+                        <col style="width:10%;">  <!-- Validity -->
                         <col style="width:9%;">   <!-- Status -->
                     </colgroup>
                     <thead>
@@ -1076,7 +1075,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Representative</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Contact No.</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Email</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">School Year</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Validity</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center;">Status</th>
                         </tr>
                     </thead>

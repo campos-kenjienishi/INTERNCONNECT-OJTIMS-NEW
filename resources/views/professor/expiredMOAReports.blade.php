@@ -526,14 +526,14 @@
                             <select class="filter-select" name="school_year_start" id="school_year_start" required>
                                 <option value="">Start Year</option>
                                 @for ($year = 2018; $year <= date('Y'); $year++)
-                                    <option value="{{ $year }}">{{ $year }}</option>
+                                    <option value="{{ $year }}" {{ (string) request('school_year_start') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
                                 @endfor
                             </select>
                             <span class="year-separator">—</span>
-                            <select class="filter-select" name="school_year_end" id="school_year_end" required>
+                            <select class="filter-select" name="school_year_end" id="school_year_end" data-selected="{{ request('school_year_end') }}" required>
                                 <option value="">End Year</option>
                                 @for ($year = 2019; $year <= date('Y'); $year++)
-                                    <option value="{{ $year }}">{{ $year }}</option>
+                                    <option value="{{ $year }}" {{ (string) request('school_year_end') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
                                 @endfor
                             </select>
                         </div>
@@ -543,7 +543,7 @@
                         <label class="filter-label"><i class="fa fa-graduation-cap"></i> Course</label>
                         <select class="filter-select" name="course" id="courseSelect" required style="min-width:220px;">
                             @foreach ($courseAll as $c)
-                                <option value="{{ $c->course }}">{{ $c->course }}</option>
+                                <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -673,17 +673,15 @@
                             <th>Representative</th>
                             <th>Contact No.</th>
                             <th>Email</th>
-                            <th>S.Y. Validity</th>
+                            <th>Validity</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
                         @php
-                            [$startYear, $endYear] = explode('-', $company->school_year);
-                            $startYear  = (int) $startYear;
-                            $difference = now()->year - $startYear;
-                            $status     = $difference > 3 ? 'Expired' : 'Active';
+                            $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
+                            $status = ($validUntil && now()->lte($validUntil)) ? 'Active' : 'Expired';
                         @endphp
                         <tr>
                             <td>{{ $company->id }}</td>
@@ -720,7 +718,7 @@
                             <td>
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <i class="fa fa-calendar" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
-                                    {{ $company->school_year }}
+                                    {{ $validUntil ? $validUntil->format('M d, Y') : 'N/A' }}
                                 </div>
                             </td>
                             <td>
@@ -818,7 +816,7 @@
     /* ── DataTable ── */
     $(document).ready(function () {
         var table = $('#companyTable').DataTable({
-            // Sort by S.Y. Validity (column 6) from latest to oldest
+            // Sort by validity (column 6) from latest to oldest
             order: [[6, 'desc']], 
             columnDefs: [
                 { targets: 0, visible: false }, // Hide ID column
@@ -847,6 +845,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const startSel = document.getElementById('school_year_start');
         const endSel   = document.getElementById('school_year_end');
+        const selectedEndYear = endSel.dataset.selected || '';
 
         function updateEndYears() {
             const sy = parseInt(startSel.value);
@@ -855,6 +854,9 @@
                 for (let y = sy + 1; y <= sy + 10; y++) {
                     const opt = document.createElement('option');
                     opt.value = y; opt.textContent = y;
+                    if (String(y) === selectedEndYear) {
+                        opt.selected = true;
+                    }
                     endSel.appendChild(opt);
                 }
             }
@@ -1032,7 +1034,7 @@
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Representative</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Contact No.</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Email</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">S.Y. Validity</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Validity</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:center;">Status</th>
                         </tr>
                     </thead>
