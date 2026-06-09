@@ -1040,17 +1040,17 @@
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
-                        $('#fileTable').DataTable({
+                        const fileTable = $('#fileTable').DataTable({
                             "order": [[3, 'desc']]
                         });
 
-                        $('.remove-button').click(function (e) {
+                        $('#fileTable tbody').on('click', '.remove-button', function (e) {
                             e.preventDefault();
                             var fileId = $(this).data('file-id');
                             showRemoveConfirmation(fileId);
                         });
 
-                        $('.view-button').click(function (e) {
+                        $('#fileTable tbody').on('click', '.view-button', function (e) {
                             e.preventDefault();
                             var fileUrl = $(this).data('file-url');
                             var fileName = $(this).data('file-name');
@@ -1070,7 +1070,7 @@
                                 $('#previewFallback').show();
                                 $('#previewBadge').addClass('no-preview').html('<i class="fa fa-file-download"></i> No preview available');
                             }
-                            var previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+                            var previewModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('previewModal'));
                             previewModal.show();
                         });
 
