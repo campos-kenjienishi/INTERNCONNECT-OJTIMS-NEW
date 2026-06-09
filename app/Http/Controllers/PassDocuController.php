@@ -312,6 +312,47 @@ public function removeFile($id)
                 return back()->with('success', 'You have updated the information successfully!');
             }
 
+            public function updateApproveStatusBulk(Request $request)
+            {
+                $request->validate([
+                    'student_name' => 'required|string',
+                    'roomId' => 'nullable',
+                ]);
+
+                $data = null;
+
+                if (Session::has('loginId')) {
+                    $data = User::where('id', Session::get('loginId'))->first();
+                }
+
+                if (!$data) {
+                    return back()->with('error', 'Professor account not found.');
+                }
+
+                $files = FileRequirement::where('adviser', $data->full_name)
+                    ->where('uploadedBy', $request->student_name)
+                    ->whereNotIn('status', [1, 2])
+                    ->get();
+
+                if ($files->isEmpty()) {
+                    return back()->with('info', 'There are no pending files to approve.');
+                }
+
+                foreach ($files as $fileRequirement) {
+                    $fileRequirement->status = 1;
+                    $fileRequirement->save();
+                }
+
+                AuditLogger::log(
+                    'PassDocu',
+                    'Update',
+                    'Approved all pending files for student: ' . $request->student_name . ' (' . $files->count() . ' files)',
+                    Session::get('loginId') ?? null
+                );
+
+                return back()->with('success', $files->count() . ' file(s) approved successfully.');
+            }
+
 
             public function updateDeniedStatus(Request $request, $id)
             {

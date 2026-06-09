@@ -152,6 +152,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::get('/professor/listStudents/{roomId}', [ProfessorController::class,'show']);
     Route::get('/professor/classList/{roomId}', [ProfessorController::class,'show_list']);
     Route::post('/professor/approve/{email}', [ProfessorController::class,'approve']);
+    Route::post('/professor/approve-all/{roomId}', [ProfessorController::class,'approveAll']);
     Route::post('/professor/deny/{email}', [ProfessorController::class,'deny']);
     Route::get('/professor/upload', function () {
         return redirect('/professor/class');
@@ -164,6 +165,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::post('/fileCategory', [PassDocuController::class,'fileCategory']);
     Route::post('/remove/files/{id}', [PassDocuController::class,'removeCategory']);
     Route::get('/studentrequire',[PassDocuController::class,'studentRequirements']);
+    Route::post('/update/approve/status/bulk', [PassDocuController::class, 'updateApproveStatusBulk']);
     Route::post('/update/approve/status/{id}', [PassDocuController::class, 'updateApproveStatus']);
     Route::post('/update/denied/status/{id}', [PassDocuController::class, 'updateDeniedStatus']);
     Route::get('/requireview',[PassDocuController::class,'requirementsView']);

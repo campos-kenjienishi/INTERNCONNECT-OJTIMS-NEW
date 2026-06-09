@@ -416,6 +416,21 @@
             box-shadow: 0 6px 16px rgba(22,163,74,0.3);
         }
 
+        .btn-approve-all {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 16px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border: none; border-radius: 9px; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 12px rgba(22,163,74,0.22);
+        }
+
+        .btn-approve-all:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 18px rgba(22,163,74,0.3);
+        }
+
         .btn-deny {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 7px 14px;
@@ -920,6 +935,17 @@
                         <button id="applySort" class="btn-view btn-apply" style="padding:8px 12px;">Apply</button>
                     </div>
 
+                    @if($pendingReq > 0)
+                        <form id="approveAllFilesForm" method="POST" action="{{ url('/update/approve/status/bulk') }}" style="display:inline;">
+                            @csrf
+                            <input type="hidden" name="student_name" value="{{ $value }}">
+                            <input type="hidden" name="roomId" value="{{ $roomId }}">
+                            <button type="submit" class="btn-approve-all">
+                                <i class="fa fa-check-double"></i> Approve All
+                            </button>
+                        </form>
+                    @endif
+
                     <div class="req-count-badge">
                         <i class="fa fa-file-alt"></i>
                         {{ $totalReq }} {{ $totalReq == 1 ? 'file' : 'files' }}
@@ -1160,6 +1186,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
@@ -1195,6 +1222,26 @@
         $('#denyRequirementCategory').text(category || 'Requirement document');
         $('#denyRequirementFile').text(file || '');
         $('#denyRequirementReason').val('');
+    });
+
+    $('#approveAllFilesForm').on('submit', function (e) {
+        e.preventDefault();
+        const form = this;
+
+        Swal.fire({
+            title: 'Approve all files?',
+            text: 'Are you sure you want to approve all files?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, approve all',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
     });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>

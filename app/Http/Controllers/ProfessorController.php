@@ -454,6 +454,55 @@ public function approve(Request $request, $email)
     return back()->with('success', 'You have updated the information successfully!');
 }
 
+public function approveAll(Request $request, $roomId)
+{
+    $data = null;
+
+    if (Session::has('loginId')) {
+        $data = User::where('id', Session::get('loginId'))->first();
+    }
+
+    $course = Classes::find($roomId);
+
+    if (!$data || !$course || $course->adviser_name !== $data->full_name) {
+        return back()->with('error', 'Unable to approve students for this class.');
+    }
+
+    $students = User::where('status', 3)
+        ->whereHas('studentInfo', function ($query) use ($roomId, $course, $data) {
+            $query->where('class_id', $roomId);
+
+            if (empty($course->school_year_start) || empty($course->school_year_end)) {
+                $query->orWhere(function ($legacy) use ($course, $data) {
+                    $legacy->whereNull('class_id')
+                        ->where('course', $course->course)
+                        ->where('adviser_name', $data->full_name);
+                });
+            }
+        })
+        ->get();
+
+    if ($students->isEmpty()) {
+        return back()->with('info', 'There are no pending students to approve.');
+    }
+
+    foreach ($students as $student) {
+        $student->status = 1;
+        $student->save();
+
+        Mail::to($student->email)->send(new UserApproved($student));
+    }
+
+    AuditLogger::log(
+        'Student Account',
+        'approve',
+        'Approved all pending students in room: ' . $course->room . ' (' . $students->count() . ' students)',
+        $data->id ?? null
+    );
+
+    return back()->with('success', $students->count() . ' student request(s) approved successfully.');
+}
+
    
 
     public function deny(Request $request, $email)

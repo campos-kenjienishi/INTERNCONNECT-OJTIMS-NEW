@@ -403,6 +403,21 @@
             box-shadow: 0 6px 16px rgba(22,163,74,0.3);
         }
 
+        .btn-approve-all {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 18px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border: none; border-radius: 9px; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 12px rgba(22,163,74,0.22);
+        }
+
+        .btn-approve-all:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 18px rgba(22,163,74,0.3);
+        }
+
         .btn-deny {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 7px 16px;
@@ -751,9 +766,22 @@
                         <p>Approve or deny student OJT enrollment requests</p>
                     </div>
                 </div>
-                <div class="request-count-badge">
-                    <i class="fa fa-user-clock"></i>
-                    {{ $totalRequests }} {{ $totalRequests == 1 ? 'request' : 'requests' }}
+                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    @if($totalRequests > 0)
+                        <form id="approveAllStudentsForm"
+                              method="POST"
+                              action="{{ url('/professor/approve-all/' . $course->id) }}"
+                              style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn-approve-all">
+                                <i class="fa fa-check-double"></i> Approve All
+                            </button>
+                        </form>
+                    @endif
+                    <div class="request-count-badge">
+                        <i class="fa fa-user-clock"></i>
+                        {{ $totalRequests }} {{ $totalRequests == 1 ? 'request' : 'requests' }}
+                    </div>
                 </div>
             </div>
 
@@ -963,6 +991,26 @@
             });
             Toast.fire({ icon: 'success', title: 'Student approved successfully' });
             setTimeout(() => form.submit(), 500);
+        });
+
+        $('#approveAllStudentsForm').on('submit', function (e) {
+            e.preventDefault();
+            const form = this;
+
+            Swal.fire({
+                title: 'Approve all students?',
+                text: 'Are you sure you want to approve all students?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, approve all',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         });
 
         // Deny — SweetAlert toast
