@@ -37,10 +37,11 @@ return [
     ],
 
     'ai' => [
-        'provider' => env('AI_PROVIDER', 'local'),
+        'provider' => env('AI_PROVIDER', 'gemini'),
         'model' => env('AI_MODEL', ''),
         'gemini_endpoint' => env('GEMINI_API_ENDPOINT', ''),
         'gemini_api_key' => env('GEMINI_API_KEY', ''),
+        'cache_ttl' => (int) env('AI_CACHE_TTL', 300),
     ],
 
 

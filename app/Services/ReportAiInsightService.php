@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Services\GeminiClient;
@@ -11,29 +10,10 @@ class ReportAiInsightService
 {
     public function summarize(string $reportType, array $metrics, array $highlights = [], array $watchouts = [], array $actions = []): array
     {
-        $provider = (string) config('services.ai.provider', 'local');
-
-        if ($provider === 'gemini') {
-            $gemini = $this->tryGeminiAi($reportType, $metrics, $highlights, $watchouts, $actions);
-            if ($gemini !== null) {
-                return $gemini;
-            }
-
-            $localAi = $this->tryLocalAi($reportType, $metrics, $highlights, $watchouts, $actions);
-            if ($localAi !== null) {
-                return $localAi;
-            }
-        } else {
-            $localAi = $this->tryLocalAi($reportType, $metrics, $highlights, $watchouts, $actions);
-
-            if ($localAi !== null) {
-                return $localAi;
-            }
-
-            $gemini = $this->tryGeminiAi($reportType, $metrics, $highlights, $watchouts, $actions);
-            if ($gemini !== null) {
-                return $gemini;
-            }
+        // Use Gemini as primary provider; fall back to internal summary.
+        $gemini = $this->tryGeminiAi($reportType, $metrics, $highlights, $watchouts, $actions);
+        if ($gemini !== null) {
+            return $gemini;
         }
 
         return [
@@ -47,51 +27,7 @@ class ReportAiInsightService
         ];
     }
 
-    protected function tryLocalAi(string $reportType, array $metrics, array $highlights, array $watchouts, array $actions): ?array
-    {
-        $endpoint = rtrim((string) config('services.local_ai.endpoint', ''), '/');
-        $model = (string) config('services.local_ai.model', 'mistral');
-
-        if ($endpoint === '') {
-            return null;
-        }
-
-        $prompt = $this->buildPrompt($reportType, $metrics, $highlights, $watchouts, $actions);
-
-        try {
-            $response = Http::timeout(12)
-                ->acceptJson()
-                ->post($endpoint, [
-                    'model' => $model,
-                    'prompt' => $prompt,
-                    'stream' => false,
-                ]);
-
-            if (!$response->successful()) {
-                return null;
-            }
-
-            $payload = $response->json();
-            $rawText = (string) ($payload['response'] ?? $payload['message']['content'] ?? $payload['content'] ?? '');
-            $decoded = $this->extractJsonObject($rawText);
-
-            if ($decoded === null) {
-                return null;
-            }
-
-            return [
-                'summary' => trim((string) ($decoded['summary'] ?? $this->buildFallbackSummary($reportType, $metrics))),
-                'key_findings' => $this->normalizeList($decoded['key_findings'] ?? $decoded['findings'] ?? $highlights),
-                'watchouts' => $this->normalizeList($decoded['watchouts'] ?? $decoded['risks'] ?? $watchouts),
-                'recommendations' => $this->normalizeList($decoded['recommendations'] ?? $decoded['actions'] ?? $actions),
-                'source' => 'local-ai',
-                'model' => $model,
-                'used_local_ai' => true,
-            ];
-        } catch (\Throwable $throwable) {
-            return null;
-        }
-    }
+    
 
     protected function buildPrompt(string $reportType, array $metrics, array $highlights, array $watchouts, array $actions): string
     {
@@ -193,8 +129,9 @@ class ReportAiInsightService
         $prompt = $this->buildPrompt($reportType, $metrics, $highlights, $watchouts, $actions);
 
         $cacheKey = 'ai:gemini:' . md5($model . '|' . $prompt);
+        $ttl = (int) config('services.ai.cache_ttl', 300);
 
-        return Cache::remember($cacheKey, 300, function () use ($prompt, $model, $reportType, $metrics, $highlights, $watchouts, $actions) {
+        return Cache::remember($cacheKey, $ttl, function () use ($prompt, $model, $reportType, $metrics, $highlights, $watchouts, $actions) {
             $client = new GeminiClient();
             $raw = $client->generate($prompt, $model);
             if ($raw === null) {

@@ -47,6 +47,50 @@ private function requireStudentSession()
     return $user;
 }
 
+private function visibleAnnouncementsForStudent($data, $classRoomNames = [], $includeClassAnnouncements = false)
+{
+    $coordinatorNames = User::where('role', 1)->pluck('full_name')->filter()->values()->all();
+    $hasAudienceColumn = Schema::hasColumn('announcements', 'audience');
+    $hasTargetCourseColumn = Schema::hasColumn('announcements', 'target_course');
+    $hasTargetRoomColumn = Schema::hasColumn('announcements', 'target_room');
+
+    if (!$hasAudienceColumn) {
+        return Announcements::where(function ($query) use ($data, $coordinatorNames, $includeClassAnnouncements) {
+            $query->whereIn('announcer', $coordinatorNames);
+
+            if ($includeClassAnnouncements && !empty($data->adviser_name)) {
+                $query->orWhere('announcer', $data->adviser_name);
+            }
+        })->latest()->get();
+    }
+
+    return Announcements::where(function ($query) use ($data, $classRoomNames, $coordinatorNames, $includeClassAnnouncements, $hasTargetCourseColumn, $hasTargetRoomColumn) {
+        $query->where(function ($coordinatorQuery) use ($coordinatorNames) {
+            $coordinatorQuery->where('audience', 'all_students')
+                ->whereIn('announcer', $coordinatorNames);
+        })
+        ->orWhere(function ($legacyCoordinatorQuery) use ($coordinatorNames) {
+            $legacyCoordinatorQuery->whereNull('audience')
+                ->whereIn('announcer', $coordinatorNames);
+        });
+
+        if ($includeClassAnnouncements) {
+            $query->orWhere(function ($classQuery) use ($data, $classRoomNames, $hasTargetCourseColumn, $hasTargetRoomColumn) {
+                $classQuery->where('audience', 'class')
+                    ->where('announcer', $data->adviser_name);
+
+                if ($hasTargetCourseColumn) {
+                    $classQuery->where('target_course', $data->course);
+                }
+
+                if ($hasTargetRoomColumn) {
+                    $classQuery->whereIn('target_room', $classRoomNames);
+                }
+            });
+        }
+    })->latest()->get();
+}
+
 public function home()
 {
     $sessionCheck = $this->requireStudentSession();
@@ -63,10 +107,13 @@ public function home()
     // GET FILE COUNT
     $fileCount = UploadedFile::count();
 
+    $announcements = $this->visibleAnnouncementsForStudent($data);
+
     return view('students.student_home', [
         'user' => $data,
         'companies' => $companies,
-        'fileCount' => $fileCount
+        'fileCount' => $fileCount,
+        'announcements' => $announcements
     ]);
 }
     public function student_acc()
@@ -227,15 +274,12 @@ public function home()
         //    $class = Classes::where('adviser_name', $data->adviser_name)->get();
 
 
-        if (!empty($data) && isset($data->status) && $data->status == 1) {
-            // User's status is 1, allow access to announcements
-            $announce = Announcements::where(function ($query) use ($data) {
-                $query->where('announcer', 'Gina Dela Cruz')
-                      ->orWhere('announcer', $data->adviser_name);
-            })->get();
-        } else {
-            $announce = [];
-        }
+        $classRoomNames = $class->pluck('room')->filter()->values()->all();
+        $announce = $this->visibleAnnouncementsForStudent(
+            $data,
+            $classRoomNames,
+            !empty($data) && isset($data->status) && $data->status == 1
+        );
         
 
     // Pass the $professor and $students variables to the view

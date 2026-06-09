@@ -1206,6 +1206,11 @@
                                     placeholder="End (e.g. 2025)" required>
                             </div>
 
+                            <label class="modal-field-label" style="margin-top: 14px;">
+                                <i class="fa fa-hourglass-end"></i> Validity Period
+                            </label>
+                            <input class="modal-field-input" type="date" name="valid_until" min="{{ now()->toDateString() }}" required>
+
                             <!-- Info notice card -->
                             <div style="
                                 background: #fff5f5;

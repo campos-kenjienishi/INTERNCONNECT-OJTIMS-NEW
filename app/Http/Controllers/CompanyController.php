@@ -180,7 +180,15 @@ public function companyCreate(Request $request)
         ]);
     }
 
-    $expirationDate = now()->addYears(3);
+    if ($data->role == 0) {
+        $request->validate([
+            'valid_until' => 'required|date|after_or_equal:today',
+        ]);
+    }
+
+    $expirationDate = $data->role == 0
+        ? $request->input('valid_until')
+        : now()->addYears(3);
 
     // Create or retrieve the company
     $com = new Company();

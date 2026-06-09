@@ -24,7 +24,6 @@ use App\Models\OJTInformation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
@@ -98,10 +97,14 @@ class AuthController extends Controller
 
         if($user){
             if(Hash::check($request->password, $user->password)){
-                $request->session()->regenerate();
                 $request->session()->put('loginId',$user->id);
                 $request->session()->put('show_terms', true);
-                Cache::put('active_session_id:' . $user->id, $request->session()->getId(), now()->addHours(8));
+                Cache::put(
+                    'active_session_id:' . $user->id,
+                    $request->session()->getId(),
+                    now()->addMinutes((int) config('session.lifetime', 120))
+                );
+
                 if ($user->role == 0) {
                     return redirect()->route('student_home');
                 } 
@@ -681,18 +684,14 @@ class AuthController extends Controller
         return $months;
     }
 
-    public function logout(Request $request){
-        $userId = $request->session()->get('loginId');
-        if ($userId) {
-            Cache::forget('active_session_id:' . $userId);
+    public function logout(){
+        if(Session::has('loginId')){
+            $id = Session::get('loginId');
+            Session::pull('loginId');
+            Session::forget('termsAccepted');
+            Cache::forget('active_session_id:' . $id);
+            return redirect('login');
         }
-
-        $request->session()->invalidate();
-        $request->session()->flush();
-        $request->session()->regenerateToken();
-        Cookie::queue(Cookie::forget(config('session.cookie')));
-
-        return redirect('login');
     }
 
     public function professorTab()
