@@ -705,6 +705,43 @@
         .welcome-text h2 { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: -0.3px; }
         .welcome-text p  { font-size: 13.5px; color: rgba(255,255,255,0.7); line-height: 1.5; }
 
+        .welcome-actions {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .welcome-video-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-video-btn:hover {
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.28);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+        }
+
+        .welcome-video-btn i {
+            font-size: 14px;
+        }
+
         .welcome-icon { font-size: 64px; opacity: 0.2; position: relative; z-index: 1; }
 
         /* Stats grid */
@@ -931,6 +968,8 @@
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .welcome-banner { flex-direction: column; gap: 12px; }
             .welcome-icon { display: none; }
+            .welcome-actions { width: 100%; }
+            .welcome-video-btn { width: 100%; justify-content: center; }
         }
 
         @media (max-width: 480px) {
@@ -1139,6 +1178,29 @@
                 <span class="pulse-dot"></span>
                 <i class="fa fa-calendar-alt"></i>
                 <span id="currentDate"></span>
+            </div>
+        </div>
+
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h2>Welcome to your professor dashboard</h2>
+                <p>
+                    For first-time users, please watch these short how-to videos to fully set up your account
+                    and get familiar with the evaluation workflow.
+                </p>
+                <div class="welcome-actions">
+                    <a href="https://youtu.be/ikfInULZYJs" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
+                        <i class="fab fa-youtube"></i>
+                        Professor Setup Guide
+                    </a>
+                    <a href="https://youtu.be/2txVame31n0" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
+                        <i class="fab fa-youtube"></i>
+                        Student Evaluation Guide
+                    </a>
+                </div>
+            </div>
+            <div class="welcome-icon">
+                <i class="fa fa-chalkboard-teacher"></i>
             </div>
         </div>
 
