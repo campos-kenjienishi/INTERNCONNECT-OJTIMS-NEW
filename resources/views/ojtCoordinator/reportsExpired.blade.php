@@ -375,6 +375,95 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             .stats-row { grid-template-columns: 1fr 1fr; }
             .filter-grid { grid-template-columns: 1fr; }
         }
+        /* ── Scroll container ── */
+.table-card-body {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+/* ── Remove padding from wrapper so sticky left:0 is flush ── */
+.table-card-body .dataTables_wrapper {
+    padding: 16px 0 16px 0;
+}
+
+/* ── DataTables controls keep their padding ── */
+.table-card-body .dataTables_filter,
+.table-card-body .dataTables_length,
+.table-card-body .dataTables_info,
+.table-card-body .dataTables_paginate {
+    padding: 0 22px;
+}
+
+.table-card-body table.dataTable {
+    min-width: 900px;
+    margin: 0 !important;
+}
+
+/* ── RESET all columns ── */
+.table-card-body table.dataTable thead th,
+.table-card-body table.dataTable tbody td {
+    position: static;
+    z-index: auto;
+    box-shadow: none;
+}
+
+/* ── Sticky: Company Name (now true first-child) ── */
+.table-card-body table.dataTable thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: #fafafa !important;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.10);
+    border-right: 2px solid #e5e5e5;
+}
+
+.table-card-body table.dataTable tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 9;
+    background: #ffffff !important;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.07);
+    border-right: 2px solid #f0f0f0;
+}
+
+.table-card-body table.dataTable tbody tr:nth-child(even) td:first-child {
+    background: #fafafa !important;
+}
+
+.table-card-body table.dataTable tbody tr:hover td:first-child {
+    background: #fff5f5 !important;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.07);
+}
+
+/* ── Dark mode ── */
+body.dark-mode .table-card-body table.dataTable thead th:first-child {
+    background: #2a2a2a !important;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.6);
+    border-right: 2px solid #3a3a3a;
+}
+
+body.dark-mode .table-card-body table.dataTable tbody td:first-child {
+    background: #2a2a2a !important;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.6);
+    border-right: 2px solid #3a3a3a;
+}
+
+body.dark-mode .table-card-body table.dataTable tbody tr:nth-child(even) td:first-child {
+    background: #252525 !important;
+}
+
+body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
+    background: rgba(220, 38, 38, 0.1) !important;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Mobile ── */
+@media (max-width: 900px) {
+    .table-card-body .dataTables_wrapper {
+        padding: 12px 0;
+    }
+}
     </style>
 </head>
 

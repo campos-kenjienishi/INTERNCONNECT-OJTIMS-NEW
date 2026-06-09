@@ -1096,7 +1096,7 @@
     </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/logout') }}" class="nav-item">
+        <a href="{{ url('/login') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>
@@ -1140,15 +1140,6 @@
                 <i class="fa fa-calendar-alt"></i>
                 <span id="currentDate"></span>
             </div>
-        </div>
-
-        <!-- Welcome Banner -->
-        <div class="welcome-banner">
-            <div class="welcome-text">
-                <h2>Welcome back, {{ explode(' ', $data->full_name)[0] }}! 👋</h2>
-                <p>Manage your OJT classes, room templates, and monitor your students' progress.</p>
-            </div>
-            <div class="welcome-icon">🎓</div>
         </div>
 
         <!-- Stats Cards -->
@@ -1308,61 +1299,165 @@ $(document).ready(function() {
         });
     }
 
-    // Sidebar toggle
-    const sidebar     = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const menuToggle  = document.getElementById('menuToggle');
-    const overlay     = document.getElementById('sidebarOverlay');
+    // Sidebar toggle - wrapped in a safe initialization function
+    function initSidebarToggle() {
+        const sidebar     = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const menuToggle  = document.getElementById('menuToggle');
+        const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+        // Ensure all elements exist
+        if (!sidebar) {
+            console.error('Sidebar element not found');
+            return;
         }
-    });
+        if (!mainContent) {
+            console.error('Main content element not found');
+            return;
+        }
+        if (!menuToggle) {
+            console.error('Menu toggle element not found');
+            return;
+        }
+        if (!overlay) {
+            console.error('Sidebar overlay element not found');
+            return;
+        }
 
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    });
+        // Click handler for menu toggle
+        menuToggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isMobile = window.innerWidth <= 900;
+            if (isMobile) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        });
 
+        // Click handler for overlay
+        overlay.addEventListener('click', function () {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 900) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            } else {
+                if (!sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                }
+            }
+        });
+    }
+
+    // Wait for DOM to be fully loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebarToggle);
+    } else {
+        // DOM is already loaded
+        initSidebarToggle();
+    }
+</script>
+</script>
+
+<script>
     /* ══════════════════════════════════════════════
        DATE & TIME MODAL
     ══════════════════════════════════════════════ */
 
-    const dtOverlay  = document.getElementById('dtOverlay') || createDTModal();
-    const dtCloseBtn = document.getElementById('dtCloseBtn');
-    const dateBadge  = document.getElementById('dateBadge');
+    let dtOverlay = document.getElementById('dtOverlay');
+    const dateBadge = document.getElementById('dateBadge');
 
-    function createDTModal() {
-        const html = `
+    // Create modal if it doesn't exist
+    if (!dtOverlay) {
+        const modalHTML = `
         <div class="dt-overlay" id="dtOverlay">
-
-            <!-- Dashboard Footer (restored) -->
-            <footer class="dashboard-footer">
-                <div class="footer-left">
-                    <span class="footer-logo"><img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP Logo" style="height:18px;vertical-align:middle;margin-right:8px;opacity:0.8;"></span>
-                    <span class="footer-copy">&copy; 1998–{{ date('Y') }} <strong>Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
-                    <span class="divider">|</span>
-                    <span class="footer-links">
-                        <a href="https://www.pup.edu.ph/terms/" target="_blank">Terms</a> ·
-                        <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy</a>
-                    </span>
+            <div class="dt-modal">
+                <div class="dt-modal-header">
+                    <div class="dt-header-top">
+                        <span class="dt-header-title">Current Date & Time</span>
+                        <button class="dt-close-btn" id="dtCloseBtn">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="dt-clock-display">
+                        <div class="dt-time-big">
+                            <span id="dtHours">00</span>
+                            <span class="colon">:</span>
+                            <span id="dtMinutes">00</span>
+                            <span class="colon">:</span>
+                            <span id="dtSeconds">00</span>
+                            <span class="dt-time-ampm" id="dtAmPm">AM</span>
+                        </div>
+                        <div class="dt-date-sub" id="dtDateSub">Loading...</div>
+                    </div>
                 </div>
-            </footer>
+                <div class="dt-analog-wrap">
+                    <div class="analog-clock" id="analogClock">
+                        <div class="hand hour-hand" id="hourHand"></div>
+                        <div class="hand minute-hand" id="minuteHand"></div>
+                        <div class="hand second-hand" id="secondHand"></div>
+                        <div class="clock-center"></div>
+                    </div>
+                </div>
+                <div class="dt-calendar">
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" id="calPrev"><i class="fa fa-chevron-left"></i></button>
+                        <div class="cal-month-label" id="calMonthLabel">January 2024</div>
+                        <button class="cal-nav-btn" id="calNext"><i class="fa fa-chevron-right"></i></button>
+                    </div>
+                    <div class="cal-grid" id="calGrid"></div>
+                </div>
+            </div>
+        </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        dtOverlay = document.getElementById('dtOverlay');
+    }
+
+    function openModal() {
+        if (dtOverlay) {
+            dtOverlay.classList.add('open');
+            startClock();
+        }
+    }
+
+    function closeModal() {
+        if (dtOverlay) {
+            dtOverlay.classList.remove('open');
+            stopClock();
+        }
+    }
+
+    // Event listeners for modal
+    const dtCloseBtn = document.getElementById('dtCloseBtn');
     if (dtCloseBtn) {
         dtCloseBtn.addEventListener('click', closeModal);
     }
-    dtOverlay.addEventListener('click', function (e) {
-        if (e.target === dtOverlay) closeModal();
-    });
+
+    if (dtOverlay) {
+        dtOverlay.addEventListener('click', function (e) {
+            if (e.target === dtOverlay) closeModal();
+        });
+    }
+
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeModal();
     });
+
+    // Open modal when date badge is clicked
+    if (dateBadge) {
+        dateBadge.addEventListener('click', openModal);
+    }
 
     /* ── Digital Clock ── */
     let clockRAF = null;

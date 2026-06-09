@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
-     <link rel="stylesheet" href="{{ asset('css/student_filereq-responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/student_filereq-responsive.css') }}">
+    
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -316,11 +317,10 @@
         /* Stats row */
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(4, 1fr);  /* always 4 columns on desktop */
             gap: 16px;
             margin-bottom: 24px;
         }
-
         .stat-card {
             background: #fff;
             border-radius: 14px;
@@ -733,7 +733,6 @@
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
         }
         /* Dashboard Footer */
 .dashboard-footer {

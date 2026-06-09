@@ -753,14 +753,7 @@
             </div>
         </div>
 
-        <!-- Welcome Banner -->
-        <div class="welcome-banner">
-            <div class="welcome-text">
-                <h2>Welcome back, {{ $user->first_name }}! 👋</h2>
-                <p>Track your OJT progress, submit requirements, and manage your internship journey all in one place.</p>
-            </div>
-            <div class="welcome-icon">🎓</div>
-        </div>
+        
 
         <!-- Stats Row -->
         <div class="stats-grid">
@@ -781,14 +774,14 @@
             <a href="{{ url('/student/ojtinfo') }}" class="stat-card">
                 <div class="stat-icon amber"><i class="fa fa-info-circle"></i></div>
                 <div class="stat-info">
-                    <div class="stat-num">Info</div>
+                    <div class="stat-num">Information</div>
                     <div class="stat-name">OJT Information</div>
                 </div>
             </a>
             <a href="{{ url('/student/evaluation') }}" class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-star-half-alt"></i></div>
                 <div class="stat-info">
-                    <div class="stat-num">Eval</div>
+                    <div class="stat-num">Evaluation</div>
                     <div class="stat-name">Supervisor Evaluation</div>
                 </div>
             </a>

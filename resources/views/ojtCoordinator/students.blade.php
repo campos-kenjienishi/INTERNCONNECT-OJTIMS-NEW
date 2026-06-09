@@ -481,6 +481,13 @@
 
         body.dark-mode .table-card-body { background: #2a2a2a; }
 
+        /* Horizontal scroll container for mobile */
+        .table-card-body {
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
 
         .table-card-body table.dataTable thead th {
@@ -491,10 +498,21 @@
             border-bottom: 1px solid #f0f0f0; border-top: none;
         }
 
+        /* Sticky first column header */
+        .table-card-body table.dataTable thead th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+
         body.dark-mode .table-card-body table.dataTable thead th {
             background: #2a2a2a;
             color: #ccc;
             border-bottom: 1px solid #3a3a3a;
+        }
+
+        body.dark-mode .table-card-body table.dataTable thead th:first-child {
+            background: #2a2a2a;
         }
 
         .table-card-body table.dataTable tbody td {
@@ -503,15 +521,33 @@
             font-size: 13px; vertical-align: middle;
         }
 
+        /* Sticky first column body */
+        .table-card-body table.dataTable tbody td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 9;
+            background: #fff;
+        }
+
         body.dark-mode .table-card-body table.dataTable tbody td {
             color: #e0e0e0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
+        body.dark-mode .table-card-body table.dataTable tbody td:first-child {
+            background: #2a2a2a;
+        }
+
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
+        .table-card-body table.dataTable tbody tr:hover td:first-child { background: #fff5f5; }
+        
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
 
         body.dark-mode .table-card-body table.dataTable tbody tr:hover td {
+            background: rgba(220,38,38,0.1);
+        }
+
+        body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
             background: rgba(220,38,38,0.1);
         }
 
@@ -904,6 +940,21 @@
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
             .stats-row { grid-template-columns: 1fr 1fr; }
+
+            /* Mobile table scrolling */
+            .table-card-body {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                min-width: 0;
+            }
+
+            .table-card-body table.dataTable {
+                min-width: 700px;
+            }
+
+            .table-card-body .dataTables_wrapper {
+                padding: 12px 16px;
+            }
         }
         .btn-back {
     display: inline-flex; align-items: center; gap: 8px;
