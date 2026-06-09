@@ -111,6 +111,7 @@
         .nav-item .nav-icon { font-size: 18px; flex-shrink: 0; width: 22px; text-align: center; }
         .nav-item .nav-label { transition: opacity 0.25s; overflow: hidden; }
         .sidebar.collapsed .nav-label { opacity: 0; width: 0; }
+        .sidebar.collapsed { width: var(--sidebar-w-collapsed); }
 
         .nav-item .tooltip-label {
             position: absolute;

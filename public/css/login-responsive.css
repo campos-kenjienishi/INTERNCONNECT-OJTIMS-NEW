@@ -1,264 +1,276 @@
-*, *::before, *::after {
-    box-sizing: border-box;
-}
+/* ===================================================
+   LOGIN PAGE RESPONSIVE STYLES
+   InternConnect
+=================================================== */
 
-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
-/* ============================================================
-   MAIN WRAPPER — centers the card on all screens
-   ============================================================ */
+/* Layout */
 .main-wrapper {
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    padding: 16px;
+    align-items: center;
+    padding: 1rem;
 }
 
-/* ============================================================
-   LOGIN CONTAINER — side-by-side on desktop (default)
-   ============================================================ */
 .login-container {
-    display: flex;
-    flex-direction: row;
+    width: min(95%, 600px);
+    margin: 0 auto;
+}
+
+body.auth-centered-page .login-container {
+    max-width: 600px;
+    min-height: auto;
+}
+
+body.auth-centered-page .main-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+body.auth-centered-page .left-panel {
+    display: none !important;
+}
+
+body.auth-centered-page .right-panel {
     width: 100%;
-    max-width: 1100px;
+    flex: 1 1 auto;
+    min-height: 450px;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    justify-content: center;
+    border-radius: 24px;
 }
 
-/* LEFT PANEL — takes remaining space */
-.left-panel {
-    flex: 1;
+/* Branding */
+.auth-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 30px;
 }
 
-/* RIGHT PANEL — fixed width on desktop */
-.right-panel {
-    width: 420px;
-    flex-shrink: 0;
+.auth-logo {
+    width: clamp(50px, 10vw, 72px);
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
 }
 
+.auth-brand-copy .brand-name {
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    margin-bottom: 4px;
+}
 
-/* ============================================================
-   BREAKPOINT: XL — Large Desktops (1280px+)
-   ============================================================ */
-@media (min-width: 1280px) {
+.auth-brand-copy .system-title {
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.auth-brand-copy .system-title,
+.login-header p {
+    text-transform: none;
+}
+
+/* Header */
+.login-header {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.login-header p {
+    margin-bottom: 0;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+}
+
+/* Form Fields */
+.field-group {
+    margin-bottom: 16px;
+}
+
+.input-wrap {
+    position: relative;
+}
+
+.input-wrap input {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px; /* Prevents iOS zoom */
+    background: #f7f4ee;
+    border: 1px solid #ddd7cb;
+    color: #3b0000;
+}
+
+.input-wrap input::placeholder {
+    color: #9a9080;
+}
+
+.input-wrap input:focus {
+    background: #fffdf9;
+    border-color: #cdbfa9;
+    outline: none;
+}
+
+.input-wrap .i-icon {
+    color: #ef4444 !important;
+    z-index: 2;
+}
+
+.toggle-pw {
+    cursor: pointer;
+}
+
+/* Browser Autofill Fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #f7f4ee inset;
+    -webkit-text-fill-color: #3b0000;
+}
+
+/* Buttons */
+.btn-wrap {
+    margin-top: 6px;
+}
+
+.btn-login {
+    width: 100%;
+    min-height: 50px;
+}
+
+/* Terms */
+.terms-wrap {
+    margin-top: 16px;
+    margin-bottom: 14px;
+}
+
+.terms-text {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.terms-text span {
+    display: inline;
+}
+
+.terms-line-top {
+    display: block;
+    margin-bottom: 2px;
+    color: rgba(255,255,255,0.5);
+}
+
+.terms-line-bottom {
+    display: block;
+    color: #fff;
+}
+
+.terms-line-bottom a {
+    color: #fca5a5;
+    text-decoration: underline;
+}
+
+.terms-line-separator {
+    color: rgba(255,255,255,0.5);
+}
+
+/* Footer */
+.footer-wrap {
+    margin-top: 8px;
+}
+
+.signup-outside {
+    margin-top: 0;
+    text-align: center;
+    width: 100%;
+    max-width: 860px;
+}
+
+.signup-outside span {
+    color: #fff;
+}
+
+.signup-outside a {
+    color: #fca5a5;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.signup-outside a:hover {
+    text-decoration: underline;
+}
+
+/* Tablet */
+@media (max-width: 991px) {
     .login-container {
-        max-width: 1200px;
+        max-width: 500px;
     }
 
-    .right-panel {
-        width: 460px;
-    }
-}
-
-/* ============================================================
-   BREAKPOINT: 2XL — TV / 4K (1920px+)
-   ============================================================ */
-@media (min-width: 1920px) {
-    .main-wrapper {
-        padding: 40px;
-    }
-
-    .login-container {
-        max-width: 1400px;
-    }
-
-    .right-panel {
-        width: 520px;
-    }
-
-    .hero-heading {
-        font-size: 3.5rem;
-    }
-
-    .hero-desc {
-        font-size: 1rem;
+    body.auth-centered-page .right-panel {
+        padding: 2rem;
+        min-height: auto;
     }
 }
 
-/* ============================================================
-   BREAKPOINT: MD — Tablets / iPad (max 1023px)
-   Panels stack: left panel on top, right panel below
-   ============================================================ */
-@media (max-width: 1023px) {
-    .main-wrapper {
-        align-items: flex-start;
-        padding-top: 20px;
-        padding-bottom: 20px;
-    }
-
-    .login-container {
-        flex-direction: column;
-        max-width: 680px;
-    }
-
-    .left-panel {
-        width: 100%;
-        padding-bottom: 24px;
-    }
-
-    /* Hide heavy content to save vertical space */
-    .hero-desc {
-        display: none;
-    }
-
-    .stats-row {
-        display: none;
-    }
-
-    .hero-heading {
-        font-size: 1.6rem;
-        margin-bottom: 0;
-    }
-
-    .logo-wrapper {
-        margin-bottom: 12px;
-    }
-
-    .right-panel {
-        width: 100%;
-    }
-}
-
-/* ============================================================
-   BREAKPOINT: SM — Large Phones (max 767px)
-   ============================================================ */
+/* Mobile */
 @media (max-width: 767px) {
-    .main-wrapper {
-        padding: 12px;
-        padding-top: 16px;
+    body.auth-centered-page .right-panel {
+        padding: 1.5rem;
     }
 
-    .login-container {
-        max-width: 100%;
+    .auth-logo {
+        width: 58px;
     }
 
-    .hero-heading {
-        font-size: 1.3rem;
-    }
-
-    .logo-img {
-        width: 42px;
-        height: 42px;
-    }
-
-    .brand-name {
-        font-size: 1rem;
+    .auth-brand-copy .brand-name {
+        font-size: 1.25rem;
     }
 
     .system-title {
-        font-size: 0.7rem;
-    }
-
-    /* font-size 16px prevents iOS auto-zoom on input focus */
-    .input-wrap input {
-        font-size: 16px;
-    }
-
-    .footer-links {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
+        letter-spacing: 1px;
     }
 }
 
-/* ============================================================
-   BREAKPOINT: XS — Small Phones (max 479px)
-   e.g. iPhone SE, small Android phones
-   ============================================================ */
-@media (max-width: 479px) {
+/* Small Phones */
+@media (max-width: 480px) {
     .main-wrapper {
-        padding: 8px;
-        padding-top: 10px;
+        padding: 0.75rem;
     }
 
-    .logo-img {
-        width: 36px;
-        height: 36px;
+    body.auth-centered-page .right-panel {
+        padding: 1.25rem;
     }
 
-    .brand-name {
-        font-size: 0.88rem;
+    .terms-text {
+        font-size: 12px;
     }
 
-    .hero-heading {
-        font-size: 1.15rem;
-    }
-
-    .logo-wrapper {
-        gap: 10px;
-    }
-
-    .footer-links {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .btn-login {
-        font-size: 0.88rem;
+    .signup-outside {
+        font-size: 13px;
     }
 }
 
-/* ============================================================
-   SPECIAL: Phone Landscape Mode
-   When phone is rotated sideways — height is very short
-   ============================================================ */
-@media (max-height: 500px) and (orientation: landscape) {
-    .main-wrapper {
-        align-items: flex-start;
-        padding: 8px 16px;
+/* Extra Small Phones */
+@media (max-width: 375px) {
+    body.auth-centered-page .right-panel {
+        padding: 1rem;
     }
 
-    /* Go back to side-by-side layout in landscape */
-    .login-container {
-        flex-direction: row;
-        max-width: 100%;
+    .auth-brand-copy .brand-name {
+        font-size: 1rem;
     }
 
-    .left-panel {
-        padding: 16px 20px;
+    .auth-brand-copy .system-title {
+        font-size: 8px;
     }
 
-    /* Hide everything except logo on very short landscape screens */
-    .hero-heading,
-    .hero-desc,
-    .stats-row {
-        display: none;
+    .terms-text {
+        font-size: 11px;
     }
 
-    .logo-wrapper {
-        margin-bottom: 0;
-    }
-
-    .right-panel {
-        width: 360px;
-        flex-shrink: 0;
-    }
-}
-/* ============================================================
-   LOGIN SCROLL FIX
-   Add this at the BOTTOM of your existing login-responsive.css
-   Do NOT replace the whole file — just append these lines.
-   ============================================================ */
-
-@media (max-width: 767px) {
-
-    /* Allow the page to scroll naturally on mobile */
-    html, body {
-        height: auto !important;
-        min-height: 100vh !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
-
-    /* Allow the wrapper to grow taller than the screen */
-    .main-wrapper {
-        align-items: flex-start !important;
-        height: auto !important;
-        min-height: 100vh !important;
+    .signup-outside {
+        font-size: 12px;
     }
 }
