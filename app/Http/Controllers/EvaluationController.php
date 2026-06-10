@@ -12,6 +12,7 @@ use App\Models\OjtEvaluationTemplateItem;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
@@ -120,8 +121,8 @@ class EvaluationController extends Controller
             return redirect('/login');
         }
 
-        $classrooms = Classes::where('adviser_name', $data->full_name)->get();
-        $classIds = $classrooms->pluck('id')->all();
+        $allClassrooms = Classes::where('adviser_name', $data->full_name)->get();
+        $classIds = $allClassrooms->pluck('id')->all();
 
         $students = User::with('studentInfo')
             ->where('role', 0)
@@ -140,9 +141,59 @@ class EvaluationController extends Controller
 
         $template = OjtEvaluationTemplate::with('items')->where('is_active', 1)->latest('id')->first();
 
+        $classStats = [];
+        foreach ($allClassrooms as $room) {
+            $classStudents = $students->filter(function ($student) use ($room) {
+                return (string) optional($student->studentInfo)->class_id === (string) $room->id;
+            });
+
+            $submittedCount = 0;
+            foreach ($classStudents as $student) {
+                $latest = ($requests[$student->id] ?? collect())->first();
+                if ($latest && $latest->status === 'submitted') {
+                    $submittedCount++;
+                }
+            }
+
+            $totalCount = $classStudents->count();
+            $classStats[$room->id] = [
+                'total_count' => $totalCount,
+                'submitted_count' => $submittedCount,
+                'pending_count' => max($totalCount - $submittedCount, 0),
+            ];
+        }
+
+        $perPage = (int) request()->query('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50], true)) {
+            $perPage = 10;
+        }
+
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $allClassrooms->forPage($currentPage, $perPage)->values();
+
+        foreach ($currentItems as $room) {
+            if (isset($classStats[$room->id])) {
+                foreach ($classStats[$room->id] as $key => $value) {
+                    $room->{$key} = $value;
+                }
+            }
+        }
+
+        $classrooms = new LengthAwarePaginator(
+            $currentItems,
+            $allClassrooms->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
+
         return view('professor.evaluation', [
             'data' => $data,
             'classrooms' => $classrooms,
+            'classroomsTotal' => $allClassrooms->count(),
             'students' => $students,
             'requestsByStudent' => $requests,
             'template' => $template,
@@ -181,6 +232,25 @@ class EvaluationController extends Controller
             ->latest('id')
             ->get()
             ->groupBy('student_id');
+
+        $perPage = (int) request()->query('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50], true)) {
+            $perPage = 10;
+        }
+
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $students->forPage($currentPage, $perPage)->values();
+
+        $students = new LengthAwarePaginator(
+            $currentItems,
+            $students->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
 
         return view('professor.evaluation_list', [
             'data' => $data,
