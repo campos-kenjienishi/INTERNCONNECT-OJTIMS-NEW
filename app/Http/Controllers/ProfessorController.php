@@ -595,7 +595,7 @@ public function requirementStatus(Request $request, $roomId)
         ->get()
         ->groupBy('uploadedBy');
 
-    $studentStatuses = $students->map(function ($student) use ($requirements, $categoryNames, $categoryLookup) {
+    $allStudentStatuses = $students->map(function ($student) use ($requirements, $categoryNames, $categoryLookup) {
         $submittedFiles = $requirements->get($student->full_name, collect());
         $submittedByCategory = $submittedFiles->groupBy(function ($file) {
             return mb_strtolower(trim((string) $file->fileName));
@@ -646,7 +646,7 @@ public function requirementStatus(Request $request, $roomId)
             'deniedCount' => $submittedFiles->where('status', 2)->count(),
             'completion' => $categoryNames->count() > 0
                 ? round(($passed->count() / $categoryNames->count()) * 100)
-                : 0,
+            : 0,
         ];
     });
 
@@ -655,7 +655,33 @@ public function requirementStatus(Request $request, $roomId)
         $activeView = 'overview';
     }
 
-    return view('professor.requirementStatus', compact('data', 'course', 'categories', 'studentStatuses', 'activeView'));
+    $displayStatuses = $activeView === 'overview'
+        ? $allStudentStatuses
+        : $allStudentStatuses->filter(fn ($status) => $status[$activeView]->count() > 0)->values();
+
+    $currentPage = LengthAwarePaginator::resolveCurrentPage();
+    $perPage = 8;
+    $currentItems = $displayStatuses->forPage($currentPage, $perPage)->values();
+
+    $studentStatuses = new LengthAwarePaginator(
+        $currentItems,
+        $displayStatuses->count(),
+        $perPage,
+        $currentPage,
+        [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]
+    );
+
+    return view('professor.requirementStatus', compact(
+        'data',
+        'course',
+        'categories',
+        'studentStatuses',
+        'allStudentStatuses',
+        'activeView'
+    ));
 }
 
     

@@ -61,6 +61,13 @@
         .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; }
         .page-header h1 span { color: var(--red); }
         .page-header p { color: #777; font-size: 13px; margin-top: 4px; }
+        .matrix-pagination { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 16px 22px 20px; border-top: 1px solid #f0f0f0; background: #fafafa; }
+        .pagination-meta { color: #777; font-size: 12px; font-weight: 600; }
+        .pagination-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .page-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; color: #444; text-decoration: none; font-size: 13px; font-weight: 700; transition: all .2s; }
+        .page-btn:hover { background: #fee2e2; color: var(--red); border-color: #fecaca; }
+        .page-btn.active { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border-color: #991b1b; }
+        .page-btn.disabled { opacity: .45; pointer-events: none; }
         .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .btn-tool { display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; border-radius: 8px; border: 1.5px solid #e5e7eb; background: #fff; color: #444; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; }
         .btn-tool.primary { border-color: #fecaca; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; }
@@ -210,6 +217,11 @@
         body.dark-mode { background: #1a1a1a; color: #e0e0e0; }
         body.dark-mode .topbar { background: #2a2a2a; border-bottom-color: #3a3a3a; }
         body.dark-mode .page-header h1, body.dark-mode .report-head h2, body.dark-mode .summary-num { color: #fff; }
+        body.dark-mode .matrix-pagination { background: #1f1f1f; border-top-color: #333; }
+        body.dark-mode .pagination-meta { color: #aaa; }
+        body.dark-mode .page-btn { background: #2a2a2a; border-color: #3a3a3a; color: #e5e5e5; }
+        body.dark-mode .page-btn:hover { background: rgba(220,38,38,.2); color: #ff6b6b; border-color: rgba(220,38,38,.3); }
+        body.dark-mode .page-btn.active { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border-color: #991b1b; }
         body.dark-mode .darkmode-toggle { background: #2a2a2a; border-color: #3a3a3a; color: #e8e8e8; }
         body.dark-mode .darkmode-toggle:hover { background: rgba(220,38,38,.2); color: #ff6b6b; border-color: rgba(220,38,38,.3); }
         body.dark-mode .topbar-badge { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); color: #ff6b6b; }
@@ -244,13 +256,13 @@
 </head>
 <body>
 @php
-    $totalStudents = $studentStatuses->count();
-    $completeStudents = $studentStatuses->where('missingCount', 0)->count();
+    $totalStudents = $allStudentStatuses->count();
+    $completeStudents = $allStudentStatuses->where('missingCount', 0)->count();
     $categoryCount = $categories->count();
-    $averageCompletion = $totalStudents > 0 ? round($studentStatuses->avg('completion')) : 0;
+    $averageCompletion = $totalStudents > 0 ? round($allStudentStatuses->avg('completion')) : 0;
     $printStatuses = ($activeView === 'overview'
-        ? $studentStatuses
-        : $studentStatuses->filter(fn ($status) => $status[$activeView]->count() > 0)
+        ? $allStudentStatuses
+        : $allStudentStatuses->filter(fn ($status) => $status[$activeView]->count() > 0)
     )->values()->map(function ($status) {
         return [
             'studentName' => $status['student']->full_name,
@@ -505,10 +517,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $focusedRows = $studentStatuses->filter(fn ($status) => $status[$activeView]->count() > 0);
-                            @endphp
-                            @forelse($focusedRows as $status)
+                            @forelse($studentStatuses as $status)
                                 <tr>
                                     <td>
                                         <div class="student-name">{{ $status['student']->full_name }}</div>
@@ -578,6 +587,28 @@
             <div class="footer-note">
                 Missing requirements are computed from the professor's current file categories. Submitted requirements with old or renamed categories appear under Extra Submitted.
             </div>
+            @if($studentStatuses->hasPages())
+                <div class="matrix-pagination">
+                    <div class="pagination-meta">
+                        Showing {{ $studentStatuses->firstItem() }} to {{ $studentStatuses->lastItem() }} of {{ $studentStatuses->total() }} students
+                    </div>
+                    <div class="pagination-nav">
+                        <a href="{{ $studentStatuses->previousPageUrl() ?: '#' }}" class="page-btn {{ $studentStatuses->onFirstPage() ? 'disabled' : '' }}">
+                            <i class="fa fa-chevron-left"></i>
+                        </a>
+                        @for($page = 1; $page <= $studentStatuses->lastPage(); $page++)
+                            @if($page === $studentStatuses->currentPage())
+                                <span class="page-btn active">{{ $page }}</span>
+                            @else
+                                <a href="{{ $studentStatuses->url($page) }}" class="page-btn">{{ $page }}</a>
+                            @endif
+                        @endfor
+                        <a href="{{ $studentStatuses->nextPageUrl() ?: '#' }}" class="page-btn {{ $studentStatuses->hasMorePages() ? '' : 'disabled' }}">
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            @endif
         </section>
     </main>
 </div>
