@@ -422,6 +422,26 @@
             color: #ff6b6b !important;
         }
 
+        .course-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-edit {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 8px;
+            background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1d4ed8;
+            font-family: 'Poppins', sans-serif; font-size: 12px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+
+        .btn-edit:hover {
+            background: #dbeafe;
+            box-shadow: 0 3px 10px rgba(37,99,235,0.15);
+        }
+
         /* Remove button */
         .btn-remove {
             display: inline-flex; align-items: center; gap: 5px;
@@ -579,6 +599,12 @@ body.dark-mode .dataTables_paginate .paginate_button:hover { background: #444 !i
 body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; }
         body.dark-mode .dataTables_info { color: #999 !important; }
 body.dark-mode .btn-download { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+body.dark-mode .btn-edit {
+    background: rgba(37,99,235,0.12);
+    border: 1.5px solid rgba(59,130,246,0.3);
+    color: #93c5fd;
+}
+body.dark-mode .btn-edit:hover { background: rgba(37,99,235,0.2); }
 body.dark-mode .btn-remove { border: 1.5px solid rgba(220,38,38,0.3); background: transparent; color: #ff6b6b; }
 body.dark-mode .btn-remove:hover { background: rgba(220,38,38,0.1); }
 
@@ -911,9 +937,20 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                                 <span class="acronym-badge">{{ $data->acronym }}</span>
                             </td>
                             <td>
-                                <button class="btn-remove remove-button" data-course-id="{{ $data->id }}">
-                                    <i class="fa fa-trash-alt"></i> Remove
-                                </button>
+                                <div class="course-actions">
+                                    <button type="button"
+                                        class="btn-edit edit-button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editCourseModal"
+                                        data-course-id="{{ $data->id }}"
+                                        data-course-name="{{ $data->course }}"
+                                        data-course-acronym="{{ $data->acronym }}">
+                                        <i class="fa fa-pen"></i> Edit
+                                    </button>
+                                    <button class="btn-remove remove-button" data-course-id="{{ $data->id }}">
+                                        <i class="fa fa-trash-alt"></i> Remove
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -984,6 +1021,47 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     </div>
 </div>
 
+<div class="modal fade" id="editCourseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-pen"></i> Edit Course
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editCourseForm" method="post">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="field-group">
+                        <label class="field-label">
+                            <i class="fa fa-book"></i> Course Name
+                        </label>
+                        <input id="edit-course-name" class="field-input" type="text" name="course"
+                               placeholder="e.g. Bachelor of Science in Information Technology" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">
+                            <i class="fa fa-tag"></i> Acronym
+                        </label>
+                        <input id="edit-course-acronym" class="field-input" type="text" name="acronym"
+                               placeholder="e.g. BSIT" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
+                        <i class="fa fa-times"></i> Close
+                    </button>
+                    <button type="submit" class="btn-modal-submit">
+                        <i class="fa fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -1024,6 +1102,16 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 search: '',
                 searchPlaceholder: 'Search courses...',
             }
+        });
+
+        $(document).on('click', '.edit-button', function () {
+            const courseId = $(this).data('course-id');
+            const courseName = $(this).data('course-name');
+            const courseAcronym = $(this).data('course-acronym');
+
+            $('#editCourseForm').attr('action', '/courses/' + courseId);
+            $('#edit-course-name').val(courseName || '');
+            $('#edit-course-acronym').val(courseAcronym || '');
         });
 
         // Remove button

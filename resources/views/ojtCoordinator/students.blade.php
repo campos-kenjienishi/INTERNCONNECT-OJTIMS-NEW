@@ -443,6 +443,11 @@
 
         .table-card-header-left { display: flex; align-items: center; gap: 12px; }
 
+        .table-card-header-right {
+            display: flex; align-items: center; gap: 12px;
+            flex-wrap: wrap; justify-content: flex-end;
+        }
+
         .header-icon {
             width: 38px; height: 38px; border-radius: 10px;
             background: #fee2e2; display: flex;
@@ -471,6 +476,42 @@
         body.dark-mode .student-count-badge {
             background: rgba(220,38,38,0.2);
             color: #ff6b6b;
+        }
+
+        .table-inline-filter {
+            display: flex; flex-direction: column; gap: 4px;
+            min-width: 190px;
+        }
+
+        .table-inline-filter-label {
+            font-size: 11px; font-weight: 700; color: #6b7280;
+            letter-spacing: 0.04em; text-transform: uppercase;
+        }
+
+        body.dark-mode .table-inline-filter-label { color: #a3a3a3; }
+
+        .table-inline-filter-select {
+            min-width: 190px; height: 40px;
+            border-radius: 10px; border: 1px solid #e5e7eb;
+            background: #fff; color: #1f2937;
+            padding: 0 12px; font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .table-inline-filter-select:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+        }
+
+        body.dark-mode .table-inline-filter-select {
+            background: #252525;
+            border-color: #3a3a3a;
+            color: #e5e7eb;
+        }
+
+        body.dark-mode .table-inline-filter-select:focus {
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.18);
         }
 
         /* DataTables */
@@ -955,6 +996,16 @@
             .table-card-body .dataTables_wrapper {
                 padding: 12px 16px;
             }
+
+            .table-card-header-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .table-inline-filter,
+            .table-inline-filter-select {
+                width: 100%;
+            }
         }
         .btn-back {
     display: inline-flex; align-items: center; gap: 8px;
@@ -1281,34 +1332,15 @@ body.dark-mode .dashboard-footer .footer-copy {
             </div>
         </div>
 
-        <!-- Report Generator -->
-        <div class="filter-card">
-            <div class="filter-card-header">
-                <div class="filter-header-icon"><i class="fa fa-file-chart-line"></i></div>
-                <div>
-                    <h3>Generate Report</h3>
-                    <p>Filter by course and generate an OJT student report</p>
-                </div>
-            </div>
-            <div class="filter-card-body">
-                <form id="reportForm" action="{{ route('ojt.report.generate') }}" method="post" target="_blank" style="display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; width:100%;">
-                    @csrf
-                    <div class="filter-field">
-                        <label class="filter-label" for="course">
-                            <i class="fa fa-graduation-cap"></i> Filter by Course
-                        </label>
-                        <select class="filter-select" id="course" name="course" required>
-                            @foreach ($course as $c)
-                                <option value="{{ $c->course }}">{{ $c->course }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button class="btn-generate" type="button" onclick="generateReportPreview()">
-                        <i class="fa fa-file-alt"></i> Generate Report
-                    </button>
-                </form>
-            </div>
-        </div>
+        @php
+            $courseOptions = collect($studentData)
+                ->pluck('student')
+                ->pluck('course')
+                ->filter()
+                ->unique()
+                ->sort()
+                ->values();
+        @endphp
 
         <!-- Students Table -->
         <div class="table-card">
@@ -1320,9 +1352,20 @@ body.dark-mode .dashboard-footer .footer-copy {
                         <p>All currently enrolled OJT students</p>
                     </div>
                 </div>
-                <div class="student-count-badge">
-                    <i class="fa fa-users"></i>
-                    {{ $totalStudents }} {{ $totalStudents == 1 ? 'student' : 'students' }}
+                <div class="table-card-header-right">
+                    <div class="table-inline-filter">
+                        <label for="courseFilter" class="table-inline-filter-label">Filter by course</label>
+                        <select id="courseFilter" class="table-inline-filter-select">
+                            <option value="">All Courses</option>
+                            @foreach ($courseOptions as $courseOption)
+                                <option value="{{ $courseOption }}">{{ $courseOption }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="student-count-badge">
+                        <i class="fa fa-users"></i>
+                        {{ $totalStudents }} {{ $totalStudents == 1 ? 'student' : 'students' }}
+                    </div>
                 </div>
             </div>
 
@@ -1630,27 +1673,6 @@ body.dark-mode .dashboard-footer .footer-copy {
     </div>
 </div>
 
-<!-- Print Preview Modal -->
-<div id="printPreviewModal" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="border-radius:16px; overflow:hidden;">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fa fa-print"></i> Report Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="printPreviewContent"></div>
-            <div class="modal-footer">
-                <button class="btn-modal-close" type="button" data-bs-dismiss="modal">Close</button>
-                <button type="button" onclick="printReport()" class="btn-modal-update">
-                    <i class="fa fa-print me-1"></i> Print
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<iframe id="printFrame" style="display:none;"></iframe>
-
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -1687,7 +1709,12 @@ body.dark-mode .dashboard-footer .footer-copy {
 
     $(document).ready(function () {
         // DataTable
-        $('#fileTable').DataTable({ order: [] });
+        const table = $('#fileTable').DataTable({ order: [] });
+
+        $('#courseFilter').on('change', function () {
+            const value = $(this).val();
+            table.column(1).search(value || '', false, true).draw();
+        });
 
         // Personal Info Modal
         $(document).on('click', '.btn-view-personal', function () {
@@ -1768,24 +1795,6 @@ body.dark-mode .dashboard-footer .footer-copy {
         });
     });
 
-    // Report generation preview
-    function generateReportPreview() {
-        var formData = new FormData(document.getElementById('reportForm'));
-        $.ajax({
-            url: "{{ route('ojt.report.generate') }}",
-            method: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function (data) {
-                $("#printPreviewContent").html(data);
-                $("#printPreviewModal").modal('show');
-            },
-            error: function () {
-                alert('An error occurred while fetching the report content.');
-            }
-        });
-    }
 </script>
 
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>

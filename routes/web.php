@@ -81,6 +81,7 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/maintenance',[MaintenanceController::class,'maintenance']);
     Route::post('/remove/course/{id}', [MaintenanceController::class,'remove']);
     Route::post('/courses', [MaintenanceController::class,'courses'])->name('courses');
+    Route::put('/courses/{id}', [MaintenanceController::class,'updateCourse'])->name('courses.update');
     Route::get('/auditlog', [MaintenanceController::class, 'auditTrail'])->name('auditlog');
     Route::get('/reports', [ReportsController::class, 'reports'])->name('reports');
     Route::match(['get', 'post'], '/OJTReports', [ReportsController::class, 'generateReport'])->name('studentojt.report.generate');

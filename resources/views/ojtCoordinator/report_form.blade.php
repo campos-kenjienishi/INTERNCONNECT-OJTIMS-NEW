@@ -47,7 +47,13 @@
 <body>
     <h1>OJT Information Report</h1>
 
-    @if (empty($studentData))
+    @php
+        $studentRows = collect($studentData ?? [])->filter(function ($item) {
+            return !empty($item['student']);
+        });
+    @endphp
+
+    @if ($studentRows->isEmpty())
         <p>No OJT records found for the selected options.</p>
     @else
         <table class="tablestyle">
@@ -70,28 +76,25 @@
             </thead>
 
             <tbody class="tablestyle">
-                @foreach ($studentData as $data)
+                @foreach ($studentRows as $data)
+                    @php $ojt = $data['ojt'] ?? null; @endphp
                     <tr class="tablestyle">
                         <td class="tablestyle">{{ $data['student']->full_name }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->company_name }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->company_address }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->nature_of_bus }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->nature_of_link }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->level }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->start_date }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->finish_date }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->report_time }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->contact_name }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->contact_position }}</td>
-                        <td class="tablestyle">{{ $data['ojt']->contact_number }}</td>
-                        
+                        <td class="tablestyle">{{ $ojt->company_name ?? 'No OJT record yet' }}</td>
+                        <td class="tablestyle">{{ $ojt->company_address ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->nature_of_bus ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->nature_of_link ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->level ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->start_date ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->finish_date ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->report_time ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->contact_name ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->contact_position ?? '-' }}</td>
+                        <td class="tablestyle">{{ $ojt->contact_number ?? '-' }}</td>
                     </tr>
-              
+                @endforeach
             </tbody>
-            @endforeach
         </table>
-
-        
     @endif
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

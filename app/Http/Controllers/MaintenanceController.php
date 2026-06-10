@@ -54,6 +54,39 @@ class MaintenanceController extends Controller
         }
     }
 
+    public function updateCourse(Request $request, $id)
+    {
+        $course = Courses::find($id);
+
+        if (!$course) {
+            return redirect()->back()->with('error', 'Course not found.');
+        }
+
+        $oldValues = [
+            'course' => $course->course,
+            'acronym' => $course->acronym,
+        ];
+
+        $course->course = $request->course;
+        $course->acronym = $request->acronym;
+        $res = $course->save();
+
+        if ($res) {
+            AuditLogger::log(
+                'Maintenance',
+                'Update',
+                'Updated course: ' . $course->course . ' (' . $course->acronym . ')',
+                Session::get('loginId') ?? null,
+                $oldValues,
+                ['course' => $course->course, 'acronym' => $course->acronym]
+            );
+
+            return back()->with('success', 'Course updated successfully.');
+        }
+
+        return back()->with('fail', 'Oh no! Something went wrong.');
+    }
+
 
 
 
