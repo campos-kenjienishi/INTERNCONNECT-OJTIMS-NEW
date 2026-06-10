@@ -263,10 +263,28 @@
         .badge-active { display: inline-flex; align-items: center; gap: 5px; background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
         .badge-expired { display: inline-flex; align-items: center; gap: 5px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
         .badge-active i, .badge-expired i { font-size: 10px; }
+        .moa-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .btn-moa-action {
+            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+            padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-moa-download {
+            background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;
+        }
+        .btn-moa-download:hover { background: #bae6fd; color: #075985; }
+        .btn-moa-print {
+            background: #fff; color: #7f0000; border: 1px solid #e5e7eb;
+        }
+        .btn-moa-print:hover { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 
         /* Dark mode status badges */
         body.dark-mode .badge-active { background: rgba(22,163,74,0.2); color: #4ade80; }
         body.dark-mode .badge-expired { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+        body.dark-mode .btn-moa-download { background: rgba(37,99,235,0.18); color: #93c5fd; border-color: rgba(96,165,250,0.3); }
+        body.dark-mode .btn-moa-download:hover { background: rgba(37,99,235,0.28); color: #bfdbfe; }
+        body.dark-mode .btn-moa-print { background: rgba(255,255,255,0.04); color: #fecaca; border-color: rgba(255,255,255,0.12); }
+        body.dark-mode .btn-moa-print:hover { background: rgba(220,38,38,0.14); color: #fff1f2; border-color: rgba(248,113,113,0.3); }
         body.dark-mode .table-card-body table.dataTable thead th { background: #3a3a3a; color: #e0e0e0; border-bottom: 1px solid #555; }
 
         /* =============== PRINT PREVIEW MODAL =============== */
@@ -675,6 +693,7 @@
                             <th>Email</th>
                             <th>Validity</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -727,6 +746,24 @@
                                 @else
                                     <span class="badge-expired"><i class="fa fa-times-circle"></i> Expired</span>
                                 @endif
+                            </td>
+                            <td>
+                                <div class="moa-actions">
+                                    @if($company->file)
+                                        <a href="{{ url('/moa/download/' . $company->file) }}"
+                                           class="btn-moa-action btn-moa-download"
+                                           target="_blank"
+                                           rel="noopener">
+                                            <i class="fa fa-download"></i> Download
+                                        </a>
+                                    @endif
+                                    <a href="{{ url('/moa/view/' . $company->id) }}"
+                                       class="btn-moa-action btn-moa-print"
+                                       target="_blank"
+                                       rel="noopener">
+                                        <i class="fa fa-print"></i> Print
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -821,7 +858,7 @@
             columnDefs: [
                 { targets: 0, visible: false }, // Hide ID column
                 // Disable the sorting dropdown arrows on all visible columns
-                { targets: [1, 2, 3, 4, 5, 6, 7], orderable: false } 
+                { targets: [1, 2, 3, 4, 5, 6, 7, 8], orderable: false } 
             ]
         });
 

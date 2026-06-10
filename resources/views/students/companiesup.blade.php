@@ -1212,8 +1212,11 @@
                             <input class="modal-field-input" type="text" name="company_email"
                                 placeholder="e.g. info@company.com" required>
 
-                            <label class="modal-field-label">
-                                <i class="fa fa-calendar-alt"></i> School Year
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+                                <span><i class="fa fa-calendar-alt"></i> School Year</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Input the current school year, example: <strong>2025-2026</strong>.
+                                </span>
                             </label>
                             <div class="school-year-row">
                                 <input type="text" name="school_year_start"
@@ -1223,8 +1226,11 @@
                                     placeholder="End (e.g. 2025)" required>
                             </div>
 
-                            <label class="modal-field-label" style="margin-top: 14px;">
-                                <i class="fa fa-hourglass-end"></i> Validity Period
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                                <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Select the MOA expiry date.
+                                </span>
                             </label>
                             <input class="modal-field-input" type="date" name="valid_until" required>
 
@@ -1242,7 +1248,7 @@
                                 </div>
                                 <div style="font-size: 11.5px; color: #777; line-height: 1.6;">
                                     Ensure your MOA is properly <strong>notarized</strong> before submitting.
-                                    Accepted formats: <strong>PDF, DOC, DOCX, JPG, PNG</strong>.
+                                    Accepted format: <strong>PDF only</strong>.
                                 </div>
                             </div>
                         </div>
@@ -1257,10 +1263,10 @@
                         <i class="fa fa-paperclip"></i> MOA Document
                     </label>
                     <div class="file-upload-zone" id="moaDropZone">
-                        <input type="file" name="file" id="moaFileInput" required>
+                        <input type="file" name="file" id="moaFileInput" accept=".pdf,application/pdf" required>
                         <i class="fa fa-cloud-upload-alt upload-icon"></i>
                         <p id="moaFileLabel">Click or drag your notarized MOA file here</p>
-                        <span>Supported: PDF, DOC, DOCX, JPG, PNG</span>
+                        <span>Supported: PDF only</span>
                     </div>
 
                 </div>
@@ -1343,9 +1349,21 @@ window.addEventListener('resize', function () {
     // File label update
     document.getElementById('moaFileInput').addEventListener('change', function () {
         const label = document.getElementById('moaFileLabel');
-        label.textContent = this.files.length > 0
-            ? this.files[0].name
-            : 'Click or drag your notarized MOA file here';
+        const file = this.files.length > 0 ? this.files[0] : null;
+
+        if (file && !file.name.toLowerCase().endsWith('.pdf')) {
+            this.value = '';
+            label.textContent = 'Click or drag your notarized MOA file here';
+            Swal.fire({
+                icon: 'error',
+                title: 'PDF only',
+                text: 'Please upload the notarized MOA as a PDF file.',
+                confirmButtonColor: '#d32f2f',
+            });
+            return;
+        }
+
+        label.textContent = file ? file.name : 'Click or drag your notarized MOA file here';
     });
 
     function confirmStudentRemove(companyId, companyName) {
