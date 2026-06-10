@@ -116,30 +116,6 @@
             color: rgba(255,255,255,.68);
             margin-top: 3px;
         }
-        .report-badge {
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .report-badge-box {
-            display: inline-block;
-            background: rgba(255,255,255,.18);
-            border: 1px solid rgba(255,255,255,.3);
-            border-radius: 6px;
-            padding: 5px 12px;
-            min-width: 90px;
-        }
-        .report-badge-num {
-            font-size: 18px;
-            font-weight: 800;
-            line-height: 1;
-        }
-        .report-badge-label {
-            font-size: 7.5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 1px;
-            color: rgba(255,255,255,.75);
-        }
         .report-meta {
             display: flex;
             align-items: center;
@@ -164,33 +140,6 @@
         }
         .meta-item span { color: #6b7280; }
         .meta-generated { font-size: 8.5px; color: #9ca3af; }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 8px;
-            padding: 12px 22px 4px;
-        }
-        .summary-card {
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--red);
-            border-radius: 8px;
-            padding: 10px 12px;
-            background: #fff;
-        }
-        .summary-card strong {
-            display: block;
-            font-size: 16px;
-            line-height: 1;
-            color: #111827;
-        }
-        .summary-card span {
-            display: block;
-            margin-top: 4px;
-            font-size: 7.5px;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            color: #6b7280;
-        }
         .section-label {
             padding: 8px 22px 3px;
         }
@@ -293,22 +242,42 @@
         }
         .footer-band .right { color: rgba(255,255,255,.5); }
         .no-print { margin-bottom: 18px; }
+        .sienna-widget,
+        .sienna-accessibility,
+        [class*="sienna"],
+        [id*="sienna"],
+        .sienna-widget * {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+        }
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: #fff; }
             .no-print { display: none !important; }
+            .sienna-widget,
+            .sienna-accessibility,
+            [class*="sienna"],
+            [id*="sienna"],
+            .sienna-widget * {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+            }
+            body > *:not(.page) { display: none !important; }
             .page { padding: 0; max-width: none; }
             .report { box-shadow: none; border-color: #ddd; }
-            .summary-card, table, .disclaimer-box { break-inside: avoid; page-break-inside: avoid; }
+            .summary-card, .disclaimer-box { break-inside: avoid; page-break-inside: avoid; }
+            table { break-inside: auto; page-break-inside: auto; }
+            thead { display: table-header-group; }
+            tr { break-inside: avoid; page-break-inside: avoid; }
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
         }
         @media (max-width: 900px) {
-            .report-head-inner, .report-meta, .summary-grid, .footer-band { flex-direction: column; align-items: stretch; }
-            .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .report-badge { align-self: flex-start; }
+            .report-head-inner, .report-meta, .footer-band { flex-direction: column; align-items: stretch; }
             .meta-row { gap: 8px; }
         }
     </style>
@@ -317,8 +286,6 @@
 @php
     $selectedClass = !empty($selectedClassId) ? $classrooms->firstWhere('id', $selectedClassId) : null;
     $totalStudents = $students->count();
-    $submittedStudents = 0;
-    $pendingStudents = 0;
     $statusRows = [];
 
     foreach ($students as $student) {
@@ -326,12 +293,6 @@
         $studentClass = $classrooms->firstWhere('id', optional($student->studentInfo)->class_id);
         $status = optional($latest)->status ?? 'not sent';
         $badge = $status === 'submitted' ? 'success' : ($status === 'expired' ? 'secondary' : ($status === 'cancelled' ? 'dark' : 'warning'));
-
-        if ($status === 'submitted') {
-            $submittedStudents++;
-        } else {
-            $pendingStudents++;
-        }
 
         $statusRows[] = [
             'student' => $student,
@@ -341,6 +302,8 @@
             'badge' => $badge,
         ];
     }
+    $submittedCount = collect($statusRows)->where('status', 'submitted')->count();
+    $notSentCount = $totalStudents - $submittedCount;
 @endphp
 <div class="page">
     <div class="topbar no-print">
@@ -364,14 +327,8 @@
                         <div class="eyebrow">Polytechnic University of the Philippines - OJT Information Management System</div>
                         <div class="brand-title">Evaluation Monitoring Report</div>
                         <div class="brand-sub">
-                            {{ $selectedClass ? $selectedClass->room : 'All Classes' }} | College of Engineering and Technology
+                            {{ $selectedClass ? $selectedClass->room : 'Selected Class' }} | College of Engineering and Technology
                         </div>
-                    </div>
-                </div>
-                <div class="report-badge">
-                    <div class="report-badge-box">
-                        <div class="report-badge-num">{{ $totalStudents }}</div>
-                        <div class="report-badge-label">Students</div>
                     </div>
                 </div>
             </div>
@@ -379,19 +336,12 @@
 
         <div class="report-meta">
             <div class="meta-row">
-                <div class="meta-item"><span>Scope:</span> <strong>{{ $selectedClass ? $selectedClass->room : 'All classes' }}</strong></div>
-                <div class="meta-item"><span>Classes:</span> <strong>{{ $classrooms->count() }}</strong></div>
-                <div class="meta-item"><span>Submitted:</span> <strong>{{ $submittedStudents }}</strong></div>
-                <div class="meta-item"><span>Pending:</span> <strong>{{ $pendingStudents }}</strong></div>
+                <div class="meta-item"><span>Scope:</span> <strong>{{ $selectedClass ? $selectedClass->room : 'Selected class' }}</strong></div>
+                <div class="meta-item"><span>Students:</span> <strong>{{ $totalStudents }}</strong></div>
+                <div class="meta-item"><span>Submitted:</span> <strong>{{ $submittedCount }}</strong></div>
+                <div class="meta-item"><span>Not Sent:</span> <strong>{{ $notSentCount }}</strong></div>
             </div>
             <div class="meta-generated">Generated: {{ $printedAt->format('M d, Y h:i A') }}</div>
-        </div>
-
-        <div class="summary-grid">
-            <div class="summary-card"><strong>{{ $classrooms->count() }}</strong><span>Classes</span></div>
-            <div class="summary-card"><strong>{{ $totalStudents }}</strong><span>Students</span></div>
-            <div class="summary-card"><strong>{{ $submittedStudents }}</strong><span>Submitted</span></div>
-            <div class="summary-card"><strong>{{ $pendingStudents }}</strong><span>Pending</span></div>
         </div>
 
         <div class="section-label">

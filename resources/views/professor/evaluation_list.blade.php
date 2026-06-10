@@ -18,9 +18,9 @@
         <div class="card-header-shell">
             <h2><span class="header-icon"><i class="fa fa-tools"></i></span> Class Tools</h2>
             <div class="stacked-actions">
-                <a href="{{ route('professor.evaluation.print', ['class_id' => $classroom->id]) }}" class="btn-eval btn-eval-outline" target="_blank">
+                <button type="button" class="btn-eval btn-eval-outline" id="openEvalPrintModalBtn">
                     <i class="fa fa-print"></i> Print Report
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -122,4 +122,56 @@
             @endif
         </div>
     </div>
+
 </x-evaluation-shell>
+
+<script>
+    (function () {
+        const openBtn = document.getElementById('openEvalPrintModalBtn');
+        const reportUrl = @json(route('professor.evaluation.print', ['class_id' => $classroom->id]));
+
+        if (!openBtn) {
+            return;
+        }
+
+        openBtn.addEventListener('click', function () {
+            const frame = document.createElement('iframe');
+            frame.style.position = 'fixed';
+            frame.style.right = '0';
+            frame.style.bottom = '0';
+            frame.style.width = '0';
+            frame.style.height = '0';
+            frame.style.border = '0';
+            frame.style.opacity = '0';
+            frame.setAttribute('aria-hidden', 'true');
+            frame.src = reportUrl;
+
+            let cleanedUp = false;
+            const cleanup = function () {
+                if (cleanedUp) {
+                    return;
+                }
+                cleanedUp = true;
+                window.removeEventListener('afterprint', cleanup);
+                if (frame.parentNode) {
+                    frame.parentNode.removeChild(frame);
+                }
+            };
+
+            frame.onload = function () {
+                setTimeout(function () {
+                    if (frame.contentWindow) {
+                        frame.contentWindow.focus();
+                        frame.contentWindow.print();
+                        window.addEventListener('afterprint', cleanup, { once: true });
+                        setTimeout(cleanup, 1500);
+                    } else {
+                        cleanup();
+                    }
+                }, 150);
+            };
+
+            document.body.appendChild(frame);
+        });
+    })();
+</script>
