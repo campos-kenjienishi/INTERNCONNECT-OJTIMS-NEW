@@ -757,12 +757,13 @@
                                             <i class="fa fa-download"></i> Download
                                         </a>
                                     @endif
-                                    <a href="{{ url('/moa/view/' . $company->id) }}"
-                                       class="btn-moa-action btn-moa-print"
-                                       target="_blank"
-                                       rel="noopener">
-                                        <i class="fa fa-print"></i> Print
-                                    </a>
+                                    @if($company->file)
+                                        <button type="button"
+                                                class="btn-moa-action btn-moa-print"
+                                                onclick="printUploadedMoa('{{ asset('assets/' . $company->file) }}')">
+                                            <i class="fa fa-print"></i> Print
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -1142,6 +1143,37 @@
                     (document.getElementById('sendEmailBtn').disabled = false);
             }
         });
+    }
+
+    function printUploadedMoa(fileUrl) {
+        if (!fileUrl) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.src = fileUrl;
+
+        iframe.onload = function () {
+            try {
+                const pdfWindow = iframe.contentWindow;
+                pdfWindow.focus();
+                pdfWindow.print();
+            } catch (error) {
+                window.open(fileUrl, '_blank');
+            }
+
+            setTimeout(function () {
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+            }, 2000);
+        };
+
+        document.body.appendChild(iframe);
     }
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>

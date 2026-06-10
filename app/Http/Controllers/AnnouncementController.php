@@ -108,5 +108,33 @@ class AnnouncementController extends Controller
 
         return redirect()->back()->with('success', 'Announcement deleted successfully.');
     }
+
+    public function update(Request $request, $id)
+    {
+        if (!Session::has('loginId')) {
+            return redirect('/login');
+        }
+
+        $user = User::where('id', Session::get('loginId'))->first();
+
+        if (!$user || !in_array((string) $user->role, ['1', '2'], true)) {
+            abort(403, 'Only coordinators and professors can edit announcements.');
+        }
+
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+        ]);
+
+        $announcement = Announcements::where('id', $id)
+            ->where('announcer', $user->full_name)
+            ->firstOrFail();
+
+        $announcement->title = $request->title;
+        $announcement->content = $request->content;
+        $announcement->save();
+
+        return redirect()->back()->with('success', 'Announcement updated successfully.');
+    }
     
 }

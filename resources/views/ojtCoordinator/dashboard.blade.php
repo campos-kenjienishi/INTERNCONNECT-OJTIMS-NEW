@@ -387,6 +387,21 @@
                 font-weight: 600;
                 cursor: pointer;
             }
+            .btn-edit-announcement {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 7px 12px;
+                border: 1.5px solid #bfdbfe;
+                border-radius: 8px;
+                background: #fff;
+                color: #2563eb;
+                font-family: 'Poppins', sans-serif;
+                font-size: 12.5px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-right: 8px;
+            }
 
             /* Form fields */
             .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
@@ -1012,9 +1027,11 @@ body.dark-mode .panel-card-header p { color: #999; }
 body.dark-mode .panel-card-footer { background: #2a2a2a !important; border-top: 1px solid #3a3a3a; }
 body.dark-mode .announcement-manage-table th { background: #2a2a2a; color: #aaa; border-bottom-color: #3a3a3a; }
 body.dark-mode .announcement-manage-table td { color: #e0e0e0; border-bottom-color: rgba(255,255,255,0.05); }
-body.dark-mode .announcement-manage-table tbody tr:hover td { background: rgba(220,38,38,0.1); }
-body.dark-mode .announcement-title-cell strong { color: #fff; }
-body.dark-mode .announcement-title-cell span { color: #aaa; }
+            body.dark-mode .announcement-manage-table tbody tr:hover td { background: rgba(220,38,38,0.1); }
+            body.dark-mode .announcement-title-cell strong { color: #fff; }
+            body.dark-mode .announcement-title-cell span { color: #aaa; }
+            body.dark-mode .btn-edit-announcement { background: rgba(37,99,235,0.12); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
+            body.dark-mode .btn-edit-announcement:hover { background: rgba(37,99,235,0.22); color: #bfdbfe; }
 body.dark-mode .analytics-header h2 { color: #fff; }
 body.dark-mode .analytics-header p { color: #aaa; }
 body.dark-mode .analytics-updated { background: #2a2a2a; border: 1px solid #3a3a3a; color: #e0e0e0; }
@@ -1378,7 +1395,17 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                                         {{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}
                                     </td>
                                     <td>
-                                        <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');">
+                                        <button type="button"
+                                                class="btn-edit-announcement"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editAnnouncementModal"
+                                                data-announcement-id="{{ $announcement->id }}"
+                                                data-announcement-title="{{ e($announcement->title) }}"
+                                                data-announcement-content="{{ e($announcement->content) }}"
+                                                data-announcement-action="{{ route('announcements.update', $announcement->id) }}">
+                                            <i class="fa fa-pen"></i> Edit
+                                        </button>
+                                        <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-delete-announcement">
@@ -1397,6 +1424,43 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="editAnnouncementModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fa fa-pen"></i> Edit Announcement
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="editAnnouncementForm" method="POST" action="">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body">
+                            <label class="field-label">
+                                <i class="fa fa-heading"></i> Announcement Title
+                            </label>
+                            <input class="field-input" type="text" name="title" id="editAnnouncementTitle" required>
+
+                            <label class="field-label">
+                                <i class="fa fa-align-left"></i> Content
+                            </label>
+                            <textarea class="field-input" name="content" id="editAnnouncementContent" rows="6" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                                <i class="fa fa-times me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn-submit">
+                                <i class="fa fa-save"></i> Update Announcement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
 <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
     <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
@@ -1667,6 +1731,12 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 grid.appendChild(el);
             }
         }
+
+        $('.btn-edit-announcement').on('click', function () {
+            $('#editAnnouncementForm').attr('action', $(this).data('announcement-action'));
+            $('#editAnnouncementTitle').val($(this).data('announcement-title'));
+            $('#editAnnouncementContent').val($(this).data('announcement-content'));
+        });
     </script>
     <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
     <script src="{{ asset('assets/js/voice-input.js') }}"></script>

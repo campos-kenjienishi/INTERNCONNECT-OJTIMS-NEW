@@ -363,6 +363,21 @@
             font-weight: 600;
             cursor: pointer;
         }
+        .btn-edit-announcement {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border: 1.5px solid #bfdbfe;
+            border-radius: 8px;
+            background: #fff;
+            color: #2563eb;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 8px;
+        }
 
         .dataTables_filter input {
             border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
@@ -734,6 +749,8 @@
         body.dark-mode .announcement-manage-table tbody tr:hover td { background: rgba(220,38,38,0.1); }
         body.dark-mode .announcement-title-cell strong { color: #fff; }
         body.dark-mode .announcement-title-cell span { color: #aaa; }
+        body.dark-mode .btn-edit-announcement { background: rgba(37,99,235,0.12); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
+        body.dark-mode .btn-edit-announcement:hover { background: rgba(37,99,235,0.22); color: #bfdbfe; }
         body.dark-mode .dataTables_wrapper { color: #e0e0e0 !important; }
         body.dark-mode .dataTables_length { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; }
         body.dark-mode .dataTables_length label { color: #e0e0e0 !important; }
@@ -1223,7 +1240,17 @@
                                 </td>
                                 <td>{{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}</td>
                                 <td>
-                                    <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');">
+                                    <button type="button"
+                                            class="btn-edit-announcement"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editAnnouncementModal"
+                                            data-announcement-id="{{ $announcement->id }}"
+                                            data-announcement-title="{{ e($announcement->title) }}"
+                                            data-announcement-content="{{ e($announcement->content) }}"
+                                            data-announcement-action="{{ route('announcements.update', $announcement->id) }}">
+                                        <i class="fa fa-pen"></i> Edit
+                                    </button>
+                                    <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-delete-announcement">
@@ -1239,6 +1266,42 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editAnnouncementModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fa fa-pen"></i> Edit Announcement
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="editAnnouncementForm" method="POST" action="">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body">
+                            <label class="modal-field-label">
+                                <i class="fa fa-heading"></i> Announcement Title
+                            </label>
+                            <input class="modal-field-input" type="text" name="title" id="editAnnouncementTitle" required>
+
+                            <label class="modal-field-label">
+                                <i class="fa fa-align-left"></i> Content
+                            </label>
+                            <textarea class="modal-field-input" name="content" id="editAnnouncementContent" rows="6" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                                <i class="fa fa-times me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn-modal-submit">
+                                <i class="fa fa-save me-1"></i> Update Announcement
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -1551,6 +1614,12 @@
                     Swal.fire('Oops!', 'Error posting announcement.', 'error');
                 }
             });
+        });
+
+        $('.btn-edit-announcement').on('click', function () {
+            $('#editAnnouncementForm').attr('action', $(this).data('announcement-action'));
+            $('#editAnnouncementTitle').val($(this).data('announcement-title'));
+            $('#editAnnouncementContent').val($(this).data('announcement-content'));
         });
 
         // Delete Room
