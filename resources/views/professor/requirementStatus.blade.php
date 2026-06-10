@@ -69,6 +69,32 @@
         .page-btn.active { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border-color: #991b1b; }
         .page-btn.disabled { opacity: .45; pointer-events: none; }
         .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .entries-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .entries-form label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            white-space: nowrap;
+        }
+        .entries-form select {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            color: #333;
+            background: #fff;
+            outline: none;
+        }
+        .entries-form select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,.08); }
         .btn-tool { display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; border-radius: 8px; border: 1.5px solid #e5e7eb; background: #fff; color: #444; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; }
         .btn-tool.primary { border-color: #fecaca; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; }
         .view-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
@@ -222,6 +248,9 @@
         body.dark-mode .page-btn { background: #2a2a2a; border-color: #3a3a3a; color: #e5e5e5; }
         body.dark-mode .page-btn:hover { background: rgba(220,38,38,.2); color: #ff6b6b; border-color: rgba(220,38,38,.3); }
         body.dark-mode .page-btn.active { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border-color: #991b1b; }
+        body.dark-mode .entries-form { background: #1f1f1f; border-color: #333; }
+        body.dark-mode .entries-form label { color: #ddd; }
+        body.dark-mode .entries-form select { background: #2a2a2a; color: #e5e5e5; border-color: #3a3a3a; }
         body.dark-mode .darkmode-toggle { background: #2a2a2a; border-color: #3a3a3a; color: #e8e8e8; }
         body.dark-mode .darkmode-toggle:hover { background: rgba(220,38,38,.2); color: #ff6b6b; border-color: rgba(220,38,38,.3); }
         body.dark-mode .topbar-badge { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); color: #ff6b6b; }
@@ -377,6 +406,18 @@
                 <p>{{ $course->course }} | {{ $course->room }} | {{ $course->school_year_start && $course->school_year_end ? $course->school_year_start . ' - ' . $course->school_year_end : 'School year not set' }}</p>
             </div>
             <div class="toolbar">
+                <form method="get" action="{{ route('professor.requirementStatus', $course->id) }}" class="entries-form">
+                    @if($activeView !== 'overview')
+                        <input type="hidden" name="view" value="{{ $activeView }}">
+                    @endif
+                    <label for="perPageSelect">Show</label>
+                    <select id="perPageSelect" name="per_page" onchange="this.form.submit()">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page', 10) == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                    <label for="perPageSelect">entries</label>
+                </form>
                 <a href="{{ route('professor.requirementStatus.classes') }}" class="btn-tool"><i class="fa fa-arrow-left"></i> Classes</a>
                 <button type="button" class="btn-tool primary" id="printReportBtn"><i class="fa fa-print"></i> Print</button>
             </div>

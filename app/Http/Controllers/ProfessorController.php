@@ -655,12 +655,16 @@ public function requirementStatus(Request $request, $roomId)
         $activeView = 'overview';
     }
 
+    $perPage = (int) $request->query('per_page', 10);
+    if (!in_array($perPage, [10, 25, 50], true)) {
+        $perPage = 10;
+    }
+
     $displayStatuses = $activeView === 'overview'
         ? $allStudentStatuses
         : $allStudentStatuses->filter(fn ($status) => $status[$activeView]->count() > 0)->values();
 
     $currentPage = LengthAwarePaginator::resolveCurrentPage();
-    $perPage = 8;
     $currentItems = $displayStatuses->forPage($currentPage, $perPage)->values();
 
     $studentStatuses = new LengthAwarePaginator(
