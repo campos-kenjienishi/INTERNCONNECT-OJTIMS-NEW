@@ -277,6 +277,17 @@
             background: #fff; color: #7f0000; border: 1px solid #e5e7eb;
         }
         .btn-moa-print:hover { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .btn-moa-action.is-disabled {
+            opacity: .45;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .moa-file-note {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #9ca3af;
+            line-height: 1.3;
+        }
 
         /* Dark mode status badges */
         body.dark-mode .badge-active { background: rgba(22,163,74,0.2); color: #4ade80; }
@@ -754,22 +765,30 @@
                             </td>
                             <td>
                                 <div class="moa-actions">
-                                    @if($company->file)
+                                    @if($company->file && !empty($company->moa_file_ready))
                                         <a href="{{ url('/moa/download/' . $company->file) }}"
                                            class="btn-moa-action btn-moa-download"
                                            target="_blank"
                                            rel="noopener">
                                             <i class="fa fa-download"></i> Download
                                         </a>
-                                    @endif
-                                    @if($company->file)
                                         <button type="button"
                                                 class="btn-moa-action btn-moa-print"
-                                                onclick="printUploadedMoa('{{ asset('assets/' . $company->file) }}')">
+                                                onclick="printUploadedMoa('{{ route('moa.print', ['file' => $company->file]) }}')">
                                             <i class="fa fa-print"></i> Print
                                         </button>
+                                    @elseif($company->file)
+                                        <span class="btn-moa-action btn-moa-download is-disabled" title="This MOA file is empty or unavailable">
+                                            <i class="fa fa-download"></i> Download
+                                        </span>
+                                        <span class="btn-moa-action btn-moa-print is-disabled" title="This MOA file is empty or unavailable">
+                                            <i class="fa fa-print"></i> Print
+                                        </span>
                                     @endif
                                 </div>
+                                @if($company->file && !empty($company->moa_file_empty))
+                                    <div class="moa-file-note">Uploaded file is empty or missing. Re-upload the PDF before printing or downloading.</div>
+                                    @endif
                             </td>
                         </tr>
                         @endforeach
@@ -859,8 +878,8 @@
     /* ── DataTable ── */
     $(document).ready(function () {
         var table = $('#companyTable').DataTable({
-            // Sort by validity (column 6) from latest to oldest
-            order: [[6, 'desc']], 
+            // Default to newest records first
+            order: [[0, 'desc']], 
             columnDefs: [
                 { targets: 0, visible: false }, // Hide ID column
                 // Disable the sorting dropdown arrows on all visible columns

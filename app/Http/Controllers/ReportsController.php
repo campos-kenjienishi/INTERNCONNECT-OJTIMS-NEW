@@ -258,7 +258,10 @@ public function reportsExpired()
         $hasStudentsWithCourse = $company->students()->where('course', $validatedData['course'])->exists();
 
         return $hasStudentsWithCourse;
-    });
+    })->sortByDesc(function ($company) {
+        return optional($company->created_at)->timestamp ?? $company->id;
+    })->values();
+    $companies = $this->annotateMoaFileStatus($companies);
     $companyNames = $companies->pluck('company_name')->toArray();
 
     // Retrieve students under the specified companies using where and get
@@ -324,9 +327,9 @@ public function reportsExpiredProf()
         $stu = Student::all();
     
         // Filter companies based on the start year of "school_year"
-        $companies = $companies->filter(function ($company) use ($currentYear) {
-            // Extract the start year from the "school_year" format
-            list($startYear, $endYear) = explode('-', $company->school_year);
+    $companies = $companies->filter(function ($company) use ($currentYear) {
+        // Extract the start year from the "school_year" format
+        list($startYear, $endYear) = explode('-', $company->school_year);
     
             // Convert them to integers
             $startYear = (int) $startYear;
@@ -334,7 +337,9 @@ public function reportsExpiredProf()
     
           
             return ($currentYear - $startYear) ;
-        });
+        })->sortByDesc(function ($company) {
+            return optional($company->created_at)->timestamp ?? $company->id;
+        })->values();
     
         $companyNames = $companies->pluck('company_name')->toArray();
 
@@ -346,6 +351,8 @@ public function reportsExpiredProf()
         //         ->where('course', $course); // Add condition to filter by course
         // })->get();
     
+        $companies = $this->annotateMoaFileStatus($companies);
+
         return view('professor.expiredMOAReports', compact('companies', 'user', 'stu','courseAll', 'reportInsights'));
     }
 
@@ -385,7 +392,10 @@ public function reportsExpiredProf()
         $hasStudentsWithCourse = $company->students()->where('course', $validatedData['course'])->exists();
 
         return  $hasStudentsWithCourse;
-    });
+    })->sortByDesc(function ($company) {
+        return optional($company->created_at)->timestamp ?? $company->id;
+    })->values();
+    $companies = $this->annotateMoaFileStatus($companies);
     $companyNames = $companies->pluck('company_name')->toArray();
 
     // Retrieve students under the specified companies using where and get
@@ -394,6 +404,8 @@ public function reportsExpiredProf()
     })
     ->where('course', $validatedData['course'])
     ->get();
+
+    $companies = $this->annotateMoaFileStatus($companies);
 
     $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
 
@@ -478,6 +490,20 @@ public function reportsExpiredProf()
             'expired_moa' => $expired,
             'course' => $course,
         ], $highlights, $watchouts, $actions);
+    }
+
+    private function annotateMoaFileStatus($companies)
+    {
+        return collect($companies)->map(function ($company) {
+            $filePath = !empty($company->file) ? public_path('assets/' . $company->file) : null;
+            $fileExists = $filePath && file_exists($filePath);
+            $fileSize = $fileExists ? filesize($filePath) : 0;
+
+            $company->moa_file_ready = $fileExists && $fileSize > 0;
+            $company->moa_file_empty = !empty($company->file) && (!$fileExists || $fileSize === 0);
+
+            return $company;
+        })->values();
     }
 
 

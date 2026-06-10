@@ -374,7 +374,6 @@
                             <td>{{ optional($row['student']->studentInfo)->studentNum ?: '-' }}</td>
                             <td>
                                 <div class="student-name">{{ $row['student']->full_name }}</div>
-                                <div class="student-meta">{{ optional($row['student']->studentInfo)->class_id ?: '-' }}</div>
                             </td>
                             <td>{{ $row['class'] ? $row['class']->room : '-' }}</td>
                             <td><span class="badge {{ $row['badge'] }}">{{ strtoupper($row['status']) }}</span></td>
