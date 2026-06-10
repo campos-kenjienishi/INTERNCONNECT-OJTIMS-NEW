@@ -16,6 +16,7 @@ use App\Http\Controllers\ForgotPassController;
 use App\Http\Controllers\CoursePerSYController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\AnnouncementController;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -189,6 +190,13 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::post('/announcements', [AnnouncementController::class,'announcement']);
     Route::post('/companyCreate', [CompanyController::class,'companyCreate'])->name('companyCreate');
     Route::get('/print-data/{company}', [MOAUploadController::class, 'printData'])->name('print-data');
+    Route::get('/companyCreate', function () {
+        $user = User::where('id', session('loginId'))->first();
+        $fallbackPath = $user && (int) $user->role === 0 ? '/student/MOA' : '/MOA';
+
+        return redirect($fallbackPath)
+            ->with('fail', 'The MOA upload link was reopened incorrectly. Please submit the notarized MOA from the form again if needed.');
+    });
     Route::get('/voucher/{company}', [CompanyController::class,'voucher'])->name('voucher');
     Route::post('/notify/{studentNum}', [StudentController::class, 'notify']);
     Route::get('/moa/download/{file}', [MOAUploadController::class,'download']);

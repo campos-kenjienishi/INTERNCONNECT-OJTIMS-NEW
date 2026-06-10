@@ -1253,6 +1253,21 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             });
         @endif
 
+        $('form[action$="/companyCreate"]').on('submit', function (e) {
+            if (this.dataset.submitting === 'true') {
+                e.preventDefault();
+                return;
+            }
+
+            this.dataset.submitting = 'true';
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Uploading...';
+            }
+        });
+
     });
 
     function confirmRemove(companyId, companyName) {

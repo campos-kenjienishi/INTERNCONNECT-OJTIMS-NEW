@@ -1417,6 +1417,20 @@ window.addEventListener('resize', function () {
         $('#studentMoaForm').on('submit', function (e) {
             if (!validateForm($(this))) {
                 e.preventDefault();
+                return;
+            }
+
+            if (this.dataset.submitting === 'true') {
+                e.preventDefault();
+                return;
+            }
+
+            this.dataset.submitting = 'true';
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Uploading...';
             }
         });
     });
