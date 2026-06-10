@@ -1136,13 +1136,31 @@
                     <h2>Announcements</h2>
                     <p>Latest announcements from your class adviser</p>
                 </div>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <label for="announcementDateSort" style="font-size:13px;color:#666;margin-bottom:0;">Date</label>
+                    <select id="announcementDateSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:160px;">
+                        <option value="newest" selected>Newest first</option>
+                        <option value="oldest">Oldest first</option>
+                    </select>
+                </div>
             </div>
             <div class="table-card-body">
 
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
-                        $('#ATable').DataTable();
+                        var announcementTable = $('#ATable').DataTable({
+                            order: [[2, 'desc']],
+                            columnDefs: [
+                                { targets: [2], type: 'num' }
+                            ]
+                        });
+
+                        $('#announcementDateSort').on('change', function () {
+                            announcementTable
+                                .order([[2, this.value === 'oldest' ? 'asc' : 'desc']])
+                                .draw();
+                        });
                     });
                 </script>
 
@@ -1160,7 +1178,9 @@
                         <tr>
                             <td><strong>{{ $item->title }}</strong></td>
                             <td>{{ $item->content }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->created_at)->format('M d, Y') }}</td>
+                            <td data-order="{{ \Carbon\Carbon::parse($item->created_at)->timestamp }}">
+                                {{ \Carbon\Carbon::parse($item->created_at)->format('M d, Y h:i A') }}
+                            </td>
                             <td>
                                 <div style="display:flex;align-items:center;gap:8px;">
                                     <div style="width:28px;height:28px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;color:var(--red);font-size:11px;">

@@ -197,6 +197,7 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ── Reports ───────
 
 Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     Route::post('/reportsExpired/send-email', [ReportsController::class, 'sendEmailExpired'])->name('reportsExpired.send.email');
 });
 

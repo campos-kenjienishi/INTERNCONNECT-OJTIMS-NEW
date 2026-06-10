@@ -87,5 +87,26 @@ class AnnouncementController extends Controller
         return redirect()->back();
 
     }
+
+    public function destroy($id)
+    {
+        if (!Session::has('loginId')) {
+            return redirect('/login');
+        }
+
+        $user = User::where('id', Session::get('loginId'))->first();
+
+        if (!$user || !in_array((string) $user->role, ['1', '2'], true)) {
+            abort(403, 'Only coordinators and professors can delete announcements.');
+        }
+
+        $announcement = Announcements::where('id', $id)
+            ->where('announcer', $user->full_name)
+            ->firstOrFail();
+
+        $announcement->delete();
+
+        return redirect()->back()->with('success', 'Announcement deleted successfully.');
+    }
     
 }

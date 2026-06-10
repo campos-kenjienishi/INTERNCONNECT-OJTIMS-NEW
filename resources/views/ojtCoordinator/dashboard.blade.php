@@ -336,6 +336,58 @@
 
             .panel-card-body { padding: 24px; }
 
+            .announcement-table-wrap { overflow-x: auto; }
+            .announcement-manage-table {
+                width: 100%;
+                min-width: 720px;
+                border-collapse: collapse;
+                table-layout: fixed;
+            }
+            .announcement-manage-table th {
+                background: #fafafa;
+                color: #555;
+                font-size: 11.5px;
+                font-weight: 700;
+                text-transform: uppercase;
+                padding: 12px 16px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            .announcement-manage-table td {
+                padding: 14px 16px;
+                color: #333;
+                border-bottom: 1px solid #f5f5f5;
+                vertical-align: middle;
+            }
+            .announcement-manage-table tbody tr:hover td { background: #fff5f5; }
+            .announcement-title-cell strong {
+                display: block;
+                color: #1a1a1a;
+                overflow-wrap: anywhere;
+            }
+            .announcement-title-cell span {
+                display: block;
+                color: #777;
+                font-size: 12px;
+                line-height: 1.45;
+                margin-top: 4px;
+                overflow-wrap: anywhere;
+            }
+            .btn-delete-announcement {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 7px 12px;
+                border: 1.5px solid #fecaca;
+                border-radius: 8px;
+                background: #fff;
+                color: #dc2626;
+                font-family: 'Poppins', sans-serif;
+                font-size: 12.5px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
             /* Form fields */
             .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
             .field-group:last-of-type { margin-bottom: 0; }
@@ -958,6 +1010,11 @@ body.dark-mode .panel-card-header { background: #2a2a2a; border-bottom: 1px soli
 body.dark-mode .panel-card-header h2 { color: #fff; }
 body.dark-mode .panel-card-header p { color: #999; }
 body.dark-mode .panel-card-footer { background: #2a2a2a !important; border-top: 1px solid #3a3a3a; }
+body.dark-mode .announcement-manage-table th { background: #2a2a2a; color: #aaa; border-bottom-color: #3a3a3a; }
+body.dark-mode .announcement-manage-table td { color: #e0e0e0; border-bottom-color: rgba(255,255,255,0.05); }
+body.dark-mode .announcement-manage-table tbody tr:hover td { background: rgba(220,38,38,0.1); }
+body.dark-mode .announcement-title-cell strong { color: #fff; }
+body.dark-mode .announcement-title-cell span { color: #aaa; }
 body.dark-mode .analytics-header h2 { color: #fff; }
 body.dark-mode .analytics-header p { color: #aaa; }
 body.dark-mode .analytics-updated { background: #2a2a2a; border: 1px solid #3a3a3a; color: #e0e0e0; }
@@ -1281,6 +1338,63 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                     </div>
                 </div>
 
+            </div>
+
+            <div class="panel-card" style="margin-top:22px;">
+                <div class="panel-card-header">
+                    <div class="panel-header-icon">
+                        <i class="fa fa-list"></i>
+                    </div>
+                    <div>
+                        <h2>My Announcements</h2>
+                        <p>Review or delete announcements you posted</p>
+                    </div>
+                </div>
+                <div class="panel-card-body announcement-table-wrap" style="padding:0;">
+                    <table class="announcement-manage-table">
+                        <colgroup>
+                            <col style="width:42%;">
+                            <col style="width:18%;">
+                            <col style="width:24%;">
+                            <col style="width:16%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Audience</th>
+                                <th>Posted</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($announcements ?? [] as $announcement)
+                                <tr>
+                                    <td class="announcement-title-cell">
+                                        <strong>{{ $announcement->title }}</strong>
+                                        <span>{{ Str::limit($announcement->content, 90) }}</span>
+                                    </td>
+                                    <td>All students</td>
+                                    <td>
+                                        {{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete-announcement">
+                                                <i class="fa fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" style="padding:28px; text-align:center; color:#999;">No announcements posted yet.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">

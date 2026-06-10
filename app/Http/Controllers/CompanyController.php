@@ -182,7 +182,7 @@ public function companyCreate(Request $request)
 
     if ($data->role == 0) {
         $request->validate([
-            'valid_until' => 'required|date|after_or_equal:today',
+            'valid_until' => 'required|date',
         ]);
     }
 
@@ -195,7 +195,7 @@ public function companyCreate(Request $request)
     $com->company_name = $request->company_name;
     $com->company_address = $request->company_address;
     $com->company_rep = $request->company_rep;
-    $com->companyNo = $request->companyNo;
+    $com->companyNo = $request->filled('companyNo') ? $request->companyNo : 'N/A';
     $com->company_email = $request->company_email;
     $startYear = $request->input('school_year_start');
     $endYear = $request->input('school_year_end');

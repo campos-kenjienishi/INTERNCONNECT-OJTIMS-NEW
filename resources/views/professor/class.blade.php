@@ -311,6 +311,59 @@
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
 
+        .announcement-table-wrap { overflow-x: auto; }
+        .announcement-manage-table {
+            width: 100%;
+            min-width: 780px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .announcement-manage-table th {
+            background: #fafafa;
+            color: #555;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .announcement-manage-table td {
+            padding: 14px 16px;
+            color: #333;
+            border-bottom: 1px solid #f5f5f5;
+            vertical-align: middle;
+        }
+        .announcement-manage-table tbody tr:hover td { background: #fff5f5; }
+        .announcement-title-cell strong {
+            display: block;
+            color: #1a1a1a;
+            overflow-wrap: anywhere;
+        }
+        .announcement-title-cell span {
+            display: block;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.45;
+            margin-top: 4px;
+            overflow-wrap: anywhere;
+        }
+        .btn-delete-announcement {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border: 1.5px solid #fecaca;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--red);
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         .dataTables_filter input {
             border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
             padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important;
@@ -676,6 +729,11 @@
         body.dark-mode .table-card-body table.dataTable thead th { background: #3a3a3a; color: #e0e0e0; border-bottom: 1px solid #555; }
         body.dark-mode .table-card-body table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid #2a2a2a; }
         body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
+        body.dark-mode .announcement-manage-table th { background: #3a3a3a; color: #e0e0e0; border-bottom-color: #555; }
+        body.dark-mode .announcement-manage-table td { color: #e0e0e0; border-bottom-color: #2a2a2a; }
+        body.dark-mode .announcement-manage-table tbody tr:hover td { background: rgba(220,38,38,0.1); }
+        body.dark-mode .announcement-title-cell strong { color: #fff; }
+        body.dark-mode .announcement-title-cell span { color: #aaa; }
         body.dark-mode .dataTables_wrapper { color: #e0e0e0 !important; }
         body.dark-mode .dataTables_length { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; }
         body.dark-mode .dataTables_length label { color: #e0e0e0 !important; }
@@ -1119,6 +1177,71 @@
             </div>
         </div>
 
+        <div class="table-card">
+            <div class="table-card-header">
+                <div class="table-card-header-left">
+                    <div class="header-icon"><i class="fa fa-bullhorn"></i></div>
+                    <div>
+                        <h2>My Announcements</h2>
+                        <p>Review or delete announcements you posted</p>
+                    </div>
+                </div>
+                <div class="room-count-badge">
+                    <i class="fa fa-list"></i>
+                    {{ count($announcements ?? []) }} {{ count($announcements ?? []) == 1 ? 'announcement' : 'announcements' }}
+                </div>
+            </div>
+
+            <div class="table-card-body announcement-table-wrap">
+                <table class="announcement-manage-table">
+                    <colgroup>
+                        <col style="width:42%;">
+                        <col style="width:22%;">
+                        <col style="width:22%;">
+                        <col style="width:14%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Target Class</th>
+                            <th>Date Posted</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($announcements ?? [] as $announcement)
+                            <tr>
+                                <td class="announcement-title-cell">
+                                    <strong>{{ $announcement->title }}</strong>
+                                    <span>{{ Str::limit($announcement->content, 90) }}</span>
+                                </td>
+                                <td>
+                                    {{ $announcement->target_course ?? 'Class' }}
+                                    @if(!empty($announcement->target_room))
+                                        - {{ $announcement->target_room }}
+                                    @endif
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}</td>
+                                <td>
+                                    <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-delete-announcement">
+                                            <i class="fa fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" style="text-align:center;color:#999;padding:28px;">No announcements posted yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
     <div style="display:flex; align-items:center; gap:8px;">
@@ -1421,6 +1544,7 @@
                         showConfirmButton: false,
                         timer: 2000, timerProgressBar: true
                     });
+                    setTimeout(() => location.reload(), 2000);
                 },
                 error: function (xhr) {
                     console.error(xhr.responseText);

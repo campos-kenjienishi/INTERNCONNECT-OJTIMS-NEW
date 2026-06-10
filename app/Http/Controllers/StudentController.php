@@ -107,7 +107,7 @@ public function home()
     // GET FILE COUNT
     $fileCount = UploadedFile::count();
 
-    $announcements = $this->visibleAnnouncementsForStudent($data);
+    $announcements = $this->visibleAnnouncementsForStudent($data)->take(5);
 
     return view('students.student_home', [
         'user' => $data,

@@ -141,8 +141,9 @@ class AuthController extends Controller
 
         $userName = $data->full_name ?? '';
         $fileCount = UploadedFile::where('uploader_name', $userName)->count();
+        $announcements = Announcements::where('announcer', $userName)->latest()->get();
 
-        return view('ojtCoordinator.dashboard', compact('data','roleCount','roleCountP','fileCount'));
+        return view('ojtCoordinator.dashboard', compact('data','roleCount','roleCountP','fileCount', 'announcements'));
     }
 
     public function analytics()

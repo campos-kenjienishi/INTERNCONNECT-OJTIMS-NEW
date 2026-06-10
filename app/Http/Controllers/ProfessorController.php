@@ -11,6 +11,7 @@ Use App\Mail\TemporaryPasswordNotification;
 use App\Models\Subject;
 use App\Models\Schedule;
 use App\Models\Professor;
+use App\Models\Announcements;
 use App\Mail\DenialReason;
 use App\Mail\UserApproved;
 use Illuminate\Support\Str;
@@ -34,6 +35,7 @@ public function class()
     $data = null;
     $classrooms = [];
     $courses = Courses::all();
+    $announcements = collect();
 
     if (Session::has('loginId')) {
         $data = User::where('id', Session::get('loginId'))->first();
@@ -44,6 +46,7 @@ public function class()
 
         // Get all rooms (classes) where this professor is adviser
         $classrooms = Classes::where('adviser_name', $data->full_name)->get();
+        $announcements = Announcements::where('announcer', $data->full_name)->latest()->get();
 
         // For each room, preload students needing approval and all students
         foreach ($classrooms as $room) {
@@ -120,7 +123,8 @@ public function class()
     return view('professor.class', [
         'data' => $data,
         'course' => $courses,
-        'class' => $classrooms
+        'class' => $classrooms,
+        'announcements' => $announcements
     ]);
 }
  

@@ -425,6 +425,22 @@
 
         .table-card-body { padding: 0; }
 
+        .moa-table-wrap { overflow-x: auto; }
+        #moaTable {
+            min-width: 860px;
+            table-layout: fixed;
+        }
+        #moaTable th,
+        #moaTable td {
+            white-space: normal !important;
+            overflow-wrap: anywhere;
+        }
+        #moaTable th:nth-child(1), #moaTable td:nth-child(1) { width: 30%; }
+        #moaTable th:nth-child(2), #moaTable td:nth-child(2) { width: 15%; }
+        #moaTable th:nth-child(3), #moaTable td:nth-child(3) { width: 20%; }
+        #moaTable th:nth-child(4), #moaTable td:nth-child(4) { width: 14%; }
+        #moaTable th:nth-child(5), #moaTable td:nth-child(5) { width: 21%; }
+
         /* DataTables */
         .table-card-body .dataTables_wrapper {
             padding: 16px 22px;
@@ -503,6 +519,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            min-width: 0;
         }
 
         .company-avatar {
@@ -518,8 +535,8 @@
             flex-shrink: 0;
         }
 
-        .company-name-text { font-weight: 600; color: #1a1a1a; font-size: 13.5px; }
-        .company-sub { font-size: 11.5px; color: #aaa; margin-top: 1px; }
+        .company-name-text { font-weight: 600; color: #1a1a1a; font-size: 13.5px; overflow-wrap: anywhere; }
+        .company-sub { font-size: 11.5px; color: #aaa; margin-top: 1px; overflow-wrap: anywhere; }
 
         /* Year badge */
         .year-badge {
@@ -1024,17 +1041,7 @@
                 </div>
             </div>
 
-            <div class="table-card-body" style="overflow-x:auto;">
-
-                <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                <script>
-                    $('#moaTable').DataTable({
-                    responsive: true,
-                    scrollX: true,
-                    autoWidth: false,
-                    order: [[0, 'asc']]
-                });
-                </script>
+            <div class="table-card-body moa-table-wrap">
 
                 @if($companies->isEmpty())
                     <div class="empty-state">
@@ -1045,7 +1052,7 @@
                         <p>Click "Add Notarized MOA" to submit your first company MOA.</p>
                     </div>
                 @else
-                <table id="moaTable" class="display nowrap" style="width:100%">
+                <table id="moaTable" class="display" style="width:100%">
                     <thead>
                         <tr>
                             <th>Company</th>
@@ -1113,6 +1120,16 @@
                         @endforeach
                     </tbody>
                 </table>
+                <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+                <script>
+                    $(document).ready(function () {
+                        $('#moaTable').DataTable({
+                            scrollX: true,
+                            autoWidth: false,
+                            order: [[0, 'asc']]
+                        });
+                    });
+                </script>
                 @endif
 
             </div>
@@ -1153,7 +1170,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data">
+            <form id="studentMoaForm" action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
 
@@ -1184,7 +1201,7 @@
                                 <i class="fa fa-phone"></i> Company Number
                             </label>
                             <input class="modal-field-input" type="text" name="companyNo"
-                                placeholder="e.g. 09XX-XXX-XXXX" required>
+                                placeholder="e.g. 09XX-XXX-XXXX or N/A">
                         </div>
 
                         <!-- RIGHT COLUMN (3 fields) -->
@@ -1209,7 +1226,7 @@
                             <label class="modal-field-label" style="margin-top: 14px;">
                                 <i class="fa fa-hourglass-end"></i> Validity Period
                             </label>
-                            <input class="modal-field-input" type="date" name="valid_until" min="{{ now()->toDateString() }}" required>
+                            <input class="modal-field-input" type="date" name="valid_until" required>
 
                             <!-- Info notice card -->
                             <div style="
@@ -1365,9 +1382,9 @@ window.addEventListener('resize', function () {
 
     // Form validation
     $(document).ready(function () {
-        function validateForm() {
+        function validateForm($form) {
             let valid = true;
-            $('input[required]').each(function () {
+            $form.find('input[required]').each(function () {
                 const errorId = $(this).attr('name') + '-error';
                 if ($(this).val() === '') {
                     valid = false;
@@ -1379,8 +1396,8 @@ window.addEventListener('resize', function () {
             return valid;
         }
 
-        $('.btn-modal-submit').click(function (e) {
-            if (!validateForm()) {
+        $('#studentMoaForm').on('submit', function (e) {
+            if (!validateForm($(this))) {
                 e.preventDefault();
             }
         });
