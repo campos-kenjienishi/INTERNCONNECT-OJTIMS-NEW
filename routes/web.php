@@ -152,6 +152,8 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::get('/professor/class', [ProfessorController::class,'class']);
     Route::get('/professor/listStudents/{roomId}', [ProfessorController::class,'show']);
     Route::get('/professor/classList/{roomId}', [ProfessorController::class,'show_list']);
+    Route::get('/professor/requirement-status', [ProfessorController::class,'requirementStatusClasses'])->name('professor.requirementStatus.classes');
+    Route::get('/professor/requirement-status/{roomId}', [ProfessorController::class,'requirementStatus'])->name('professor.requirementStatus');
     Route::post('/professor/approve/{email}', [ProfessorController::class,'approve']);
     Route::post('/professor/approve-all/{roomId}', [ProfessorController::class,'approveAll']);
     Route::post('/professor/deny/{email}', [ProfessorController::class,'deny']);
@@ -188,8 +190,6 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::get('/download/{file}', [FileController::class,'download']);
     Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::post('/announcements', [AnnouncementController::class,'announcement']);
-    Route::post('/companyCreate', [CompanyController::class,'companyCreate'])->name('companyCreate');
-    Route::get('/print-data/{company}', [MOAUploadController::class, 'printData'])->name('print-data');
     Route::get('/companyCreate', function () {
         $user = User::where('id', session('loginId'))->first();
         $fallbackPath = $user && (int) $user->role === 0 ? '/student/MOA' : '/MOA';
@@ -197,6 +197,8 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
         return redirect($fallbackPath)
             ->with('fail', 'The MOA upload link was reopened incorrectly. Please submit the notarized MOA from the form again if needed.');
     });
+    Route::post('/companyCreate', [CompanyController::class,'companyCreate'])->name('companyCreate');
+    Route::get('/print-data/{company}', [MOAUploadController::class, 'printData'])->name('print-data');
     Route::get('/voucher/{company}', [CompanyController::class,'voucher'])->name('voucher');
     Route::post('/notify/{studentNum}', [StudentController::class, 'notify']);
     Route::get('/moa/download/{file}', [MOAUploadController::class,'download']);

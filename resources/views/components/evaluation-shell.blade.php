@@ -15,6 +15,10 @@
 
 @php
     $user = auth()->user();
+    if (!$user && session()->has('loginId')) {
+        $user = \App\Models\User::find(session('loginId'));
+    }
+
     $isAuthenticatedShell = in_array($role, ['student', 'professor', 'coordinator'], true);
 
     $sidebarLinks = [];
@@ -30,9 +34,11 @@
         ];
     } elseif ($role === 'professor') {
         $sidebarLinks = [
-            ['url' => url('/professor/home'), 'icon' => 'fa-home', 'label' => 'Home', 'pattern' => 'professor/home*'],
+            ['url' => url('/professor/home'), 'icon' => 'fa-home', 'label' => 'Dashboard', 'pattern' => 'professor/home*'],
             ['url' => url('/professor/class'), 'icon' => 'fa-clipboard', 'label' => 'Class', 'pattern' => 'professor/class*'],
+            ['url' => route('professor.requirementStatus.classes'), 'icon' => 'fa-clipboard-check', 'label' => 'Req. Status', 'pattern' => 'professor/requirement-status*'],
             ['url' => url('/professor/analytics'), 'icon' => 'fa-chart-line', 'label' => 'Analytics', 'pattern' => 'professor/analytics*'],
+            ['url' => url('/reportsExpiredProf'), 'icon' => 'fa-file-contract', 'label' => 'MOA', 'pattern' => 'reportsExpiredProf*'],
             ['url' => url('/professor/maintain'), 'icon' => 'fa-cogs', 'label' => 'Maintenance', 'pattern' => 'professor/maintain*'],
             ['url' => url('/professor/evaluation'), 'icon' => 'fa-star-half-alt', 'label' => 'Evaluation', 'pattern' => 'professor/evaluation*'],
         ];
@@ -904,7 +910,7 @@
             @endif
         </div>
         <div class="user-info">
-            <span class="user-name">{{ $user ? trim($user->first_name . ' ' . $user->last_name) : 'Account' }}</span>
+            <span class="user-name">{{ $user ? ($user->full_name ?: trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''))) : 'Account' }}</span>
             <span class="user-role">
                 {{ $role === 'student' ? 'Student' : ($role === 'professor' ? 'Professor' : 'OJT Coordinator') }}
             </span>

@@ -378,6 +378,11 @@
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
+        <a href="{{ route('professor.requirementStatus.classes') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-clipboard-check"></i></span>
+            <span class="nav-label">Req. Status</span>
+            <span class="tooltip-label">Req. Status</span>
+        </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item active">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
             <span class="nav-label">Analytics</span>

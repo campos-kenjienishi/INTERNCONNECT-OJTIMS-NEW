@@ -12,6 +12,8 @@ use App\Models\Subject;
 use App\Models\Schedule;
 use App\Models\Professor;
 use App\Models\Announcements;
+use App\Models\FileCategory;
+use App\Models\FileRequirement;
 use App\Mail\DenialReason;
 use App\Mail\UserApproved;
 use Illuminate\Support\Str;
@@ -429,6 +431,190 @@ public function show_list($roomId)
         // Pass the $course and $students variables to the view
         return view('professor.classList', compact('course', 'studentData', 'data'));
     }
+}
+
+public function requirementStatusClasses()
+{
+    if (!Session::has('loginId')) {
+        return redirect('/login');
+    }
+
+    $data = User::where('id', Session::get('loginId'))->first();
+    $classes = Classes::where('adviser_name', $data->full_name)
+        ->orderBy('course')
+        ->orderBy('room')
+        ->get();
+
+    $professor = Professor::where('full_name', $data->full_name)->first();
+    $categoryCount = $professor
+        ? FileCategory::where('professor_id', $professor->id)->count()
+        : 0;
+
+    foreach ($classes as $classroom) {
+        $studentQuery = User::join('students', 'users.id', '=', 'students.user_id')
+            ->where('users.status', 1)
+            ->select('users.full_name');
+
+        $studentQuery->where(function ($query) use ($classroom, $data) {
+            $query->where('students.class_id', $classroom->id);
+
+            if (empty($classroom->school_year_start) || empty($classroom->school_year_end)) {
+                $query->orWhere(function ($legacy) use ($classroom, $data) {
+                    $legacy->whereNull('students.class_id')
+                        ->where('students.course', $classroom->course)
+                        ->where('students.adviser_name', $data->full_name);
+                });
+            }
+        });
+
+        $studentNames = $studentQuery->pluck('users.full_name')->filter()->values();
+        $classroom->student_count = $studentNames->count();
+
+        $submittedPairs = FileRequirement::where('adviser', $data->full_name)
+            ->whereIn('uploadedBy', $studentNames)
+            ->select('uploadedBy', 'fileName')
+            ->get()
+            ->groupBy('uploadedBy');
+
+        $completeCount = 0;
+        $submittedCategoryTotal = 0;
+        foreach ($studentNames as $studentName) {
+            $submittedCount = $submittedPairs->get($studentName, collect())
+                ->pluck('fileName')
+                ->map(fn ($name) => mb_strtolower(trim((string) $name)))
+                ->unique()
+                ->count();
+
+            $submittedCategoryTotal += min($submittedCount, $categoryCount);
+
+            if ($categoryCount > 0 && $submittedCount >= $categoryCount) {
+                $completeCount++;
+            }
+        }
+
+        $classroom->complete_count = $completeCount;
+        $classroom->average_completion = $classroom->student_count > 0 && $categoryCount > 0
+            ? round(($submittedCategoryTotal / ($classroom->student_count * $categoryCount)) * 100)
+            : 0;
+    }
+
+    return view('professor.requirementStatusClasses', compact('data', 'classes', 'categoryCount'));
+}
+
+public function requirementStatus(Request $request, $roomId)
+{
+    if (!Session::has('loginId')) {
+        return redirect('/login');
+    }
+
+    $data = User::where('id', Session::get('loginId'))->first();
+    $course = Classes::where('id', $roomId)
+        ->where('adviser_name', $data->full_name)
+        ->first();
+
+    if (!$course) {
+        return redirect()->back()->with('error', 'Room not found.');
+    }
+
+    $professor = Professor::where('full_name', $data->full_name)->first();
+    $categories = $professor
+        ? FileCategory::where('professor_id', $professor->id)->get()
+        : collect();
+
+    $categories = $categories
+        ->sortBy('fileName', SORT_NATURAL | SORT_FLAG_CASE)
+        ->values();
+
+    $studentsQuery = User::with('studentInfo')
+        ->join('students', 'users.id', '=', 'students.user_id')
+        ->where('users.status', 1)
+        ->orderBy('users.full_name')
+        ->select('users.*');
+
+    $studentsQuery->where(function ($query) use ($roomId, $course, $data) {
+        $query->where('students.class_id', $roomId);
+
+        if (empty($course->school_year_start) || empty($course->school_year_end)) {
+            $query->orWhere(function ($legacy) use ($course, $data) {
+                $legacy->whereNull('students.class_id')
+                    ->where('students.course', $course->course)
+                    ->where('students.adviser_name', $data->full_name);
+            });
+        }
+    });
+
+    $students = $studentsQuery->get();
+    $categoryNames = $categories->pluck('fileName')->values();
+    $categoryLookup = $categoryNames->mapWithKeys(function ($name) {
+        return [mb_strtolower(trim((string) $name)) => $name];
+    });
+
+    $requirements = FileRequirement::where('adviser', $data->full_name)
+        ->whereIn('uploadedBy', $students->pluck('full_name')->filter()->values())
+        ->get()
+        ->groupBy('uploadedBy');
+
+    $studentStatuses = $students->map(function ($student) use ($requirements, $categoryNames, $categoryLookup) {
+        $submittedFiles = $requirements->get($student->full_name, collect());
+        $submittedByCategory = $submittedFiles->groupBy(function ($file) {
+            return mb_strtolower(trim((string) $file->fileName));
+        });
+
+        $passed = collect();
+        $missing = collect();
+        $approved = collect();
+        $pending = collect();
+        $denied = collect();
+
+        foreach ($categoryNames as $categoryName) {
+            $key = mb_strtolower(trim((string) $categoryName));
+            if ($submittedByCategory->has($key)) {
+                $passed->push($categoryName);
+
+                $categoryFiles = $submittedByCategory->get($key);
+                if ($categoryFiles->where('status', 1)->isNotEmpty()) {
+                    $approved->push($categoryName);
+                } elseif ($categoryFiles->where('status', 2)->isNotEmpty()) {
+                    $denied->push($categoryName);
+                } else {
+                    $pending->push($categoryName);
+                }
+            } else {
+                $missing->push($categoryName);
+            }
+        }
+
+        $extraSubmitted = $submittedByCategory->keys()
+            ->filter(fn ($key) => !$categoryLookup->has($key))
+            ->map(fn ($key) => optional($submittedByCategory->get($key)->first())->fileName)
+            ->filter()
+            ->values();
+
+        return [
+            'student' => $student,
+            'passed' => $passed,
+            'missing' => $missing,
+            'approved' => $approved,
+            'pending' => $pending,
+            'denied' => $denied,
+            'extraSubmitted' => $extraSubmitted,
+            'submittedCount' => $passed->count(),
+            'missingCount' => $missing->count(),
+            'approvedCount' => $submittedFiles->where('status', 1)->count(),
+            'pendingCount' => $submittedFiles->whereNotIn('status', [1, 2])->count(),
+            'deniedCount' => $submittedFiles->where('status', 2)->count(),
+            'completion' => $categoryNames->count() > 0
+                ? round(($passed->count() / $categoryNames->count()) * 100)
+                : 0,
+        ];
+    });
+
+    $activeView = $request->query('view', 'overview');
+    if (!in_array($activeView, ['overview', 'approved', 'pending', 'denied', 'missing'], true)) {
+        $activeView = 'overview';
+    }
+
+    return view('professor.requirementStatus', compact('data', 'course', 'categories', 'studentStatuses', 'activeView'));
 }
 
     
