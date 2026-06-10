@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Helpers\AuditLogger;
 
 
@@ -440,17 +441,21 @@ public function requirementStatusClasses()
     }
 
     $data = User::where('id', Session::get('loginId'))->first();
-    $classes = Classes::where('adviser_name', $data->full_name)
-        ->orderBy('course')
-        ->orderBy('room')
-        ->get();
-
     $professor = Professor::where('full_name', $data->full_name)->first();
     $categoryCount = $professor
         ? FileCategory::where('professor_id', $professor->id)->count()
         : 0;
 
-    foreach ($classes as $classroom) {
+    $allClasses = Classes::where('adviser_name', $data->full_name)
+        ->orderBy('course')
+        ->orderBy('room')
+        ->get();
+
+    $classStats = [];
+    $totalStudents = 0;
+    $totalCompleteStudents = 0;
+
+    foreach ($allClasses as $classroom) {
         $studentQuery = User::join('students', 'users.id', '=', 'students.user_id')
             ->where('users.status', 1)
             ->select('users.full_name');
@@ -468,7 +473,8 @@ public function requirementStatusClasses()
         });
 
         $studentNames = $studentQuery->pluck('users.full_name')->filter()->values();
-        $classroom->student_count = $studentNames->count();
+        $studentCount = $studentNames->count();
+        $totalStudents += $studentCount;
 
         $submittedPairs = FileRequirement::where('adviser', $data->full_name)
             ->whereIn('uploadedBy', $studentNames)
@@ -492,13 +498,48 @@ public function requirementStatusClasses()
             }
         }
 
-        $classroom->complete_count = $completeCount;
-        $classroom->average_completion = $classroom->student_count > 0 && $categoryCount > 0
-            ? round(($submittedCategoryTotal / ($classroom->student_count * $categoryCount)) * 100)
-            : 0;
+        $totalCompleteStudents += $completeCount;
+
+        $classStats[$classroom->id] = [
+            'student_count' => $studentCount,
+            'complete_count' => $completeCount,
+            'average_completion' => $studentCount > 0 && $categoryCount > 0
+                ? round(($submittedCategoryTotal / ($studentCount * $categoryCount)) * 100)
+                : 0,
+        ];
     }
 
-    return view('professor.requirementStatusClasses', compact('data', 'classes', 'categoryCount'));
+    $currentPage = LengthAwarePaginator::resolveCurrentPage();
+    $perPage = 6;
+    $currentItems = $allClasses->forPage($currentPage, $perPage)->values();
+
+    foreach ($currentItems as $classroom) {
+        if (isset($classStats[$classroom->id])) {
+            foreach ($classStats[$classroom->id] as $key => $value) {
+                $classroom->{$key} = $value;
+            }
+        }
+    }
+
+    $classes = new LengthAwarePaginator(
+        $currentItems,
+        $allClasses->count(),
+        $perPage,
+        $currentPage,
+        [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]
+    );
+
+    return view('professor.requirementStatusClasses', compact(
+        'data',
+        'classes',
+        'categoryCount',
+        'allClasses',
+        'totalStudents',
+        'totalCompleteStudents'
+    ));
 }
 
 public function requirementStatus(Request $request, $roomId)

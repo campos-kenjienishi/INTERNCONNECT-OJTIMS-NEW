@@ -76,6 +76,14 @@
         .mini-stat span { display:block; color:#777; font-size:10.5px; margin-top:3px; text-transform:uppercase; }
         .btn-report { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border-radius:8px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; text-decoration:none; font-size:13px; font-weight:700; }
         .empty-state { text-align:center; padding:36px; color:#888; background:#fff; border-radius:8px; border:1px dashed #ddd; }
+        .pagination-wrap { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:18px; }
+        .pagination-meta { color:#777; font-size:12px; font-weight:600; }
+        .pagination-nav { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+        .page-btn { display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; padding:0 12px; border-radius:8px; border:1px solid #e5e7eb; background:#fff; color:#444; text-decoration:none; font-size:13px; font-weight:700; transition:all .2s; }
+        .page-btn:hover { background:#fee2e2; color:var(--red); border-color:#fecaca; }
+        .page-btn.active { background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; border-color:#991b1b; }
+        .page-btn.disabled { opacity:.45; pointer-events:none; }
+        .page-ellipsis { color:#999; padding:0 4px; font-weight:700; }
         body.dark-mode { background:#1a1a1a; color:#e0e0e0; }
         body.dark-mode .topbar,body.dark-mode .summary-card,body.dark-mode .class-card,body.dark-mode .mini-stat { background:#1f1f1f; color:#e5e5e5; border-color:#333; }
         body.dark-mode .topbar { background:#2a2a2a; border-bottom-color:#3a3a3a; }
@@ -83,6 +91,10 @@
         body.dark-mode .darkmode-toggle { background:#2a2a2a; border-color:#3a3a3a; color:#e8e8e8; }
         body.dark-mode .darkmode-toggle:hover { background:rgba(220,38,38,.2); color:#ff6b6b; border-color:rgba(220,38,38,.3); }
         body.dark-mode .topbar-badge { background:rgba(220,38,38,.15); border-color:rgba(220,38,38,.3); color:#ff6b6b; }
+        body.dark-mode .page-btn { background:#2a2a2a; border-color:#3a3a3a; color:#e5e5e5; }
+        body.dark-mode .page-btn:hover { background:rgba(220,38,38,.2); color:#ff6b6b; border-color:rgba(220,38,38,.3); }
+        body.dark-mode .page-btn.active { background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; border-color:#991b1b; }
+        body.dark-mode .pagination-meta, body.dark-mode .empty-state { color:#aaa; }
         @media (max-width:900px) { .sidebar { transform:translateX(-100%); } .sidebar.mobile-open { transform:translateX(0); } .main-content,.main-content.expanded { margin-left:0; } .page-content { padding:20px 14px; } }
     </style>
 </head>
@@ -183,10 +195,10 @@
             </div>
         </div>
         <div class="summary-grid">
-            <div class="summary-card"><div class="summary-num">{{ $classes->count() }}</div><div class="summary-label">Classes</div></div>
-            <div class="summary-card"><div class="summary-num">{{ $classes->sum('student_count') }}</div><div class="summary-label">Students</div></div>
+            <div class="summary-card"><div class="summary-num">{{ $classes->total() }}</div><div class="summary-label">Classes</div></div>
+            <div class="summary-card"><div class="summary-num">{{ $totalStudents }}</div><div class="summary-label">Students</div></div>
             <div class="summary-card"><div class="summary-num">{{ $categoryCount }}</div><div class="summary-label">Required Categories</div></div>
-            <div class="summary-card"><div class="summary-num">{{ $classes->sum('complete_count') }}</div><div class="summary-label">Complete Students</div></div>
+            <div class="summary-card"><div class="summary-num">{{ $totalCompleteStudents }}</div><div class="summary-label">Complete Students</div></div>
         </div>
 
         @if($classes->isEmpty())
@@ -222,6 +234,28 @@
                     </article>
                 @endforeach
             </div>
+            @if($classes->hasPages())
+                <div class="pagination-wrap">
+                    <div class="pagination-meta">
+                        Showing {{ $classes->firstItem() }} to {{ $classes->lastItem() }} of {{ $classes->total() }} classes
+                    </div>
+                    <div class="pagination-nav">
+                        <a href="{{ $classes->previousPageUrl() ?: '#' }}" class="page-btn {{ $classes->onFirstPage() ? 'disabled' : '' }}">
+                            <i class="fa fa-chevron-left"></i>
+                        </a>
+                        @for($page = 1; $page <= $classes->lastPage(); $page++)
+                            @if($page === $classes->currentPage())
+                                <span class="page-btn active">{{ $page }}</span>
+                            @else
+                                <a href="{{ $classes->url($page) }}" class="page-btn">{{ $page }}</a>
+                            @endif
+                        @endfor
+                        <a href="{{ $classes->nextPageUrl() ?: '#' }}" class="page-btn {{ $classes->hasMorePages() ? '' : 'disabled' }}">
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            @endif
         @endif
     </main>
 </div>
