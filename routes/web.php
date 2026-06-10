@@ -145,6 +145,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::get('/professor/analytics/drilldown',[AuthController::class,'professorAnalyticsDrilldown'])->name('professor.analytics.drilldown');
     Route::get('/professor/analytics/export/csv',[AuthController::class,'professorAnalyticsExportCsv'])->name('professor.analytics.export.csv');
     Route::get('/professor/analytics/export/pdf',[AuthController::class,'professorAnalyticsExportPdf'])->name('professor.analytics.export.pdf');
+    Route::get('/professor/analytics/print',[AuthController::class,'professorAnalyticsPrint'])->name('professor.analytics.print');
     Route::match(['get', 'post'], '/professor/login',[AuthController::class, 'logout']);
     Route::get('/professor/accountinfo', [AccountInfo::class,'profAcc']);
     Route::put('/professor/edit/{id}', [AccountInfo::class,'edit']);

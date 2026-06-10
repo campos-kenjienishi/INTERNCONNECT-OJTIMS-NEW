@@ -987,6 +987,150 @@ class AuthController extends Controller
         ));
     }
 
+    public function professorAnalyticsPrint()
+    {
+        $data = [];
+        if (Session::has('loginId')) {
+            $data = User::where('id', Session::get('loginId'))->first();
+        }
+
+        if (!$data) {
+            return redirect('/login');
+        }
+
+        $professor = Professor::where('user_id', $data->id)->first();
+        $classrooms = Classes::where('adviser_name', $data->full_name)->get();
+        $classIds = $classrooms->pluck('id')->all();
+
+        $students = User::with('studentInfo')
+            ->where('role', 0)
+            ->whereHas('studentInfo', function ($query) use ($classIds, $data) {
+                $query->whereIn('class_id', $classIds)
+                    ->orWhere(function ($legacy) use ($data) {
+                        $legacy->whereNull('class_id')
+                            ->where('adviser_name', $data->full_name);
+                    });
+            })
+            ->get();
+
+        $totalStudents = $students->count();
+        $approvedStudents = $students->where('status', 1)->count();
+        $pendingApprovals = $students->where('status', 3)->count();
+        $deniedStudents = $students->where('status', 2)->count();
+        $inactiveStudents = $students->where('status', 0)->count();
+
+        $classAnalytics = $classrooms->map(function ($room) use ($students) {
+            $roomStudents = $students->filter(function ($student) use ($room) {
+                return (string) optional($student->studentInfo)->class_id === (string) $room->id;
+            });
+
+            $requestTotal = OjtEvaluationRequest::where('class_id', $room->id)->count();
+            $submitted = OjtEvaluationRequest::where('class_id', $room->id)->where('status', 'submitted')->count();
+
+            return [
+                'label' => $room->room,
+                'total_students' => $roomStudents->count(),
+                'submitted' => $submitted,
+                'requests' => $requestTotal,
+                'completion' => $requestTotal > 0 ? round(($submitted / $requestTotal) * 100) : 0,
+            ];
+        })->values();
+
+        $requestStats = OjtEvaluationRequest::whereIn('class_id', $classIds)
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+
+        $requestTotal = array_sum($requestStats);
+        $sentRequests = $requestStats['sent'] ?? 0;
+        $openedRequests = $requestStats['opened'] ?? 0;
+        $submittedRequests = $requestStats['submitted'] ?? 0;
+        $expiredRequests = $requestStats['expired'] ?? 0;
+        $cancelledRequests = $requestStats['cancelled'] ?? 0;
+
+        $requestAnalytics = [
+            ['label' => 'Sent', 'count' => $sentRequests, 'class' => 'blue'],
+            ['label' => 'Opened', 'count' => $openedRequests, 'class' => 'amber'],
+            ['label' => 'Submitted', 'count' => $submittedRequests, 'class' => 'green'],
+            ['label' => 'Expired', 'count' => $expiredRequests, 'class' => 'red'],
+            ['label' => 'Cancelled', 'count' => $cancelledRequests, 'class' => 'purple'],
+        ];
+
+        $templateCount = FileCategory::when($professor, function ($query) use ($professor) {
+            $query->where('professor_id', $professor->id);
+        })->count();
+
+        $profFileStats = FileRequirement::where('adviser', $data->full_name)
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+
+        $filePending = $profFileStats[0] ?? 0;
+        $fileApproved = $profFileStats[1] ?? 0;
+        $fileDenied = $profFileStats[2] ?? 0;
+
+        $monthlyActivity = collect(range(5, 0))->map(function ($offset) use ($classIds) {
+            $month = Carbon::now()->subMonths($offset);
+            $start = $month->copy()->startOfMonth();
+            $end = $month->copy()->endOfMonth();
+
+            return [
+                'label' => $month->format('M Y'),
+                'submitted' => OjtEvaluationRequest::whereIn('class_id', $classIds)->whereBetween('submitted_at', [$start, $end])->count(),
+                'sent' => OjtEvaluationRequest::whereIn('class_id', $classIds)->whereBetween('emailed_at', [$start, $end])->count(),
+            ];
+        })->values();
+
+        $maxSubmitted = max(1, (int) $monthlyActivity->max('submitted'));
+        $maxSent = max(1, (int) $monthlyActivity->max('sent'));
+
+        $monthlyActivity = $monthlyActivity->map(function ($item) use ($maxSubmitted, $maxSent) {
+            return [
+                'label' => $item['label'],
+                'submitted' => $item['submitted'],
+                'sent' => $item['sent'],
+                'submitted_percentage' => round(($item['submitted'] / $maxSubmitted) * 100),
+                'sent_percentage' => round(($item['sent'] / $maxSent) * 100),
+            ];
+        })->values();
+
+        $analyticsInsights = $this->buildProfessorAnalyticsInsights(
+            $classAnalytics,
+            $requestAnalytics,
+            $totalStudents,
+            $approvedStudents,
+            $pendingApprovals,
+            $submittedRequests,
+            $requestTotal,
+            $filePending,
+            $fileApproved,
+            $fileDenied,
+            $monthlyActivity
+        );
+
+        return view('professor.analytics_print', compact(
+            'data',
+            'classrooms',
+            'classAnalytics',
+            'requestAnalytics',
+            'totalStudents',
+            'approvedStudents',
+            'pendingApprovals',
+            'deniedStudents',
+            'inactiveStudents',
+            'requestTotal',
+            'submittedRequests',
+            'templateCount',
+            'filePending',
+            'fileApproved',
+            'fileDenied',
+            'monthlyActivity',
+            'analyticsInsights'
+        ));
+    }
+
     // JSON endpoint for AJAX-driven charting and filters
     public function professorAnalyticsData(Request $request)
     {

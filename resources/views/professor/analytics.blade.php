@@ -215,6 +215,30 @@
             border-radius: 20px; padding: 6px 14px;
             font-size: 12.5px; font-weight: 600; color: var(--red-dark);
         }
+        .analytics-print-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 1px solid #fecaca;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.16);
+            transition: transform .2s, box-shadow .2s, filter .2s;
+        }
+        .analytics-print-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.03);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.22);
+        }
+        .analytics-print-btn:focus-visible {
+            outline: 3px solid rgba(220,38,38,.18);
+            outline-offset: 2px;
+        }
 
         body.dark-mode .topbar { background: #252525; border-bottom: 1px solid #3a3a3a; }
         body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
@@ -228,7 +252,14 @@
         }
         .page-header h1 { font-size: 26px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         .page-header h1 span { color: var(--red); }
-        .page-header p { font-size: 13.5px; color: #888; margin-top: 4px; }
+            .page-header p { font-size: 13.5px; color: #888; margin-top: 4px; }
+        .analytics-print {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.05);
+            border-radius: 10px;
+            box-shadow: 0 2px 14px rgba(0,0,0,.06);
+            overflow: hidden;
+        }
         .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888; margin-top: 6px; }
         .breadcrumb a { color: var(--red); text-decoration: none; }
 
@@ -299,6 +330,8 @@
         .fill.amber { background: linear-gradient(90deg, #f59e0b, #b45309); }
         .fill.purple { background: linear-gradient(90deg, #a78bfa, #6d28d9); }
 
+        #print-area-wrapper { display: none; }
+
         .month-row {
             display: grid;
             grid-template-columns: 96px 1fr;
@@ -320,11 +353,16 @@
         }
 
         @media print {
-            .sidebar, .topbar, .no-print { display: none !important; }
-            .main-content { margin-left: 0 !important; }
-            .page-content { padding: 0 !important; }
-            .panel { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+            @page { size: A4 portrait; margin: 14mm; }
+            body > *:not(#print-area-wrapper) { display: none !important; }
+            #print-area-wrapper { display: block !important; }
+            #print-area-wrapper, #print-area-wrapper * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
             body { background: #fff !important; }
+            .analytics-print { color: #111827; font-family: 'Poppins', sans-serif; }
+            .analytics-print * { box-sizing: border-box; }
         }
 
         /* Loading spinner for buttons */
@@ -430,15 +468,21 @@
         <div class="page-header">
             <div>
                 <h1>Professor <span>Analytics</span></h1>
-                <p>Class load, evaluation progress, and requirement review insights for your advisees.</p>
+                <p>Advising load, student standing, and file requirement trends for your advisees.</p>
                 <div class="breadcrumb">
                     <a href="{{ url('/professor/home') }}"><i class="fa fa-home"></i> Dashboard</a>
                     <i class="fa fa-chevron-right" style="font-size:10px;"></i>
                     <span>Analytics</span>
                 </div>
             </div>
-            <div class="topbar-badge" style="margin-top:6px;">
-                <i class="fa fa-sync-alt"></i> Updated {{ now()->format('M d, Y') }}
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:6px;">
+                <button type="button" id="printBtn" aria-label="Print analytics report" class="analytics-print-btn">
+                    <i class="fa fa-print"></i>
+                    <span>Print Report</span>
+                </button>
+                <div class="topbar-badge">
+                    <i class="fa fa-sync-alt"></i> Updated {{ now()->format('M d, Y') }}
+                </div>
             </div>
         </div>
 
@@ -459,17 +503,24 @@
             </div>
             <div class="stat-card">
                 <div class="stat-card-left">
+                    <div class="stat-num">{{ $approvedStudents }}</div>
+                    <div class="stat-name">Approved Students</div>
+                </div>
+                <div class="stat-icon-box green"><i class="fa fa-user-check"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-left">
                     <div class="stat-num">{{ $pendingApprovals }}</div>
-                    <div class="stat-name">Pending Approvals</div>
+                    <div class="stat-name">Pending Students</div>
                 </div>
                 <div class="stat-icon-box amber"><i class="fa fa-hourglass-half"></i></div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-left">
-                    <div class="stat-num">{{ $submittedRequests }}</div>
-                    <div class="stat-name">Submitted Evaluations</div>
+                    <div class="stat-num">{{ $deniedStudents }}</div>
+                    <div class="stat-name">Denied Students</div>
                 </div>
-                <div class="stat-icon-box green"><i class="fa fa-star"></i></div>
+                <div class="stat-icon-box red"><i class="fa fa-user-times"></i></div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-left">
@@ -480,18 +531,64 @@
             </div>
             <div class="stat-card">
                 <div class="stat-card-left">
+                    <div class="stat-num">{{ $fileApproved }}</div>
+                    <div class="stat-name">Approved Files</div>
+                </div>
+                <div class="stat-icon-box green"><i class="fa fa-check-circle"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-left">
                     <div class="stat-num">{{ $filePending }}</div>
                     <div class="stat-name">Pending Files</div>
                 </div>
                 <div class="stat-icon-box amber"><i class="fa fa-file-alt"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-left">
+                    <div class="stat-num">{{ $fileDenied }}</div>
+                    <div class="stat-name">Denied Files</div>
+                </div>
+                <div class="stat-icon-box red"><i class="fa fa-times-circle"></i></div>
             </div>
         </div>
 
         <div class="analytics-grid">
             <div class="panel">
                 <div class="panel-head">
-                    <h2>Class Load</h2>
-                    <p>Students, requests, and completion rate per class</p>
+                    <h2>Student Standing</h2>
+                    <p>Adviser-side breakdown of student approval status</p>
+                </div>
+                <div class="panel-body">
+                    <div class="metric-list">
+                        @php
+                            $studentMetrics = [
+                                ['label' => 'Approved students', 'count' => $approvedStudents, 'class' => 'green'],
+                                ['label' => 'Pending students', 'count' => $pendingApprovals, 'class' => 'amber'],
+                                ['label' => 'Denied students', 'count' => $deniedStudents, 'class' => 'red'],
+                                ['label' => 'Inactive students', 'count' => $inactiveStudents, 'class' => 'blue'],
+                            ];
+                            $studentTotal = max(1, $approvedStudents + $pendingApprovals + $deniedStudents + $inactiveStudents);
+                        @endphp
+                        @foreach($studentMetrics as $metric)
+                            <div>
+                                <div class="metric-row">
+                                    <div>
+                                        <div class="metric-title">{{ $metric['label'] }}</div>
+                                        <div class="metric-meta">{{ $metric['count'] }} students</div>
+                                    </div>
+                                    <div class="metric-percent">{{ round(($metric['count'] / $studentTotal) * 100) }}%</div>
+                                </div>
+                                <div class="track"><div class="fill {{ $metric['class'] }}" data-width="{{ round(($metric['count'] / $studentTotal) * 100) }}"></div></div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-head">
+                    <h2>Class Overview</h2>
+                    <p>Student load and submitted evaluation activity per class</p>
                 </div>
                 <div class="panel-body">
                     <div class="metric-list">
@@ -509,29 +606,6 @@
                         @empty
                             <div class="metric-meta">No classes found for your account.</div>
                         @endforelse
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-head">
-                    <h2>Evaluation Requests</h2>
-                    <p>Status breakdown for sent evaluation links</p>
-                </div>
-                <div class="panel-body">
-                    <div class="metric-list">
-                        @foreach($requestAnalytics as $metric)
-                            <div>
-                                <div class="metric-row">
-                                    <div>
-                                        <div class="metric-title">{{ $metric['label'] }}</div>
-                                        <div class="metric-meta">{{ $metric['count'] }} requests</div>
-                                    </div>
-                                    <div class="metric-percent">{{ $requestTotal > 0 ? round(($metric['count'] / $requestTotal) * 100) : 0 }}%</div>
-                                </div>
-                                <div class="track"><div class="fill {{ $metric['class'] }}" data-width="{{ $requestTotal > 0 ? round(($metric['count'] / $requestTotal) * 100) : 0 }}"></div></div>
-                            </div>
-                        @endforeach
                     </div>
                 </div>
             </div>
@@ -569,35 +643,202 @@
 
             <div class="panel full">
                 <div class="panel-head">
-                    <h2>Monthly Activity</h2>
-                    <p>Evaluation links sent and submitted over the last six months</p>
+                    <h2>Analytics Insight</h2>
+                    <p>Quick read of the current advising snapshot</p>
                 </div>
                 <div class="panel-body">
-                    <div class="no-print" style="width:100%; margin-bottom: 12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-                        <select id="classFilter" aria-label="Filter by class" style="min-width:220px; padding:8px; border-radius:8px; border:1px solid #e5e7eb;">
-                            <option value="">All classes</option>
-                            @foreach($classrooms as $c)
-                                <option value="{{ $c->id }}">{{ $c->room }}</option>
-                            @endforeach
-                        </select>
-                        <label style="font-size:13px;color:#666;">
-                            From
-                            <input type="month" id="startMonth" aria-label="Start month filter" style="margin-left:8px;padding:6px;border-radius:6px;border:1px solid #e5e7eb;">
-                        </label>
-                        <label style="font-size:13px;color:#666;">
-                            To
-                            <input type="month" id="endMonth" aria-label="End month filter" style="margin-left:8px;padding:6px;border-radius:6px;border:1px solid #e5e7eb;">
-                        </label>
-                        <button id="applyFilters" type="button" aria-label="Apply analytics filters" class="btn" style="background:#ef4444;color:#fff;border-radius:8px;padding:8px 12px;border:none;display:inline-flex;align-items:center;">
-                            <span class="btn-label">Apply</span>
-                            <span class="ic-spinner" style="display:none;"></span>
-                        </button>
-                        <button type="button" id="exportCsvBtn" aria-label="Export analytics as CSV" class="btn" style="background:#0f766e;color:#fff;border-radius:8px;padding:8px 12px;border:none;">CSV</button>
-                        <button type="button" id="exportPdfBtn" aria-label="Export analytics as PDF" class="btn" style="background:#1d4ed8;color:#fff;border-radius:8px;padding:8px 12px;border:none;">PDF</button>
-                        <button type="button" id="printBtn" aria-label="Print analytics report" class="btn" style="background:#6b7280;color:#fff;border-radius:8px;padding:8px 12px;border:none;">Print</button>
+                    <p style="font-size:14px; line-height:1.7; color:#374151; margin-bottom:16px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                            <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
+                            <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                @forelse(($analyticsInsights['key_findings'] ?? []) as $item)
+                                    <li>{{ $item }}</li>
+                                @empty
+                                    <li>No key findings available.</li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                            <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
+                            <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                @forelse(($analyticsInsights['watchouts'] ?? []) as $item)
+                                    <li>{{ $item }}</li>
+                                @empty
+                                    <li>No major watchouts detected.</li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                            <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
+                            <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                @forelse(($analyticsInsights['recommendations'] ?? []) as $item)
+                                    <li>{{ $item }}</li>
+                                @empty
+                                    <li>No actions suggested.</li>
+                                @endforelse
+                            </ul>
+                        </div>
                     </div>
-                    <div style="width:100%;">
-                        <canvas id="monthlyActivityChart" role="img" aria-label="Monthly activity chart showing sent and submitted requests" style="width:100%;height:260px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@php
+    $analyticsPrintStudentMetrics = [
+        ['label' => 'Approved students', 'count' => $approvedStudents, 'class' => 'green'],
+        ['label' => 'Pending students', 'count' => $pendingApprovals, 'class' => 'amber'],
+        ['label' => 'Denied students', 'count' => $deniedStudents, 'class' => 'red'],
+        ['label' => 'Inactive students', 'count' => $inactiveStudents, 'class' => 'blue'],
+    ];
+    $analyticsPrintFileMetrics = [
+        ['label' => 'Approved files', 'count' => $fileApproved, 'class' => 'green'],
+        ['label' => 'Pending files', 'count' => $filePending, 'class' => 'amber'],
+        ['label' => 'Denied files', 'count' => $fileDenied, 'class' => 'red'],
+    ];
+@endphp
+
+<div id="print-area-wrapper">
+    <div class="analytics-print">
+        <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); color:#fff;">
+            <div style="height:4px; background:rgba(255,255,255,.16);"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 22px; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:14px; min-width:0;">
+                    <div style="width:50px; height:50px; border-radius:10px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:36px; height:36px; object-fit:contain;">
+                    </div>
+                    <div style="min-width:0;">
+                        <div style="font-size:6.5px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,.6); margin-bottom:3px;">Polytechnic University of the Philippines - OJT Information Management System</div>
+                        <div style="font-size:15px; font-weight:800; line-height:1.15;">Professor Analytics Report</div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,.68); margin-top:3px;">{{ $data->full_name }} | Professor Portal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding:10px 22px; border-bottom:1px solid #e5e7eb; background:#f8f9fa; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div style="display:flex; flex-wrap:wrap; gap:14px; font-size:9.5px; color:#374151;">
+                <div><span style="color:#6b7280;">Classes:</span> <strong>{{ $classrooms->count() }}</strong></div>
+                <div><span style="color:#6b7280;">Students:</span> <strong>{{ $totalStudents }}</strong></div>
+                <div><span style="color:#6b7280;">Approved:</span> <strong>{{ $approvedStudents }}</strong></div>
+                <div><span style="color:#6b7280;">File Categories:</span> <strong>{{ $templateCount }}</strong></div>
+            </div>
+            <div style="font-size:8.5px; color:#9ca3af;">Generated: {{ now()->format('M d, Y h:i A') }}</div>
+        </div>
+
+        <div style="padding:8px 22px 4px;">
+            <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Professor Snapshot</div>
+        </div>
+
+        <div style="padding:14px 22px 22px;">
+            <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; margin-bottom:16px;">
+                    <div style="border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $totalStudents }}</div>
+                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Total Advisees</div>
+                    </div>
+                    <div style="border:1px solid #e5e7eb; border-left:4px solid #2563eb; border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $classrooms->count() }}</div>
+                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Active Classes</div>
+                    </div>
+                    <div style="border:1px solid #e5e7eb; border-left:4px solid #16a34a; border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $approvedStudents }}</div>
+                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Approved Students</div>
+                    </div>
+                    <div style="border:1px solid #e5e7eb; border-left:4px solid #7c3aed; border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $templateCount }}</div>
+                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">File Categories</div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; margin-bottom:14px;">
+                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
+                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Student Standing</div>
+                        <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                            <thead>
+                                <tr style="background:#f9fafb;">
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th>
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($analyticsPrintStudentMetrics as $metric)
+                                    <tr>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['label'] }}</td>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['count'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
+                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Class Overview</div>
+                        <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                            <thead>
+                                <tr style="background:#f9fafb;">
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Class</th>
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th>
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Submitted</th>
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Completion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($classAnalytics as $room)
+                                    <tr>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['label'] }}</td>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['total_students'] }}</td>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['submitted'] }}</td>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['completion'] }}%</td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" style="padding:8px; border:1px solid #e5e7eb; text-align:center;">No classes found.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px;">
+                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
+                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Requirement Review</div>
+                        <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                            <thead>
+                                <tr style="background:#f9fafb;">
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th>
+                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($analyticsPrintFileMetrics as $metric)
+                                    <tr>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['label'] }}</td>
+                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['count'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
+                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Analytics Insight</div>
+                        <p style="font-size:11px; line-height:1.7; color:#374151; margin-bottom:10px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
+                        <div style="font-size:10px; color:#6b7280; line-height:1.6;">This report focuses on the current adviser snapshot, student standing, class overview, and file requirements.</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:16px; border-top:1px dashed #d1d5db; padding-top:14px;">
+                    <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                        <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px;">Disclaimer</div>
+                        <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.</div>
+                    </div>
+                    <div style="margin-top:10px; background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:13px; height:13px; object-fit:contain; opacity:.7;">
+                            <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">Polytechnic University of the Philippines - InternConnect OJT IMS</span>
+                        </div>
+                        <div style="font-size:8px; color:rgba(255,255,255,.5);">Ref: ANA-RPT-{{ now()->year }}</div>
                     </div>
                 </div>
             </div>
@@ -658,7 +899,7 @@
 
             const datasets = [
                 {
-                    label: 'Sent',
+                    label: 'Evaluation Requests Sent',
                     data: sentData,
                     borderColor: '#2563eb',
                     backgroundColor: 'rgba(37,99,235,0.08)',
@@ -668,7 +909,7 @@
                     fill: true,
                 },
                 {
-                    label: 'Submitted',
+                    label: 'Evaluation Responses Submitted',
                     data: submittedData,
                     borderColor: '#16a34a',
                     backgroundColor: 'rgba(16,163,74,0.08)',
@@ -771,27 +1012,175 @@
             }
         });
 
-        function buildProfessorExportUrl(type) {
-            const classId = document.getElementById('classFilter')?.value || '';
-            const startMonth = document.getElementById('startMonth')?.value || '';
-            const endMonth = document.getElementById('endMonth')?.value || '';
-            const routeBase = type === 'pdf' ? "{{ route('professor.analytics.export.pdf') }}" : "{{ route('professor.analytics.export.csv') }}";
-            const url = new URL(routeBase, window.location.origin);
-            if (classId) url.searchParams.set('class_id', classId);
-            if (startMonth) url.searchParams.set('start', startMonth + '-01');
-            if (endMonth) url.searchParams.set('end', endMonth + '-01');
-            return url.toString();
+        function escapeHtml(text) {
+            return String(text ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
-        document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
-            window.location.href = buildProfessorExportUrl('csv');
-        });
+        const analyticsPrintData = {
+            title: 'Professor Analytics Report',
+            subtitle: @json($data->full_name),
+            summary: @json($analyticsInsights['summary'] ?? 'No insight available.'),
+            generatedAt: @json(now()->format('M d, Y h:i A')),
+            totalStudents: @json($totalStudents),
+            classCount: @json($classrooms->count()),
+            submittedRequests: @json($submittedRequests),
+            templateCount: @json($templateCount),
+            classAnalytics: @json($classAnalytics),
+            requestAnalytics: @json($requestAnalytics),
+            fileMetrics: @json($analyticsPrintFileMetrics),
+        };
 
-        document.getElementById('exportPdfBtn')?.addEventListener('click', () => {
-            window.location.href = buildProfessorExportUrl('pdf');
-        });
+        function buildAnalyticsPrintHTML() {
+            const classRows = analyticsPrintData.classAnalytics.map(room => `
+                <tr>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${escapeHtml(room.label)}</td>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${room.total_students ?? 0}</td>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${room.submitted ?? 0}</td>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${room.completion ?? 0}%</td>
+                </tr>
+            `).join('');
 
-        document.getElementById('printBtn')?.addEventListener('click', () => window.print());
+            const requestRows = analyticsPrintData.requestAnalytics.map(metric => `
+                <tr>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${escapeHtml(metric.label)}</td>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${metric.count ?? 0}</td>
+                </tr>
+            `).join('');
+
+            const fileRows = analyticsPrintData.fileMetrics.map(metric => `
+                <tr>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${escapeHtml(metric.label)}</td>
+                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${metric.count ?? 0}</td>
+                </tr>
+            `).join('');
+
+            return `
+                <div class="analytics-print" style="font-family:Poppins,Arial,sans-serif;color:#111827;">
+                    <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;">
+                        <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%);color:#fff;padding:18px 22px;">
+                            <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.7);font-weight:700;">Polytechnic University of the Philippines - OJT Information Management System</div>
+                            <div style="font-size:22px;font-weight:800;line-height:1.15;margin-top:4px;">${escapeHtml(analyticsPrintData.title)}</div>
+                            <div style="font-size:11px;color:rgba(255,255,255,.82);margin-top:4px;">${escapeHtml(analyticsPrintData.subtitle)}</div>
+                        </div>
+                        <div style="padding:14px 22px;border-bottom:1px solid #e5e7eb;background:#f9fafb;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;">
+                            <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:#374151;line-height:1.6;">
+                                <div><span style="color:#6b7280;">Scope:</span> <strong>${escapeHtml(analyticsPrintData.subtitle)}</strong></div>
+                                <div><span style="color:#6b7280;">Students:</span> <strong>${analyticsPrintData.totalStudents}</strong></div>
+                                <div><span style="color:#6b7280;">Submitted:</span> <strong>${analyticsPrintData.submittedRequests}</strong></div>
+                                <div><span style="color:#6b7280;">Generated:</span> <strong>${escapeHtml(analyticsPrintData.generatedAt)}</strong></div>
+                            </div>
+                            <div style="font-size:10px;color:#9ca3af;">Analytics snapshot</div>
+                        </div>
+                        <div style="padding:18px 22px 22px;">
+                            <div style="border:1px solid #e5e7eb;border-left:4px solid #dc2626;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+                                <div style="font-size:12px;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Report Summary</div>
+                                <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;">
+                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.totalStudents}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">Total Advisees</div></div>
+                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.classCount}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">Active Classes</div></div>
+                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.submittedRequests}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">Submitted Evaluations</div></div>
+                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.templateCount}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">File Categories</div></div>
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;">
+                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
+                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Student Standing</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10px;">
+                                        <thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Status</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Count</th></tr></thead>
+                                        <tbody>
+                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Approved students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">{{ $approvedStudents }}</td></tr>
+                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Pending students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">{{ $pendingApprovals }}</td></tr>
+                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Denied students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">{{ $deniedStudents }}</td></tr>
+                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Inactive students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">{{ $inactiveStudents }}</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
+                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Class Overview</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10px;">
+                                        <thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Class</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Students</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Submitted</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Completion</th></tr></thead>
+                                        <tbody>${classRows || '<tr><td colspan="4" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No classes found.</td></tr>'}</tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">
+                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
+                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Requirement Review</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10px;">
+                                        <thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Status</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Count</th></tr></thead>
+                                        <tbody>${fileRows}</tbody>
+                                    </table>
+                                </div>
+                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
+                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Analytics Insight</div>
+                                    <div style="font-size:11px;line-height:1.7;color:#374151;margin-bottom:10px;">${escapeHtml(analyticsPrintData.summary)}</div>
+                                    <div style="font-size:10px;color:#6b7280;line-height:1.6;">This printed report focuses on the current adviser snapshot, student standing, class overview, and file requirements.</div>
+                                </div>
+                            </div>
+                            <div style="margin-top:16px;border-top:1px dashed #d1d5db;padding-top:14px;">
+                                <div style="background:#f8fafc;border:1px solid #e5e7eb;border-left:4px solid #dc2626;border-radius:8px;padding:12px 14px;">
+                                    <div style="font-size:9px;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;">Disclaimer</div>
+                                    <div style="font-size:8.5px;color:#4b5563;line-height:1.6;">This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.</div>
+                                </div>
+                                <div style="margin-top:10px;background:#7f0000;padding:8px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:13px;height:13px;object-fit:contain;opacity:.7;">
+                                        <span style="font-size:8px;color:rgba(255,255,255,.75);font-weight:500;">Polytechnic University of the Philippines - InternConnect OJT IMS</span>
+                                    </div>
+                                    <div style="font-size:8px;color:rgba(255,255,255,.5);">Ref: ANA-RPT-${new Date().getFullYear()}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const analyticsPrintUrl = @json(route('professor.analytics.print'));
+
+        document.getElementById('printBtn')?.addEventListener('click', function () {
+            const frame = document.createElement('iframe');
+            frame.style.position = 'fixed';
+            frame.style.right = '0';
+            frame.style.bottom = '0';
+            frame.style.width = '0';
+            frame.style.height = '0';
+            frame.style.border = '0';
+            frame.style.opacity = '0';
+            frame.setAttribute('aria-hidden', 'true');
+            frame.src = analyticsPrintUrl;
+
+            let cleanedUp = false;
+            const cleanup = function () {
+                if (cleanedUp) {
+                    return;
+                }
+                cleanedUp = true;
+                window.removeEventListener('afterprint', cleanup);
+                if (frame.parentNode) {
+                    frame.parentNode.removeChild(frame);
+                }
+            };
+
+            frame.onload = function () {
+                setTimeout(function () {
+                    if (frame.contentWindow) {
+                        frame.contentWindow.focus();
+                        frame.contentWindow.print();
+                        window.addEventListener('afterprint', cleanup, { once: true });
+                        setTimeout(cleanup, 1500);
+                    } else {
+                        cleanup();
+                    }
+                }, 150);
+            };
+
+            document.body.appendChild(frame);
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && drilldownModal && drilldownModal.style.display === 'flex') {
