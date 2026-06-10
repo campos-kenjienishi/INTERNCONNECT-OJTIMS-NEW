@@ -94,7 +94,6 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');
     Route::post('/sendFile', [MOAUploadController::class,'sendFiles']);
     Route::get('/send/download/{file}', [MOAUploadController::class, 'downloadFile'])->name('download.file');
-    Route::get('/moa/print/{file}', [MOAUploadController::class, 'printFile'])->name('moa.print');
     Route::post('/status/{studentNum}', [StudentController::class,'update']);
     Route::get('/studentLists', [StudentController::class,'StuList']);
     Route::get('/ojt-report', [OJTController::class, 'showForm'])->name('ojt.report.form');

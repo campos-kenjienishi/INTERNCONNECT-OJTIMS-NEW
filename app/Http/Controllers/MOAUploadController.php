@@ -168,34 +168,6 @@ public function view($id)
     return response()->json(['message' => 'File not found'], 404);
 }
 
-public function printFile($file)
-{
-    $fileRecord = Company::where('file', $file)->first();
-
-    if (!$fileRecord) {
-        return response()->json(['message' => 'File not found'], 404);
-    }
-
-    if ($fileRecord->valid_until && now()->gt($fileRecord->valid_until)) {
-        return response()->json(['message' => 'File has expired'], 403);
-    }
-
-    if (!$this->isReadableMoaFile($fileRecord)) {
-        return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 422);
-    }
-
-    $filePath = public_path('assets/' . $file);
-
-    if (!file_exists($filePath)) {
-        return response()->json(['message' => 'File not found'], 404);
-    }
-
-    return response()->file($filePath, [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
-    ]);
-}
-
 public function printData(Company $company)
 {
     // Load the company's data along with its students
