@@ -68,15 +68,13 @@
         .page-btn:hover { background: #fee2e2; color: var(--red); border-color: #fecaca; }
         .page-btn.active { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border-color: #991b1b; }
         .page-btn.disabled { opacity: .45; pointer-events: none; }
-        .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .entries-form {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 12px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            background: #fff;
+            padding: 0;
+            border: none;
+            background: transparent;
         }
         .entries-form label {
             font-size: 12px;
@@ -87,7 +85,7 @@
         .entries-form select {
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 6px 10px;
+            padding: 5px 10px;
             font-family: 'Poppins', sans-serif;
             font-size: 12.5px;
             color: #333;
@@ -108,6 +106,10 @@
         .report-head { padding: 18px 22px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fafafa; }
         .report-head h2 { font-size: 16px; font-weight: 700; }
         .report-head p { font-size: 12px; color: #777; margin-top: 2px; }
+        .report-head-left { display: grid; gap: 4px; }
+        .report-head-meta { display: grid; gap: 8px; justify-items: end; }
+        .report-generated { font-size: 12px; color: #777; }
+        .report-filter-row { display: flex; justify-content: flex-end; }
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 920px; table-layout: fixed; }
         th { background: #fff; color: #555; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; padding: 12px 14px; border-bottom: 1px solid #eee; }
@@ -124,11 +126,14 @@
         .metric-pill span { display: block; color: #777; font-size: 10.5px; margin-top: 3px; text-transform: uppercase; letter-spacing: .3px; }
         .metric-pill.good strong { color: #16a34a; }
         .metric-pill.warn strong { color: #dc2626; }
-        .requirement-menu-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .requirement-menu-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
         .requirement-menu-toggle {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            min-width: 0;
             padding: 8px 10px;
             border-radius: 8px;
             border: 1px solid #e5e7eb;
@@ -139,6 +144,7 @@
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
+            overflow: hidden;
         }
         .requirement-menu-toggle.submitted { border-color: #bbf7d0; color: #15803d; background: #f0fdf4; }
         .requirement-menu-toggle.missing { border-color: #fecaca; color: #b91c1c; background: #fff5f5; }
@@ -157,6 +163,12 @@
             background: rgba(255,255,255,.8);
             font-size: 11px;
             font-weight: 800;
+            flex-shrink: 0;
+        }
+        .requirement-menu-toggle .label {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .print-requirement-lists { display: none; }
         .requirement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 7px; }
@@ -244,11 +256,11 @@
         body.dark-mode .topbar { background: #2a2a2a; border-bottom-color: #3a3a3a; }
         body.dark-mode .page-header h1, body.dark-mode .report-head h2, body.dark-mode .summary-num { color: #fff; }
         body.dark-mode .matrix-pagination { background: #1f1f1f; border-top-color: #333; }
+        body.dark-mode .report-generated { color: #aaa; }
         body.dark-mode .pagination-meta { color: #aaa; }
         body.dark-mode .page-btn { background: #2a2a2a; border-color: #3a3a3a; color: #e5e5e5; }
         body.dark-mode .page-btn:hover { background: rgba(220,38,38,.2); color: #ff6b6b; border-color: rgba(220,38,38,.3); }
         body.dark-mode .page-btn.active { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border-color: #991b1b; }
-        body.dark-mode .entries-form { background: #1f1f1f; border-color: #333; }
         body.dark-mode .entries-form label { color: #ddd; }
         body.dark-mode .entries-form select { background: #2a2a2a; color: #e5e5e5; border-color: #3a3a3a; }
         body.dark-mode .darkmode-toggle { background: #2a2a2a; border-color: #3a3a3a; color: #e8e8e8; }
@@ -406,18 +418,6 @@
                 <p>{{ $course->course }} | {{ $course->room }} | {{ $course->school_year_start && $course->school_year_end ? $course->school_year_start . ' - ' . $course->school_year_end : 'School year not set' }}</p>
             </div>
             <div class="toolbar">
-                <form method="get" action="{{ route('professor.requirementStatus', $course->id) }}" class="entries-form">
-                    @if($activeView !== 'overview')
-                        <input type="hidden" name="view" value="{{ $activeView }}">
-                    @endif
-                    <label for="perPageSelect">Show</label>
-                    <select id="perPageSelect" name="per_page" onchange="this.form.submit()">
-                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
-                        <option value="25" {{ request('per_page', 10) == 25 ? 'selected' : '' }}>25</option>
-                        <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>50</option>
-                    </select>
-                    <label for="perPageSelect">entries</label>
-                </form>
                 <a href="{{ route('professor.requirementStatus.classes') }}" class="btn-tool"><i class="fa fa-arrow-left"></i> Classes</a>
                 <button type="button" class="btn-tool primary" id="printReportBtn"><i class="fa fa-print"></i> Print</button>
             </div>
@@ -440,11 +440,27 @@
 
         <section class="report-card">
             <div class="report-head">
-                <div>
+                <div class="report-head-left">
                     <h2>Student Requirement Matrix</h2>
                     <p>Submitted and missing requirements are based on the current professor file categories.</p>
                 </div>
-                <p>Generated: {{ now()->format('M d, Y h:i A') }}</p>
+                <div class="report-head-meta">
+                    <p class="report-generated">Generated: {{ now()->format('M d, Y h:i A') }}</p>
+                    <div class="report-filter-row">
+                        <form method="get" action="{{ route('professor.requirementStatus', $course->id) }}" class="entries-form">
+                            @if($activeView !== 'overview')
+                                <input type="hidden" name="view" value="{{ $activeView }}">
+                            @endif
+                            <label for="perPageSelect">Show</label>
+                            <select id="perPageSelect" name="per_page" onchange="this.form.submit()">
+                                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('per_page', 10) == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>50</option>
+                            </select>
+                            <label for="perPageSelect">entries</label>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="table-wrap">
                 <table>
@@ -490,7 +506,7 @@
                                             data-empty-text="No submitted requirements yet."
                                             data-student-name="{{ e($status['student']->full_name) }}"
                                             data-requirements='@json($status["passed"]->values()->all())'>
-                                            <i class="fa fa-eye"></i> View Submitted <span class="count">{{ $status['submittedCount'] }}</span>
+                                            <i class="fa fa-eye"></i> <span class="label">View Submitted</span> <span class="count">{{ $status['submittedCount'] }}</span>
                                         </button>
                                         <button type="button"
                                             class="requirement-menu-toggle missing requirement-modal-trigger"
@@ -499,7 +515,7 @@
                                             data-empty-text="Complete"
                                             data-student-name="{{ e($status['student']->full_name) }}"
                                             data-requirements='@json($status["missing"]->values()->all())'>
-                                            <i class="fa fa-eye"></i> View Missing <span class="count">{{ $status['missingCount'] }}</span>
+                                            <i class="fa fa-eye"></i> <span class="label">View Missing</span> <span class="count">{{ $status['missingCount'] }}</span>
                                         </button>
                                     </div>
                                     <div class="print-requirement-lists">
@@ -577,7 +593,7 @@
                                             data-empty-text="No {{ $activeView }} requirements found."
                                             data-student-name="{{ e($status['student']->full_name) }}"
                                             data-requirements='@json($status[$activeView]->values()->all())'>
-                                            <i class="fa fa-{{ $focusedIcon }}"></i> View {{ ucfirst($activeView) }} <span class="count">{{ $status[$activeView]->count() }}</span>
+                                            <i class="fa fa-{{ $focusedIcon }}"></i> <span class="label">View {{ ucfirst($activeView) }}</span> <span class="count">{{ $status[$activeView]->count() }}</span>
                                         </button>
                                         <div class="print-requirement-lists">
                                             <div class="requirement-grid">
