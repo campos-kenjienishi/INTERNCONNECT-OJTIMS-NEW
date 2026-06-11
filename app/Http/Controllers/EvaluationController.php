@@ -543,6 +543,13 @@ class EvaluationController extends Controller
         $requestRow->supervisor_name = $validated['supervisor_name'];
         $requestRow->save();
 
+        AuditLogger::log(
+            'Evaluation',
+            'submit',
+            'Supervisor submitted evaluation for student: ' . ($requestRow->student_name ?: ('Student ID ' . $requestRow->student_id)),
+            $requestRow->student_id
+        );
+
         return redirect()->route('evaluation.form.thankyou');
     }
 
@@ -679,6 +686,13 @@ class EvaluationController extends Controller
 
         $signaturePreview = $this->buildSignaturePreviewDataUri($requestRow->evaluation->signature_path);
 
+        AuditLogger::log(
+            'Evaluation',
+            'view',
+            'Professor viewed submitted evaluation for student: ' . ($requestRow->student_name ?: optional($student)->full_name),
+            $user->id
+        );
+
         return view('evaluations.detail', [
             'requestRow' => $requestRow,
             'evaluation' => $requestRow->evaluation,
@@ -715,6 +729,13 @@ class EvaluationController extends Controller
             ->latest('id')
             ->get();
 
+        AuditLogger::log(
+            'Evaluation',
+            'view',
+            'Professor viewed evaluation history for student: ' . $student->full_name,
+            $user->id
+        );
+
         return view('professor.evaluation_history', [
             'data' => $user,
             'student' => $student,
@@ -747,6 +768,19 @@ class EvaluationController extends Controller
 
         $students = $studentsQuery->get();
         $studentIds = $students->pluck('id')->all();
+        $selectedClass = !empty($selectedClassId)
+            ? Classes::where('id', $selectedClassId)->where('adviser_name', $user->full_name)->first()
+            : null;
+        $scopeLabel = $selectedClass
+            ? ($selectedClass->room . ' - ' . $selectedClass->course)
+            : 'All adviser classes';
+
+        AuditLogger::log(
+            'Evaluation Report',
+            'export',
+            'Professor exported evaluation CSV for scope: ' . $scopeLabel . ' (' . $students->count() . ' students)',
+            $user->id
+        );
 
         if (empty($studentIds)) {
             $filename = 'evaluation-monitoring-' . now()->format('Ymd-His') . '.csv';
@@ -822,6 +856,19 @@ class EvaluationController extends Controller
             ->latest('id')
             ->get()
             ->groupBy('student_id');
+        $selectedClass = !empty($selectedClassId)
+            ? $classrooms->firstWhere('id', $selectedClassId)
+            : null;
+        $scopeLabel = $selectedClass
+            ? ($selectedClass->room . ' - ' . $selectedClass->course)
+            : 'All adviser classes';
+
+        AuditLogger::log(
+            'Evaluation Report',
+            'print',
+            'Professor generated evaluation print report for scope: ' . $scopeLabel . ' (' . $students->count() . ' students)',
+            $user->id
+        );
 
         return view('professor.evaluation_print', [
             'data' => $user,

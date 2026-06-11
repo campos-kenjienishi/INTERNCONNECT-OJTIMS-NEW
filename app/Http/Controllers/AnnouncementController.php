@@ -84,6 +84,13 @@ class AnnouncementController extends Controller
 
         $data->save();
 
+        AuditLogger::log(
+            'Announcements',
+            'Create',
+            'Posted announcement: ' . $data->title . ($audience === 'class' ? ' for ' . $targetCourse . ' - ' . $targetRoom : ' for all students'),
+            $user->id
+        );
+
         return redirect()->back();
 
     }
@@ -104,7 +111,15 @@ class AnnouncementController extends Controller
             ->where('announcer', $user->full_name)
             ->firstOrFail();
 
+        $title = $announcement->title;
         $announcement->delete();
+
+        AuditLogger::log(
+            'Announcements',
+            'Delete',
+            'Deleted announcement: ' . $title,
+            $user->id
+        );
 
         return redirect()->back()->with('success', 'Announcement deleted successfully.');
     }
@@ -130,9 +145,17 @@ class AnnouncementController extends Controller
             ->where('announcer', $user->full_name)
             ->firstOrFail();
 
+        $oldTitle = $announcement->title;
         $announcement->title = $request->title;
         $announcement->content = $request->content;
         $announcement->save();
+
+        AuditLogger::log(
+            'Announcements',
+            'Update',
+            'Updated announcement: ' . $oldTitle . ' -> ' . $announcement->title,
+            $user->id
+        );
 
         return redirect()->back()->with('success', 'Announcement updated successfully.');
     }

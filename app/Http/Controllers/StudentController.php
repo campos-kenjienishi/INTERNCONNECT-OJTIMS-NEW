@@ -292,9 +292,14 @@ public function home()
 public function join(Request $request, $email, $classId)
     {
         $user = User::where('email', $email)->first();
+        $class = Classes::find($classId);
 
         if (!$user) {
             return back()->with('error', 'User not found.');
+        }
+
+        if (!$class) {
+            return back()->with('error', 'Class not found.');
         }
     
     
@@ -309,7 +314,7 @@ public function join(Request $request, $email, $classId)
         AuditLogger::log(
             'Student Account',
             'join',
-            'Student joined a room',
+            'Student joined class: ' . $class->room . ' (' . $class->course . ')',
             $user->id
         );   
         return back()->with('success', 'You have updated the information successfully!');
@@ -327,6 +332,13 @@ public function join(Request $request, $email, $classId)
             }
 
             // Just change the status to "not joined"
+            $studentProfile = Student::where('user_id', $user->id)->first();
+            $class = null;
+
+            if ($studentProfile && !empty($studentProfile->class_id)) {
+                $class = Classes::find($studentProfile->class_id);
+            }
+
             $user->status = 0;
             if (Schema::hasColumn('students', 'class_id')) {
                 Student::where('user_id', $user->id)->update(['class_id' => null]);
@@ -336,7 +348,9 @@ public function join(Request $request, $email, $classId)
             AuditLogger::log(
                 'Student Account',
                 'leave',
-                'Student left a room',
+                $class
+                    ? ('Student left class: ' . $class->room . ' (' . $class->course . ')')
+                    : 'Student left class',
                 $user->id
             );
             return response()->json(['success' => true]);

@@ -202,12 +202,19 @@
         .count-badge { display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 5px 14px; font-size: 12.5px; font-weight: 700; }
 
         /* DataTables */
-        .table-card-body .dataTables_wrapper { padding: 16px 22px; font-family: 'Poppins', sans-serif; font-size: 13px; overflow-x: auto; }
+        .table-card-body .dataTables_wrapper {
+            width: 100%;
+            max-width: 100%;
+            padding: 16px 22px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+        }
         .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; min-width: 1000px; }
         .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap; }
         .table-card-body table.dataTable tbody td { padding: 11px 12px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
+        .dataTables_filter label { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: #555; }
         .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; }
         .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }
         .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; }
@@ -275,6 +282,7 @@
         body.dark-mode table.dataTable thead th { background: #2a2a2a; color: #aaa; border-bottom: 1px solid #3a3a3a; }
         body.dark-mode table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         body.dark-mode table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
+        body.dark-mode .dataTables_filter label { color: #e0e0e0 !important; }
         body.dark-mode .dataTables_filter input { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
         body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
         body.dark-mode .dataTables_length select { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
@@ -379,9 +387,33 @@
 
 /* ── Scroll container ── */
 .table-card-body {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     position: relative;
+}
+
+.table-card-body .table-scroll {
+    width: 100%;
+}
+
+.table-card-body .dataTables_length,
+.table-card-body .dataTables_filter,
+.table-card-body .dataTables_info,
+.table-card-body .dataTables_paginate {
+    width: auto;
+    max-width: 100%;
+}
+
+.table-card-body .dataTables_scroll {
+    width: 100%;
+}
+
+.table-card-body .dataTables_scrollHead,
+.table-card-body .dataTables_scrollBody {
+    width: 100% !important;
+}
+
+.table-card-body .dataTables_scrollBody {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table-card-body table.dataTable {
@@ -718,58 +750,60 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
             </div>
 
             <div class="table-card-body">
-                <table id="fileTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Company Name</th>
-                            <th>Company Address</th>
-                            <th>Nature of Business</th>
-                            <th>Nature of Linkages</th>
-                            <th>Level</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Reporting Time</th>
-                            <th>Contact Name</th>
-                            <th>Position</th>
-                            <th>Contact No.</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($studentData as $data)
-                            @if(isset($data['ojt']) && $data['ojt'])
+                <div class="table-scroll">
+                    <table id="fileTable" class="display" style="width:100%">
+                        <thead>
                             <tr>
-                                <td>
-                                    <div class="name-cell">
-                                        <div class="name-avatar">{{ strtoupper(substr($data['student']->full_name, 0, 1)) }}</div>
-                                        <span class="name-text">{{ $data['student']->full_name }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="display:flex; align-items:center; gap:5px;">
-                                        <i class="fa fa-building" style="color:var(--red); font-size:11px;"></i>
-                                        {{ $data['ojt']->company_name }}
-                                    </div>
-                                </td>
-                                <td class="company-address-cell" style="max-width:160px; word-break:break-word; font-size:12.5px;">{{ $data['ojt']->company_address }}</td>
-                                <td>{{ $data['ojt']->nature_of_bus }}</td>
-                                <td>{{ $data['ojt']->nature_of_link }}</td>
-                                <td>
-                                <span class="level-badge">
-                                {{ Str::limit($data['ojt']->level, 15) }}
-                                </span>
-                                </td>
-                                <td><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date }}</span></td>
-                                <td><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date }}</span></td>
-                                <td class="report-time-cell" style="white-space:nowrap;"><i class="fa fa-clock" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->report_time }}</td>
-                                <td style="font-weight:600;">{{ $data['ojt']->contact_name }}</td>
-                                <td class="position-cell" style="font-size:12.5px;">{{ $data['ojt']->contact_position }}</td>
-                                <td style="white-space:nowrap;"><i class="fa fa-phone" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->contact_number }}</td>
+                                <th>Student Name</th>
+                                <th>Company Name</th>
+                                <th>Company Address</th>
+                                <th>Nature of Business</th>
+                                <th>Nature of Linkages</th>
+                                <th>Level</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Reporting Time</th>
+                                <th>Contact Name</th>
+                                <th>Position</th>
+                                <th>Contact No.</th>
                             </tr>
-                            @endif
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($studentData as $data)
+                                @if(isset($data['ojt']) && $data['ojt'])
+                                <tr>
+                                    <td>
+                                        <div class="name-cell">
+                                            <div class="name-avatar">{{ strtoupper(substr($data['student']->full_name, 0, 1)) }}</div>
+                                            <span class="name-text">{{ $data['student']->full_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <i class="fa fa-building" style="color:var(--red); font-size:11px;"></i>
+                                            {{ $data['ojt']->company_name }}
+                                        </div>
+                                    </td>
+                                    <td class="company-address-cell" style="max-width:160px; word-break:break-word; font-size:12.5px;">{{ $data['ojt']->company_address }}</td>
+                                    <td>{{ $data['ojt']->nature_of_bus }}</td>
+                                    <td>{{ $data['ojt']->nature_of_link }}</td>
+                                    <td>
+                                    <span class="level-badge">
+                                    {{ Str::limit($data['ojt']->level, 15) }}
+                                    </span>
+                                    </td>
+                                    <td><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date }}</span></td>
+                                    <td><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date }}</span></td>
+                                    <td class="report-time-cell" style="white-space:nowrap;"><i class="fa fa-clock" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->report_time }}</td>
+                                    <td style="font-weight:600;">{{ $data['ojt']->contact_name }}</td>
+                                    <td class="position-cell" style="font-size:12.5px;">{{ $data['ojt']->contact_position }}</td>
+                                    <td style="white-space:nowrap;"><i class="fa fa-phone" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->contact_number }}</td>
+                                </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -869,7 +903,11 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
 
     /* ── DataTable ── */
     $(document).ready(function () {
-        $('#fileTable').DataTable({ order: [] });
+        $('#fileTable').DataTable({
+            order: [],
+            scrollX: true,
+            autoWidth: false
+        });
     });
 
     /* ── Dynamic end year options ── */

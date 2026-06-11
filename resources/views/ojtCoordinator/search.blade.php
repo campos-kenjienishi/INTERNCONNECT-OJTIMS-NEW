@@ -220,7 +220,7 @@
                                 </td>
 
                                 <td>
-                                    <form action="{{url('/remove',$data->id)}}" method="post" enctype="multipart/form-data">
+                                    <form action="{{url('/remove',$data->id)}}" method="post" enctype="multipart/form-data" class="legacy-remove-form" data-template-name="{{ e($data->name) }}">
                                         @csrf
                                             <button type="submit" style="background-color: red;border-radius: 12px;padding: 5px 10px;border-color : red;color:white;font-family: 'Poppins', sans-serif;text-decoration:none;">
                                                 Remove
@@ -245,17 +245,49 @@
                 
 
     <!-- =========== Scripts =========  -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/main.js"></script>
 
     <!-- ====== ionicons ======= -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+<script>
+    document.querySelectorAll('.legacy-remove-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const templateName = form.dataset.templateName || 'this template';
+            const proceed = function () { form.submit(); };
+
+            if (typeof Swal === 'undefined') {
+                if (window.confirm('Remove ' + templateName + '? This cannot be undone.')) {
+                    proceed();
+                }
+                return;
+            }
+
+            Swal.fire({
+                title: 'Remove template?',
+                html: 'This will permanently delete <strong>' + templateName + '</strong>.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, remove it',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    proceed();
+                }
+            });
+        });
+    });
+</script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 
 </html>
-
-
 
 
 

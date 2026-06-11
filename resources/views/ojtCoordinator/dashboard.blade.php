@@ -1405,7 +1405,7 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                                                 data-announcement-action="{{ route('announcements.update', $announcement->id) }}">
                                             <i class="fa fa-pen"></i> Edit
                                         </button>
-                                        <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');" style="display:inline;">
+                                        <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" class="delete-announcement-form" data-announcement-title="{{ e($announcement->title) }}" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-delete-announcement">
@@ -1481,6 +1481,7 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
 </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -1506,6 +1507,38 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         overlay.addEventListener('click', function () {
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
+        });
+
+        document.querySelectorAll('.delete-announcement-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const title = form.dataset.announcementTitle || 'this announcement';
+                const proceed = function () { form.submit(); };
+
+                if (typeof Swal === 'undefined') {
+                    if (window.confirm('Delete "' + title + '"? This cannot be undone.')) {
+                        proceed();
+                    }
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Delete announcement?',
+                    html: 'This will permanently delete <strong>' + title + '</strong>.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, delete it',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        proceed();
+                    }
+                });
+            });
         });
 
         /* ══════════════════════════════════════════════

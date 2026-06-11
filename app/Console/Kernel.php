@@ -13,6 +13,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('app:delete-old-users')->daily(); // Corrected command signature
+
+        if (config('audit.prune_enabled', true)) {
+            $schedule->command('app:prune-audit-logs')
+                ->dailyAt('01:30')
+                ->withoutOverlapping();
+        }
     }
 
     /**

@@ -184,7 +184,13 @@ class ReportsController extends Controller
                         }
 
             $reportInsights = $this->buildStudentReportInsights($studentData, $coursed);
-                        
+            
+        AuditLogger::log(
+            'Reports',
+            'Generate',
+            'Generated Student OJT Information report for ' . ($coursed ?: 'all courses') . ' (' . ($selectedSchoolYear ?: 'all school years') . ')',
+            Session::get('loginId') ?? null
+        );
     
         // Pass the course variable to the view
             return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSchoolYear'));
@@ -238,6 +244,13 @@ class ReportsController extends Controller
 
     // Send email with print contents
     Mail::to($email)->send(new PrintContentsEmail($studentData));
+
+    AuditLogger::log(
+        'Reports',
+        'Send Email',
+        'Sent Student OJT Information report to ' . $email,
+        Session::get('loginId') ?? null
+    );
 
     return back()->with(['message' => 'Email sent successfully']);
 }
@@ -297,6 +310,13 @@ public function reportsExpired()
     ->where('course', $validatedData['course'])
     ->get();
 
+    AuditLogger::log(
+        'Reports',
+        'Generate',
+        'Generated MOA report for ' . $validatedData['course'] . ' (' . $startYear . '-' . $endYear . ')',
+        Session::get('loginId') ?? null
+    );
+
     return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user','course'));
 }
 
@@ -326,6 +346,13 @@ public function sendEmailExpired(Request $request)
     $reportInsights = $this->buildMoaReportInsights($companies, $course);
 
     Mail::to($email)->send(new MOAReportEmail($companies, $students));
+
+    AuditLogger::log(
+        'Reports',
+        'Send Email',
+        'Sent MOA report to ' . $email . ($course ? ' for ' . $course : ''),
+        Session::get('loginId') ?? null
+    );
 
     return back()->with(['message' => 'Email sent successfully', 'reportInsights' => $reportInsights]);
 }
@@ -434,6 +461,13 @@ public function reportsExpiredProf()
     $companies = $this->annotateMoaFileStatus($companies);
 
     $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
+
+    AuditLogger::log(
+        'Reports',
+        'Generate',
+        'Generated professor MOA report for ' . $validatedData['course'] . ' (' . $startYear . '-' . $endYear . ')',
+        Session::get('loginId') ?? null
+    );
 
     return view('professor.expiredMOAReports', compact('companies', 'students', 'user','courseAll', 'reportInsights'));
 }

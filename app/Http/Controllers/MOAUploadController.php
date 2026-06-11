@@ -131,6 +131,13 @@ public function view($id)
     
         try {
             Mail::to($request->email)->send(new SendFileNotif($attachmentPath, $file->file));
+
+            AuditLogger::log(
+                'MOA Upload',
+                'Send',
+                'Sent MOA file for company: ' . $file->company_name . ' to ' . $request->email,
+                Session::get('loginId') ?? null
+            );
     
             return back()->with('success', 'Email sent with file attachment.');
         } catch (\Exception $e) {

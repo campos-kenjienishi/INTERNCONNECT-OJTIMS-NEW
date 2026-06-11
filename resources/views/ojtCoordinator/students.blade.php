@@ -592,12 +592,14 @@
             background: rgba(220,38,38,0.1);
         }
 
+        .dataTables_filter label { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: #555; }
         .dataTables_filter input {
             border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
             padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important;
             font-size: 13px !important; outline: none !important;
         }
 
+        body.dark-mode .dataTables_filter label { color: #e0e0e0 !important; }
         body.dark-mode .dataTables_filter input {
             background: #3a3a3a !important;
             border: 1px solid #3a3a3a !important;

@@ -109,7 +109,7 @@
                                             @endif
 
                                             @if(!in_array($row->status, ['submitted', 'cancelled']))
-                                                <form action="{{ route('student.evaluation.cancel', ['requestId' => $row->id]) }}" method="POST" class="no-print" onsubmit="return confirm('Cancel this evaluation request?');">
+                                                <form action="{{ route('student.evaluation.cancel', ['requestId' => $row->id]) }}" method="POST" class="no-print cancel-evaluation-form" data-supervisor-email="{{ $row->supervisor_email }}">
                                                     @csrf
                                                     <button type="submit" class="btn-eval btn-eval-danger">
                                                         <i class="fa fa-ban"></i> Cancel
@@ -131,6 +131,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         (function () {
             const form = document.getElementById('sendEvaluationForm');
@@ -158,6 +159,40 @@
                     }
                     confirmInput.value = '1';
                 }
+            });
+        })();
+
+        (function () {
+            document.querySelectorAll('.cancel-evaluation-form').forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const email = form.dataset.supervisorEmail || 'this supervisor';
+                    const proceed = function () { form.submit(); };
+
+                    if (typeof Swal === 'undefined') {
+                        if (window.confirm('Cancel this evaluation request for ' + email + '?')) {
+                            proceed();
+                        }
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Cancel evaluation request?',
+                        html: 'This will cancel the request sent to <strong>' + email + '</strong>.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Yes, cancel it',
+                        cancelButtonText: 'Keep it',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            proceed();
+                        }
+                    });
+                });
             });
         })();
     </script>

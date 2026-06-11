@@ -1255,7 +1255,7 @@
                                             data-announcement-action="{{ route('announcements.update', $announcement->id) }}">
                                         <i class="fa fa-pen"></i> Edit
                                     </button>
-                                    <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" onsubmit="return confirm('Delete this announcement? This cannot be undone.');" style="display:inline;">
+                                    <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" class="delete-announcement-form" data-announcement-title="{{ e($announcement->title) }}" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-delete-announcement">
@@ -1442,6 +1442,30 @@
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
+    });
+
+    document.querySelectorAll('.delete-announcement-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const title = form.dataset.announcementTitle || 'this announcement';
+
+            Swal.fire({
+                title: 'Delete announcement?',
+                html: 'This will permanently delete <strong>' + title + '</strong>.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="fa fa-trash"></i> Yes, delete it',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
     });
 
     $(document).ready(function () {

@@ -58,6 +58,10 @@
     background: #7f0000;
     color: #fff;
 }
+body.swal2-shown .voice-guide-btn,
+body.swal2-shown .voice-mic-button {
+    display: none !important;
+}
 @media (max-width: 600px) {
     .voice-guide-btn { right: 12px; bottom: 90px; }
 }
@@ -182,6 +186,10 @@ window.addEventListener('click', function(e) {
 
     function isEligibleField(field) {
         if (!field || field.dataset.voiceMicSkip === "true") {
+            return false;
+        }
+
+        if (field.closest(".swal2-container, .swal2-popup, #voiceInputGuideModal")) {
             return false;
         }
 
@@ -530,6 +538,9 @@ window.addEventListener('click', function(e) {
 
     function scanAndAttach(root) {
         var scope = root || document;
+        if (scope instanceof Element && scope.closest && scope.closest(".swal2-container, .swal2-popup, #voiceInputGuideModal")) {
+            return;
+        }
         var fields = scope.querySelectorAll(TARGET_SELECTOR);
         fields.forEach(attachMic);
     }
@@ -539,6 +550,10 @@ window.addEventListener('click', function(e) {
             mutations.forEach(function (mutation) {
                 mutation.addedNodes.forEach(function (node) {
                     if (!(node instanceof Element)) {
+                        return;
+                    }
+
+                    if (node.matches && node.matches(".swal2-container, .swal2-popup, #voiceInputGuideModal")) {
                         return;
                     }
 

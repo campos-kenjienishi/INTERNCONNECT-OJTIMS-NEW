@@ -259,6 +259,7 @@
         .table-card-body table.dataTable tbody tr:hover td:first-child { background: #fff5f5; }
         
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
+        .dataTables_filter label { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: #555; }
         .dataTables_filter input {
             border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
             padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important;
@@ -451,6 +452,7 @@
         body.dark-mode table.dataTable tbody tr:hover td:first-child { background: rgba(220,38,38,0.1); }
 
         /* DataTables controls */
+        body.dark-mode .dataTables_filter label { color: #e0e0e0 !important; }
         body.dark-mode .dataTables_filter input { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }
         body.dark-mode .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2) !important; }
         body.dark-mode .dataTables_length select { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1px solid #3a3a3a !important; }

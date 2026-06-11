@@ -374,6 +374,12 @@
         }
 
         .table-card-header-left { display: flex; align-items: center; gap: 12px; }
+        .table-card-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
 
         .header-icon {
             width: 38px; height: 38px;
@@ -389,6 +395,15 @@
 
         .table-card-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
         .table-card-header p  { font-size: 12.5px; color: #888; margin-top: 2px; }
+        .table-card-header .dataTables_filter { margin: 0; }
+        .table-card-header .dataTables_filter label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            color: #666;
+            font-weight: 600;
+        }
 
         .table-card-body { padding: 0; }
 
@@ -397,6 +412,71 @@
             padding: 16px 22px;
             font-family: 'Poppins', sans-serif;
             font-size: 13.5px;
+        }
+
+        .audit-filters {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .audit-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .audit-filter-label {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .audit-filter-select {
+            min-width: 150px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            color: #333;
+            background: #fff;
+            outline: none;
+        }
+
+        .audit-filter-select:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+        }
+
+        .audit-filter-date {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            color: #333;
+            background: #fff;
+            outline: none;
+        }
+
+        .audit-filter-date:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+        }
+
+        .audit-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .audit-toolbar .dataTables_length {
+            margin: 0;
         }
 
         .table-card-body table.dataTable {
@@ -501,6 +581,34 @@
             border: 1px solid #fecaca;
         }
 
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: capitalize;
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .role-student {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .role-coordinator {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .role-professor {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
         /* Name cell */
         .name-cell {
             display: flex;
@@ -522,6 +630,175 @@
         }
 
         .name-text { font-size: 13px; font-weight: 600; color: #000; }
+
+        .btn-view-desc {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #fecaca;
+            background: #fff5f5;
+            color: var(--red);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view-desc:hover {
+            background: #fee2e2;
+            transform: translateY(-1px);
+        }
+
+        .desc-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .desc-modal.show {
+            display: flex;
+        }
+
+        .desc-modal-card {
+            width: min(640px, 100%);
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.25);
+            overflow: hidden;
+            border: 1px solid rgba(220,38,38,0.12);
+        }
+
+        .desc-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            background: linear-gradient(135deg, #991b1b 0%, #dc2626 58%, #ef4444 100%);
+        }
+
+        .desc-modal-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .desc-modal-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.16);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+        }
+
+        .desc-modal-kicker {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 3px;
+        }
+
+        .desc-modal-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .desc-modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.14);
+            color: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .desc-modal-close:hover {
+            background: rgba(255,255,255,0.22);
+            transform: translateY(-1px);
+        }
+
+        .desc-modal-body {
+            padding: 22px;
+            background:
+                linear-gradient(180deg, rgba(254,242,242,0.78) 0%, rgba(255,255,255,1) 34%);
+        }
+
+        .desc-modal-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .desc-modal-meta-item {
+            background: linear-gradient(180deg, #fff 0%, #fff8f8 100%);
+            border: 1px solid #f3d2d2;
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 8px 18px rgba(220,38,38,0.06);
+        }
+
+        .desc-modal-meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #b91c1c;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .desc-modal-meta-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .desc-modal-content {
+            background: #fff;
+            border: 1px solid #f0d7d7;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.05);
+        }
+
+        .desc-modal-content-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            background: linear-gradient(90deg, #fff1f2 0%, #fff 100%);
+            border-bottom: 1px solid #f3d2d2;
+            color: #b91c1c;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .desc-modal-text {
+            padding: 18px;
+            line-height: 1.7;
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
 
         /* Date cell */
        .date-main { font-size: 13px; color: #000; font-weight: 500; }
@@ -606,6 +883,7 @@
         body.dark-mode .table-card-header { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
         body.dark-mode .table-card-header h2 { color: #fff; }
         body.dark-mode .table-card-header p { color: #999; }
+        body.dark-mode .table-card-header .dataTables_filter label { color: #cfcfcf; }
         body.dark-mode .file-count-badge { background: rgba(220,38,38,0.2); color: #ff6b6b; }
 
         /* DataTables */
@@ -620,6 +898,9 @@ body.dark-mode table.dataTable tbody td { color: #fff !important; border-bottom:
         body.dark-mode .dataTables_paginate .paginate_button { background: #3a3a3a !important; border-color: #3a3a3a !important; color: #e0e0e0 !important; }
         body.dark-mode .dataTables_paginate .paginate_button:hover { background: #444 !important; border-color: #444 !important; }
         body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; }
+        body.dark-mode .audit-filter-label { color: #cfcfcf; }
+        body.dark-mode .audit-filter-select { background: #3a3a3a; color: #e0e0e0; border-color: #4a4a4a; }
+        body.dark-mode .audit-filter-date { background: #3a3a3a; color: #e0e0e0; border-color: #4a4a4a; }
 
         /* Audit Log Table Cells */
         body.dark-mode .audit-date-cell { color: #fff !important; }
@@ -640,6 +921,19 @@ body.dark-mode table.dataTable tbody td { color: #fff !important; border-bottom:
         body.dark-mode .modal-footer { background: #2a2a2a; border-top: 1px solid #3a3a3a; }
         body.dark-mode .btn-modal-close { background: #3a3a3a; border: 1px solid #3a3a3a; color: #e0e0e0; }
         body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); }
+        body.dark-mode .btn-view-desc { background: rgba(220,38,38,0.15); border-color: rgba(220,38,38,0.25); color: #ff8a8a; }
+        body.dark-mode .btn-view-desc:hover { background: rgba(220,38,38,0.24); }
+        body.dark-mode .desc-modal-card { background: #2a2a2a; border-color: rgba(239,68,68,0.18); }
+        body.dark-mode .desc-modal-header { background: linear-gradient(135deg, #5f0f0f 0%, #991b1b 55%, #b91c1c 100%); border-bottom: 1px solid rgba(255,255,255,0.08); }
+        body.dark-mode .desc-modal-title { color: #fff; }
+        body.dark-mode .desc-modal-close { background: rgba(255,255,255,0.12); color: #e0e0e0; }
+        body.dark-mode .desc-modal-body { background: linear-gradient(180deg, rgba(127,29,29,0.28) 0%, #2a2a2a 32%); }
+        body.dark-mode .desc-modal-meta-item { background: linear-gradient(180deg, #333 0%, #2d2d2d 100%); border-color: #454545; box-shadow: none; }
+        body.dark-mode .desc-modal-meta-label { color: #fca5a5; }
+        body.dark-mode .desc-modal-meta-value,
+        body.dark-mode .desc-modal-text { color: #e0e0e0; }
+        body.dark-mode .desc-modal-content { background: #2f2f2f; border-color: #454545; box-shadow: none; }
+        body.dark-mode .desc-modal-content-head { background: linear-gradient(90deg, rgba(127,29,29,0.38) 0%, #2f2f2f 100%); border-bottom: 1px solid #454545; color: #fca5a5; }
 
         /* File dropzone */
         body.dark-mode .file-dropzone { border-color: #3a3a3a; background: #2a2a2a; }
@@ -692,6 +986,7 @@ body.dark-mode .dashboard-footer .footer-logo {
             .topbar-title { display: none; }
             .stats-row { grid-template-columns: 1fr 1fr; }
             .desc-text { max-width: 160px; }
+            .desc-modal-meta { grid-template-columns: 1fr 1fr; }
         }
         
     </style>
@@ -860,6 +1155,7 @@ body.dark-mode .dashboard-footer .footer-logo {
                         <p>Track all actions performed within the InternConnect system</p>
                     </div>
                 </div>
+                <div class="table-card-header-right" id="auditTableHeaderSearch"></div>
             </div>
 
             <div class="table-card-body">
@@ -867,9 +1163,95 @@ body.dark-mode .dashboard-footer .footer-logo {
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
-                        $('#auditTable').DataTable({
+                        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                            if (settings.nTable.id !== 'auditTable') {
+                                return true;
+                            }
+
+                            const rowNode = settings.aoData[dataIndex]?.nTr;
+                            if (!rowNode) {
+                                return true;
+                            }
+
+                            const selectedAction = ($('#actionFilter').val() || '').toLowerCase();
+                            const selectedRole = ($('#roleFilter').val() || '').toLowerCase();
+                            const selectedMonth = $('#monthFilter').val();
+                            const selectedYear = $('#yearFilter').val();
+                            const rowAction = (rowNode.getAttribute('data-action') || '').toLowerCase();
+                            const rowRole = (rowNode.getAttribute('data-role') || '').toLowerCase();
+                            const rowMonth = rowNode.getAttribute('data-month') || '';
+                            const rowYear = rowNode.getAttribute('data-year') || '';
+
+                            if (selectedAction && rowAction !== selectedAction) {
+                                return false;
+                            }
+
+                            if (selectedRole && rowRole !== selectedRole) {
+                                return false;
+                            }
+
+                            if (selectedMonth && rowMonth !== selectedMonth) {
+                                return false;
+                            }
+
+                            if (selectedYear && rowYear !== selectedYear) {
+                                return false;
+                            }
+
+                            return true;
+                        });
+
+                        const table = $('#auditTable').DataTable({
                             "order": [[0, 'desc']],
-                            "pageLength": 15,
+                            "pageLength": 10,
+                            "dom": '<"audit-toolbar"lf>rtip',
+                        });
+
+                        const $toolbar = $('#auditTable_wrapper .audit-toolbar');
+                        const $length = $toolbar.find('.dataTables_length');
+                        const $filter = $toolbar.find('.dataTables_filter');
+                        const $customFilters = $('#auditFilters');
+                        const $headerSearch = $('#auditTableHeaderSearch');
+
+                        $customFilters.insertAfter($length);
+                        $headerSearch.append($filter);
+
+                        $('#actionFilter, #roleFilter, #monthFilter, #yearFilter').on('change', function () {
+                            table.draw();
+                        });
+
+                        $(document).on('click', '.btn-view-desc', function () {
+                            const modal = document.getElementById('descModal');
+                            document.getElementById('descModalAction').textContent = $(this).data('action') || 'N/A';
+                            document.getElementById('descModalRole').textContent = $(this).data('role') || 'Unknown';
+                            document.getElementById('descModalModule').textContent = $(this).data('module') || 'N/A';
+                            document.getElementById('descModalDate').textContent = $(this).data('datetime') || 'N/A';
+                            document.getElementById('descModalText').textContent = $(this).data('description') || 'No description available.';
+                            modal.classList.add('show');
+                            document.body.style.overflow = 'hidden';
+                        });
+
+                        function closeDescModal() {
+                            $('#descModal').removeClass('show');
+                            document.body.style.overflow = '';
+                        }
+
+                        $('#descModalClose').on('click', function (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            closeDescModal();
+                        });
+
+                        $('#descModal').on('click', function (event) {
+                            if (event.target === this) {
+                                closeDescModal();
+                            }
+                        });
+
+                        $(document).on('keydown', function (event) {
+                            if (event.key === 'Escape' && $('#descModal').hasClass('show')) {
+                                closeDescModal();
+                            }
                         });
                     });
                 </script>
@@ -880,19 +1262,76 @@ body.dark-mode .dashboard-footer .footer-logo {
                         <p>No audit logs recorded yet.</p>
                     </div>
                 @else
+                <div class="audit-filters" id="auditFilters">
+                    <div class="audit-filter-group">
+                        <label for="actionFilter" class="audit-filter-label">Action</label>
+                        <select id="actionFilter" class="audit-filter-select">
+                            <option value="">All Actions</option>
+                            @foreach($logs->pluck('action')->filter()->map(fn ($action) => strtolower(trim($action)))->unique()->sort()->values() as $actionOption)
+                                <option value="{{ $actionOption }}">{{ ucfirst($actionOption) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="audit-filter-group">
+                        <label for="roleFilter" class="audit-filter-label">Role</label>
+                        <select id="roleFilter" class="audit-filter-select">
+                            <option value="">All Roles</option>
+                            @foreach($logs->pluck('user_role')->filter()->map(fn ($role) => strtolower(trim($role)))->unique()->sort()->values() as $roleOption)
+                                <option value="{{ $roleOption }}">{{ ucfirst($roleOption) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="audit-filter-group">
+                        <label for="monthFilter" class="audit-filter-label">Month</label>
+                        <select id="monthFilter" class="audit-filter-date">
+                            <option value="">All Months</option>
+                            @foreach([
+                                '01' => 'January',
+                                '02' => 'February',
+                                '03' => 'March',
+                                '04' => 'April',
+                                '05' => 'May',
+                                '06' => 'June',
+                                '07' => 'July',
+                                '08' => 'August',
+                                '09' => 'September',
+                                '10' => 'October',
+                                '11' => 'November',
+                                '12' => 'December',
+                            ] as $monthValue => $monthLabel)
+                                <option value="{{ $monthValue }}">{{ $monthLabel }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="audit-filter-group">
+                        <label for="yearFilter" class="audit-filter-label">Year</label>
+                        <select id="yearFilter" class="audit-filter-date">
+                            <option value="">All Years</option>
+                            @foreach($logs->pluck('created_at')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('Y'))->unique()->sortDesc()->values() as $yearOption)
+                                <option value="{{ $yearOption }}">{{ $yearOption }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <table id="auditTable" class="display" style="width:100%">
                     <thead>
                         <tr>
                             <th>Date / Time</th>
                             <th>Action</th>
                             <th>Name</th>
+                            <th>Role</th>
                             <th>Module</th>
                             <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($logs as $log)
-                        <tr>
+                        <tr
+                            data-action="{{ strtolower(trim((string) $log->action)) }}"
+                            data-role="{{ strtolower(trim((string) $log->user_role)) }}"
+                            data-month="{{ \Carbon\Carbon::parse($log->created_at)->format('m') }}"
+                            data-year="{{ \Carbon\Carbon::parse($log->created_at)->format('Y') }}"
+                        >
                             <td class="audit-date-cell" data-order="{{ \Carbon\Carbon::parse($log->created_at)->format('Y-m-d H:i:s') }}">
                                 <div class="date-main">
                                     {{ \Carbon\Carbon::parse($log->created_at)->format('M d, Y') }}
@@ -935,15 +1374,39 @@ body.dark-mode .dashboard-footer .footer-logo {
                                 </div>
                             </td>
                             <td>
+                                @php
+                                    $role = strtolower(trim((string) ($log->user_role ?? 'unknown')));
+                                    $roleClass = match($role) {
+                                        'student' => 'role-student',
+                                        'ojt coordinator', 'coordinator' => 'role-coordinator',
+                                        'professor' => 'role-professor',
+                                        default => '',
+                                    };
+                                @endphp
+                                <span class="role-badge {{ $roleClass }}">
+                                    <i class="fa fa-user-shield"></i>
+                                    {{ $log->user_role ?: 'Unknown' }}
+                                </span>
+                            </td>
+                            <td>
                                 <span class="module-badge">
                                     <i class="fa fa-tag"></i>
                                     {{ $log->module }}
                                 </span>
                             </td>
                             <td class="audit-desc-cell">
-                                <div class="desc-text" title="{{ $log->description }}">
-                                    {{ $log->description }}
-                                </div>
+                                <button
+                                    type="button"
+                                    class="btn-view-desc"
+                                    data-action="{{ ucfirst($log->action) }}"
+                                    data-role="{{ $log->user_role ?: 'Unknown' }}"
+                                    data-module="{{ $log->module }}"
+                                    data-datetime="{{ \Carbon\Carbon::parse($log->created_at)->format('M d, Y h:i A') }}"
+                                    data-description="{{ $log->description }}"
+                                >
+                                    <i class="fa fa-eye"></i>
+                                    View
+                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -954,6 +1417,38 @@ body.dark-mode .dashboard-footer .footer-logo {
             </div>
         </div>
 
+    </div>
+
+    <div class="desc-modal" id="descModal">
+        <div class="desc-modal-card">
+            <div class="desc-modal-header">
+                <div class="desc-modal-title">Audit Log Description</div>
+                <button type="button" class="desc-modal-close" id="descModalClose">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="desc-modal-body">
+                <div class="desc-modal-meta">
+                    <div class="desc-modal-meta-item">
+                        <div class="desc-modal-meta-label">Action</div>
+                        <div class="desc-modal-meta-value" id="descModalAction">N/A</div>
+                    </div>
+                    <div class="desc-modal-meta-item">
+                        <div class="desc-modal-meta-label">Role</div>
+                        <div class="desc-modal-meta-value" id="descModalRole">Unknown</div>
+                    </div>
+                    <div class="desc-modal-meta-item">
+                        <div class="desc-modal-meta-label">Module</div>
+                        <div class="desc-modal-meta-value" id="descModalModule">N/A</div>
+                    </div>
+                    <div class="desc-modal-meta-item">
+                        <div class="desc-modal-meta-label">Date / Time</div>
+                        <div class="desc-modal-meta-value" id="descModalDate">N/A</div>
+                    </div>
+                </div>
+                <div class="desc-modal-text" id="descModalText"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->

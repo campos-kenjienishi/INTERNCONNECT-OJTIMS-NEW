@@ -301,6 +301,12 @@ $res = $fileup->save();
         $voucher->uploader_name = $data->full_name;
         $voucher->save();
 
+        AuditLogger::log(
+            'MOA Upload',
+            'Create',
+            'Created MOA: ' . $com->company_name . ' (' . $com->school_year . ')',
+            Session::get('loginId') ?? null
+        );
 
     
 
