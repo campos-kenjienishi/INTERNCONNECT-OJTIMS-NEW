@@ -934,17 +934,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                                         aria-label="Edit MOA"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editCompanyModal"
-                                        data-company-id="{{ $company->id }}"
-                                        data-company-name="{{ e($company->company_name) }}"
-                                        data-company-address="{{ e($company->company_address) }}"
-                                        data-company-rep="{{ e($company->company_rep) }}"
-                                        data-company-no="{{ e($company->companyNo) }}"
-                                        data-company-email="{{ e($company->company_email) }}"
-                                        data-school-year-start="{{ trim($schoolYearStart) }}"
-                                        data-school-year-end="{{ trim($schoolYearEnd) }}"
-                                        data-course="{{ e($company->course) }}"
-                                        data-selected-students="{{ htmlspecialchars(json_encode($linkedStudentNames->values()->all()), ENT_QUOTES, 'UTF-8') }}"
-                                        data-manual-students="{{ htmlspecialchars(json_encode($manualStudentNames->values()->all()), ENT_QUOTES, 'UTF-8') }}">
+                                        onclick="openEditCompanyModal({{ $company->id }})">
                                         <i class="fa fa-pen"></i>
                                     </button>
 
@@ -1131,6 +1121,31 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         </div>
     </div>
 </div>
+
+@php
+    $companyEditPayload = $companies->mapWithKeys(function ($companyItem) {
+        $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($companyItem->student_names_display ?? '')))));
+        $linkedStudentNames = $companyItem->students->pluck('full_name')->filter()->values();
+        $manualStudentNames = $displayStudents->diff($linkedStudentNames)->values();
+        [$schoolYearStart, $schoolYearEnd] = array_pad(explode('-', (string) ($companyItem->school_year ?? '')), 2, '');
+
+        return [
+            $companyItem->id => [
+                'id' => $companyItem->id,
+                'company_name' => $companyItem->company_name,
+                'company_address' => $companyItem->company_address,
+                'company_rep' => $companyItem->company_rep,
+                'company_no' => $companyItem->companyNo,
+                'company_email' => $companyItem->company_email,
+                'school_year_start' => trim((string) $schoolYearStart),
+                'school_year_end' => trim((string) $schoolYearEnd),
+                'course' => $companyItem->course,
+                'selected_students' => $linkedStudentNames->all(),
+                'manual_students' => $manualStudentNames->all(),
+            ],
+        ];
+    });
+@endphp
 
 <!-- =============== EDIT COMPANY MODAL =============== -->
 <div class="modal fade" id="editCompanyModal" tabindex="-1" aria-hidden="true">
@@ -1323,6 +1338,8 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
+    const companyEditData = @json($companyEditPayload);
+
     // Sidebar toggle
     const sidebar     = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
@@ -1416,31 +1433,6 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         const filterAddStudents = setupStudentFilter('#moaCourseSelect', '#moaStudentSearch', '#moaStudentSelect', '#moaStudentHint');
         const filterEditStudents = setupStudentFilter('#editMoaCourseSelect', '#editMoaStudentSearch', '#editMoaStudentSelect', '#editMoaStudentHint');
 
-        $(document).on('click', '.btn-open-edit', function () {
-            const selectedStudents = JSON.parse($(this).attr('data-selected-students') || '[]');
-            const manualStudents = JSON.parse($(this).attr('data-manual-students') || '[]');
-            const companyId = $(this).attr('data-company-id') || '';
-
-            $('#editCompanyForm').attr('action', '/company/' + companyId);
-            $('#edit_company_name').val($(this).attr('data-company-name') || '');
-            $('#edit_company_address').val($(this).attr('data-company-address') || '');
-            $('#edit_company_rep').val($(this).attr('data-company-rep') || '');
-            $('#edit_company_no').val($(this).attr('data-company-no') || '');
-            $('#edit_company_email').val($(this).attr('data-company-email') || '');
-            $('#edit_school_year_start').val($(this).attr('data-school-year-start') || '');
-            $('#edit_school_year_end').val($(this).attr('data-school-year-end') || '');
-            $('#editMoaCourseSelect').val($(this).attr('data-course') || '');
-            $('#editMoaStudentSearch').val('');
-            $('#editManualStudentInput').val(Array.isArray(manualStudents) ? manualStudents.join(', ') : '');
-
-            filterEditStudents();
-
-            const selectedSet = new Set(Array.isArray(selectedStudents) ? selectedStudents : []);
-            Array.from(document.getElementById('editMoaStudentSelect').options).forEach(function (option) {
-                option.selected = selectedSet.has(option.value) && !option.disabled;
-            });
-        });
-
         // File validation error
         @if ($errors->has('file'))
             Swal.fire({
@@ -1485,6 +1477,39 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                 document.getElementById('remove-form-' + companyId).submit();
             }
         });
+    }
+
+    function openEditCompanyModal(companyId) {
+        const company = companyEditData[String(companyId)] || companyEditData[companyId];
+
+        if (!company) {
+            return;
+        }
+
+        $('#editCompanyForm').attr('action', '/company/' + company.id);
+        $('#edit_company_name').val(company.company_name || '');
+        $('#edit_company_address').val(company.company_address || '');
+        $('#edit_company_rep').val(company.company_rep || '');
+        $('#edit_company_no').val(company.company_no || '');
+        $('#edit_company_email').val(company.company_email || '');
+        $('#edit_school_year_start').val(company.school_year_start || '');
+        $('#edit_school_year_end').val(company.school_year_end || '');
+        $('#editMoaCourseSelect').val(company.course || '');
+        $('#editMoaStudentSearch').val('');
+        $('#editManualStudentInput').val(Array.isArray(company.manual_students) ? company.manual_students.join(', ') : '');
+
+        const courseSelect = document.getElementById('editMoaCourseSelect');
+        if (courseSelect) {
+            courseSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        const selectedSet = new Set(Array.isArray(company.selected_students) ? company.selected_students : []);
+        const studentSelect = document.getElementById('editMoaStudentSelect');
+        if (studentSelect) {
+            Array.from(studentSelect.options).forEach(function (option) {
+                option.selected = selectedSet.has(option.value) && !option.disabled;
+            });
+        }
     }
 
     // Print functions
