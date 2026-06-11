@@ -61,7 +61,12 @@ class PassDocuController extends Controller
 
         // Fetch only file categories created by this professor
         $professor = Professor::where('user_id', $data->id)->first();
-        $files = $professor ? FileCategory::where('professor_id', $professor->id)->get() : collect();
+        $files = $professor
+            ? FileCategory::where('professor_id', $professor->id)
+                ->get()
+                ->sortBy('fileName', SORT_NATURAL | SORT_FLAG_CASE)
+                ->values()
+            : collect();
 
         return view('professor.fileCategory', compact('data', 'userName', 'files'));
     }
@@ -112,6 +117,31 @@ class PassDocuController extends Controller
             null
         );
         return redirect()->back();
+    }
+
+    public function updateCategory(Request $request, $id)
+    {
+        $request->validate([
+            'fileName' => 'required|string|max:255',
+        ]);
+
+        $category = FileCategory::find($id);
+
+        if (!$category) {
+            return redirect()->back()->with('error', 'File category not found.');
+        }
+
+        $category->fileName = $request->fileName;
+        $category->save();
+
+        AuditLogger::log(
+            'FileCategory',
+            'Update',
+            'Updated file category: ' . $category->fileName,
+            Session::get('loginId') ?? null
+        );
+
+        return redirect()->back()->with('success', 'File category updated successfully.');
     }
 
 

@@ -400,6 +400,28 @@
     box-shadow: 0 6px 18px rgba(220,38,38,0.35);
 }
 
+.btn-edit {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border: none; border-radius: 8px; color: #fff;
+    font-family: 'Poppins', sans-serif; font-size: 12.5px;
+    font-weight: 600; cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 3px 10px rgba(37,99,235,0.25);
+}
+
+.btn-edit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
         /* =============== MODAL =============== */
         .modal-content {
             border-radius: 16px; border: none;
@@ -804,9 +826,19 @@
                                 </div>
                             </td>
                             <td>
-                                <button class="btn-remove remove-button" data-file-id="{{ $file->id }}">
-                                    <i class="fa fa-trash"></i> Remove
-                                </button>
+                                <div class="action-buttons">
+                                    <button
+                                        type="button"
+                                        class="btn-edit edit-button"
+                                        data-file-id="{{ $file->id }}"
+                                        data-file-name="{{ e($file->fileName) }}"
+                                    >
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                    <button class="btn-remove remove-button" data-file-id="{{ $file->id }}">
+                                        <i class="fa fa-trash"></i> Remove
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -835,6 +867,40 @@
         <a href="{{ url('/privacy') }}">Privacy Statement</a>
     </div>
 </footer>
+</div>
+
+<!-- =============== EDIT CATEGORY MODAL =============== -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-edit"></i> Edit File Category
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editCategoryForm" method="post" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <label class="modal-field-label">
+                        <i class="fa fa-folder"></i> Category Name
+                    </label>
+                    <input class="modal-field-input" type="text" name="fileName" id="editCategoryName"
+                           placeholder="e.g. Endorsement Letter, Daily Time Record..."
+                           required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn-modal-submit">
+                        <i class="fa fa-save me-1"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- =============== ADD CATEGORY MODAL =============== -->
@@ -902,6 +968,16 @@
     // Remove category
     $(document).ready(function () {
         $('#fileTable').DataTable();
+        const editCategoryModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+
+        $('.edit-button').on('click', function () {
+            const fileId = $(this).data('file-id');
+            const fileName = $(this).data('file-name');
+
+            $('#editCategoryForm').attr('action', '/fileCategory/' + fileId);
+            $('#editCategoryName').val(fileName);
+            editCategoryModal.show();
+        });
 
         $('.remove-button').on('click', function (e) {
             e.preventDefault();

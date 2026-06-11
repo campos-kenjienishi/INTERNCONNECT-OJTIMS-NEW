@@ -169,6 +169,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::post('/roomDelete/{id}', [ProfessorController::class,'roomDelete'])->name('roomDelete');
     Route::get('/professor/maintain',[PassDocuController::class,'maintainFileCategory']);
     Route::post('/fileCategory', [PassDocuController::class,'fileCategory']);
+    Route::put('/fileCategory/{id}', [PassDocuController::class,'updateCategory'])->name('fileCategory.update');
     Route::post('/remove/files/{id}', [PassDocuController::class,'removeCategory']);
     Route::get('/studentrequire',[PassDocuController::class,'studentRequirements']);
     Route::post('/update/approve/status/bulk', [PassDocuController::class, 'updateApproveStatusBulk']);
