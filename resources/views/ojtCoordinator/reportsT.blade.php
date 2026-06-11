@@ -178,7 +178,7 @@
         .panel-card-header h2 { font-size: 15px; font-weight: 700; color: #1a1a1a; }
         .panel-card-header p  { font-size: 12px; color: #888; margin-top: 2px; }
         .panel-card-body { padding: 22px; }
-        .filter-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; align-items: end; }
+        .filter-grid { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto; gap: 16px; align-items: end; }
         .field-group { display: flex; flex-direction: column; gap: 5px; }
         .field-label { font-size: 12px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 5px; }
         .field-label i { color: var(--red); font-size: 11px; }
@@ -660,7 +660,7 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                 <div class="panel-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h2>Generate Report</h2>
-                    <p>Filter by year range and course to generate the OJT report</p>
+                    <p>Filter by school year and course to generate the OJT report</p>
                 </div>
             </div>
             <div class="panel-card-body">
@@ -668,25 +668,21 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                     @csrf
                     <div class="filter-grid">
                         <div class="field-group">
-                            <label class="field-label"><i class="fa fa-calendar-alt"></i> Start Year</label>
-                            <select class="field-select" id="start_year" name="start_year" required>
-                                <option value="">Select Start Year</option>
-                                @for ($year = (date('Y') - 10); $year <= (date('Y') + 10); $year++)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-calendar-check"></i> End Year</label>
-                            <select class="field-select" id="end_year" name="end_year" required>
-                                <option value="">Select End Year</option>
+                            <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year</label>
+                            <select class="field-select" id="school_year" name="school_year" required>
+                                <option value="">Select School Year</option>
+                                @foreach (($schoolYears ?? collect()) as $schoolYear)
+                                    <option value="{{ $schoolYear }}" {{ ($selectedSchoolYear ?? '') === $schoolYear ? 'selected' : '' }}>
+                                        {{ $schoolYear }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
                             <select class="field-select" id="course" name="course" required>
                                 @foreach ($course as $c)
-                                <option value="{{ $c->course }}">{{ $c->course }}</option>
+                                <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -877,28 +873,6 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
     });
 
     /* ── Dynamic end year options ── */
-    document.addEventListener('DOMContentLoaded', function () {
-        const startYear = document.getElementById('start_year');
-        const endYear = document.getElementById('end_year');
-
-        function updateEndYears() {
-            const selectedStartYear = parseInt(startYear.value, 10);
-            endYear.innerHTML = '<option value="">Select End Year</option>';
-
-            if (!isNaN(selectedStartYear)) {
-                for (let year = selectedStartYear; year <= selectedStartYear + 10; year++) {
-                    const option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    endYear.appendChild(option);
-                }
-            }
-        }
-
-        updateEndYears();
-        startYear.addEventListener('change', updateEndYears);
-    });
-
     /* ══════════════════════════════════════════════
        BUILD PRINT HTML
     ══════════════════════════════════════════════ */
@@ -915,9 +889,8 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
         const pageNum          = pageInfo.page + 1;
         const pageCount        = pageInfo.pages;
 
-        const startYear = document.getElementById('start_year').value || '—';
-        const endYear   = document.getElementById('end_year').value   || '—';
-        const course    = document.getElementById('course').value     || '—';
+        const schoolYear = document.getElementById('school_year').value || '—';
+        const course     = document.getElementById('course').value || '?';
 
         let rowsHTML = '';
         for (let i = 0; i < currentPageNodes.length; i++) {
@@ -997,8 +970,8 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                 <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Year Range:</span>
-                        <strong style="color:#111827;">${startYear} → ${endYear}</strong>
+                        <span style="color:#6b7280;">School Year:</span>
+                        <strong style="color:#111827;">${schoolYear}</strong>
                     </div>
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
@@ -1048,18 +1021,10 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
             <div style="page-break-inside: avoid !important; break-inside: avoid !important; display: table; width: 100%;">
                 <div style="padding:18px 22px 12px 22px;">
                     <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
-                        <div style="display:flex; justify-content:space-between; gap:24px;">
-                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                                <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">OJT COORDINATOR</div>
-                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
-                            </div>
-                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                                <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DEPARTMENT CHAIR / HEAD</div>
-                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Signature over Printed Name</div>
-                            </div>
-                            <div style="flex:1; text-align:center; border-top:1.5px solid #374151; padding-top:6px; margin-top:32px;">
-                                <div style="font-size:9.5px; font-weight:700; color:#111827; letter-spacing:0.3px;">DATE</div>
-                                <div style="font-size:8px; color:#6b7280; margin-top:2px;">Date Approved / Noted</div>
+                        <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                            <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Disclaimer</div>
+                            <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">
+                                This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.
                             </div>
                         </div>
                     </div>

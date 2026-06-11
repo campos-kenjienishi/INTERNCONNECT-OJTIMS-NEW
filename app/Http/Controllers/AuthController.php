@@ -227,6 +227,28 @@ class AuthController extends Controller
 
         $partnerCompanies = Company::count();
         $placedStudents = Student::whereHas('companies')->count();
+        $unplacedStudents = max(0, $totalStudents - $placedStudents);
+
+        $companies = Company::withCount('students')->get();
+        $activeMoaCount = 0;
+        $expiredMoaCount = 0;
+        $unassignedMoaCount = 0;
+
+        foreach ($companies as $company) {
+            $parts = explode('-', str_replace(' ', '', (string) ($company->school_year ?? '0-0')));
+            $startYear = (int) ($parts[0] ?? 0);
+            $isExpired = $startYear > 0 ? ((now()->year - $startYear) > 3) : false;
+
+            if ($isExpired) {
+                $expiredMoaCount++;
+            } else {
+                $activeMoaCount++;
+            }
+
+            if ((int) $company->students_count === 0) {
+                $unassignedMoaCount++;
+            }
+        }
 
         $courseAnalytics = Student::select('course', DB::raw('COUNT(*) as total'))
             ->groupBy('course')
@@ -256,29 +278,47 @@ class AuthController extends Controller
             ];
         })->values();
 
-        $monthlyActivity = collect(range(5, 0))->map(function ($offset) {
-            $month = Carbon::now()->subMonths($offset);
-            $start = $month->copy()->startOfMonth();
-            $end = $month->copy()->endOfMonth();
+        $placementAnalytics = [
+            [
+                'label' => 'Placed students',
+                'count' => $placedStudents,
+                'percentage' => $totalStudents > 0 ? round(($placedStudents / $totalStudents) * 100) : 0,
+                'class' => 'green',
+            ],
+            [
+                'label' => 'Not yet placed',
+                'count' => $unplacedStudents,
+                'percentage' => $totalStudents > 0 ? round(($unplacedStudents / $totalStudents) * 100) : 0,
+                'class' => 'amber',
+            ],
+            [
+                'label' => 'Joined rooms',
+                'count' => $inClassStudents,
+                'percentage' => $totalStudents > 0 ? round(($inClassStudents / $totalStudents) * 100) : 0,
+                'class' => 'blue',
+            ],
+        ];
 
-            return [
-                'label' => $month->format('M Y'),
-                'files' => FileRequirement::whereBetween('created_at', [$start, $end])->count(),
-                'students' => Student::whereBetween('created_at', [$start, $end])->count(),
-            ];
-        })->values();
-
-        $maxMonthlyFiles = max(1, (int) $monthlyActivity->max('files'));
-        $maxMonthlyStudents = max(1, (int) $monthlyActivity->max('students'));
-        $monthlyActivity = $monthlyActivity->map(function ($item) use ($maxMonthlyFiles, $maxMonthlyStudents) {
-            return [
-                'label' => $item['label'],
-                'files' => $item['files'],
-                'students' => $item['students'],
-                'file_percentage' => round(($item['files'] / $maxMonthlyFiles) * 100),
-                'student_percentage' => round(($item['students'] / $maxMonthlyStudents) * 100),
-            ];
-        })->values();
+        $moaStatusAnalytics = [
+            [
+                'label' => 'Active MOAs',
+                'count' => $activeMoaCount,
+                'percentage' => $partnerCompanies > 0 ? round(($activeMoaCount / $partnerCompanies) * 100) : 0,
+                'class' => 'green',
+            ],
+            [
+                'label' => 'Expired MOAs',
+                'count' => $expiredMoaCount,
+                'percentage' => $partnerCompanies > 0 ? round(($expiredMoaCount / $partnerCompanies) * 100) : 0,
+                'class' => 'red',
+            ],
+            [
+                'label' => 'MOAs without students',
+                'count' => $unassignedMoaCount,
+                'percentage' => $partnerCompanies > 0 ? round(($unassignedMoaCount / $partnerCompanies) * 100) : 0,
+                'class' => 'amber',
+            ],
+        ];
 
         $analyticsInsights = $this->buildCoordinatorAnalyticsInsights(
             $studentStatusAnalytics,
@@ -305,9 +345,11 @@ class AuthController extends Controller
             'fileStatusAnalytics',
             'partnerCompanies',
             'placedStudents',
+            'unplacedStudents',
             'courseAnalytics',
             'topCompanies',
-            'monthlyActivity',
+            'placementAnalytics',
+            'moaStatusAnalytics',
             'analyticsInsights'
         ));
     }

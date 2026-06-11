@@ -292,6 +292,33 @@
             color: #991b1b;
         }
 
+        .analytics-print-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 1px solid #fecaca;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.16);
+            transition: transform .2s, box-shadow .2s, filter .2s;
+        }
+
+        .analytics-print-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.03);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.22);
+        }
+
+        .analytics-print-btn:focus-visible {
+            outline: 3px solid rgba(220,38,38,.18);
+            outline-offset: 2px;
+        }
+
         body.dark-mode .topbar { background: #252525; border-bottom: 1px solid #3a3a3a; }
         body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
         body.dark-mode .topbar-title { color: #999; }
@@ -506,6 +533,64 @@
         }
 
         .bar-row .track { margin-top: 0; }
+        #print-area-wrapper { display: none; }
+
+        .dashboard-footer {
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            color: #888;
+            text-align: center;
+            padding: 18px 28px;
+            font-size: 12.5px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .dashboard-footer .footer-logo {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            opacity: 0.6;
+        }
+
+        .dashboard-footer .footer-copy {
+            font-size: 12.5px;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .dashboard-footer .footer-copy span {
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        .dashboard-footer .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dashboard-footer a {
+            color: #888;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12.5px;
+            transition: color 0.2s;
+        }
+
+        .dashboard-footer a:hover {
+            color: var(--red);
+            text-decoration: none;
+        }
+
+        .dashboard-footer .divider {
+            color: #e5e5e5;
+            margin: 0 2px;
+        }
 
         @media (max-width: 960px) {
             .app-layout {
@@ -520,15 +605,29 @@
             .analytics-grid { grid-template-columns: 1fr; }
             .panel.full { grid-column: auto; }
             .page { padding: 18px; }
+            .dashboard-footer { padding: 18px; }
         }
 
         @media print {
-            .sidebar, .topbar, .no-print { display: none !important; }
-            .app-layout { display: block !important; }
-            .page { padding: 0 !important; }
-            .panel { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+            body > *:not(#print-area-wrapper) { display: none !important; }
+            #print-area-wrapper { display: block !important; }
+            #print-area-wrapper, #print-area-wrapper * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
             body { background: #fff !important; }
         }
+
+        body.dark-mode .dashboard-footer {
+            background: #1a1a1a;
+            border-top: 1px solid #3a3a3a;
+            color: #999;
+        }
+
+        body.dark-mode .dashboard-footer a { color: #999; }
+        body.dark-mode .dashboard-footer a:hover { color: var(--red); }
+        body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
+        body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
 
         /* Loading spinner for buttons */
         .btn[disabled] { opacity: 0.65; cursor: not-allowed; }
@@ -545,7 +644,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="app-layout">
@@ -656,7 +754,12 @@
                 <h1>Live <span>Analytics</span></h1>
                 <p>Operational visibility across students, requirements, and partner companies.</p>
             </div>
-            <div class="updated"><i class="fa fa-sync-alt" style="margin-right:6px;"></i> Updated {{ now()->format('M d, Y') }}</div>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <button type="button" id="printBtn" aria-label="Print analytics report" class="analytics-print-btn">
+                    <i class="fa fa-print"></i> Print Report
+                </button>
+                <div class="updated"><i class="fa fa-sync-alt" style="margin-right:6px;"></i> Updated {{ now()->format('M d, Y') }}</div>
+            </div>
         </section>
 
         <section class="stats-grid">
@@ -838,41 +941,104 @@
                 </div>
             </article>
 
-            <article class="panel full">
+            <article class="panel">
                 <header class="panel-head">
-                    <h2>Monthly Activity</h2>
-                    <p>Recent student registrations and file submissions</p>
+                    <h2>Placement Coverage</h2>
+                    <p>Current student placement progress across the portal</p>
                 </header>
                 <div class="panel-body">
-                    <div class="no-print" style="width:100%; margin-bottom: 12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-                        <label style="font-size:13px;color:#666;">
-                            From
-                            <input type="month" id="startMonth" aria-label="Start month filter" style="margin-left:8px;padding:6px;border-radius:6px;border:1px solid #e5e7eb;">
-                        </label>
-                        <label style="font-size:13px;color:#666;">
-                            To
-                            <input type="month" id="endMonth" aria-label="End month filter" style="margin-left:8px;padding:6px;border-radius:6px;border:1px solid #e5e7eb;">
-                        </label>
-                        <button id="applyFilters" type="button" aria-label="Apply analytics filters" class="btn" style="background:#dc2626;color:#fff;border-radius:8px;padding:8px 12px;border:none;display:inline-flex;align-items:center;">
-                            <span class="btn-label">Apply</span>
-                            <span class="ic-spinner" style="display:none;"></span>
-                        </button>
-                        <button type="button" id="exportCsvBtn" aria-label="Export analytics as CSV" class="btn" style="background:#0f766e;color:#fff;border-radius:8px;padding:8px 12px;border:none;">CSV</button>
-                        <button type="button" id="exportPdfBtn" aria-label="Export analytics as PDF" class="btn" style="background:#1d4ed8;color:#fff;border-radius:8px;padding:8px 12px;border:none;">PDF</button>
-                        <button type="button" id="printBtn" aria-label="Print analytics report" class="btn" style="background:#6b7280;color:#fff;border-radius:8px;padding:8px 12px;border:none;">Print</button>
-                    </div>
-                    <div style="width:100%;">
-                        <canvas id="monthlyActivityChart" role="img" aria-label="Monthly activity chart showing student registrations and file submissions" style="width:100%;height:260px;"></canvas>
-                    </div>
+                    @foreach ($placementAnalytics as $stat)
+                        @php
+                            $fillClass = match($stat['class']) {
+                                'green' => 'fill-green',
+                                'amber' => 'fill-amber',
+                                default => 'fill-blue',
+                            };
+                        @endphp
+                        <div>
+                            <div class="row-metric">
+                                <div>
+                                    <div class="metric-label">{{ $stat['label'] }}</div>
+                                    <div class="metric-meta">{{ $stat['count'] }} students</div>
+                                </div>
+                                <div class="metric-percent">{{ $stat['percentage'] }}%</div>
+                            </div>
+                            <div class="track"><div class="fill {{ $fillClass }}" data-width="{{ $stat['percentage'] }}"></div></div>
+                        </div>
+                    @endforeach
+                </div>
+            </article>
+
+            <article class="panel">
+                <header class="panel-head">
+                    <h2>MOA Portfolio</h2>
+                    <p>Health and assignment coverage of current MOA records</p>
+                </header>
+                <div class="panel-body">
+                    @foreach ($moaStatusAnalytics as $stat)
+                        @php
+                            $fillClass = match($stat['class']) {
+                                'green' => 'fill-green',
+                                'red' => 'fill-red',
+                                default => 'fill-amber',
+                            };
+                        @endphp
+                        <div>
+                            <div class="row-metric">
+                                <div>
+                                    <div class="metric-label">{{ $stat['label'] }}</div>
+                                    <div class="metric-meta">{{ $stat['count'] }} records</div>
+                                </div>
+                                <div class="metric-percent">{{ $stat['percentage'] }}%</div>
+                            </div>
+                            <div class="track"><div class="fill {{ $fillClass }}" data-width="{{ $stat['percentage'] }}"></div></div>
+                        </div>
+                    @endforeach
                 </div>
             </article>
         </section>
     </main>
 
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <span class="footer-copy">
+                © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            </span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank">
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                PUP Website
+            </a>
+            <span class="divider">|</span>
+            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        </div>
+    </footer>
+
         </div>
     </div>
 
+    <div id="print-area-wrapper"></div>
+
     <script>
+        const analyticsPrintData = {
+            updatedAt: @json(now()->format('M d, Y')),
+            approvedStudents: @json($approvedStudents),
+            pendingStudents: @json($pendingStudents),
+            placedStudents: @json($placedStudents),
+            partnerCompanies: @json($partnerCompanies),
+            studentStatusAnalytics: @json($studentStatusAnalytics),
+            fileStatusAnalytics: @json($fileStatusAnalytics),
+            courseAnalytics: @json($courseAnalytics),
+            topCompanies: @json($topCompanies),
+            placementAnalytics: @json($placementAnalytics),
+            moaStatusAnalytics: @json($moaStatusAnalytics),
+            analyticsSummary: @json($analyticsInsights['summary'] ?? null),
+        };
+
         const darkToggle = document.getElementById('darkmodeToggle');
         const darkIcon = document.getElementById('darkmodeIcon');
         const darkKey = 'internconnect_darkmode';
@@ -895,309 +1061,216 @@
             });
         }
 
-        /* Monthly Activity Chart */
-        let monthlyChart = null;
-
-        function createOrUpdateChart(labels, filesArray, studentsArray) {
-            const ctx = document.getElementById('monthlyActivityChart');
-            if (!ctx) return;
-
-            const datasets = [
-                {
-                    label: 'Files Submitted',
-                    data: filesArray,
-                    borderColor: '#dc2626',
-                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                },
-                {
-                    label: 'Students Registered',
-                    data: studentsArray,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                }
-            ];
-
-            if (monthlyChart) {
-                monthlyChart.data.labels = labels;
-                monthlyChart.data.datasets = datasets;
-                monthlyChart.update();
-                return;
-            }
-
-            monthlyChart = new Chart(ctx.getContext('2d'), {
-                type: 'line',
-                data: { labels: labels, datasets: datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
-                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
-                    onClick: (evt, elems) => {
-                        if (elems.length > 0) {
-                            const idx = elems[0].index;
-                            const label = labels[idx];
-                            const [month, year] = label.split(' ');
-                            const monthNum = new Date(Date.parse(month + ' 1')).getMonth() + 1;
-                            window.drilldownYear = year;
-                            window.drilldownMonth = monthNum;
-                            openDrilldownModal(label, year, monthNum, 'files');
-                        }
-                    }
-                }
-            });
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
-        async function fetchMonthlyData(params = {}, opts = { showLoading: true }) {
-            const applyBtn = document.getElementById('applyFilters');
-            const spinner = applyBtn?.querySelector('.ic-spinner');
-            if (opts.showLoading && applyBtn) { applyBtn.disabled = true; if (spinner) spinner.style.display = 'inline-block'; }
-            const url = new URL("{{ route('coordinator.analytics.data') }}", window.location.origin);
-            Object.keys(params).forEach(k => { if (params[k] !== undefined && params[k] !== null && params[k] !== '') url.searchParams.set(k, params[k]); });
-            try {
-                const res = await fetch(url.toString(), { credentials: 'same-origin' });
-                if (!res.ok) throw new Error('Failed to fetch');
-                const json = await res.json();
-                createOrUpdateChart(json.labels || [], json.files || [], json.students || []);
-            } catch (e) {
-                console.error('Monthly data load error', e);
-            } finally {
-                if (opts.showLoading && applyBtn) { applyBtn.disabled = false; if (spinner) spinner.style.display = 'none'; }
-            }
+        function buildCoordinatorPrintHTML() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            const studentRows = (analyticsPrintData.studentStatusAnalytics || []).map((item, index) => `
+                <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">${escapeHtml(item.label)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${escapeHtml(item.count)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#991b1b;font-weight:700;">${escapeHtml(item.percentage)}%</td>
+                </tr>
+            `).join('');
+
+            const fileRows = (analyticsPrintData.fileStatusAnalytics || []).map((item, index) => `
+                <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">${escapeHtml(item.label)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${escapeHtml(item.count)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#991b1b;font-weight:700;">${escapeHtml(item.percentage)}%</td>
+                </tr>
+            `).join('');
+
+            const courseRows = (analyticsPrintData.courseAnalytics || []).map((item, index) => `
+                <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">${escapeHtml(item.label)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${escapeHtml(item.count)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#991b1b;font-weight:700;">${escapeHtml(item.percentage)}%</td>
+                </tr>
+            `).join('');
+
+            const companyRows = (analyticsPrintData.topCompanies || []).map((item, index) => `
+                <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">${escapeHtml(item.label)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${escapeHtml(item.count)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#991b1b;font-weight:700;">${escapeHtml(item.percentage)}%</td>
+                </tr>
+            `).join('');
+
+            const placementRows = (analyticsPrintData.placementAnalytics || []).map((item, index) => `
+                <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">${escapeHtml(item.label)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${escapeHtml(item.count)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#991b1b;font-weight:700;">${escapeHtml(item.percentage)}%</td>
+                </tr>
+            `).join('');
+
+            const moaRows = (analyticsPrintData.moaStatusAnalytics || []).map((item, index) => `
+                <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">${escapeHtml(item.label)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${escapeHtml(item.count)}</td>
+                    <td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#991b1b;font-weight:700;">${escapeHtml(item.percentage)}%</td>
+                </tr>
+            `).join('');
+
+            return `
+                <div style="font-family:'Poppins',Arial,sans-serif; background:#fff; color:#111827;">
+                    <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
+                        <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
+                        <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
+                            <div style="width:50px; height:50px; background:rgba(255,255,255,0.18); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.25);">
+                                <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);" alt="PUP">
+                            </div>
+                            <div style="flex:1;">
+                                <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines - OJT Information Management System</div>
+                                <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Coordinator Analytics Report</div>
+                                <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus | College of Engineering and Technology</div>
+                            </div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
+                    </div>
+
+                    <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                            <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                                <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                                <span style="color:#6b7280;">Updated:</span>
+                                <strong style="color:#111827;">${escapeHtml(analyticsPrintData.updatedAt)}</strong>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                                <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                                <span style="color:#6b7280;">Generated:</span>
+                                <strong style="color:#111827;">${dateStr} ${timeStr}</strong>
+                            </div>
+                        </div>
+                        <div style="font-size:8.5px; color:#9ca3af;">Coordinator dashboard summary</div>
+                    </div>
+
+                    <div style="padding:14px 22px 0 22px;">
+                        <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px;">
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                                <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Approved Students</div>
+                                <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(analyticsPrintData.approvedStudents)}</div>
+                            </div>
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                                <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Pending Students</div>
+                                <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(analyticsPrintData.pendingStudents)}</div>
+                            </div>
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                                <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Placed Students</div>
+                                <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(analyticsPrintData.placedStudents)}</div>
+                            </div>
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                                <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Partner Companies</div>
+                                <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(analyticsPrintData.partnerCompanies)}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:14px 22px 0 22px;">
+                        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;">
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                                <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Student Status Breakdown</div>
+                                <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                    <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
+                                    <tbody>${studentRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No student data found.</td></tr>'}</tbody>
+                                </table>
+                            </div>
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                                <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Requirement Status</div>
+                                <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                    <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
+                                    <tbody>${fileRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No file data found.</td></tr>'}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:14px 22px 0 22px;">
+                        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;">
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                                <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Placement Coverage</div>
+                                <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                    <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
+                                    <tbody>${placementRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No placement data found.</td></tr>'}</tbody>
+                                </table>
+                            </div>
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                                <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">MOA Portfolio</div>
+                                <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                    <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
+                                    <tbody>${moaRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No MOA data found.</td></tr>'}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:14px 22px 0 22px;">
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                            <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Course Distribution</div>
+                            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Course</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
+                                <tbody>${courseRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No course data found.</td></tr>'}</tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div style="padding:14px 22px 0 22px;">
+                        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;">
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                                <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Top Partner Companies</div>
+                                <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                    <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Company</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
+                                    <tbody>${companyRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No company data found.</td></tr>'}</tbody>
+                                </table>
+                            </div>
+                            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                                <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Analytics Insight</div>
+                                <div style="font-size:11px; color:#374151; line-height:1.7;">${escapeHtml(analyticsPrintData.analyticsSummary || 'This printed report focuses on student status, requirement review, placement coverage, MOA health, course distribution, and partner company coverage.')}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:18px 22px 12px 22px;">
+                        <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+                            <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                                <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px;">Disclaimer</div>
+                                <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);" alt="PUP">
+                            <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">Polytechnic University of the Philippines - InternConnect OJT IMS</span>
+                        </div>
+                        <div style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: COORD-ANA-${now.getFullYear()}</div>
+                    </div>
+                </div>
+            `;
         }
 
-        // controls
-        (function setupFilters() {
-            const startInput = document.getElementById('startMonth');
-            const endInput = document.getElementById('endMonth');
-            const applyBtn = document.getElementById('applyFilters');
-
-            // restore from localStorage
-            try {
-                const stored = JSON.parse(localStorage.getItem('coord_analytics_filters') || 'null');
-                if (stored) {
-                    if (stored.start && startInput) startInput.value = stored.start;
-                    if (stored.end && endInput) endInput.value = stored.end;
-                }
-            } catch (e) { }
-
-            applyBtn?.addEventListener('click', function () {
-                const startMonth = startInput?.value || '';
-                const endMonth = endInput?.value || '';
-                try { localStorage.setItem('coord_analytics_filters', JSON.stringify({ start: startMonth, end: endMonth })); } catch (e) {}
-                const start = startMonth ? startMonth + '-01' : '';
-                const end = endMonth ? endMonth + '-01' : '';
-                fetchMonthlyData({ start: start ? start : undefined, end: end ? end : undefined }, { showLoading: true });
-            });
-        })();
-
-        // load initial data (use restored filters if any)
-        (function initLoad() {
-            try {
-                const stored = JSON.parse(localStorage.getItem('coord_analytics_filters') || 'null') || {};
-                const params = {};
-                if (stored.start) params.start = stored.start + '-01';
-                if (stored.end) params.end = stored.end + '-01';
-                fetchMonthlyData(params, { showLoading: true });
-            } catch (e) {
-                fetchMonthlyData({}, { showLoading: true });
-            }
-        })();
-
-        function buildCoordinatorExportUrl(type) {
-            const startMonth = document.getElementById('startMonth')?.value || '';
-            const endMonth = document.getElementById('endMonth')?.value || '';
-            const routeBase = type === 'pdf' ? "{{ route('coordinator.analytics.export.pdf') }}" : "{{ route('coordinator.analytics.export.csv') }}";
-            const url = new URL(routeBase, window.location.origin);
-            if (startMonth) url.searchParams.set('start', startMonth + '-01');
-            if (endMonth) url.searchParams.set('end', endMonth + '-01');
-            return url.toString();
-        }
-
-        document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
-            window.location.href = buildCoordinatorExportUrl('csv');
+        document.getElementById('printBtn')?.addEventListener('click', () => {
+            const wrapper = document.getElementById('print-area-wrapper');
+            if (!wrapper) return;
+            wrapper.innerHTML = buildCoordinatorPrintHTML();
+            window.print();
+            setTimeout(() => {
+                wrapper.innerHTML = '';
+            }, 1000);
         });
 
-        document.getElementById('exportPdfBtn')?.addEventListener('click', () => {
-            window.location.href = buildCoordinatorExportUrl('pdf');
-        });
-
-        document.getElementById('printBtn')?.addEventListener('click', () => window.print());
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && drilldownModal && drilldownModal.style.display === 'flex') {
-                drilldownModal.style.display = 'none';
-            }
-        });
-
-        // Drilldown modal functions
-        const drilldownModal = document.getElementById('drilldownModal');
-        let currentPage = 1;
-
-        function setDrilldownControls(type) {
-            const statusFilter = document.getElementById('drilldownStatusFilter');
-            if (!statusFilter) return;
-
-            if (type === 'files') {
-                statusFilter.innerHTML = `
-                    <option value="">All statuses</option>
-                    <option value="1">Approved</option>
-                    <option value="0">Pending</option>
-                    <option value="2">Denied</option>
-                `;
-                statusFilter.disabled = false;
-                statusFilter.style.display = 'inline-block';
-            } else {
-                statusFilter.innerHTML = '<option value="">All statuses</option>';
-                statusFilter.disabled = true;
-                statusFilter.style.display = 'none';
-            }
-        }
-
-        function openDrilldownModal(label, year, month, type) {
-            document.getElementById('drilldownTitle').textContent = (type === 'files' ? 'Files Submitted' : 'Students Registered') + ' - ' + label;
-            currentPage = 1;
-            setDrilldownControls(type);
-            fetchDrilldownData(year, month, 1, type);
-            drilldownModal.style.display = 'flex';
-        }
-
-        async function fetchDrilldownData(year, month, page, type) {
-            const url = new URL("{{ route('coordinator.analytics.drilldown') }}", window.location.origin);
-            const status = document.getElementById('drilldownStatusFilter')?.value || '';
-            const queryText = document.getElementById('drilldownSearch')?.value?.trim() || '';
-            url.searchParams.set('year', year);
-            url.searchParams.set('month', month);
-            url.searchParams.set('type', type);
-            if (status) url.searchParams.set('status', status);
-            if (queryText) url.searchParams.set('q', queryText);
-            url.searchParams.set('page', page);
-
-            try {
-                const res = await fetch(url.toString(), { credentials: 'same-origin' });
-                if (!res.ok) throw new Error('Failed to fetch');
-                const json = await res.json();
-                renderDrilldownTable(json, type);
-            } catch (e) {
-                console.error('Drilldown fetch error', e);
-            }
-        }
-
-        function renderDrilldownTable(data, type) {
-            const tbody = document.getElementById('drilldownTableBody');
-            tbody.innerHTML = '';
-
-            if (!data.data || data.data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;">No records found</td></tr>';
-                return;
-            }
-
-            data.data.forEach(item => {
-                const row = document.createElement('tr');
-                if (type === 'files') {
-                    row.innerHTML = `
-                        <td style="padding:8px;">${item.file_name}</td>
-                        <td style="padding:8px;">${item.adviser || '-'}</td>
-                        <td style="padding:8px;"><span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;">${item.status === 1 ? 'Approved' : item.status === 0 ? 'Pending' : 'Denied'}</span></td>
-                        <td style="padding:8px;font-size:12px;color:#666;">${new Date(item.created_at).toLocaleDateString()}</td>
-                    `;
-                } else {
-                    row.innerHTML = `
-                        <td style="padding:8px;">${item.first_name} ${item.last_name}</td>
-                        <td style="padding:8px;">${item.course || '-'}</td>
-                        <td style="padding:8px;"><span style="background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:4px;font-size:11px;">Registered</span></td>
-                        <td style="padding:8px;font-size:12px;color:#666;">${new Date(item.created_at).toLocaleDateString()}</td>
-                    `;
-                }
-                tbody.appendChild(row);
-            });
-
-            document.getElementById('drilldownPaginationInfo').textContent = `Page ${data.current_page} of ${Math.ceil(data.total / data.per_page)}`;
-            document.getElementById('drilldownPrevBtn').disabled = data.current_page === 1;
-            document.getElementById('drilldownNextBtn').disabled = data.current_page >= Math.ceil(data.total / data.per_page);
-            currentPage = data.current_page;
-            window.lastDrilldownType = type;
-        }
-
-        document.getElementById('drilldownCloseBtn')?.addEventListener('click', () => {
-            drilldownModal.style.display = 'none';
-        });
-
-        document.getElementById('drilldownPrevBtn')?.addEventListener('click', () => {
-            if (currentPage > 1) fetchDrilldownData(window.drilldownYear, window.drilldownMonth, currentPage - 1, window.lastDrilldownType);
-        });
-
-        document.getElementById('drilldownNextBtn')?.addEventListener('click', () => {
-            fetchDrilldownData(window.drilldownYear, window.drilldownMonth, currentPage + 1, window.lastDrilldownType);
-        });
-
-        document.getElementById('drilldownSearchBtn')?.addEventListener('click', () => {
-            currentPage = 1;
-            fetchDrilldownData(window.drilldownYear, window.drilldownMonth, 1, window.lastDrilldownType);
-        });
-
-        document.getElementById('drilldownSearch')?.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                currentPage = 1;
-                fetchDrilldownData(window.drilldownYear, window.drilldownMonth, 1, window.lastDrilldownType);
-            }
-        });
-
-        document.getElementById('drilldownStatusFilter')?.addEventListener('change', () => {
-            currentPage = 1;
-            fetchDrilldownData(window.drilldownYear, window.drilldownMonth, 1, window.lastDrilldownType);
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === drilldownModal) drilldownModal.style.display = 'none';
-        });
     </script>
-
-<!-- Drilldown Modal -->
-<div id="drilldownModal" role="dialog" aria-modal="true" aria-labelledby="drilldownTitle" tabindex="-1" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:9999;">
-    <div style="background:#fff;border-radius:12px;width:90%;max-width:700px;max-height:80vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e5e7eb;">
-            <h3 id="drilldownTitle" style="margin:0;font-size:16px;font-weight:600;">Details</h3>
-            <button id="drilldownCloseBtn" type="button" aria-label="Close details dialog" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">&times;</button>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid #e5e7eb;align-items:center;">
-            <input id="drilldownSearch" type="text" aria-label="Search drilldown records" placeholder="Search file, adviser, or student" style="flex:1;min-width:220px;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;">
-            <select id="drilldownStatusFilter" aria-label="Filter drilldown status" style="padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;min-width:160px;">
-                <option value="">All statuses</option>
-                <option value="1">Approved</option>
-                <option value="0">Pending</option>
-                <option value="2">Denied</option>
-            </select>
-            <button id="drilldownSearchBtn" type="button" aria-label="Search drilldown records" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;">Search</button>
-        </div>
-        <div style="padding:16px;overflow-x:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                <thead>
-                    <tr style="background:#f5f5f5;">
-                        <th style="padding:8px;text-align:left;font-weight:600;border-bottom:1px solid #e5e7eb;">Name</th>
-                        <th style="padding:8px;text-align:left;font-weight:600;border-bottom:1px solid #e5e7eb;">Company/Course</th>
-                        <th style="padding:8px;text-align:left;font-weight:600;border-bottom:1px solid #e5e7eb;">Status</th>
-                        <th style="padding:8px;text-align:left;font-weight:600;border-bottom:1px solid #e5e7eb;">Date</th>
-                    </tr>
-                </thead>
-                <tbody id="drilldownTableBody"></tbody>
-            </table>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid #e5e7eb;">
-            <span id="drilldownPaginationInfo" style="font-size:12px;color:#666;"></span>
-            <div style="display:flex;gap:8px;">
-                <button id="drilldownPrevBtn" type="button" aria-label="Previous page" style="background:#f5f5f5;border:1px solid #ddd;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;">← Prev</button>
-                <button id="drilldownNextBtn" type="button" aria-label="Next page" style="background:#f5f5f5;border:1px solid #ddd;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;">Next →</button>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>

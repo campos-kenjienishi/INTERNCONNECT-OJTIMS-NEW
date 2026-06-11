@@ -32,6 +32,7 @@ class ReportsController extends Controller
     
         $students = User::where('role', 0)
                     ->where('status', 1)
+                    ->with('studentInfo')
                     ->get();
         $studentData = [];
         
@@ -70,9 +71,27 @@ class ReportsController extends Controller
             ];
         }
 
+        $schoolYears = $students
+            ->map(function ($student) {
+                $info = $student->studentInfo;
+                if (!$info || empty($info->school_year_start) || empty($info->school_year_end)) {
+                    return null;
+                }
+
+                return trim($info->school_year_start . '-' . $info->school_year_end);
+            })
+            ->filter()
+            ->unique()
+            ->sortByDesc(function ($schoolYear) {
+                $parts = explode('-', str_replace(' ', '', $schoolYear));
+                return (int) ($parts[0] ?? 0);
+            })
+            ->values();
+
         $reportInsights = $this->buildStudentReportInsights($studentData, null);
     
-        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights'));
+        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears'))
+            ->with('selectedSchoolYear', null);
 
     }
 
@@ -80,42 +99,49 @@ class ReportsController extends Controller
 
     public function generateReport(Request $request)
     {
-        $startYear = $request->input('start_year');
-        $endYear = $request->input('end_year');
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        $selectedSchoolYear = trim((string) $request->input('school_year'));
         $coursed = $request->input('course');
         $course = Courses::all();
-
-        // Backward compatibility: derive years if legacy date inputs are sent.
-        if (!$startYear && $startDate) {
-            $startYear = Carbon::parse($startDate)->year;
-        }
-        if (!$endYear && $endDate) {
-            $endYear = Carbon::parse($endDate)->year;
-        }
-
-        // Default to a wide range if filter values are missing.
-        $startYear = (int) ($startYear ?: 1900);
-        $endYear = (int) ($endYear ?: 2100);
-
-        if ($endYear < $startYear) {
-            [$startYear, $endYear] = [$endYear, $startYear];
-        }
 
         // Get the current user
         $user = [];
         if (Session::has('loginId')) {
             $user = User::where('id', '=', Session::get('loginId'))->first();
         }
+
+        $allStudents = User::where('role', 0)
+            ->where('status', 1)
+            ->with('studentInfo')
+            ->get();
+
+        $schoolYears = $allStudents
+            ->map(function ($student) {
+                $info = $student->studentInfo;
+                if (!$info || empty($info->school_year_start) || empty($info->school_year_end)) {
+                    return null;
+                }
+
+                return trim($info->school_year_start . '-' . $info->school_year_end);
+            })
+            ->filter()
+            ->unique()
+            ->sortByDesc(function ($schoolYear) {
+                $parts = explode('-', str_replace(' ', '', $schoolYear));
+                return (int) ($parts[0] ?? 0);
+            })
+            ->values();
+
+        [$schoolYearStart, $schoolYearEnd] = array_pad(explode('-', str_replace(' ', '', $selectedSchoolYear)), 2, null);
     
         // Query users based on criteria
         $students = User::where('role', 0)
                         ->where('status', 1)
-                        ->whereYear('created_at', '>=', $startYear)
-                        ->whereYear('created_at', '<=', $endYear)
-                        ->whereHas('studentInfo', function ($query) use ($coursed) {
+                        ->whereHas('studentInfo', function ($query) use ($coursed, $schoolYearStart, $schoolYearEnd) {
                             $query->where('course', $coursed);
+                            if (!empty($schoolYearStart) && !empty($schoolYearEnd)) {
+                                $query->where('school_year_start', $schoolYearStart)
+                                    ->where('school_year_end', $schoolYearEnd);
+                            }
                         })
                         ->get();
 
@@ -161,7 +187,7 @@ class ReportsController extends Controller
                         
     
         // Pass the course variable to the view
-            return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights'));
+            return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSchoolYear'));
     }
 
 
