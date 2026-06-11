@@ -90,6 +90,7 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::match(['get', 'post'], '/ExpiredMOAReports', [ReportsController::class, 'generateMOAReport'])->name('reports.generate');
 
     Route::get('/MOA', [CompanyController::class,'companies']);
+    Route::put('/company/{id}', [CompanyController::class,'companyUpdate'])->name('company.update');
     Route::post('/uploadMOA', [MOAUploadController::class,'uploadfile']);
     Route::post('/moa/remove/{id}', [MOAUploadController::class,'remove']);
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');

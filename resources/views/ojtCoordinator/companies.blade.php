@@ -297,55 +297,60 @@
         }
 
         /* Action buttons */
-        .actions-wrap { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .actions-wrap {
+            display: grid;
+            grid-template-columns: repeat(3, 34px);
+            gap: 6px;
+            justify-content: start;
+            min-width: 114px;
+        }
 
-        .btn-view {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 5px 11px; border-radius: 7px;
-            background: #fff; border: 1.5px solid #e0e7ff; color: #4f46e5;
-            font-family: 'Poppins', sans-serif; font-size: 11.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        .btn-action-icon {
+            width: 34px; height: 34px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 9px; border: 1.5px solid transparent;
+            font-size: 13px; cursor: pointer; transition: all 0.2s;
+            text-decoration: none;
+            background: #fff;
+        }
+
+        .btn-action-icon:hover {
+            transform: translateY(-1px);
             text-decoration: none;
         }
-        .btn-view:hover { background: #e0e7ff; color: #4f46e5; text-decoration: none; }
+
+        .btn-view {
+            border-color: #e0e7ff; color: #4f46e5; background: #fff;
+        }
+        .btn-view:hover { background: #eef2ff; color: #4f46e5; }
+
+        .btn-edit {
+            border-color: #dbeafe; color: #2563eb; background: #fff;
+        }
+        .btn-edit:hover { background: #eff6ff; color: #2563eb; }
 
         .btn-download {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 5px 11px; border-radius: 7px;
+            border-color: #bfdbfe;
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            border: none; color: #fff;
-            font-family: 'Poppins', sans-serif; font-size: 11.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-            text-decoration: none; box-shadow: 0 2px 6px rgba(37,99,235,0.2);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
         }
-        .btn-download:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(37,99,235,0.3); color: #fff; text-decoration: none; }
+        .btn-download:hover { box-shadow: 0 4px 10px rgba(37,99,235,0.3); color: #fff; }
 
         .btn-send {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 5px 11px; border-radius: 7px;
-            background: #fff; border: 1.5px solid #d1fae5; color: #059669;
-            font-family: 'Poppins', sans-serif; font-size: 11.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            border-color: #d1fae5; color: #059669; background: #fff;
         }
-        .btn-send:hover { background: #d1fae5; }
+        .btn-send:hover { background: #ecfdf5; color: #059669; }
 
         .btn-print {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 5px 11px; border-radius: 7px;
-            background: #fff; border: 1.5px solid #fef3c7; color: #d97706;
-            font-family: 'Poppins', sans-serif; font-size: 11.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            border-color: #fef3c7; color: #d97706; background: #fff;
         }
-        .btn-print:hover { background: #fef3c7; }
+        .btn-print:hover { background: #fffbeb; color: #d97706; }
 
         .btn-remove {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 5px 11px; border-radius: 7px;
-            background: #fff; border: 1.5px solid #fecaca; color: #dc2626;
-            font-family: 'Poppins', sans-serif; font-size: 11.5px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            border-color: #fecaca; color: #dc2626; background: #fff;
         }
-        .btn-remove:hover { background: #fee2e2; }
+        .btn-remove:hover { background: #fef2f2; color: #dc2626; }
 
         /* =============== MODAL =============== */
         .modal-content {
@@ -459,8 +464,16 @@
         body.dark-mode .field-label { color: #e0e0e0; }
 
         /* Buttons */
+        body.dark-mode .btn-view { background: #252525; border-color: rgba(99,102,241,0.3); color: #c7d2fe; }
+        body.dark-mode .btn-view:hover { background: rgba(79,70,229,0.2); }
+        body.dark-mode .btn-edit { background: #252525; border-color: rgba(59,130,246,0.3); color: #93c5fd; }
+        body.dark-mode .btn-edit:hover { background: rgba(37,99,235,0.2); }
         body.dark-mode .btn-download { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
-        body.dark-mode .btn-remove { border: 1.5px solid rgba(220,38,38,0.3); background: transparent; color: #ff6b6b; }
+        body.dark-mode .btn-send { background: #252525; border-color: rgba(16,185,129,0.3); color: #6ee7b7; }
+        body.dark-mode .btn-send:hover { background: rgba(16,185,129,0.16); }
+        body.dark-mode .btn-print { background: #252525; border-color: rgba(245,158,11,0.3); color: #fbbf24; }
+        body.dark-mode .btn-print:hover { background: rgba(245,158,11,0.16); }
+        body.dark-mode .btn-remove { border: 1.5px solid rgba(220,38,38,0.3); background: #252525; color: #ff6b6b; }
         body.dark-mode .btn-remove:hover { background: rgba(220,38,38,0.1); }
 
         /* Modal */
@@ -835,6 +848,12 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
+                        @php
+                            $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($company->student_names_display ?? '')))));
+                            $linkedStudentNames = $company->students->pluck('full_name')->filter()->values();
+                            $manualStudentNames = $displayStudents->diff($linkedStudentNames)->values();
+                            [$schoolYearStart, $schoolYearEnd] = array_pad(explode('-', (string) ($company->school_year ?? '')), 2, '');
+                        @endphp
                         <tr>
                             <td style="display:none;">{{ $company->id }}</td>
 
@@ -876,9 +895,6 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
                             <!-- Students -->
                             <td>
-                                @php
-                                    $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($company->student_names_display ?? '')))));
-                                @endphp
                                 @if ($displayStudents->isNotEmpty())
                                     @foreach ($displayStudents as $displayStudent)
                                         <span class="student-pill">{{ $displayStudent }}</span>
@@ -904,36 +920,67 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                                 <div class="actions-wrap">
 
                                     <!-- View -->
-                                    <a class="btn-view"
-                                       href="{{ route('moa.view', ['companyId' => $company->id]) }}">
-                                        <i class="fa fa-eye"></i> View
+                                    <a class="btn-action-icon btn-view"
+                                       href="{{ route('moa.view', ['companyId' => $company->id]) }}"
+                                       title="View MOA"
+                                       aria-label="View MOA">
+                                        <i class="fa fa-eye"></i>
                                     </a>
 
+                                    <!-- Edit -->
+                                    <button type="button"
+                                        class="btn-action-icon btn-edit btn-open-edit"
+                                        title="Edit MOA"
+                                        aria-label="Edit MOA"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editCompanyModal"
+                                        data-company-id="{{ $company->id }}"
+                                        data-company-name="{{ e($company->company_name) }}"
+                                        data-company-address="{{ e($company->company_address) }}"
+                                        data-company-rep="{{ e($company->company_rep) }}"
+                                        data-company-no="{{ e($company->companyNo) }}"
+                                        data-company-email="{{ e($company->company_email) }}"
+                                        data-school-year-start="{{ trim($schoolYearStart) }}"
+                                        data-school-year-end="{{ trim($schoolYearEnd) }}"
+                                        data-course="{{ e($company->course) }}"
+                                        data-selected-students="{{ htmlspecialchars(json_encode($linkedStudentNames->values()->all()), ENT_QUOTES, 'UTF-8') }}"
+                                        data-manual-students="{{ htmlspecialchars(json_encode($manualStudentNames->values()->all()), ENT_QUOTES, 'UTF-8') }}">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+
                                     <!-- Download -->
-                                    <a class="btn-download"
-                                       href="{{ url('/moa/download', $company->file) }}">
-                                        <i class="fa fa-download"></i> Download
+                                    <a class="btn-action-icon btn-download"
+                                       href="{{ url('/moa/download', $company->file) }}"
+                                       title="Download MOA"
+                                       aria-label="Download MOA">
+                                        <i class="fa fa-download"></i>
                                     </a>
 
                                     <!-- Send -->
-                                    <button class="btn-send btn-open-send"
+                                    <button class="btn-action-icon btn-send btn-open-send"
                                         data-file-id="{{ $company->id }}"
                                         data-company-name="{{ $company->company_name }}"
+                                        title="Send MOA"
+                                        aria-label="Send MOA"
                                         data-bs-toggle="modal"
                                         data-bs-target="#sendModal">
-                                        <i class="fa fa-paper-plane"></i> Send
+                                        <i class="fa fa-paper-plane"></i>
                                     </button>
 
                                     <!-- Print -->
-                                    <button class="btn-print"
+                                    <button class="btn-action-icon btn-print"
+                                        title="Print MOA"
+                                        aria-label="Print MOA"
                                         onclick="openViewModal('{{ route('print-data', ['company' => $company->id]) }}')">
-                                        <i class="fa fa-print"></i> Print
+                                        <i class="fa fa-print"></i>
                                     </button>
 
                                     <!-- Remove -->
-                                    <button type="button" class="btn-remove"
+                                    <button type="button" class="btn-action-icon btn-remove"
+                                        title="Remove MOA"
+                                        aria-label="Remove MOA"
                                         onclick="confirmRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}')">
-                                        <i class="fa fa-trash"></i> Remove
+                                        <i class="fa fa-trash"></i>
                                     </button>
 
                                     <form id="remove-form-{{ $company->id }}" action="{{ url('/moa/remove/' . $company->id) }}" method="POST" style="display:none;">
@@ -1085,6 +1132,123 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
     </div>
 </div>
 
+<!-- =============== EDIT COMPANY MODAL =============== -->
+<div class="modal fade" id="editCompanyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-pen"></i> Edit MOA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editCompanyForm" action="" method="post" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+
+                    <div class="modal-section"><i class="fa fa-building"></i> Company Details</div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-building"></i> Company Name <span style="color:var(--red);">*</span></label>
+                        <input id="edit_company_name" class="field-input" type="text" name="company_name" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-map-marker-alt"></i> Company Address <span style="color:var(--red);">*</span></label>
+                        <input id="edit_company_address" class="field-input" type="text" name="company_address" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-user-tie"></i> Company Representative <span style="color:var(--red);">*</span></label>
+                        <input id="edit_company_rep" class="field-input" type="text" name="company_rep" required>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label"><i class="fa fa-phone"></i> Contact Number <span style="color:#aaa; font-weight:400;">(Optional)</span></label>
+                            <input id="edit_company_no" class="field-input" type="text" name="companyNo">
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label"><i class="fa fa-envelope"></i> Email Address <span style="color:#aaa; font-weight:400;">(Optional)</span></label>
+                            <input id="edit_company_email" class="field-input" type="email" name="company_email">
+                        </div>
+                    </div>
+
+                    <div class="modal-section"><i class="fa fa-calendar-alt"></i> Academic Details</div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year <span style="color:var(--red);">*</span></label>
+                        <div class="year-row">
+                            <input id="edit_school_year_start" class="field-input" type="text" name="school_year_start" placeholder="Start Year" required>
+                            <span>–</span>
+                            <input id="edit_school_year_end" class="field-input" type="text" name="school_year_end" placeholder="End Year" required>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Course <span style="color:var(--red);">*</span></label>
+                        <select name="course" id="editMoaCourseSelect" class="field-select" required>
+                            <option value="" disabled>Select course</option>
+                            @foreach ($course as $courseItem)
+                                <option value="{{ $courseItem->course }}">{{ $courseItem->course }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="modal-section"><i class="fa fa-paperclip"></i> MOA Document</div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-file-pdf"></i> Replace MOA File <span style="color:#aaa; font-weight:400;">(Optional)</span></label>
+                        <input class="field-input" type="file" name="file" accept="application/pdf" style="padding:8px 13px;">
+                        <div style="font-size:12px; color:#888; margin-top:8px;">Leave this blank to keep the current PDF.</div>
+                    </div>
+
+                    <div class="modal-section"><i class="fa fa-users"></i> Assign Students</div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-user-graduate"></i> Student Names <span style="color:#aaa; font-weight:400;">(Optional, hold Ctrl to select multiple)</span></label>
+                        <input
+                            id="editMoaStudentSearch"
+                            class="field-input"
+                            type="text"
+                            placeholder="Search student name"
+                            style="margin-bottom:8px;"
+                            disabled
+                        >
+                        <select name="student_names[]" id="editMoaStudentSelect" class="field-select" multiple style="min-height:100px;" disabled>
+                            @foreach ($stu as $student)
+                                <option value="{{ $student->full_name }}" data-course="{{ strtolower(trim($student->course ?? '')) }}">{{ $student->full_name }}</option>
+                            @endforeach
+                        </select>
+                        <div id="editMoaStudentHint" style="margin-top:6px; font-size:12px; color:#888;">Select a course first to show matching students.</div>
+                    </div>
+
+                    <div class="field-group" style="margin-top:10px;">
+                        <label class="field-label"><i class="fa fa-keyboard"></i> Manual Student Input <span style="color:#aaa; font-weight:400;">(Optional, comma or new line separated)</span></label>
+                        <textarea
+                            id="editManualStudentInput"
+                            name="manual_student_names"
+                            class="field-input"
+                            rows="3"
+                            placeholder="Type student names separated by comma or new line"
+                            style="resize:vertical; min-height:88px;"
+                        ></textarea>
+                        <div style="font-size:12px; color:#888; margin-top:8px;">Use this for students without accounts. Input is also shown in the MOA list.</div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn-modal-submit">
+                        <i class="fa fa-save me-1"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- =============== SEND MODAL =============== -->
 <div class="modal fade" id="sendModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1198,50 +1362,84 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             $('#send-company-name').text(companyName);
         });
 
-        function filterStudentOptionsByCourse() {
-            const selectedCourse = (($('#moaCourseSelect').val() || '').trim()).toLowerCase();
-            const searchQuery = (($('#moaStudentSearch').val() || '').trim()).toLowerCase();
-            const studentSelect = document.getElementById('moaStudentSelect');
-            const studentSearch = document.getElementById('moaStudentSearch');
-            const studentHint = document.getElementById('moaStudentHint');
+        function setupStudentFilter(courseSelector, searchSelector, selectSelector, hintSelector) {
+            const $course = $(courseSelector);
+            const $search = $(searchSelector);
+            const studentSelect = document.querySelector(selectSelector);
+            const studentHint = document.querySelector(hintSelector);
 
-            if (!studentSelect) {
-                return;
-            }
-
-            const hasSelectedCourse = selectedCourse.length > 0;
-            studentSelect.disabled = !hasSelectedCourse;
-            if (studentSearch) {
-                studentSearch.disabled = !hasSelectedCourse;
-            }
-
-            if (studentHint) {
-                studentHint.textContent = hasSelectedCourse
-                    ? 'Only students from the selected course are shown.'
-                    : 'Select a course first to show matching students.';
-            }
-
-            Array.from(studentSelect.options).forEach(function (option) {
-                const studentCourse = (option.getAttribute('data-course') || '').trim().toLowerCase();
-                const matchesCourse = !selectedCourse || studentCourse === selectedCourse;
-                const matchesSearch = !searchQuery || option.value.toLowerCase().includes(searchQuery);
-                const isMatch = matchesCourse && matchesSearch;
-
-                option.hidden = !isMatch;
-                option.disabled = !isMatch;
-
-                if (!isMatch) {
-                    option.selected = false;
+            function runFilter() {
+                if (!studentSelect) {
+                    return;
                 }
+
+                const selectedCourse = (($course.val() || '').trim()).toLowerCase();
+                const searchQuery = (($search.val() || '').trim()).toLowerCase();
+                const hasSelectedCourse = selectedCourse.length > 0;
+
+                studentSelect.disabled = !hasSelectedCourse;
+                if ($search.length) {
+                    $search.prop('disabled', !hasSelectedCourse);
+                }
+
+                if (studentHint) {
+                    studentHint.textContent = hasSelectedCourse
+                        ? 'Only students from the selected course are shown.'
+                        : 'Select a course first to show matching students.';
+                }
+
+                Array.from(studentSelect.options).forEach(function (option) {
+                    const studentCourse = (option.getAttribute('data-course') || '').trim().toLowerCase();
+                    const matchesCourse = !selectedCourse || studentCourse === selectedCourse;
+                    const matchesSearch = !searchQuery || option.value.toLowerCase().includes(searchQuery);
+                    const isMatch = matchesCourse && matchesSearch;
+
+                    option.hidden = !isMatch;
+                    option.disabled = !isMatch;
+
+                    if (!isMatch) {
+                        option.selected = false;
+                    }
+                });
+            }
+
+            $course.on('change', function () {
+                $search.val('');
+                runFilter();
             });
+            $search.on('input', runFilter);
+
+            runFilter();
+            return runFilter;
         }
 
-        $('#moaCourseSelect').on('change', function () {
-            $('#moaStudentSearch').val('');
-            filterStudentOptionsByCourse();
+        const filterAddStudents = setupStudentFilter('#moaCourseSelect', '#moaStudentSearch', '#moaStudentSelect', '#moaStudentHint');
+        const filterEditStudents = setupStudentFilter('#editMoaCourseSelect', '#editMoaStudentSearch', '#editMoaStudentSelect', '#editMoaStudentHint');
+
+        $(document).on('click', '.btn-open-edit', function () {
+            const selectedStudents = JSON.parse($(this).attr('data-selected-students') || '[]');
+            const manualStudents = JSON.parse($(this).attr('data-manual-students') || '[]');
+            const companyId = $(this).attr('data-company-id') || '';
+
+            $('#editCompanyForm').attr('action', '/company/' + companyId);
+            $('#edit_company_name').val($(this).attr('data-company-name') || '');
+            $('#edit_company_address').val($(this).attr('data-company-address') || '');
+            $('#edit_company_rep').val($(this).attr('data-company-rep') || '');
+            $('#edit_company_no').val($(this).attr('data-company-no') || '');
+            $('#edit_company_email').val($(this).attr('data-company-email') || '');
+            $('#edit_school_year_start').val($(this).attr('data-school-year-start') || '');
+            $('#edit_school_year_end').val($(this).attr('data-school-year-end') || '');
+            $('#editMoaCourseSelect').val($(this).attr('data-course') || '');
+            $('#editMoaStudentSearch').val('');
+            $('#editManualStudentInput').val(Array.isArray(manualStudents) ? manualStudents.join(', ') : '');
+
+            filterEditStudents();
+
+            const selectedSet = new Set(Array.isArray(selectedStudents) ? selectedStudents : []);
+            Array.from(document.getElementById('editMoaStudentSelect').options).forEach(function (option) {
+                option.selected = selectedSet.has(option.value) && !option.disabled;
+            });
         });
-        $('#moaStudentSearch').on('input', filterStudentOptionsByCourse);
-        filterStudentOptionsByCourse();
 
         // File validation error
         @if ($errors->has('file'))
@@ -1253,7 +1451,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             });
         @endif
 
-        $('form[action$="/companyCreate"]').on('submit', function (e) {
+        $('form[action$="/companyCreate"], #editCompanyForm').on('submit', function (e) {
             if (this.dataset.submitting === 'true') {
                 e.preventDefault();
                 return;
@@ -1264,7 +1462,9 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             const submitButton = this.querySelector('button[type="submit"]');
             if (submitButton) {
                 submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Uploading...';
+                submitButton.innerHTML = this.id === 'editCompanyForm'
+                    ? '<i class="fa fa-spinner fa-spin me-1"></i> Saving...'
+                    : '<i class="fa fa-spinner fa-spin me-1"></i> Uploading...';
             }
         });
 

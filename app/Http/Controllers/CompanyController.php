@@ -59,7 +59,7 @@ private function requireStudentSession()
         $currentYear = now()->year;
     
         // Retrieve the selected company or companies
-        $companies = Company::all(); // Get all companies
+        $companies = Company::with('students')->get(); // Get all companies
         $schoolYears = Company::whereNotNull('school_year')
             ->pluck('school_year')
             ->filter()
@@ -310,6 +310,126 @@ $res = $fileup->save();
     else {
         return back()->with('fail', 'Something went wrong. Company and students could not be created.');
     }
+}
+
+public function companyUpdate(Request $request, $id)
+{
+    $data = [];
+
+    if (Session::has('loginId')) {
+        $data = User::where('id', '=', Session::get('loginId'))->first();
+    }
+
+    $company = Company::with('students')->find($id);
+
+    if (!$company) {
+        return back()->with('fail', 'MOA record not found.');
+    }
+
+    $validator = Validator::make($request->all(), [
+        'file' => 'nullable|mimes:pdf|max:10240',
+        'course' => 'required|exists:courses,course',
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+    }
+
+    $oldValues = [
+        'company_name' => $company->company_name,
+        'company_address' => $company->company_address,
+        'company_rep' => $company->company_rep,
+        'companyNo' => $company->companyNo,
+        'company_email' => $company->company_email,
+        'school_year' => $company->school_year,
+        'course' => $company->course,
+        'student_names_display' => $company->student_names_display ?? null,
+    ];
+
+    $company->company_name = $request->company_name;
+    $company->company_address = $request->company_address;
+    $company->company_rep = $request->company_rep;
+    $company->companyNo = $request->filled('companyNo') ? $request->companyNo : 'N/A';
+    $company->company_email = $request->company_email;
+    $startYear = $request->input('school_year_start');
+    $endYear = $request->input('school_year_end');
+    $company->school_year = $startYear . '-' . $endYear;
+    $company->course = $request->input('course');
+
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move('assets', $filename);
+
+        $oldFilePath = public_path('assets/' . $company->file);
+        if (!empty($company->file) && file_exists($oldFilePath)) {
+            @unlink($oldFilePath);
+        }
+
+        $company->file = $filename;
+    }
+
+    $selectedStudentNames = $request->input('student_names', []);
+    $manualStudentNames = $request->input('manual_student_names', '');
+    $parsedManualNames = array_values(array_unique(array_filter(array_map('trim', preg_split('/[\r\n,]+/', (string) $manualStudentNames)))));
+    $studentNames = array_values(array_unique(array_filter(array_map('trim', array_merge($selectedStudentNames, $parsedManualNames)))));
+
+    $hasStudentDisplayColumn = Schema::hasColumn('companies', 'student_names_display');
+
+    if ($hasStudentDisplayColumn) {
+        $company->student_names_display = implode(', ', $studentNames);
+    } elseif (!empty($manualStudentNames)) {
+        return back()
+            ->withInput()
+            ->with('fail', 'Manual student names cannot be saved yet. Please add column companies.student_names_display first.');
+    }
+
+    $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
+    $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
+
+    if (!empty($studentNames)) {
+        $mismatchedStudents = $existingStudents->filter(function ($student) use ($company) {
+            return $student->course !== $company->course;
+        });
+
+        if ($mismatchedStudents->isNotEmpty()) {
+            $studentList = $mismatchedStudents->map(function ($student) {
+                return $student->full_name;
+            })->implode(', ');
+
+            return back()
+                ->withInput()
+                ->with('fail', 'Selected student course does not match the MOA course: ' . $studentList);
+        }
+    }
+
+    if ($company->save()) {
+        $company->students()->sync($existingStudents->pluck('id')->all());
+
+        AuditLogger::log(
+            'MOA Upload',
+            'Update',
+            'Updated MOA: ' . $company->company_name,
+            Session::get('loginId') ?? null,
+            $oldValues,
+            [
+                'company_name' => $company->company_name,
+                'company_address' => $company->company_address,
+                'company_rep' => $company->company_rep,
+                'companyNo' => $company->companyNo,
+                'company_email' => $company->company_email,
+                'school_year' => $company->school_year,
+                'course' => $company->course,
+                'student_names_display' => $company->student_names_display ?? null,
+            ]
+        );
+
+        return back()->with('success', 'MOA updated successfully.');
+    }
+
+    return back()->with('fail', 'Something went wrong. MOA could not be updated.');
 }
 
 
