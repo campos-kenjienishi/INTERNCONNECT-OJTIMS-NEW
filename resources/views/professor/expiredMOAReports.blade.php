@@ -239,6 +239,18 @@
         .table-card-body table.dataTable tbody td { padding: 14px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13.5px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
+        .table-card-body table.dataTable tbody td.email-cell { max-width: 220px; }
+        .table-card-body table.dataTable tbody td.email-cell .email-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            min-width: 0;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+        .table-card-body table.dataTable tbody td.email-cell .email-wrap i { margin-top: 2px; }
         .dataTables_wrapper { color: #333 !important; }
         .dataTables_length { color: #333 !important; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
         .dataTables_length label { color: #333 !important; font-weight: 500; }
@@ -744,8 +756,8 @@
                                     {{ $company->companyNo }}
                                 </div>
                             </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
+                            <td class="email-cell">
+                                <div class="email-wrap">
                                     <i class="fa fa-envelope" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
                                     {{ $company->company_email }}
                                 </div>
