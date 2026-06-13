@@ -645,17 +645,46 @@
                 </div>
             </div>
 
-            <div class="panel full">
-                <div class="panel-head">
-                    <h2>Analytics Insight</h2>
-                    <p>Quick read of the current advising snapshot</p>
+            <div data-ai-insight-card class="panel full">
+                <div class="panel-head" style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:42px; height:42px; border-radius:12px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fa fa-robot"></i>
+                        </div>
+                        <div>
+                            <h2>AI Analytics Insight</h2>
+                            <p>Summary generated from the current dashboard metrics</p>
+                        </div>
+                    </div>
+                    @php
+                        $analyticsAiSource = $analyticsInsights['source'] ?? 'fallback';
+                        $analyticsAiLabel = $analyticsAiSource === 'gemini'
+                            ? 'Gemini AI'
+                            : ($analyticsAiSource === 'openai' ? 'OpenAI' : 'Internal Insight');
+                    @endphp
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-left:auto;">
+                        <button type="button" data-ai-insight-button data-ai-context="analyticsAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:#dc2626; color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                            <i class="fa fa-magic"></i> Generate AI Insight
+                        </button>
+                        <span style="display:inline-flex; align-items:center; gap:7px; border:1px solid #fecaca; background:#fff5f5; color:#b91c1c; border-radius:999px; padding:8px 13px; font-size:12px; font-weight:800;">
+                            <i class="fa fa-brain"></i>
+                            <span data-ai-badge>{{ $analyticsAiLabel }}</span>
+                        </span>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <p style="font-size:14px; line-height:1.7; color:#374151; margin-bottom:16px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
+                <div data-ai-result-panel class="panel-body" style="display:none;">
+                    @if(($analyticsInsights['source'] ?? '') === 'fallback')
+                        <div data-ai-notice style="display:flex; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;">
+                            <i class="fa fa-exclamation-triangle" style="margin-top:2px;"></i>
+                            <div><strong>Gemini is temporarily unavailable.</strong> <span data-ai-notice-text>{{ $analyticsInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes, or later if the daily free-tier quota was reached.' }}</span></div>
+                        </div>
+                    @endif
+                    <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; color:#888;"></div>
+                    <p data-ai-summary style="font-size:14px; line-height:1.7; color:#374151; margin-bottom:16px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
                         <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
                             <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
-                            <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                            <ul data-ai-findings style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
                                 @forelse(($analyticsInsights['key_findings'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
@@ -665,7 +694,7 @@
                         </div>
                         <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
                             <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
-                            <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                            <ul data-ai-watchouts style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
                                 @forelse(($analyticsInsights['watchouts'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
@@ -675,13 +704,63 @@
                         </div>
                         <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
                             <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
-                            <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                            <ul data-ai-actions style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
                                 @forelse(($analyticsInsights['recommendations'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
                                     <li>No actions suggested.</li>
                                 @endforelse
                             </ul>
+                        </div>
+                    </div>
+                    @php
+                        $analyticsPromptSuggestions = [
+                            ['label' => 'Priorities', 'question' => 'What should I prioritize first based on this professor analytics dashboard?'],
+                            ['label' => 'Risk', 'question' => 'What risk level does this advising dashboard suggest and why?'],
+                            ['label' => 'Action plan', 'question' => 'Create a short action plan based on the current professor analytics metrics.'],
+                        ];
+
+                        if (($pendingApprovals ?? 0) > 0) {
+                            $analyticsPromptSuggestions[] = ['label' => 'Pending approvals', 'question' => 'How should I handle the pending student approvals shown here?'];
+                        }
+
+                        if (($filePending ?? 0) > 0) {
+                            $analyticsPromptSuggestions[] = ['label' => 'Pending files', 'question' => 'What should I do about pending file requirements?'];
+                        }
+
+                        if (($requestTotal ?? 0) > 0 && ($submittedRequests ?? 0) < ($requestTotal ?? 0)) {
+                            $analyticsPromptSuggestions[] = ['label' => 'Evaluations', 'question' => 'What does the evaluation completion data suggest I should follow up on?'];
+                        }
+                    @endphp
+                    <div style="margin-top:18px; border-top:1px solid #f0f0f0; padding-top:16px;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                            <div>
+                                <div style="font-size:13px; font-weight:800; color:#1f2937;">Ask AI about this dashboard</div>
+                                <div style="font-size:12px; color:#888; margin-top:2px;">Click a suggested prompt to ask instantly, or type your own question and press Ask.</div>
+                            </div>
+                            <div style="display:grid; gap:7px;">
+                                <div style="font-size:11px; font-weight:800; color:#991b1b; text-transform:uppercase; letter-spacing:.6px;">Suggested prompts</div>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    @foreach($analyticsPromptSuggestions as $suggestion)
+                                        <button type="button" class="analytics-ai-quick-question" data-question="{{ $suggestion['question'] }}" style="display:inline-flex; align-items:center; gap:7px; border:1.5px solid #fecaca; background:#fff; color:#991b1b; border-radius:9px; padding:9px 12px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(220,38,38,0.08);"><i class="fa fa-bolt" style="width:18px; height:18px; border-radius:6px; background:#fee2e2; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#dc2626;"></i>{{ $suggestion['label'] }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:grid; gap:10px;">
+                            <textarea id="analyticsAiQuestionInput" rows="3" maxlength="500" placeholder="Ask a question about this analytics dashboard..." style="width:100%; resize:vertical; min-height:86px; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; outline:none; line-height:1.6;"></textarea>
+                            <button type="button" id="analyticsAskAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap;">
+                                <i class="fa fa-paper-plane"></i> Ask
+                            </button>
+                        </div>
+                        <div id="analyticsAiAskStatus" style="display:none; margin-top:10px; font-size:12px; color:#888;"></div>
+                        <div id="analyticsAiAnswerBox" style="display:none; margin-top:12px; background:#fff; border:1px solid #eee; border-radius:12px; padding:14px;">
+                            <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:8px;">
+                                <div style="font-size:12px; font-weight:800; color:#dc2626; text-transform:uppercase; letter-spacing:.4px;">AI Answer</div>
+                                <div id="analyticsAiAnswerSource" style="font-size:11px; font-weight:700; color:#888;"></div>
+                            </div>
+                            <div id="analyticsAiAnswerText" style="font-size:13px; color:#333; line-height:1.7;"></div>
+                            <ul id="analyticsAiAnswerSteps" style="margin:10px 0 0; padding-left:18px; color:#444; font-size:13px; line-height:1.65;"></ul>
                         </div>
                     </div>
                 </div>
@@ -1037,6 +1116,128 @@
             fileMetrics: @json($analyticsPrintFileMetrics),
         };
 
+        window.analyticsAiContext = {
+            report_type: 'professor_analytics',
+            metrics: {
+                total_students: @json($totalStudents),
+                approved_students: @json($approvedStudents),
+                pending_approvals: @json($pendingApprovals),
+                denied_students: @json($deniedStudents),
+                inactive_students: @json($inactiveStudents),
+                request_total: @json($requestTotal),
+                submitted_requests: @json($submittedRequests),
+                template_count: @json($templateCount),
+                file_pending: @json($filePending),
+                file_approved: @json($fileApproved),
+                file_denied: @json($fileDenied),
+                class_analytics: @json($classAnalytics),
+                request_analytics: @json($requestAnalytics),
+                monthly_activity: @json($monthlyActivity)
+            },
+            insight: @json($analyticsInsights ?? [])
+        };
+
+        const analyticsAiContext = window.analyticsAiContext;
+
+        function renderAnalyticsAiAnswer(data) {
+            const answerBox = document.getElementById('analyticsAiAnswerBox');
+            const answerText = document.getElementById('analyticsAiAnswerText');
+            const answerSteps = document.getElementById('analyticsAiAnswerSteps');
+            const answerSource = document.getElementById('analyticsAiAnswerSource');
+
+            if (!answerBox || !answerText || !answerSteps || !answerSource) return;
+
+            answerText.textContent = data.answer || 'No answer was generated.';
+            answerSource.textContent = data.source === 'gemini' ? 'Gemini AI' : (data.source === 'openai' ? 'OpenAI' : 'Internal Insight');
+            answerSteps.innerHTML = '';
+            (data.next_steps || []).forEach(function (step) {
+                const li = document.createElement('li');
+                li.textContent = step;
+                answerSteps.appendChild(li);
+            });
+            answerBox.style.display = 'block';
+        }
+
+        function askAnalyticsAi(question) {
+            const status = document.getElementById('analyticsAiAskStatus');
+            const button = document.getElementById('analyticsAskAiBtn');
+
+            if (!question.trim()) {
+                if (status) {
+                    status.textContent = 'Type a question first.';
+                    status.style.display = 'block';
+                }
+                return;
+            }
+
+            if (button) button.disabled = true;
+            if (status) {
+                status.textContent = 'Asking AI...';
+                status.style.display = 'block';
+            }
+
+            fetch(@json(route('reports.ai.ask')), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': @json(csrf_token())
+                },
+                body: JSON.stringify({
+                    question: question,
+                    report_type: analyticsAiContext.report_type,
+                    metrics: analyticsAiContext.metrics,
+                    insight: analyticsAiContext.insight
+                })
+            })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('AI request failed.');
+                    return response.json();
+                })
+                .then(function (data) {
+                    renderAnalyticsAiAnswer(data);
+                    if (status) {
+                        status.textContent = data.source === 'fallback'
+                            ? ((data.availability && data.availability.message) ? data.availability.message + ' Internal answer shown.' : 'Gemini is unavailable or rate-limited. Internal answer shown; try again in a few minutes, or later if daily quota was reached.')
+                            : 'Answer generated.';
+                    }
+                })
+                .catch(function () {
+                    if (status) {
+                        status.textContent = 'AI could not answer right now. Please try again later.';
+                        status.style.display = 'block';
+                    }
+                })
+                .finally(function () {
+                    if (button) button.disabled = false;
+                });
+        }
+
+        document.querySelectorAll('.analytics-ai-quick-question').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const input = document.getElementById('analyticsAiQuestionInput');
+                const question = btn.getAttribute('data-question') || '';
+                if (input) input.value = question;
+                askAnalyticsAi(question);
+            });
+        });
+
+        const analyticsAskAiBtn = document.getElementById('analyticsAskAiBtn');
+        if (analyticsAskAiBtn) {
+            analyticsAskAiBtn.addEventListener('click', function () {
+                const input = document.getElementById('analyticsAiQuestionInput');
+                askAnalyticsAi(input ? input.value : '');
+            });
+        }
+
+        const analyticsAiCard = document.querySelector('[data-ai-insight-card]');
+        const analyticsPageHeader = document.querySelector('.page-header');
+        if (analyticsAiCard && analyticsPageHeader) {
+            analyticsAiCard.style.marginTop = '0';
+            analyticsAiCard.style.marginBottom = '24px';
+            analyticsPageHeader.insertAdjacentElement('afterend', analyticsAiCard);
+        }
+
         function buildAnalyticsPrintHTML() {
             const classRows = analyticsPrintData.classAnalytics.map(room => `
                 <tr>
@@ -1287,6 +1488,7 @@
         fetchMonthlyData();
     })();
 </script>
+<script src="{{ asset('js/ai-insight-controls.js') }}"></script>
 
 <!-- Drilldown Modal -->
 <div id="drilldownModal" role="dialog" aria-modal="true" aria-labelledby="drilldownTitle" tabindex="-1" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:9999;">
@@ -1320,49 +1522,6 @@
                 <tbody id="drilldownTableBody"></tbody>
             </table>
 
-            @if(!empty($analyticsInsights))
-                <div class="panel" style="margin-top:18px; border-left:4px solid #ef4444;">
-                    <div class="panel-head">
-                        <h2>AI Analytics Insight</h2>
-                        <p>Summary generated from the current dashboard metrics</p>
-                    </div>
-                    <div class="panel-body">
-                        <p style="font-size:14px; line-height:1.7; color:#374151; margin-bottom:16px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
-                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
-                            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                                <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
-                                <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
-                                    @forelse(($analyticsInsights['key_findings'] ?? []) as $item)
-                                        <li>{{ $item }}</li>
-                                    @empty
-                                        <li>No key findings available.</li>
-                                    @endforelse
-                                </ul>
-                            </div>
-                            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                                <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
-                                <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
-                                    @forelse(($analyticsInsights['watchouts'] ?? []) as $item)
-                                        <li>{{ $item }}</li>
-                                    @empty
-                                        <li>No major watchouts detected.</li>
-                                    @endforelse
-                                </ul>
-                            </div>
-                            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                                <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
-                                <ul style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
-                                    @forelse(($analyticsInsights['recommendations'] ?? []) as $item)
-                                        <li>{{ $item }}</li>
-                                    @empty
-                                        <li>No actions suggested.</li>
-                                    @endforelse
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid #e5e7eb;">
             <span id="drilldownPaginationInfo" style="font-size:12px;color:#666;"></span>

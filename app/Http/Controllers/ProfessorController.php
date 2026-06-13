@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Helpers\AuditLogger;
+use App\Services\ReportAiInsightService;
 
 
 class ProfessorController extends Controller
@@ -678,14 +679,90 @@ public function requirementStatus(Request $request, $roomId)
         ]
     );
 
+    $requirementInsights = $this->buildRequirementStatusInsights($course, $categories, $allStudentStatuses);
+
     return view('professor.requirementStatus', compact(
         'data',
         'course',
         'categories',
         'studentStatuses',
         'allStudentStatuses',
-        'activeView'
+        'activeView',
+        'requirementInsights'
     ));
+}
+
+protected function buildRequirementStatusInsights($course, $categories, $allStudentStatuses): array
+{
+    $totalStudents = $allStudentStatuses->count();
+    $categoryCount = $categories->count();
+    $completeStudents = $allStudentStatuses->where('missingCount', 0)->count();
+    $studentsWithMissing = $allStudentStatuses->filter(fn ($status) => $status['missingCount'] > 0)->count();
+    $studentsWithPending = $allStudentStatuses->filter(fn ($status) => $status['pendingCount'] > 0)->count();
+    $averageCompletion = $totalStudents > 0 ? round($allStudentStatuses->avg('completion')) : 0;
+    $submittedRequirements = (int) $allStudentStatuses->sum('submittedCount');
+    $missingRequirements = (int) $allStudentStatuses->sum('missingCount');
+    $approvedRequirements = (int) $allStudentStatuses->sum('approvedCount');
+    $pendingRequirements = (int) $allStudentStatuses->sum('pendingCount');
+    $deniedRequirements = (int) $allStudentStatuses->sum('deniedCount');
+
+    $topMissing = $allStudentStatuses
+        ->flatMap(fn ($status) => $status['missing']->values())
+        ->countBy()
+        ->sortDesc()
+        ->take(5)
+        ->map(fn ($count, $label) => ['label' => $label, 'count' => $count])
+        ->values();
+
+    $classLabel = trim(($course->course ?? '') . ' ' . ($course->room ?? ''));
+    $schoolYear = ($course->school_year_start && $course->school_year_end)
+        ? $course->school_year_start . '-' . $course->school_year_end
+        : 'Not set';
+
+    $highlights = [
+        'Class coverage includes ' . $totalStudents . ' student' . ($totalStudents === 1 ? '' : 's') . ' and ' . $categoryCount . ' required categor' . ($categoryCount === 1 ? 'y' : 'ies') . '.',
+        $completeStudents . ' student' . ($completeStudents === 1 ? '' : 's') . ' have completed all tracked requirement categories.',
+        'Average requirement completion is ' . $averageCompletion . '%.',
+    ];
+
+    if ($topMissing->isNotEmpty()) {
+        $firstMissing = $topMissing->first();
+        $highlights[] = 'Most common missing requirement: ' . $firstMissing['label'] . ' (' . $firstMissing['count'] . ' student' . ($firstMissing['count'] === 1 ? '' : 's') . ').';
+    }
+
+    $watchouts = [];
+    if ($studentsWithMissing > 0) {
+        $watchouts[] = $studentsWithMissing . ' student' . ($studentsWithMissing === 1 ? '' : 's') . ' still have missing requirement categories.';
+    }
+    if ($pendingRequirements > 0) {
+        $watchouts[] = $pendingRequirements . ' submitted requirement' . ($pendingRequirements === 1 ? '' : 's') . ' still need review.';
+    }
+    if ($deniedRequirements > 0) {
+        $watchouts[] = $deniedRequirements . ' requirement' . ($deniedRequirements === 1 ? '' : 's') . ' have been denied and may need resubmission.';
+    }
+
+    $actions = [
+        'Prioritize students with missing or denied requirements.',
+        'Review pending submitted files before exporting the report.',
+        'Use the requirement tabs to isolate missing, pending, approved, and denied items.',
+    ];
+
+    return app(ReportAiInsightService::class)->summarize('requirement_status', [
+        'class' => $classLabel,
+        'school_year' => $schoolYear,
+        'total_students' => $totalStudents,
+        'required_categories' => $categoryCount,
+        'complete_students' => $completeStudents,
+        'students_with_missing' => $studentsWithMissing,
+        'students_with_pending' => $studentsWithPending,
+        'average_completion' => $averageCompletion,
+        'submitted_requirements' => $submittedRequirements,
+        'missing_requirements' => $missingRequirements,
+        'approved_requirements' => $approvedRequirements,
+        'pending_requirements' => $pendingRequirements,
+        'denied_requirements' => $deniedRequirements,
+        'top_missing_requirements' => $topMissing->all(),
+    ], $highlights, $watchouts, $actions);
 }
 
     

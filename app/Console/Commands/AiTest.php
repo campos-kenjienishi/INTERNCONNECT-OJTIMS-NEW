@@ -25,11 +25,22 @@ class AiTest extends Command
     {
         $this->info('AI Provider: ' . config('services.ai.provider'));
 
+        $provider = (string) config('services.ai.provider');
+
+        if ($provider === 'openai' && empty(config('services.ai.openai_api_key'))) {
+            $this->warn('OpenAI API key is not configured. The command will run fallback summarizer.');
+        } elseif ($provider === 'openai') {
+            $this->line('OpenAI endpoint: ' . config('services.ai.openai_endpoint'));
+            $this->line('OpenAI model: ' . config('services.ai.openai_model'));
+        }
+
         $endpoint = config('services.ai.gemini_endpoint');
         $key = config('services.ai.gemini_api_key');
 
-        if (empty($endpoint) || empty($key)) {
-            $this->warn('Gemini endpoint or API key not configured. The command will run fallback summarizer.');
+        if ($provider === 'gemini' && empty($key)) {
+            $this->warn('Gemini API key is not configured. The command will run fallback summarizer.');
+        } elseif ($provider === 'gemini' && empty($endpoint)) {
+            $this->line('Gemini endpoint is blank; using the default generateContent endpoint for the configured model.');
         }
 
         /** @var ReportAiInsightService $service */
@@ -42,7 +53,7 @@ class AiTest extends Command
             'course' => 'BSIT',
         ];
 
-        $result = $service->summarize('moa', $metrics, ['Strong company engagement'], ['2 expired MOAs'], ['Follow up with partners']);
+        $result = $service->summarize('moa', $metrics, ['Strong company engagement'], ['2 expired MOAs'], ['Follow up with partners'], true);
 
         $this->line(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 

@@ -38,10 +38,14 @@ return [
 
     'ai' => [
         'provider' => env('AI_PROVIDER', 'gemini'),
-        'model' => env('AI_MODEL', ''),
+        'model' => env('AI_MODEL', 'gemini-3.5-flash'),
         'gemini_endpoint' => env('GEMINI_API_ENDPOINT', ''),
         'gemini_api_key' => env('GEMINI_API_KEY', ''),
+        'openai_endpoint' => env('OPENAI_API_ENDPOINT', 'https://api.openai.com/v1/responses'),
+        'openai_api_key' => env('OPENAI_API_KEY', ''),
+        'openai_model' => env('OPENAI_MODEL', env('AI_MODEL', 'gpt-4.1-mini')),
         'cache_ttl' => (int) env('AI_CACHE_TTL', 300),
+        'auto_insights' => filter_var(env('AI_AUTO_INSIGHTS', false), FILTER_VALIDATE_BOOL),
     ],
 
 

@@ -148,6 +148,49 @@
 
     <div class="card-shell section-gap">
         <div class="card-header-shell">
+            <h2><span class="header-icon"><i class="fa fa-robot"></i></span> AI Evaluation Insight</h2>
+            <button type="button" class="btn-eval btn-eval-primary" id="generateEvaluationInsightBtn">
+                <i class="fa fa-magic"></i> Generate AI Insight
+            </button>
+        </div>
+        <div class="card-body-shell" id="evaluationInsightPanel" style="display:none;">
+            <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                <button type="button" id="evaluationInsightCloseBtn" class="btn-eval btn-eval-outline" style="padding:7px 11px; font-size:12px;">
+                    <i class="fa fa-times"></i> Close
+                </button>
+            </div>
+            <div class="panel-note" id="evaluationInsightIntro">
+                AI insight is generated only when you click the button, so Gemini usage is controlled by the user.
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:14px;">
+                <div class="summary-card"><div class="label">Submitted</div><div class="value">{{ $evaluationAiData['metrics']['submitted_evaluations'] ?? 0 }}</div></div>
+                <div class="summary-card"><div class="label">Pending</div><div class="value">{{ $evaluationAiData['metrics']['pending_evaluations'] ?? 0 }}</div></div>
+                <div class="summary-card"><div class="label">Expired</div><div class="value">{{ $evaluationAiData['metrics']['expired_requests'] ?? 0 }}</div></div>
+                <div class="summary-card"><div class="label">Classes Pending</div><div class="value">{{ $evaluationAiData['metrics']['classes_with_pending'] ?? 0 }}</div></div>
+            </div>
+            <div id="evaluationAiStatus" style="display:none; font-size:12px; color:var(--text-secondary); margin-bottom:12px;"></div>
+            <div id="evaluationAiResult" style="display:none;">
+                <p id="evaluationAiSummary" style="font-size:14px; line-height:1.7; color:var(--text-primary); margin:0 0 16px;"></p>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+                    <div style="background:var(--surface-muted); border:1px solid var(--border); border-radius:12px; padding:14px;">
+                        <div style="font-size:12px; font-weight:800; color:var(--danger); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
+                        <ul id="evaluationAiFindings" style="margin:0; padding-left:18px; color:var(--text-primary); line-height:1.65;"></ul>
+                    </div>
+                    <div style="background:var(--surface-muted); border:1px solid var(--border); border-radius:12px; padding:14px;">
+                        <div style="font-size:12px; font-weight:800; color:var(--danger); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
+                        <ul id="evaluationAiWatchouts" style="margin:0; padding-left:18px; color:var(--text-primary); line-height:1.65;"></ul>
+                    </div>
+                    <div style="background:var(--surface-muted); border:1px solid var(--border); border-radius:12px; padding:14px;">
+                        <div style="font-size:12px; font-weight:800; color:var(--danger); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
+                        <ul id="evaluationAiActions" style="margin:0; padding-left:18px; color:var(--text-primary); line-height:1.65;"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-shell section-gap">
+        <div class="card-header-shell">
             <h2><span class="header-icon"><i class="fa fa-door-open"></i></span> Student Evaluation Status by Class</h2>
             <span class="badge-like secondary">{{ $classrooms->total() }} Classes</span>
         </div>
@@ -238,6 +281,90 @@
 
     <script>
         (function () {
+            const evaluationAiData = @json($evaluationAiData ?? []);
+            const generateInsightBtn = document.getElementById('generateEvaluationInsightBtn');
+            const insightPanel = document.getElementById('evaluationInsightPanel');
+            const insightCloseBtn = document.getElementById('evaluationInsightCloseBtn');
+            const insightStatus = document.getElementById('evaluationAiStatus');
+            const insightIntro = document.getElementById('evaluationInsightIntro');
+            const insightResult = document.getElementById('evaluationAiResult');
+            const insightSummary = document.getElementById('evaluationAiSummary');
+            const insightFindings = document.getElementById('evaluationAiFindings');
+            const insightWatchouts = document.getElementById('evaluationAiWatchouts');
+            const insightActions = document.getElementById('evaluationAiActions');
+
+            function renderList(target, items, emptyText) {
+                if (!target) return;
+                target.innerHTML = '';
+                const list = Array.isArray(items) && items.length ? items : [emptyText];
+                list.forEach(function (item) {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    target.appendChild(li);
+                });
+            }
+
+            function renderEvaluationInsight(data) {
+                if (!insightResult || !insightSummary) return;
+
+                insightSummary.textContent = data.summary || 'No AI insight was returned.';
+                renderList(insightFindings, data.key_findings, 'No key findings available.');
+                renderList(insightWatchouts, data.watchouts, 'No major watchouts detected.');
+                renderList(insightActions, data.recommendations, 'No actions suggested.');
+                insightResult.style.display = 'block';
+                if (insightIntro) insightIntro.style.display = 'none';
+            }
+
+            if (generateInsightBtn) {
+                generateInsightBtn.addEventListener('click', function () {
+                    generateInsightBtn.disabled = true;
+                    if (insightPanel) {
+                        insightPanel.style.display = 'block';
+                    }
+                    if (insightStatus) {
+                        insightStatus.textContent = 'Generating AI insight...';
+                        insightStatus.style.display = 'block';
+                    }
+
+                    fetch(@json(route('reports.ai.insight')), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': @json(csrf_token())
+                        },
+                        body: JSON.stringify(evaluationAiData)
+                    })
+                        .then(function (response) {
+                            if (!response.ok) throw new Error('AI insight request failed.');
+                            return response.json();
+                        })
+                        .then(function (data) {
+                            renderEvaluationInsight(data);
+                            if (insightStatus) {
+                                insightStatus.textContent = data.source === 'fallback'
+                                    ? ((data.availability && data.availability.message) ? data.availability.message + ' Internal insight shown.' : 'Gemini is unavailable or rate-limited. Internal insight shown.')
+                                    : 'AI insight generated.';
+                            }
+                        })
+                        .catch(function () {
+                            if (insightStatus) {
+                                insightStatus.textContent = 'AI insight could not be generated right now. Please try again later.';
+                                insightStatus.style.display = 'block';
+                            }
+                        })
+                        .finally(function () {
+                            generateInsightBtn.disabled = false;
+                        });
+                });
+            }
+
+            if (insightCloseBtn && insightPanel) {
+                insightCloseBtn.addEventListener('click', function () {
+                    insightPanel.style.display = 'none';
+                });
+            }
+
             const questionList = document.getElementById('ratingQuestionList');
             const addButton = document.getElementById('addQuestionBlockBtn');
             const template = document.getElementById('questionBlockTemplate');

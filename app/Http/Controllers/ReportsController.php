@@ -317,7 +317,9 @@ public function reportsExpired()
         Session::get('loginId') ?? null
     );
 
-    return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user','course'));
+    $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
+
+    return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user','course', 'reportInsights'));
 }
 
 public function sendEmailExpired(Request $request)
@@ -355,6 +357,47 @@ public function sendEmailExpired(Request $request)
     );
 
     return back()->with(['message' => 'Email sent successfully', 'reportInsights' => $reportInsights]);
+}
+
+public function askAi(Request $request)
+{
+    $validated = $request->validate([
+        'question' => 'required|string|max:500',
+        'report_type' => 'nullable|string|max:80',
+        'metrics' => 'nullable|array',
+        'insight' => 'nullable|array',
+    ]);
+
+    $answer = app(ReportAiInsightService::class)->answerQuestion(
+        $validated['question'],
+        $validated['report_type'] ?? 'report',
+        $validated['metrics'] ?? [],
+        $validated['insight'] ?? []
+    );
+
+    return response()->json($answer);
+}
+
+public function generateAiInsight(Request $request)
+{
+    $validated = $request->validate([
+        'report_type' => 'nullable|string|max:80',
+        'metrics' => 'nullable|array',
+        'highlights' => 'nullable|array',
+        'watchouts' => 'nullable|array',
+        'actions' => 'nullable|array',
+    ]);
+
+    $insight = app(ReportAiInsightService::class)->summarize(
+        $validated['report_type'] ?? 'report',
+        $validated['metrics'] ?? [],
+        $validated['highlights'] ?? [],
+        $validated['watchouts'] ?? [],
+        $validated['actions'] ?? [],
+        true
+    );
+
+    return response()->json($insight);
 }
 
 
