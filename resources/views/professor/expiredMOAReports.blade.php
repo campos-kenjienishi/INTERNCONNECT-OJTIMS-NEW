@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ asset('css/professor_moa-responsive.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }

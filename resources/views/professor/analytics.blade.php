@@ -343,15 +343,6 @@
         .bar-row span { width: 62px; font-size: 11px; font-weight: 600; color: #777; }
         .bar-row .track { margin-top: 0; }
 
-        @media (max-width: 960px) {
-            .sidebar { width: 100%; height: auto; position: static; }
-            .main-content { margin-left: 0; }
-            .analytics-grid { grid-template-columns: 1fr; }
-            .panel.full { grid-column: auto; }
-            .page-content { padding: 18px; }
-            .topbar-title { display: none; }
-        }
-
         @media print {
             @page { size: A4 portrait; margin: 14mm; }
             body > *:not(#print-area-wrapper) { display: none !important; }
@@ -379,9 +370,22 @@
             margin-left: 8px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+        pointer-events: none;
+    }
+    .sidebar-overlay.active {
+        display: block;
+        pointer-events: auto;
+    }
     </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div> 
 <div class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
@@ -847,44 +851,42 @@
 </div>
 
 <script>
-    (function () {
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        const menuToggle = document.getElementById('menuToggle');
-        const darkToggle = document.getElementById('darkmodeToggle');
-        const darkIcon = document.getElementById('darkmodeIcon');
-        const storageKey = 'internconnect_darkmode';
+   // Replace your existing sidebar toggle script
+(function () {
+    const sidebar     = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const menuToggle  = document.getElementById('menuToggle');
+    const overlay     = document.getElementById('sidebarOverlay');
 
-        function applyDarkMode(isDark) {
-            document.body.classList.toggle('dark-mode', isDark);
-            if (darkIcon) {
-                darkIcon.className = isDark ? 'fa fa-sun' : 'fa fa-moon';
-            }
+    if (!sidebar || !menuToggle) return;
+
+    menuToggle.addEventListener('click', function () {
+        const isMobile = window.innerWidth < 1024;
+
+        if (isMobile) {
+            sidebar.classList.toggle('mobile-open');
+            if (overlay) overlay.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            if (mainContent) mainContent.classList.toggle('expanded');
         }
+    });
 
-        const savedMode = localStorage.getItem(storageKey);
-        applyDarkMode(savedMode === '1');
-
-        if (menuToggle && sidebar && mainContent) {
-            menuToggle.addEventListener('click', function () {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-            });
-        }
-
-        if (darkToggle) {
-            darkToggle.addEventListener('click', function () {
-                const isDark = !document.body.classList.contains('dark-mode');
-                applyDarkMode(isDark);
-                localStorage.setItem(storageKey, isDark ? '1' : '0');
-            });
-        }
-
-        document.querySelectorAll('.fill[data-width]').forEach(function (el) {
-            const width = Number(el.dataset.width || 0);
-            el.style.width = Math.max(0, Math.min(100, width)) + '%';
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
         });
-    })();
+    }
+
+    /* Close sidebar when resizing back to desktop */
+    window.addEventListener('resize', function () {
+        if (window.innerWidth >= 1024) {
+            sidebar.classList.remove('mobile-open');
+            if (overlay) overlay.classList.remove('active');
+        }
+    });
+})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

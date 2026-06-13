@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/student_moa-responsive.css') }}">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1175,7 +1176,7 @@
                 <div class="modal-body">
 
                     <!-- Two-column grid -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px;">
+                    <div class="moa-form-grid">
 
                         <!-- LEFT COLUMN (4 fields) -->
                         <div>
