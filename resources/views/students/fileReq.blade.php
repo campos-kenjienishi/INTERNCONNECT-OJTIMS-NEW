@@ -1206,10 +1206,11 @@
                         <i class="fa fa-paperclip"></i> Choose File
                     </label>
                     <div class="file-upload-zone" id="dropZone">
-                        <input type="file" name="file" required id="fileInput" accept="application/pdf,.pdf">
+                        <input type="file" name="file" required id="fileInput" data-max-size-mb="2" accept="application/pdf,.pdf">
                         <div class="upload-icon"><i class="fa fa-cloud-upload-alt"></i></div>
                         <p id="fileLabel">Click or drag a file here to upload</p>
-                        <span>Accepts PDF files only</span>
+                        <span>Accepts PDF files only | Max file size: 2 MB</span>
+                        <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                     </div>
 
                     <input type="hidden" name="uploadedBy" value="{{ $user->full_name }}">
@@ -1336,6 +1337,7 @@
     }
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

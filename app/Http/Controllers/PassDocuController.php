@@ -180,7 +180,7 @@ public function fileReqCreate(Request $request){
 
     $request->validate([
         'fileName' => 'required|string',
-        'file' => 'required|file|mimes:pdf|max:10240',
+        'file' => 'required|file|mimes:pdf|max:2048',
         'uploadedBy' => 'required|string',
         'adviser' => 'required|string',
     ], [

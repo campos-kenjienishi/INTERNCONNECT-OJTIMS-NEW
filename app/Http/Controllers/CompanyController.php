@@ -165,7 +165,7 @@ public function companyCreate(Request $request)
 
     $validator = Validator::make($request->all(), [
                         
-        'file' => 'required|mimes:pdf|max:10240', // max:10240 is the maximum file size in kilobytes (10 MB)
+        'file' => 'required|mimes:pdf|max:2048', // max:2048 is the maximum file size in kilobytes (2 MB)
     ]);
 
     if ($validator->fails()) {
@@ -333,7 +333,7 @@ public function companyUpdate(Request $request, $id)
     }
 
     $validator = Validator::make($request->all(), [
-        'file' => 'nullable|mimes:pdf|max:10240',
+        'file' => 'nullable|mimes:pdf|max:2048',
         'course' => 'required|exists:courses,course',
     ]);
 

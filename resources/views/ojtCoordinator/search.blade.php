@@ -148,10 +148,14 @@
                                 <td>
                                     <input type="text" name="name">
                                 </td>
-                                <td>
-                                    <input type="file" name="file">
+                            <td>
+                                <input type="file" name="file" data-max-size-mb="2">
+                                <div style="margin-top:6px; font-size:11px; color:#777;">
+                                    Max file size: 2 MB
+                                </div>
+                                <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:11px; font-weight:600;"></div>
 
-                                </td>
+                            </td>
                                 <td>
                                     <input type="submit" style="background-color:#FFA800;border-radius: 12px;padding: 5px 10px;border-color : gold;color:white;">
                                 </td>
@@ -284,12 +288,11 @@
         });
     });
 </script>
+<script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 
 </html>
-
-
 
 
 

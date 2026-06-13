@@ -1249,6 +1249,7 @@
                                 <div style="font-size: 11.5px; color: #777; line-height: 1.6;">
                                     Ensure your MOA is properly <strong>notarized</strong> before submitting.
                                     Accepted format: <strong>PDF only</strong>.
+                                    Max file size: <strong>2 MB</strong>.
                                 </div>
                             </div>
                         </div>
@@ -1263,10 +1264,11 @@
                         <i class="fa fa-paperclip"></i> MOA Document
                     </label>
                     <div class="file-upload-zone" id="moaDropZone">
-                        <input type="file" name="file" id="moaFileInput" accept=".pdf,application/pdf" required>
+                        <input type="file" name="file" id="moaFileInput" data-max-size-mb="2" accept=".pdf,application/pdf" required>
                         <i class="fa fa-cloud-upload-alt upload-icon"></i>
                         <p id="moaFileLabel">Click or drag your notarized MOA file here</p>
-                        <span>Supported: PDF only</span>
+                        <span>Supported: PDF only | Max file size: 2 MB</span>
+                        <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                     </div>
 
                 </div>
@@ -1443,6 +1445,7 @@ window.addEventListener('resize', function () {
 });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 <script src="{{ url('/js/mobile-utils.js') }}"></script>
 </body>

@@ -948,13 +948,14 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <i class="fa fa-file-word"></i> Choose File
                         </label>
                         <div class="file-dropzone" id="dropzone">
-                            <input type="file" name="file" id="fileInput"
+                            <input type="file" name="file" id="fileInput" data-max-size-mb="2"
                                    accept=".doc,.docx" required>
                             <div class="file-dropzone-icon">
                                 <i class="fa fa-cloud-upload-alt"></i>
                             </div>
                             <div class="file-dropzone-title">Click or drag to upload</div>
-                            <div class="file-dropzone-sub">Accepted: .doc, .docx files only</div>
+                            <div class="file-dropzone-sub">Accepted: .doc, .docx files only | Max file size: 2 MB</div>
+                            <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                             <div class="file-dropzone-name" id="selectedFileName"></div>
                         </div>
                     </div>
@@ -1082,6 +1083,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

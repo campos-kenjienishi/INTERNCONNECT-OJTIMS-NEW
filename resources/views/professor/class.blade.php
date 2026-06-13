@@ -1013,7 +1013,11 @@
                                                     <input class="modal-field-input" type="text" name="name" placeholder="Enter template name" required>
 
                                                     <label class="modal-field-label"><i class="fa fa-paperclip"></i> File</label>
-                                                    <input class="modal-field-input" type="file" name="file" accept=".doc,.docx,.pdf" required>
+                                                    <input class="modal-field-input" type="file" name="file" data-max-size-mb="2" accept=".doc,.docx,.pdf" required>
+                                                    <div style="margin-top:6px; font-size:12px; color:#777;">
+                                                        Accepted: .doc, .docx, .pdf | Max file size: 2 MB
+                                                    </div>
+                                                    <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
 
                                                     <div style="margin-top:12px;">
                                                         <strong style="font-size:13px; color:#555;">Uploaded in this room:</strong>
@@ -1722,6 +1726,7 @@
     });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
