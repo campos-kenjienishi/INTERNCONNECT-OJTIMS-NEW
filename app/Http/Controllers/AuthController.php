@@ -143,7 +143,42 @@ class AuthController extends Controller
         $fileCount = UploadedFile::where('uploader_name', $userName)->count();
         $announcements = Announcements::where('announcer', $userName)->latest()->get();
 
-        return view('ojtCoordinator.dashboard', compact('data','roleCount','roleCountP','fileCount', 'announcements'));
+        $pendingStudents = User::where('role', 0)->where('status', 0)->count();
+        $approvedStudents = User::where('role', 0)->where('status', 1)->count();
+        $pendingRequirements = FileRequirement::where('status', 0)->count();
+        $partnerCompanies = Company::count();
+        $placedStudents = Student::whereHas('companies')->count();
+        $unplacedStudents = max(0, $roleCount - $placedStudents);
+        $expiredMoaCount = $this->countExpiredMoaRecords();
+        $dashboardInsights = $this->buildCoordinatorDashboardInsights(
+            $roleCount,
+            $roleCountP,
+            $fileCount,
+            $announcements->count(),
+            $pendingStudents,
+            $approvedStudents,
+            $pendingRequirements,
+            $partnerCompanies,
+            $placedStudents,
+            $unplacedStudents,
+            $expiredMoaCount
+        );
+
+        return view('ojtCoordinator.dashboard', compact(
+            'data',
+            'roleCount',
+            'roleCountP',
+            'fileCount',
+            'announcements',
+            'dashboardInsights',
+            'pendingStudents',
+            'approvedStudents',
+            'pendingRequirements',
+            'partnerCompanies',
+            'placedStudents',
+            'unplacedStudents',
+            'expiredMoaCount'
+        ));
     }
 
     public function analytics()
@@ -1320,6 +1355,66 @@ class AuthController extends Controller
             $data=User::where('id','=', Session::get('loginId'))->first();
         }
         return view('students.pending', compact('data'));
+    }
+
+    protected function buildCoordinatorDashboardInsights(int $recentStudents, int $professors, int $templates, int $announcements, int $pendingStudents, int $approvedStudents, int $pendingRequirements, int $partnerCompanies, int $placedStudents, int $unplacedStudents, int $expiredMoaCount)
+    {
+        $highlights = [
+            'Dashboard coverage shows ' . $recentStudents . ' recent student records and ' . $professors . ' professor accounts.',
+            'Operational resources include ' . $templates . ' uploaded templates, ' . $partnerCompanies . ' partner companies, and ' . $announcements . ' posted announcements.',
+            'Placement coverage shows ' . $placedStudents . ' students with assigned companies.',
+        ];
+
+        $watchouts = [];
+        if ($pendingStudents > 0) {
+            $watchouts[] = $pendingStudents . ' student account' . ($pendingStudents === 1 ? '' : 's') . ' still need approval review.';
+        }
+        if ($pendingRequirements > 0) {
+            $watchouts[] = $pendingRequirements . ' requirement file' . ($pendingRequirements === 1 ? '' : 's') . ' are pending review.';
+        }
+        if ($expiredMoaCount > 0) {
+            $watchouts[] = $expiredMoaCount . ' MOA record' . ($expiredMoaCount === 1 ? '' : 's') . ' may need renewal follow-up.';
+        }
+        if ($unplacedStudents > 0) {
+            $watchouts[] = $unplacedStudents . ' recent student record' . ($unplacedStudents === 1 ? '' : 's') . ' are not yet matched with company placement data.';
+        }
+
+        $actions = [
+            'Review pending student approvals and requirement files first.',
+            'Check placement coverage for students without company assignments.',
+            'Use the MOA page to prioritize renewal follow-up for expired agreements.',
+        ];
+
+        return app(ReportAiInsightService::class)->summarize('coordinator_dashboard', [
+            'total_records' => $recentStudents,
+            'approved_students' => $approvedStudents,
+            'pending_students' => $pendingStudents,
+            'pending_files' => $pendingRequirements,
+            'total_companies' => $partnerCompanies,
+            'records_with_ojt' => $placedStudents,
+            'missing_ojt' => $unplacedStudents,
+            'expired_moa' => $expiredMoaCount,
+            'uploaded_templates' => $templates,
+            'announcements' => $announcements,
+        ], $highlights, $watchouts, $actions);
+    }
+
+    protected function countExpiredMoaRecords(): int
+    {
+        return Company::all()->filter(function ($company) {
+            if (!empty($company->valid_until)) {
+                try {
+                    return Carbon::parse($company->valid_until)->isPast();
+                } catch (\Throwable $e) {
+                    return false;
+                }
+            }
+
+            $parts = explode('-', str_replace(' ', '', (string) ($company->school_year ?? '0-0')));
+            $startYear = (int) ($parts[0] ?? 0);
+
+            return $startYear > 0 && ((now()->year - $startYear) > 3);
+        })->count();
     }
 
     protected function buildCoordinatorAnalyticsInsights($studentStatusAnalytics, $fileStatusAnalytics, $courseAnalytics, $topCompanies, int $totalStudents, int $partnerCompanies, int $placedStudents)

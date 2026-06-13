@@ -163,6 +163,61 @@ class EvaluationController extends Controller
             ];
         }
 
+        $latestRequests = $students->map(function ($student) use ($requests) {
+            return ($requests[$student->id] ?? collect())->first();
+        })->filter();
+
+        $totalStudents = $students->count();
+        $submittedRequests = $latestRequests->where('status', 'submitted')->count();
+        $sentRequests = $latestRequests->where('status', 'sent')->count();
+        $openedRequests = $latestRequests->where('status', 'opened')->count();
+        $expiredRequests = $latestRequests->where('status', 'expired')->count();
+        $pendingEvaluations = max($totalStudents - $submittedRequests, 0);
+        $classesWithPending = collect($classStats)->filter(fn ($stat) => ($stat['pending_count'] ?? 0) > 0)->count();
+        $topPendingClass = $allClassrooms
+            ->map(function ($room) use ($classStats) {
+                return [
+                    'label' => trim(($room->course ?? '') . ' ' . ($room->room ?? '')),
+                    'pending' => (int) ($classStats[$room->id]['pending_count'] ?? 0),
+                    'total' => (int) ($classStats[$room->id]['total_count'] ?? 0),
+                    'submitted' => (int) ($classStats[$room->id]['submitted_count'] ?? 0),
+                ];
+            })
+            ->sortByDesc('pending')
+            ->first();
+
+        $evaluationAiData = [
+            'report_type' => 'professor_evaluation',
+            'metrics' => [
+                'total_classes' => $allClassrooms->count(),
+                'total_students' => $totalStudents,
+                'submitted_evaluations' => $submittedRequests,
+                'pending_evaluations' => $pendingEvaluations,
+                'sent_requests' => $sentRequests,
+                'opened_requests' => $openedRequests,
+                'expired_requests' => $expiredRequests,
+                'classes_with_pending' => $classesWithPending,
+                'top_pending_class' => $topPendingClass,
+                'template_title' => $template->title ?? null,
+                'template_version' => $template->version ?? null,
+            ],
+            'highlights' => [
+                'Evaluation coverage includes ' . $allClassrooms->count() . ' class' . ($allClassrooms->count() === 1 ? '' : 'es') . ' and ' . $totalStudents . ' student' . ($totalStudents === 1 ? '' : 's') . '.',
+                $submittedRequests . ' evaluation request' . ($submittedRequests === 1 ? '' : 's') . ' have been submitted.',
+                'Active template: ' . ($template->title ?? 'No active template') . '.',
+            ],
+            'watchouts' => array_values(array_filter([
+                $pendingEvaluations > 0 ? $pendingEvaluations . ' evaluation' . ($pendingEvaluations === 1 ? '' : 's') . ' still need follow-up.' : null,
+                $expiredRequests > 0 ? $expiredRequests . ' request' . ($expiredRequests === 1 ? '' : 's') . ' have expired.' : null,
+                $classesWithPending > 0 ? $classesWithPending . ' class' . ($classesWithPending === 1 ? '' : 'es') . ' still have pending evaluation submissions.' : null,
+            ])),
+            'actions' => [
+                'Open classes with pending evaluations and resend reminders where needed.',
+                'Review expired requests before exporting the evaluation report.',
+                'Keep the active template updated before sending new evaluation links.',
+            ],
+        ];
+
         $perPage = (int) request()->query('per_page', 10);
         if (!in_array($perPage, [10, 25, 50], true)) {
             $perPage = 10;
@@ -197,6 +252,7 @@ class EvaluationController extends Controller
             'students' => $students,
             'requestsByStudent' => $requests,
             'template' => $template,
+            'evaluationAiData' => $evaluationAiData,
         ]);
     }
 

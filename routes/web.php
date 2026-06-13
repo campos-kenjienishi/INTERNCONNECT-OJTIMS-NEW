@@ -214,6 +214,8 @@ Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
     Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
     Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     Route::post('/reportsExpired/send-email', [ReportsController::class, 'sendEmailExpired'])->name('reportsExpired.send.email');
+    Route::post('/reports/ai/ask', [ReportsController::class, 'askAi'])->name('reports.ai.ask');
+    Route::post('/reports/ai/insight', [ReportsController::class, 'generateAiInsight'])->name('reports.ai.insight');
 });
 
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ─────────────────

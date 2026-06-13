@@ -1248,6 +1248,129 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 </a>
             </div>
 
+            @if(!empty($dashboardInsights))
+                <section data-ai-insight-card style="background:#fff; border:1px solid #f1f1f1; border-left:5px solid var(--red); border-radius:14px; box-shadow:0 8px 28px rgba(15,23,42,0.06); margin-bottom:22px; overflow:hidden;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 20px; border-bottom:1px solid #f3f4f6; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="width:42px; height:42px; border-radius:12px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center;">
+                                <i class="fa fa-robot"></i>
+                            </div>
+                            <div>
+                                <h2 style="font-size:18px; font-weight:800; color:#111827; margin:0;">Today&apos;s AI Brief</h2>
+                                <p style="font-size:13px; color:#777; margin:4px 0 0;">Generated from current dashboard activity</p>
+                            </div>
+                        </div>
+                        @php
+                            $dashboardAiSource = $dashboardInsights['source'] ?? 'fallback';
+                            $dashboardAiLabel = $dashboardAiSource === 'gemini'
+                                ? 'Gemini AI'
+                                : ($dashboardAiSource === 'openai' ? 'OpenAI' : 'Internal insight');
+                        @endphp
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <button type="button" data-ai-insight-button data-ai-context="dashboardAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:#dc2626; color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                                <i class="fa fa-magic"></i> Generate AI Insight
+                            </button>
+                            <span style="display:inline-flex; align-items:center; gap:7px; border:1px solid #fecaca; background:#fff5f5; color:#b91c1c; border-radius:999px; padding:8px 13px; font-size:12px; font-weight:800;">
+                                <i class="fa fa-brain"></i> <span data-ai-badge>{{ $dashboardAiLabel }}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div data-ai-result-panel style="display:none; padding:20px;">
+                        @if(($dashboardInsights['source'] ?? '') === 'fallback')
+                            <div data-ai-notice style="display:flex; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;">
+                                <i class="fa fa-exclamation-triangle" style="margin-top:2px;"></i>
+                                <div><strong>Gemini is temporarily unavailable.</strong> <span data-ai-notice-text>{{ $dashboardInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes, or later if the daily free-tier quota was reached.' }}</span></div>
+                            </div>
+                        @endif
+                        <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; color:#777;"></div>
+                        <p data-ai-summary style="font-size:15px; line-height:1.7; color:#1f2937; margin:0 0 18px;">{{ $dashboardInsights['summary'] ?? 'No dashboard insight available.' }}</p>
+
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+                            <div style="background:#fafafa; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                                <div style="font-size:12px; font-weight:800; color:#dc2626; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
+                                <ul data-ai-findings style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                    @forelse(($dashboardInsights['key_findings'] ?? []) as $item)
+                                        <li>{{ $item }}</li>
+                                    @empty
+                                        <li>No key findings available.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                            <div style="background:#fafafa; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                                <div style="font-size:12px; font-weight:800; color:#dc2626; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
+                                <ul data-ai-watchouts style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                    @forelse(($dashboardInsights['watchouts'] ?? []) as $item)
+                                        <li>{{ $item }}</li>
+                                    @empty
+                                        <li>No major watchouts detected.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                            <div style="background:#fafafa; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
+                                <div style="font-size:12px; font-weight:800; color:#dc2626; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
+                                <ul data-ai-actions style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                                    @forelse(($dashboardInsights['recommendations'] ?? []) as $item)
+                                        <li>{{ $item }}</li>
+                                    @empty
+                                        <li>No actions suggested.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                        </div>
+
+                        @php
+                            $dashboardPromptSuggestions = [
+                                ['label' => 'Priorities', 'question' => 'What should we prioritize today based on this dashboard?'],
+                                ['label' => 'Risk', 'question' => 'What risks does this dashboard show and why?'],
+                                ['label' => 'Action plan', 'question' => 'Create a short coordinator action plan from this dashboard.'],
+                            ];
+
+                            if (($pendingStudents ?? 0) > 0) {
+                                $dashboardPromptSuggestions[] = ['label' => 'Pending students', 'question' => 'How should we handle the pending student accounts shown here?'];
+                            }
+
+                            if (($pendingRequirements ?? 0) > 0) {
+                                $dashboardPromptSuggestions[] = ['label' => 'Pending files', 'question' => 'What should we do about the pending requirement files?'];
+                            }
+
+                            if (($expiredMoaCount ?? 0) > 0) {
+                                $dashboardPromptSuggestions[] = ['label' => 'MOA renewals', 'question' => 'What should be done about the expired MOA records?'];
+                            }
+                        @endphp
+
+                        <div style="margin-top:18px; border-top:1px solid #f0f0f0; padding-top:16px;">
+                            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                                <div>
+                                    <div style="font-size:13px; font-weight:800; color:#1f2937;">Ask AI about this dashboard</div>
+                                    <div style="font-size:12px; color:#888; margin-top:2px;">Click a suggested prompt to ask instantly, or type your own question and press Ask.</div>
+                                </div>
+                                <div style="display:grid; gap:7px;">
+                                    <div style="font-size:11px; font-weight:800; color:#991b1b; text-transform:uppercase; letter-spacing:.6px;">Suggested prompts</div>
+                                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                        @foreach($dashboardPromptSuggestions as $suggestion)
+                                            <button type="button" class="dashboard-ai-quick-question" data-question="{{ $suggestion['question'] }}" style="display:inline-flex; align-items:center; gap:7px; border:1.5px solid #fecaca; background:#fff; color:#991b1b; border-radius:9px; padding:9px 12px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(220,38,38,0.08);"><i class="fa fa-bolt" style="width:18px; height:18px; border-radius:6px; background:#fee2e2; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#dc2626;"></i>{{ $suggestion['label'] }}</button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px; align-items:start;">
+                                <textarea id="dashboardAiQuestionInput" rows="3" placeholder="Ask about pending approvals, files, placements, MOAs, or next actions..." style="width:100%; min-height:82px; border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; resize:vertical;"></textarea>
+                                <button type="button" id="dashboardAskAiBtn" style="height:44px; border:none; border-radius:12px; padding:0 18px; background:#dc2626; color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px;"><i class="fa fa-paper-plane"></i> Ask</button>
+                            </div>
+                            <div id="dashboardAiAskStatus" style="display:none; margin-top:10px; font-size:12px; color:#777;"></div>
+                            <div id="dashboardAiAnswer" style="display:none; margin-top:12px; background:#fff7f7; border:1px solid #fecaca; border-radius:12px; padding:14px;">
+                                <div style="font-size:12px; font-weight:800; color:#b91c1c; margin-bottom:8px;">AI Answer</div>
+                                <p id="dashboardAiAnswerText" style="margin:0; color:#374151; line-height:1.7; font-size:13px;"></p>
+                                <div id="dashboardAiNextStepsWrap" style="display:none; margin-top:10px;">
+                                    <div style="font-size:12px; font-weight:800; color:#b91c1c; margin-bottom:6px;">Next Steps</div>
+                                    <ul id="dashboardAiNextSteps" style="margin:0; padding-left:18px; color:#374151; line-height:1.6; font-size:13px;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            @endif
+
             <!-- Dashboard Grid -->
             <div class="dashboard-grid">
 
@@ -1765,12 +1888,129 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
             }
         }
 
+        window.dashboardAiContext = {
+            report_type: 'coordinator_dashboard',
+            metrics: {
+                total_records: @json($roleCount ?? 0),
+                professors: @json($roleCountP ?? 0),
+                uploaded_templates: @json($fileCount ?? 0),
+                announcements: @json(isset($announcements) ? $announcements->count() : 0),
+                approved_students: @json($approvedStudents ?? 0),
+                pending_students: @json($pendingStudents ?? 0),
+                pending_files: @json($pendingRequirements ?? 0),
+                total_companies: @json($partnerCompanies ?? 0),
+                records_with_ojt: @json($placedStudents ?? 0),
+                missing_ojt: @json($unplacedStudents ?? 0),
+                expired_moa: @json($expiredMoaCount ?? 0)
+            },
+            insight: @json($dashboardInsights ?? null)
+        };
+
+        const dashboardAiContext = window.dashboardAiContext;
+
+        function renderDashboardAiAnswer(data) {
+            const answerBox = document.getElementById('dashboardAiAnswer');
+            const answerText = document.getElementById('dashboardAiAnswerText');
+            const nextStepsWrap = document.getElementById('dashboardAiNextStepsWrap');
+            const nextStepsList = document.getElementById('dashboardAiNextSteps');
+
+            if (!answerBox || !answerText) return;
+
+            answerText.textContent = data.answer || 'No answer was returned.';
+            answerBox.style.display = 'block';
+
+            if (nextStepsList) nextStepsList.innerHTML = '';
+            if (Array.isArray(data.next_steps) && data.next_steps.length && nextStepsWrap && nextStepsList) {
+                data.next_steps.forEach(function (step) {
+                    const li = document.createElement('li');
+                    li.textContent = step;
+                    nextStepsList.appendChild(li);
+                });
+                nextStepsWrap.style.display = 'block';
+            } else if (nextStepsWrap) {
+                nextStepsWrap.style.display = 'none';
+            }
+        }
+
+        function askDashboardAi(question) {
+            const status = document.getElementById('dashboardAiAskStatus');
+            const button = document.getElementById('dashboardAskAiBtn');
+
+            if (!question.trim()) {
+                if (status) {
+                    status.textContent = 'Type a question first.';
+                    status.style.display = 'block';
+                }
+                return;
+            }
+
+            if (button) button.disabled = true;
+            if (status) {
+                status.textContent = 'Asking AI...';
+                status.style.display = 'block';
+            }
+
+            fetch(@json(route('reports.ai.ask')), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': @json(csrf_token())
+                },
+                body: JSON.stringify({
+                    question: question,
+                    report_type: dashboardAiContext.report_type,
+                    metrics: dashboardAiContext.metrics,
+                    insight: dashboardAiContext.insight
+                })
+            })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('AI request failed.');
+                    return response.json();
+                })
+                .then(function (data) {
+                    renderDashboardAiAnswer(data);
+                    if (status) {
+                        status.textContent = data.source === 'fallback'
+                            ? ((data.availability && data.availability.message) ? data.availability.message + ' Internal answer shown.' : 'Gemini is unavailable or rate-limited. Internal answer shown; try again in a few minutes, or later if daily quota was reached.')
+                            : 'Answer generated.';
+                    }
+                })
+                .catch(function () {
+                    if (status) {
+                        status.textContent = 'AI could not answer right now. Please try again later.';
+                        status.style.display = 'block';
+                    }
+                })
+                .finally(function () {
+                    if (button) button.disabled = false;
+                });
+        }
+
+        document.querySelectorAll('.dashboard-ai-quick-question').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const input = document.getElementById('dashboardAiQuestionInput');
+                const question = btn.getAttribute('data-question') || '';
+                if (input) input.value = question;
+                askDashboardAi(question);
+            });
+        });
+
+        const dashboardAskAiBtn = document.getElementById('dashboardAskAiBtn');
+        if (dashboardAskAiBtn) {
+            dashboardAskAiBtn.addEventListener('click', function () {
+                const input = document.getElementById('dashboardAiQuestionInput');
+                askDashboardAi(input ? input.value : '');
+            });
+        }
+
         $('.btn-edit-announcement').on('click', function () {
             $('#editAnnouncementForm').attr('action', $(this).data('announcement-action'));
             $('#editAnnouncementTitle').val($(this).data('announcement-title'));
             $('#editAnnouncementContent').val($(this).data('announcement-content'));
         });
     </script>
+    <script src="{{ asset('js/ai-insight-controls.js') }}"></script>
     <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
     <script src="{{ asset('assets/js/voice-input.js') }}"></script>
     <script src="{{ url('/js/mobile-utils.js') }}"></script>

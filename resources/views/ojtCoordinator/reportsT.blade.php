@@ -641,24 +641,39 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
         </div>
 
         @if(!empty($reportInsights))
-            <div class="panel-card" style="margin-bottom:22px; border-left:4px solid var(--red);">
+            <div data-ai-insight-card class="panel-card" style="margin-bottom:22px; border-left:4px solid var(--red);">
                 <div class="panel-card-header">
                     <div class="panel-header-icon"><i class="fa fa-robot"></i></div>
                     <div>
                         <h2>AI Report Insight</h2>
                         <p>Generated from the current OJT report data</p>
                     </div>
-                    <div style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:700;">
-                        <i class="fa fa-brain"></i>
-                        {{ !empty($reportInsights['used_local_ai']) ? 'Local AI' : 'Internal Insight' }}
+                    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <button type="button" data-ai-insight-button data-ai-context="studentAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:var(--red); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                            <i class="fa fa-magic"></i> Generate AI Insight
+                        </button>
+                        <div style="display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:700;">
+                            <i class="fa fa-brain"></i>
+                            <span data-ai-badge>{{ ($reportInsights['source'] ?? '') === 'openai' ? 'OpenAI' : (($reportInsights['source'] ?? '') === 'gemini' ? 'Gemini AI' : (!empty($reportInsights['used_local_ai']) ? 'Local AI' : 'Internal Insight')) }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="panel-card-body">
-                    <p style="font-size:14px; line-height:1.7; color:#333; margin-bottom:16px;">{{ $reportInsights['summary'] ?? 'No AI insight available.' }}</p>
+                <div data-ai-result-panel class="panel-card-body" style="display:none;">
+                    @if(($reportInsights['source'] ?? '') === 'fallback')
+                        <div data-ai-notice style="display:flex; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;">
+                            <i class="fa fa-exclamation-triangle" style="margin-top:2px;"></i>
+                            <div>
+                                <strong>Gemini is temporarily unavailable.</strong>
+                                <span data-ai-notice-text>{{ $reportInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes, or later if the daily free-tier quota was reached.' }}</span>
+                            </div>
+                        </div>
+                    @endif
+                    <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; color:#888;"></div>
+                    <p data-ai-summary style="font-size:14px; line-height:1.7; color:#333; margin-bottom:16px;">{{ $reportInsights['summary'] ?? 'No AI insight available.' }}</p>
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
                         <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
                             <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
-                            <ul style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                            <ul data-ai-findings style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
                                 @foreach(($reportInsights['key_findings'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @endforeach
@@ -666,7 +681,7 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                         </div>
                         <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
                             <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
-                            <ul style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                            <ul data-ai-watchouts style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
                                 @forelse(($reportInsights['watchouts'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
@@ -676,11 +691,61 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                         </div>
                         <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
                             <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
-                            <ul style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                            <ul data-ai-actions style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
                                 @foreach(($reportInsights['recommendations'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @endforeach
                             </ul>
+                        </div>
+                    </div>
+                    @php
+                        $studentReportRecords = collect($studentData);
+                        $studentRecordsWithOjt = $studentReportRecords->filter(fn ($row) => !empty($row['ojt']));
+                        $studentCompanyCount = $studentRecordsWithOjt->pluck('ojt.company_name')->filter()->unique()->count();
+                        $studentMissingOjt = $studentReportRecords->count() - $studentRecordsWithOjt->count();
+                        $studentPromptSuggestions = [
+                            ['label' => 'Priorities', 'question' => 'What should we prioritize first in this student OJT report?'],
+                            ['label' => 'Coverage', 'question' => 'How strong is the placement coverage in this OJT report?'],
+                            ['label' => 'Executive summary', 'question' => 'Write a short executive summary for this student OJT report.'],
+                        ];
+
+                        if ($studentMissingOjt > 0) {
+                            $studentPromptSuggestions[] = ['label' => 'Missing OJT', 'question' => 'What should we do about the student records missing OJT details?'];
+                        }
+
+                        if ($studentCompanyCount > 0) {
+                            $studentPromptSuggestions[] = ['label' => 'Companies', 'question' => 'What does the company placement distribution suggest from this report?'];
+                        }
+                    @endphp
+                    <div style="margin-top:18px; border-top:1px solid #f0f0f0; padding-top:16px;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                            <div>
+                                <div style="font-size:13px; font-weight:800; color:#1f2937;">Ask AI about this report</div>
+                                <div style="font-size:12px; color:#888; margin-top:2px;">Click a suggested prompt to ask instantly, or type your own question and press Ask.</div>
+                            </div>
+                            <div style="display:grid; gap:7px;">
+                                <div style="font-size:11px; font-weight:800; color:#991b1b; text-transform:uppercase; letter-spacing:.6px;">Suggested prompts</div>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    @foreach($studentPromptSuggestions as $suggestion)
+                                        <button type="button" class="student-ai-quick-question" data-question="{{ $suggestion['question'] }}" style="display:inline-flex; align-items:center; gap:7px; border:1.5px solid #fecaca; background:#fff; color:#991b1b; border-radius:9px; padding:9px 12px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(220,38,38,0.08);"><i class="fa fa-bolt" style="width:18px; height:18px; border-radius:6px; background:#fee2e2; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#dc2626;"></i>{{ $suggestion['label'] }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:grid; gap:10px;">
+                            <textarea id="studentAiQuestionInput" rows="3" maxlength="500" placeholder="Ask a question about this student OJT report..." style="width:100%; resize:vertical; min-height:86px; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; outline:none; line-height:1.6;"></textarea>
+                            <button type="button" id="studentAskAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap;">
+                                <i class="fa fa-paper-plane"></i> Ask
+                            </button>
+                        </div>
+                        <div id="studentAiAskStatus" style="display:none; margin-top:10px; font-size:12px; color:#888;"></div>
+                        <div id="studentAiAnswerBox" style="display:none; margin-top:12px; background:#fff; border:1px solid #eee; border-radius:12px; padding:14px;">
+                            <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:8px;">
+                                <div style="font-size:12px; font-weight:800; color:var(--red); text-transform:uppercase; letter-spacing:.4px;">AI Answer</div>
+                                <div id="studentAiAnswerSource" style="font-size:11px; font-weight:700; color:#888;"></div>
+                            </div>
+                            <div id="studentAiAnswerText" style="font-size:13px; color:#333; line-height:1.7;"></div>
+                            <ul id="studentAiAnswerSteps" style="margin:10px 0 0; padding-left:18px; color:#444; font-size:13px; line-height:1.65;"></ul>
                         </div>
                     </div>
                 </div>
@@ -863,6 +928,112 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
+    window.studentAiContext = {
+        report_type: 'student_ojt_report',
+        metrics: {
+            total_records: @json(count($studentData)),
+            total_companies: @json(collect($studentData)->pluck('ojt.company_name')->filter()->unique()->count()),
+            records_with_ojt: @json(collect($studentData)->filter(fn ($row) => !empty($row['ojt']))->count()),
+            missing_ojt: @json(count($studentData) - collect($studentData)->filter(fn ($row) => !empty($row['ojt']))->count()),
+            course: @json(request('course') ?: null),
+            school_year: @json($selectedSchoolYear ?? null)
+        },
+        insight: @json($reportInsights ?? [])
+    };
+
+    const studentAiContext = window.studentAiContext;
+
+    function renderStudentAiAnswer(data) {
+        const answerBox = document.getElementById('studentAiAnswerBox');
+        const answerText = document.getElementById('studentAiAnswerText');
+        const answerSteps = document.getElementById('studentAiAnswerSteps');
+        const answerSource = document.getElementById('studentAiAnswerSource');
+
+        if (!answerBox || !answerText || !answerSteps || !answerSource) return;
+
+        answerText.textContent = data.answer || 'No answer was generated.';
+        answerSource.textContent = data.source === 'gemini' ? 'Gemini AI' : (data.source === 'openai' ? 'OpenAI' : 'Internal Insight');
+        answerSteps.innerHTML = '';
+        (data.next_steps || []).forEach(function (step) {
+            const li = document.createElement('li');
+            li.textContent = step;
+            answerSteps.appendChild(li);
+        });
+        answerBox.style.display = 'block';
+    }
+
+    function askStudentAi(question) {
+        const status = document.getElementById('studentAiAskStatus');
+        const button = document.getElementById('studentAskAiBtn');
+
+        if (!question.trim()) {
+            if (status) {
+                status.textContent = 'Type a question first.';
+                status.style.display = 'block';
+            }
+            return;
+        }
+
+        if (button) button.disabled = true;
+        if (status) {
+            status.textContent = 'Asking AI...';
+            status.style.display = 'block';
+        }
+
+        fetch(@json(route('reports.ai.ask')), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': @json(csrf_token())
+            },
+            body: JSON.stringify({
+                question: question,
+                report_type: studentAiContext.report_type,
+                metrics: studentAiContext.metrics,
+                insight: studentAiContext.insight
+            })
+        })
+            .then(function (response) {
+                if (!response.ok) throw new Error('AI request failed.');
+                return response.json();
+            })
+            .then(function (data) {
+                renderStudentAiAnswer(data);
+                if (status) {
+                    status.textContent = data.source === 'fallback'
+                        ? ((data.availability && data.availability.message) ? data.availability.message + ' Internal answer shown.' : 'Gemini is unavailable or rate-limited. Internal answer shown; try again in a few minutes, or later if daily quota was reached.')
+                        : 'Answer generated.';
+                }
+            })
+            .catch(function () {
+                if (status) {
+                    status.textContent = 'AI could not answer right now. Please try again later.';
+                    status.style.display = 'block';
+                }
+            })
+            .finally(function () {
+                if (button) button.disabled = false;
+            });
+    }
+
+    document.querySelectorAll('.student-ai-quick-question').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const input = document.getElementById('studentAiQuestionInput');
+            const question = btn.getAttribute('data-question') || '';
+            if (input) input.value = question;
+            askStudentAi(question);
+        });
+    });
+
+    const studentAskAiBtn = document.getElementById('studentAskAiBtn');
+    if (studentAskAiBtn) {
+        studentAskAiBtn.addEventListener('click', function () {
+            const input = document.getElementById('studentAiQuestionInput');
+            askStudentAi(input ? input.value : '');
+        });
+    }
+
     /* ── Sidebar toggle ── */
     const sidebar     = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
@@ -1110,6 +1281,7 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
 
 </script>
 
+<script src="{{ asset('js/ai-insight-controls.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
