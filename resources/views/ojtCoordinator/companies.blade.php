@@ -960,12 +960,18 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                                     </button>
 
                                     <!-- Print -->
-                                    <button class="btn-action-icon btn-print"
-                                        title="Print MOA"
-                                        aria-label="Print MOA"
-                                        onclick="openViewModal('{{ route('print-data', ['company' => $company->id]) }}')">
-                                        <i class="fa fa-print"></i>
-                                    </button>
+                                    @if($company->file)
+                                        <button class="btn-action-icon btn-print"
+                                            title="Print MOA"
+                                            aria-label="Print MOA"
+                                            onclick="printUploadedMoa('{{ asset('assets/' . $company->file) }}')">
+                                            <i class="fa fa-print"></i>
+                                        </button>
+                                    @else
+                                        <button class="btn-action-icon btn-print" disabled title="No MOA file available">
+                                            <i class="fa fa-print"></i>
+                                        </button>
+                                    @endif
 
                                     <!-- Remove -->
                                     <button type="button" class="btn-action-icon btn-remove"
@@ -1524,6 +1530,36 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
     function openViewModal(routeUrl) {
         document.getElementById('viewIframe').src = routeUrl;
         $('#viewModal').modal('show');
+    }
+
+    function printUploadedMoa(fileUrl) {
+        if (!fileUrl) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.src = fileUrl;
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+            try {
+                const pdfWindow = iframe.contentWindow;
+                pdfWindow.focus();
+                pdfWindow.print();
+            } catch (error) {
+                window.open(fileUrl, '_blank');
+            } finally {
+                setTimeout(function () {
+                    if (iframe.parentNode) {
+                        iframe.parentNode.removeChild(iframe);
+                    }
+                }, 1000);
+            }
+        };
     }
 
     function printRegularPreview() {
