@@ -535,16 +535,18 @@ public function ojt_edit(Request $request,$studentNum)
 
     public function notify(Request $request, $studentNum)
     {
-        // Find the student's email
-        $student = User::where('studentNum', $studentNum)->first();
+        // Find the student's profile and linked user record
+        $studentProfile = Student::with('user')->where('studentNum', $studentNum)->first();
     
-        if (!$student) {
+        if (!$studentProfile || !$studentProfile->user) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Student not found.'], 422);
             }
 
             return back()->with('error', 'Student not found.');
         }
+
+        $student = $studentProfile->user;
 
         if (empty($student->email)) {
             if ($request->expectsJson()) {
@@ -568,16 +570,18 @@ public function ojt_edit(Request $request,$studentNum)
         try {
             // Get the status from OJTInformation
             $status = $ojtInformation->status;
+            $studentName = $student->full_name ?? 'the student';
+            $successMessage = 'Notification email sent to ' . $studentName . ' for OJT status: ' . $status . '.';
 
             // Send the notification email with the status
             $notificationMail = new StudentNotificationMail($student, $status);
             Mail::to($student->email)->send($notificationMail);
 
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Notification sent.']);
+                return response()->json(['message' => $successMessage]);
             }
 
-            return back()->with('success', 'Notification sent.');
+            return back()->with('success', $successMessage);
         } catch (\Throwable $e) {
             \Log::error('Student notification failed', [
                 'studentNum' => $studentNum,

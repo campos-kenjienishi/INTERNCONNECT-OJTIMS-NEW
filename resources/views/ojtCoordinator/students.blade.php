@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -1790,23 +1791,49 @@ body.dark-mode .dashboard-footer .footer-copy {
             e.preventDefault();
             const form = $(this);
             const btn = form.find('button[type="submit"]');
+            const originalHtml = btn.html();
+            const toastDelay = 2600;
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: toastDelay,
+                timerProgressBar: true
+            });
+
             btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Sending...');
             $.ajax({
                 type: 'POST',
                 url: form.attr('action'),
                 data: form.serialize(),
                 dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
                 success: function (response) {
-                    btn.html('<i class="fa fa-check"></i> Sent!');
-                    alert((response && response.message) ? response.message : 'Notification email sent successfully!');
-                    location.reload();
+                    btn.prop('disabled', false).html(originalHtml);
+                    Toast.fire({
+                        icon: 'success',
+                        title: (response && response.message) ? response.message : 'Notification sent successfully.'
+                    });
+                    setTimeout(function () {
+                        location.reload();
+                    }, toastDelay + 150);
                 },
                 error: function (xhr) {
-                    btn.prop('disabled', false).html('<i class="fa fa-bell"></i> Notify');
+                    btn.prop('disabled', false).html(originalHtml);
+                    const rawResponse = (xhr.responseText || '').trim();
+                    const isHtmlResponse = rawResponse.startsWith('<!DOCTYPE html') || rawResponse.startsWith('<html');
                     const message = xhr.responseJSON && xhr.responseJSON.message
                         ? xhr.responseJSON.message
-                        : (xhr.responseText ? xhr.responseText : 'Failed to send notification. Please try again.');
-                    alert(message);
+                        : isHtmlResponse
+                            ? 'Notification could not be sent because the mail server returned an error.'
+                            : (rawResponse || 'Failed to send notification. Please try again.');
+                    Toast.fire({
+                        icon: 'error',
+                        title: message
+                    });
                 }
             });
         });
