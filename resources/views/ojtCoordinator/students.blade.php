@@ -1805,7 +1805,7 @@ body.dark-mode .dashboard-footer .footer-copy {
                     btn.prop('disabled', false).html('<i class="fa fa-bell"></i> Notify');
                     const message = xhr.responseJSON && xhr.responseJSON.message
                         ? xhr.responseJSON.message
-                        : 'Failed to send notification. Please try again.';
+                        : (xhr.responseText ? xhr.responseText : 'Failed to send notification. Please try again.');
                     alert(message);
                 }
             });

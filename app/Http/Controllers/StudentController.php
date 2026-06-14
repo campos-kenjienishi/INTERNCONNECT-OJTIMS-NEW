@@ -545,7 +545,15 @@ public function ojt_edit(Request $request,$studentNum)
 
             return back()->with('error', 'Student not found.');
         }
-    
+
+        if (empty($student->email)) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'This student does not have an email address saved yet.'], 422);
+            }
+
+            return back()->with('error', 'This student does not have an email address saved yet.');
+        }
+
         // Find the OJTInformation for the student
         $ojtInformation = OJTInformation::where('studentNum', $studentNum)->first();
     
@@ -557,18 +565,34 @@ public function ojt_edit(Request $request,$studentNum)
             return back()->with('error', 'OJT Information not found for the student.');
         }
     
-        // Get the status from OJTInformation
-        $status = $ojtInformation->status;
-    
-        // Send the notification email with the status
-        $notificationMail = new StudentNotificationMail($student, $status); // Pass $status to the email
-        Mail::to($student->email)->send($notificationMail);
-    
-        if ($request->expectsJson()) {
-            return response()->json(['message' => 'Notification sent.']);
-        }
+        try {
+            // Get the status from OJTInformation
+            $status = $ojtInformation->status;
 
-        return back()->with('success', 'Notification sent.');
+            // Send the notification email with the status
+            $notificationMail = new StudentNotificationMail($student, $status);
+            Mail::to($student->email)->send($notificationMail);
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Notification sent.']);
+            }
+
+            return back()->with('success', 'Notification sent.');
+        } catch (\Throwable $e) {
+            \Log::error('Student notification failed', [
+                'studentNum' => $studentNum,
+                'student_email' => $student->email ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Notification could not be sent: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->with('error', 'Notification could not be sent.');
+        }
     }
     
     
