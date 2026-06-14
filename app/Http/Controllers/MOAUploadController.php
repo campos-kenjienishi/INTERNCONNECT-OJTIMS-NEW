@@ -63,6 +63,13 @@ class MOAUploadController extends Controller
     $company = Company::find($id);
 
     if ($company) {
+        if (!empty($company->file)) {
+            $filePath = public_path('assets/' . $company->file);
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        }
+
         // Get the associated students
         $students = $company->students;
 
@@ -204,6 +211,13 @@ public function studentRemove($id)
     DB::table('company_student')
         ->where('company_id', $company->id)
         ->delete();
+
+    if (!empty($company->file)) {
+        $filePath = public_path('assets/' . $company->file);
+        if (file_exists($filePath)) {
+            @unlink($filePath);
+        }
+    }
 
     $company->delete();
 

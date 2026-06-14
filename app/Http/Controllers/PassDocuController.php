@@ -106,6 +106,13 @@ class PassDocuController extends Controller
         if (!$data) {
             return redirect()->back()->with('error', 'File not found.');
         }
+
+        if (!empty($data->file)) {
+            $filePath = public_path('assets/' . $data->file);
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        }
     
         $data->delete();
         AuditLogger::log(

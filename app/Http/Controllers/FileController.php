@@ -126,6 +126,13 @@ class FileController extends Controller
         if (!$data) {
             return redirect()->back()->with('error', 'File not found.');
         }
+
+        if (!empty($data->file)) {
+            $filePath = public_path('assets/' . $data->file);
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        }
     
         $data->delete();
         AuditLogger::log(
@@ -171,6 +178,13 @@ class FileController extends Controller
             'name' => $file->name,
             'class_id' => $file->class_id,
         ];
+
+        if (!empty($file->file)) {
+            $filePath = public_path('assets/' . $file->file);
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        }
 
         $file->delete();
 
