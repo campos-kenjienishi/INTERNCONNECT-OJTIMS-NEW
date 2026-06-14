@@ -1470,14 +1470,25 @@ body.dark-mode .dashboard-footer .footer-copy {
             <i class="fa fa-info-circle"></i> Status
         </button>
 
-        <form class="notifyForm d-inline"
-              action="{{ url('/notify', $data['ojt']->studentNum ?? 0) }}"
-              method="POST">
-            @csrf
-            <button type="submit" class="btn-action notify">
+        @php
+            $canNotify = !empty($data['ojt']) && !empty($data['ojt']->studentNum);
+        @endphp
+
+        @if($canNotify)
+            <form class="notifyForm d-inline"
+                  action="{{ url('/notify', $data['ojt']->studentNum) }}"
+                  method="POST">
+                @csrf
+                <button type="submit" class="btn-action notify">
+                    <i class="fa fa-bell"></i> Notify
+                </button>
+            </form>
+        @else
+            <button type="button" class="btn-action notify" disabled
+                    title="No OJT information is saved yet for this student.">
                 <i class="fa fa-bell"></i> Notify
             </button>
-        </form>
+        @endif
 
     </div>
 </td>
@@ -1783,15 +1794,19 @@ body.dark-mode .dashboard-footer .footer-copy {
             $.ajax({
                 type: 'POST',
                 url: form.attr('action'),
-                data: { _token: "{{ csrf_token() }}" },
-                success: function () {
+                data: form.serialize(),
+                dataType: 'json',
+                success: function (response) {
                     btn.html('<i class="fa fa-check"></i> Sent!');
-                    alert('Notification email sent successfully!');
+                    alert((response && response.message) ? response.message : 'Notification email sent successfully!');
                     location.reload();
                 },
-                error: function () {
+                error: function (xhr) {
                     btn.prop('disabled', false).html('<i class="fa fa-bell"></i> Notify');
-                    alert('Failed to send notification. Please try again.');
+                    const message = xhr.responseJSON && xhr.responseJSON.message
+                        ? xhr.responseJSON.message
+                        : 'Failed to send notification. Please try again.';
+                    alert(message);
                 }
             });
         });

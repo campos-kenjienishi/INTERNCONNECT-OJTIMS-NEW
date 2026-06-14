@@ -539,6 +539,10 @@ public function ojt_edit(Request $request,$studentNum)
         $student = User::where('studentNum', $studentNum)->first();
     
         if (!$student) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Student not found.'], 422);
+            }
+
             return back()->with('error', 'Student not found.');
         }
     
@@ -546,6 +550,10 @@ public function ojt_edit(Request $request,$studentNum)
         $ojtInformation = OJTInformation::where('studentNum', $studentNum)->first();
     
         if (!$ojtInformation) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'No OJT information is saved yet for this student, so the notification cannot be sent.'], 422);
+            }
+
             return back()->with('error', 'OJT Information not found for the student.');
         }
     
@@ -556,6 +564,10 @@ public function ojt_edit(Request $request,$studentNum)
         $notificationMail = new StudentNotificationMail($student, $status); // Pass $status to the email
         Mail::to($student->email)->send($notificationMail);
     
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Notification sent.']);
+        }
+
         return back()->with('success', 'Notification sent.');
     }
     
