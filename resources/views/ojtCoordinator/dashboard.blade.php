@@ -514,6 +514,10 @@
                 .topbar-title { display: none; }
                 .stats-row { grid-template-columns: 1fr 1fr; }
                 .topbar-date { display: none; }
+                .welcome-banner { flex-direction: column; gap: 12px; align-items: flex-start; }
+                .welcome-actions { width: 100%; }
+                .welcome-video-btn { width: 100%; justify-content: center; }
+                .welcome-icon { align-self: flex-end; margin-top: -46px; }
             }
 
             @media (max-width: 480px) {
@@ -929,15 +933,60 @@
             background: rgba(255,255,255,0.04);
         }
 
-        .welcome-banner h2 {
+        .welcome-text { position: relative; z-index: 1; }
+        .welcome-text h2 {
             font-size: 22px; font-weight: 800; color: #fff;
             margin-bottom: 6px; letter-spacing: -0.3px;
-            position: relative; z-index: 1;
         }
 
-        .welcome-banner p {
-            font-size: 13.5px; color: rgba(255,255,255,0.75);
-            line-height: 1.5; position: relative; z-index: 1;
+        .welcome-text p {
+            font-size: 13.5px; color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+
+        .welcome-actions {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .welcome-video-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-video-btn:hover {
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.28);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+        }
+
+        .welcome-video-btn i {
+            font-size: 14px;
+        }
+
+        .welcome-icon {
+            font-size: 64px;
+            opacity: 0.2;
+            position: relative;
+            z-index: 1;
+            color: #fff;
         }
         /* Dashboard Footer */
 .dashboard-footer {
@@ -1199,11 +1248,21 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
 
 <!-- Red welcome banner, no date inside -->
 <div class="welcome-banner">
-    <div class="welcome-left">
-        <h2>Welcome back, {{ explode(' ', $data->full_name)[0] }}! 👋</h2>
-        <p>Here's what's happening in your OJT portal today.</p>
+    <div class="welcome-text">
+        <h2>Welcome to your coordinator dashboard</h2>
+        <p>
+            For first-time users, please watch these how-to videos to get familiar with the coordinator workflow.
+        </p>
+        <div class="welcome-actions">
+            <a href="https://www.youtube.com/playlist?list=PLyMOKHLwy4fOPcBDkY_buk3Ol98a91zWW" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
+                <i class="fab fa-youtube"></i>
+                How To Videos
+            </a>
+        </div>
     </div>
-    
+    <div class="welcome-icon">
+        <i class="fa fa-user-shield"></i>
+    </div>
 </div>
 
             <!-- Stats Row -->

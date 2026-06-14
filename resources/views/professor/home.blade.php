@@ -1203,6 +1203,10 @@
                         <i class="fab fa-youtube"></i>
                         Student Evaluation Guide
                     </a>
+                    <a href="https://www.youtube.com/playlist?list=PLyMOKHLwy4fOSbAPTzUQBSlEcMHoLQvcQ" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
+                        <i class="fab fa-youtube"></i>
+                        How To Videos
+                    </a>
                 </div>
             </div>
             <div class="welcome-icon">
