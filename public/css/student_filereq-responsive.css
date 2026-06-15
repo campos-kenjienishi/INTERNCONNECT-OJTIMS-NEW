@@ -4,6 +4,12 @@
    Place AFTER your inline <style> block.
    ============================================================ */
 
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 /* ─────────────────────────────────────────────
    LG — 1024px and below (small laptops)
 ───────────────────────────────────────────── */
@@ -110,7 +116,10 @@
     }
 
     .page-content { padding: 12px !important; }
-    .page-header { flex-direction: row !important; align-items: center !important; }
+    .page-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
     .page-header h1 { font-size: 16px !important; }
     .breadcrumb { font-size: 11.5px !important; }
 
@@ -119,7 +128,9 @@
         font-size: 12px !important;
         padding: 8px 12px !important;
         gap: 6px !important;
-        white-space: nowrap !important;
+        width: 100% !important;
+        justify-content: center !important;
+        white-space: normal !important;
     }
 
     /* Stats — 2 columns stays, just more compact */
@@ -202,6 +213,32 @@
 
     .dataTables_length select { font-size: 12px !important; }
 
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        float: none !important;
+        text-align: left !important;
+        width: 100% !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        margin-top: 8px !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter label,
+    .dataTables_wrapper .dataTables_length label {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        display: block !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-top: 6px !important;
+    }
+
     /* Modal */
     .modal-header { padding: 16px 18px !important; }
     .modal-title { font-size: 14.5px !important; }
@@ -247,6 +284,7 @@
     }
 
     .topbar-left { gap: 8px !important; }
+    .topbar-title { display: none !important; }
     .page-header h1 { font-size: 15px !important; }
 
     /* Stats — stack to 1 column on very small phones */
