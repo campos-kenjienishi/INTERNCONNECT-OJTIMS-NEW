@@ -101,7 +101,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($requests as $row)
+                        @foreach($requests as $row)
                             <tr>
                                 <td>{{ $row->supervisor_email }}</td>
                                 <td>{{ $row->supervisor_name ?: '-' }}</td>
@@ -140,11 +140,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center-shell muted-text">No evaluation requests yet.</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
