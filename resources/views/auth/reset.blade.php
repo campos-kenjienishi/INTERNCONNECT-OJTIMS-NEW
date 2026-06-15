@@ -37,6 +37,44 @@ $email = $_GET['email'] ?? '';
             justify-content: center;
         }
 
+        body.auth-centered-page .right-panel.success-state {
+            min-height: auto;
+            padding: 36px 42px;
+            justify-content: center;
+        }
+
+        .success-compact {
+            width: 100%;
+            max-width: 460px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .success-compact .reset-header {
+            margin-bottom: 0;
+        }
+
+        .success-compact .reset-header h2 {
+            margin-bottom: 6px;
+        }
+
+        .success-compact .reset-header p {
+            margin-bottom: 0;
+        }
+
+        .success-compact .alert {
+            margin-bottom: 0;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .success-compact .btn-wrap {
+            margin-top: 0;
+        }
+
         body.auth-centered-page .shield-icon-wrap {
             display: none !important;
         }
@@ -94,6 +132,10 @@ $email = $_GET['email'] ?? '';
             body.auth-centered-page .right-panel {
                 min-height: auto;
                 padding: 40px 24px;
+            }
+
+            body.auth-centered-page .right-panel.success-state {
+                padding: 28px 20px;
             }
 
             .auth-logo {
@@ -166,7 +208,7 @@ $email = $_GET['email'] ?? '';
         </div>
 
         <!-- RIGHT PANEL -->
-        <div class="right-panel">
+        <div class="right-panel{{ Session::has('success') ? ' success-state' : '' }}">
             <!-- Floating shield icon -->
             <div class="shield-icon-wrap">
                 <div class="shield-circle">
@@ -174,19 +216,26 @@ $email = $_GET['email'] ?? '';
                 </div>
             </div>
 
-            <div class="reset-header">
-                <h2>Set New Password</h2>
-                <p>Your new password must be different from your previous password.</p>
-            </div>
-
             @if(Session::has('success'))
-                <div class="alert alert-success">{{ Session::get('success') }}</div>
-                <div class="btn-wrap">
-                    <a href="{{ url('/login') }}" class="btn-reset" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-                        <i class="fa fa-arrow-right me-2"></i> Proceed to Login
-                    </a>
+                <div class="success-compact">
+                    <div class="reset-header">
+                        <h2>Set New Password</h2>
+                        <p>Your new password must be different from your previous password.</p>
+                    </div>
+
+                    <div class="alert alert-success">{{ Session::get('success') }}</div>
+                    <div class="btn-wrap">
+                        <a href="{{ url('/login') }}" class="btn-reset" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                            <i class="fa fa-arrow-right me-2"></i> Proceed to Login
+                        </a>
+                    </div>
                 </div>
             @else
+                <div class="reset-header">
+                    <h2>Set New Password</h2>
+                    <p>Your new password must be different from your previous password.</p>
+                </div>
+
                 <form action="{{ url('/reset-password') }}?email={{ $email }}" method="post">
                     @csrf
 

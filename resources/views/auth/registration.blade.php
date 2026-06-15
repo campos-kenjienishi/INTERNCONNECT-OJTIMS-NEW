@@ -32,6 +32,10 @@
             min-height: auto;
         }
 
+        body.auth-centered-page .login-container.success-state {
+            max-width: 640px;
+        }
+
         body.auth-centered-page .left-panel {
             display: none !important;
         }
@@ -42,6 +46,44 @@
             min-height: 620px;
             padding: 48px 42px;
             justify-content: center;
+        }
+
+        body.auth-centered-page .right-panel.success-state {
+            min-height: auto;
+            padding: 36px 42px;
+            justify-content: center;
+        }
+
+        .success-compact {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .success-compact .reg-header {
+            margin-bottom: 0 !important;
+        }
+
+        .success-compact .reg-header h2 {
+            margin-bottom: 6px;
+        }
+
+        .success-compact .reg-header p {
+            margin-bottom: 0;
+        }
+
+        .success-compact .alert {
+            margin-bottom: 0;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .success-compact .nav-btn-row {
+            margin-top: 0 !important;
         }
 
         .auth-brand {
@@ -108,6 +150,10 @@
             body.auth-centered-page .right-panel {
                 min-height: auto;
                 padding: 40px 24px;
+            }
+
+            body.auth-centered-page .right-panel.success-state {
+                padding: 28px 20px;
             }
 
             .auth-logo {
@@ -296,7 +342,7 @@
 
 <body class="auth-centered-page">
 <div class="main-wrapper">
-    <div class="login-container">
+    <div class="login-container{{ Session::has('success') ? ' success-state' : '' }}">
 
         <!-- LEFT PANEL -->
         <div class="left-panel">
@@ -351,20 +397,22 @@
         </div>
 
         <!-- RIGHT PANEL -->
-        <div class="right-panel">
+        <div class="right-panel{{ Session::has('success') ? ' success-state' : '' }}">
 
             @if(Session::has('success'))
-                <div class="reg-header" style="text-align:center; margin-bottom:24px;">
-                    <h2>Registration Complete</h2>
-                    <p>Your account has been created successfully.</p>
-                </div>
+                <div class="success-compact">
+                    <div class="reg-header" style="text-align:center;">
+                        <h2>Registration Complete</h2>
+                        <p>Your account has been created successfully.</p>
+                    </div>
 
-                <div class="alert alert-success">{{ Session::get('success') }}</div>
+                    <div class="alert alert-success">{{ Session::get('success') }}</div>
 
-                <div class="nav-btn-row" style="margin-top:18px;">
-                    <a href="{{ url('/login') }}" class="btn-proceed" style="text-decoration:none;">
-                        <i class="fa fa-arrow-right"></i> Proceed to Login
-                    </a>
+                    <div class="nav-btn-row">
+                        <a href="{{ url('/login') }}" class="btn-proceed" style="text-decoration:none;">
+                            <i class="fa fa-arrow-right"></i> Proceed to Login
+                        </a>
+                    </div>
                 </div>
             @else
                 {{-- header removed as requested --}}
