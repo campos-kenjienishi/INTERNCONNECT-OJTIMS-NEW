@@ -968,7 +968,10 @@
     $(document).ready(function () {
 
         // DataTable
-        $('#fileTable').DataTable();
+        $('#fileTable').DataTable({
+            scrollX: true,
+            autoWidth: false
+        });
 
         // Populate deny modal with student data dynamically
         $(document).on('click', '.open-deny-modal', function () {

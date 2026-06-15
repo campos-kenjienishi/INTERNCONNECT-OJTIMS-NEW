@@ -1093,6 +1093,8 @@
         var table = $('#companyTable').DataTable({
             // Default to newest records first
             order: [[0, 'desc']], 
+            scrollX: true,
+            autoWidth: false,
             columnDefs: [
                 { targets: 0, visible: false }, // Hide ID column
                 // Disable the sorting dropdown arrows on all visible columns

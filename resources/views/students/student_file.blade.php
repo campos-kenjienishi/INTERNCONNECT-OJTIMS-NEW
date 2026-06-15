@@ -645,7 +645,25 @@
 }
 .dataTables_wrapper {
     width: 100%;
-    overflow-x: auto;
+    overflow: visible;
+}
+
+.table-card {
+    overflow: hidden;
+}
+
+.table-card-body {
+    overflow: visible;
+}
+
+.table-card-body .dataTables_scroll {
+    width: 100%;
+}
+
+.table-card-body .dataTables_scrollBody {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
 }
 #fileTable th,
 #fileTable td {
@@ -818,8 +836,8 @@
                         });
                     });
                     </script>
-                    <div style="overflow-x: auto;">
-                    <table id="fileTable" class="display" style="width:100%">
+                    <div style="overflow: visible;">
+                      <table id="fileTable" class="display" style="width:100%">
                         <thead>
                             <tr>
                                 <th>File Name</th>

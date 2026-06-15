@@ -219,3 +219,28 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
     }
     .dashboard-footer .footer-links { flex-wrap: wrap; justify-content: center; }
 }
+
+/* Keep DataTables controls anchored; only the table body scrolls sideways */
+.table-card-body {
+    max-width: 100%;
+    overflow: visible !important;
+}
+
+.table-card-body .dataTables_wrapper {
+    overflow: visible !important;
+    min-width: 0;
+}
+
+.table-card-body .dataTables_scroll {
+    width: 100%;
+}
+
+.table-card-body .dataTables_scrollHead {
+    overflow: hidden !important;
+}
+
+.table-card-body .dataTables_scrollBody {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+}

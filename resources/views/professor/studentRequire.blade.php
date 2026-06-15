@@ -966,6 +966,8 @@
                     $(document).ready(function () {
                         var table = $('#fileTable').DataTable({
                             order: [[2, 'desc']], // default: newest first (date column)
+                            scrollX: true,
+                            autoWidth: false,
                             columnDefs: [
                                 { targets: [2], type: 'date' }
                             ]

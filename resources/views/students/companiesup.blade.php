@@ -425,7 +425,7 @@
 
         .table-card-body { padding: 0; }
 
-        .moa-table-wrap { overflow-x: auto; }
+        .moa-table-wrap { overflow: visible; }
         #moaTable {
             min-width: 860px;
             table-layout: fixed;
@@ -472,6 +472,20 @@
 
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
+
+        .table-card {
+            overflow: hidden;
+        }
+
+        .table-card-body .dataTables_scroll {
+            width: 100%;
+        }
+
+        .table-card-body .dataTables_scrollBody {
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch;
+        }
 
         .dataTables_filter input {
             border: 1px solid #e5e5e5 !important;
@@ -694,13 +708,16 @@
 
         .school-year-row {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            align-items: stretch;
             gap: 10px;
             margin-bottom: 16px;
+            width: 100%;
         }
 
         .school-year-row input {
-            flex: 1;
+            flex: none;
+            width: 100%;
             background: #fafafa;
             border: 1.5px solid #e8e8e8;
             border-radius: 10px;
@@ -719,6 +736,7 @@
         }
 
         .school-year-row .sep {
+            display: none;
             font-size: 16px;
             color: #aaa;
             font-weight: 600;
@@ -866,15 +884,18 @@
     .info-banner { flex-direction: column; text-align: center; }
     .action-buttons { flex-direction: column; align-items: flex-start; }
 }
-        .school-year-row {
+.school-year-row {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .school-year-row input {
-    flex: 1;
+    flex: none;
+    width: 100%;
     min-width: 0; /* prevents overflow in grid */
     background: #fafafa;
     border: 1.5px solid #e8e8e8;
@@ -894,10 +915,28 @@
 }
 
 .school-year-row .sep {
+    display: none;
     font-size: 16px;
     color: #aaa;
     font-weight: 600;
     flex-shrink: 0;
+}
+
+@media (min-width: 577px) {
+    .school-year-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .school-year-row input {
+        flex: 1;
+        width: auto;
+    }
+
+    .school-year-row .sep {
+        display: inline;
+    }
 }
     </style>
 </head>

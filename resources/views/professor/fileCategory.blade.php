@@ -795,7 +795,10 @@
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
-                        $('#fileTable').DataTable();
+                        $('#fileTable').DataTable({
+                            scrollX: true,
+                            autoWidth: false
+                        });
                     });
                 </script>
 
@@ -968,7 +971,10 @@
 
     // Remove category
     $(document).ready(function () {
-        $('#fileTable').DataTable();
+        $('#fileTable').DataTable({
+            scrollX: true,
+            autoWidth: false
+        });
         const editCategoryModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
 
         $('.edit-button').on('click', function () {

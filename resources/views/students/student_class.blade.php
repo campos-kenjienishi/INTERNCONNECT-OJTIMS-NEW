@@ -1152,6 +1152,8 @@
                     $(document).ready(function () {
                         var announcementTable = $('#ATable').DataTable({
                             order: [[2, 'desc']],
+                            scrollX: true,
+                            autoWidth: false,
                             columnDefs: [
                                 { targets: [2], type: 'num' }
                             ]

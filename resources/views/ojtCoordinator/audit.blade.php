@@ -1204,6 +1204,8 @@ body.dark-mode .dashboard-footer .footer-logo {
                         const table = $('#auditTable').DataTable({
                             "order": [[0, 'desc']],
                             "pageLength": 10,
+                            "scrollX": true,
+                            "autoWidth": false,
                             "dom": '<"audit-toolbar"lf>rtip',
                         });
 

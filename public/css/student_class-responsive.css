@@ -241,3 +241,32 @@
     .rooms-table thead th,
     .rooms-table tbody td { font-size: 14.5px !important; padding: 16px 24px !important; }
 }
+
+/* Keep DataTables controls anchored; only the table body scrolls sideways */
+.table-card {
+    overflow: hidden;
+}
+
+.table-card-body {
+    max-width: 100%;
+    overflow: visible !important;
+}
+
+.table-card-body .dataTables_wrapper {
+    overflow: visible !important;
+    min-width: 0;
+}
+
+.table-card-body .dataTables_scroll {
+    width: 100%;
+}
+
+.table-card-body .dataTables_scrollHead {
+    overflow: hidden !important;
+}
+
+.table-card-body .dataTables_scrollBody {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+}
