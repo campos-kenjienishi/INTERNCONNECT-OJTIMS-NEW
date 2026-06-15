@@ -8,6 +8,7 @@
         <title>InternConnect - Dashboard</title>
         <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+        <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
@@ -401,6 +402,82 @@
                 font-weight: 600;
                 cursor: pointer;
                 margin-right: 8px;
+            }
+            .announcement-toolbar {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-left: auto;
+            }
+            .announcement-sort-select {
+                min-width: 150px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 7px 10px;
+                background: #fff;
+                color: #374151;
+                font-family: 'Poppins', sans-serif;
+                font-size: 12.5px;
+                outline: none;
+            }
+            .announcement-sort-select:focus {
+                border-color: var(--red);
+                box-shadow: 0 0 0 3px rgba(220,38,38,.12);
+            }
+            .announcement-table-wrap .dataTables_wrapper {
+                padding: 18px 24px;
+                font-family: 'Poppins', sans-serif;
+                font-size: 13px;
+            }
+            .announcement-table-wrap .dataTables_length,
+            .announcement-table-wrap .dataTables_filter {
+                margin-bottom: 14px;
+            }
+            .announcement-table-wrap .dataTables_length label,
+            .announcement-table-wrap .dataTables_filter label,
+            .announcement-table-wrap .dataTables_info {
+                color: #4b5563 !important;
+                font-size: 12.5px;
+                font-weight: 600;
+            }
+            .announcement-table-wrap .dataTables_length select,
+            .announcement-table-wrap .dataTables_filter input {
+                border: 1px solid #e5e7eb !important;
+                border-radius: 8px !important;
+                background: #fff !important;
+                color: #1f2937 !important;
+                font-family: 'Poppins', sans-serif !important;
+                font-size: 12.5px !important;
+                padding: 6px 10px !important;
+            }
+            .announcement-table-wrap .dataTables_filter input:focus {
+                border-color: var(--red) !important;
+                box-shadow: 0 0 0 3px rgba(220,38,38,.12) !important;
+            }
+            .announcement-table-wrap .dataTables_paginate .paginate_button {
+                border-radius: 8px !important;
+                border: 1px solid #e5e7eb !important;
+                background: #fff !important;
+                color: #374151 !important;
+                font-family: 'Poppins', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+            }
+            .announcement-table-wrap .dataTables_paginate .paginate_button.current {
+                background: linear-gradient(135deg, #dc2626, #991b1b) !important;
+                border-color: #991b1b !important;
+                color: #fff !important;
+            }
+            .announcement-table-wrap .dataTables_paginate .paginate_button:hover {
+                background: #fee2e2 !important;
+                border-color: #fecaca !important;
+                color: var(--red) !important;
+            }
+            .announcement-table-wrap .dataTables_empty {
+                color: #9ca3af;
+                padding: 28px 12px !important;
+                text-align: center;
             }
 
             /* Form fields */
@@ -1077,10 +1154,31 @@ body.dark-mode .panel-card-footer { background: #2a2a2a !important; border-top: 
 body.dark-mode .announcement-manage-table th { background: #2a2a2a; color: #aaa; border-bottom-color: #3a3a3a; }
 body.dark-mode .announcement-manage-table td { color: #e0e0e0; border-bottom-color: rgba(255,255,255,0.05); }
             body.dark-mode .announcement-manage-table tbody tr:hover td { background: rgba(220,38,38,0.1); }
-            body.dark-mode .announcement-title-cell strong { color: #fff; }
-            body.dark-mode .announcement-title-cell span { color: #aaa; }
-            body.dark-mode .btn-edit-announcement { background: rgba(37,99,235,0.12); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
-            body.dark-mode .btn-edit-announcement:hover { background: rgba(37,99,235,0.22); color: #bfdbfe; }
+body.dark-mode .announcement-title-cell strong { color: #fff; }
+body.dark-mode .announcement-title-cell span { color: #aaa; }
+body.dark-mode .btn-edit-announcement { background: rgba(37,99,235,0.12); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
+body.dark-mode .btn-edit-announcement:hover { background: rgba(37,99,235,0.22); color: #bfdbfe; }
+body.dark-mode .announcement-sort-select { background: #2a2a2a; color: #e5e7eb; border-color: #3a3a3a; }
+body.dark-mode .announcement-table-wrap .dataTables_length label,
+body.dark-mode .announcement-table-wrap .dataTables_filter label,
+body.dark-mode .announcement-table-wrap .dataTables_info { color: #d1d5db !important; }
+body.dark-mode .announcement-table-wrap .dataTables_length select,
+body.dark-mode .announcement-table-wrap .dataTables_filter input {
+    background: #2a2a2a !important;
+    color: #e5e7eb !important;
+    border-color: #3a3a3a !important;
+}
+body.dark-mode .announcement-table-wrap .dataTables_paginate .paginate_button {
+    background: #2a2a2a !important;
+    color: #e5e7eb !important;
+    border-color: #3a3a3a !important;
+}
+body.dark-mode .announcement-table-wrap .dataTables_paginate .paginate_button:hover {
+    background: rgba(220,38,38,0.2) !important;
+    color: #ff6b6b !important;
+    border-color: rgba(220,38,38,0.3) !important;
+}
+body.dark-mode .announcement-table-wrap .dataTables_empty { color: #9ca3af; }
 body.dark-mode .analytics-header h2 { color: #fff; }
 body.dark-mode .analytics-header p { color: #aaa; }
 body.dark-mode .analytics-updated { background: #2a2a2a; border: 1px solid #3a3a3a; color: #e0e0e0; }
@@ -1548,9 +1646,15 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                         <h2>My Announcements</h2>
                         <p>Review or delete announcements you posted</p>
                     </div>
+                    <div class="announcement-toolbar">
+                        <select id="coordinatorAnnouncementSort" class="announcement-sort-select" aria-label="Sort announcements by date">
+                            <option value="desc" selected>Newest first</option>
+                            <option value="asc">Oldest first</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="panel-card-body announcement-table-wrap" style="padding:0;">
-                    <table class="announcement-manage-table">
+                    <table id="coordinatorAnnouncementTable" class="announcement-manage-table">
                         <colgroup>
                             <col style="width:42%;">
                             <col style="width:18%;">
@@ -1566,14 +1670,14 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($announcements ?? [] as $announcement)
+                            @foreach(($announcements ?? []) as $announcement)
                                 <tr>
                                     <td class="announcement-title-cell">
                                         <strong>{{ $announcement->title }}</strong>
                                         <span>{{ Str::limit($announcement->content, 90) }}</span>
                                     </td>
                                     <td>All students</td>
-                                    <td>
+                                    <td data-order="{{ \Carbon\Carbon::parse($announcement->created_at)->timestamp }}">
                                         {{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}
                                     </td>
                                     <td>
@@ -1596,11 +1700,7 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                                         </form>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" style="padding:28px; text-align:center; color:#999;">No announcements posted yet.</td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -1665,10 +1765,29 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
     <script>
+        $(document).ready(function () {
+            const coordinatorAnnouncementTable = $('#coordinatorAnnouncementTable').DataTable({
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                order: [[2, 'desc']],
+                columnDefs: [
+                    { orderable: false, targets: 3 }
+                ],
+                language: {
+                    emptyTable: 'No announcements posted yet.'
+                }
+            });
+
+            $('#coordinatorAnnouncementSort').on('change', function () {
+                coordinatorAnnouncementTable.order([2, this.value]).draw();
+            });
+        });
+
         // Sidebar toggle
         const sidebar     = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');

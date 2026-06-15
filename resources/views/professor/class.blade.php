@@ -379,6 +379,28 @@
             cursor: pointer;
             margin-right: 8px;
         }
+        .announcement-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+        .announcement-sort-select {
+            min-width: 150px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            color: #333;
+            background: #fff;
+            outline: none;
+        }
+        .announcement-sort-select:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+        }
 
         .dataTables_filter input {
             border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
@@ -752,6 +774,7 @@
         body.dark-mode .announcement-title-cell span { color: #aaa; }
         body.dark-mode .btn-edit-announcement { background: rgba(37,99,235,0.12); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
         body.dark-mode .btn-edit-announcement:hover { background: rgba(37,99,235,0.22); color: #bfdbfe; }
+        body.dark-mode .announcement-sort-select { background: #2a2a2a; color: #e0e0e0; border-color: #555; }
         body.dark-mode .dataTables_wrapper { color: #e0e0e0 !important; }
         body.dark-mode .dataTables_length { background: #3a3a3a !important; color: #e0e0e0 !important; padding: 8px 12px; border-radius: 6px; display: inline-block; }
         body.dark-mode .dataTables_length label { color: #e0e0e0 !important; }
@@ -917,6 +940,22 @@
                         $('#fileTable').DataTable({
                             scrollX: true,
                             autoWidth: false
+                        });
+
+                        const profAnnouncementTable = $('#profAnnouncementTable').DataTable({
+                            pageLength: 5,
+                            lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                            order: [[2, 'desc']],
+                            columnDefs: [
+                                { orderable: false, targets: 3 }
+                            ],
+                            language: {
+                                emptyTable: 'No announcements posted yet.'
+                            }
+                        });
+
+                        $('#profAnnouncementSort').on('change', function () {
+                            profAnnouncementTable.order([2, this.value]).draw();
                         });
                     });
                 </script>
@@ -1216,14 +1255,20 @@
                         <p>Review or delete announcements you posted</p>
                     </div>
                 </div>
-                <div class="room-count-badge">
-                    <i class="fa fa-list"></i>
-                    {{ count($announcements ?? []) }} {{ count($announcements ?? []) == 1 ? 'announcement' : 'announcements' }}
+                <div class="announcement-toolbar">
+                    <div class="room-count-badge">
+                        <i class="fa fa-list"></i>
+                        {{ count($announcements ?? []) }} {{ count($announcements ?? []) == 1 ? 'announcement' : 'announcements' }}
+                    </div>
+                    <select id="profAnnouncementSort" class="announcement-sort-select" aria-label="Sort announcements by date">
+                        <option value="desc" selected>Newest first</option>
+                        <option value="asc">Oldest first</option>
+                    </select>
                 </div>
             </div>
 
             <div class="table-card-body announcement-table-wrap">
-                <table class="announcement-manage-table">
+                <table id="profAnnouncementTable" class="announcement-manage-table">
                     <colgroup>
                         <col style="width:42%;">
                         <col style="width:22%;">
@@ -1239,7 +1284,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($announcements ?? [] as $announcement)
+                        @foreach(($announcements ?? []) as $announcement)
                             <tr>
                                 <td class="announcement-title-cell">
                                     <strong>{{ $announcement->title }}</strong>
@@ -1251,7 +1296,7 @@
                                         - {{ $announcement->target_room }}
                                     @endif
                                 </td>
-                                <td>{{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}</td>
+                                <td data-order="{{ \Carbon\Carbon::parse($announcement->created_at)->timestamp }}">{{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}</td>
                                 <td>
                                     <button type="button"
                                             class="btn-edit-announcement"
@@ -1272,11 +1317,7 @@
                                     </form>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" style="text-align:center;color:#999;padding:28px;">No announcements posted yet.</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
