@@ -217,15 +217,7 @@ class EvaluationController extends Controller
             ],
         ];
 
-        $perPage = (int) request()->query('per_page', 10);
-        if (!in_array($perPage, [10, 25, 50], true)) {
-            $perPage = 10;
-        }
-
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $allClassrooms->forPage($currentPage, $perPage)->values();
-
-        foreach ($currentItems as $room) {
+        foreach ($allClassrooms as $room) {
             if (isset($classStats[$room->id])) {
                 foreach ($classStats[$room->id] as $key => $value) {
                     $room->{$key} = $value;
@@ -233,20 +225,9 @@ class EvaluationController extends Controller
             }
         }
 
-        $classrooms = new LengthAwarePaginator(
-            $currentItems,
-            $allClassrooms->count(),
-            $perPage,
-            $currentPage,
-            [
-                'path' => request()->url(),
-                'query' => request()->query(),
-            ]
-        );
-
         return view('professor.evaluation', [
             'data' => $data,
-            'classrooms' => $classrooms,
+            'classrooms' => $allClassrooms->values(),
             'classroomsTotal' => $allClassrooms->count(),
             'students' => $students,
             'requestsByStudent' => $requests,

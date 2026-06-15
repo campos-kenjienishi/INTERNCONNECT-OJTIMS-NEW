@@ -192,22 +192,26 @@
     <div class="card-shell section-gap">
         <div class="card-header-shell">
             <h2><span class="header-icon"><i class="fa fa-door-open"></i></span> Student Evaluation Status by Class</h2>
-            <span class="badge-like secondary">{{ $classrooms->total() }} Classes</span>
+            <span class="badge-like secondary">{{ $classroomsTotal }} Classes</span>
         </div>
         <div class="card-body-shell tight">
-            <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
-                <form method="get" action="{{ route('professor.evaluation') }}" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                    <label for="evalPerPage" style="font-size:12px; font-weight:700; color:var(--text-secondary);">Show</label>
-                    <select id="evalPerPage" name="per_page" onchange="this.form.submit()" style="border:1px solid var(--border); border-radius:8px; padding:5px 10px; font-family:'Poppins',sans-serif; font-size:12.5px; color:var(--text-primary); background:var(--surface); outline:none;">
-                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
-                        <option value="25" {{ request('per_page', 10) == 25 ? 'selected' : '' }}>25</option>
-                        <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>50</option>
+            <div class="shell-table-controls">
+                <div class="shell-length-form">
+                    <label for="classStatusPerPage">Show</label>
+                    <select id="classStatusPerPage" class="shell-length-select">
+                        @foreach([10, 25, 50] as $size)
+                            <option value="{{ $size }}" {{ $size === 10 ? 'selected' : '' }}>{{ $size }}</option>
+                        @endforeach
                     </select>
-                    <label for="evalPerPage" style="font-size:12px; font-weight:700; color:var(--text-secondary);">entries</label>
-                </form>
+                    <span>entries</span>
+                </div>
+                <div class="shell-filter-form">
+                    <label for="classStatusSearch" class="muted-text" style="font-size:13px; font-weight:500;">Search:</label>
+                    <input type="search" id="classStatusSearch" class="shell-filter-input" placeholder="Search class or room">
+                </div>
             </div>
-            <div class="table-wrap">
-                <table class="table-shell">
+            <div class="table-wrap history-datatable-wrap">
+                <table id="classStatusTable" class="display table-shell" style="width:100%">
                     <thead>
                         <tr>
                             <th>Class / Room</th>
@@ -218,68 +222,55 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($classrooms as $room)
-                            @php
-                                $classStudents = $students->filter(function ($student) use ($room) {
-                                    return (string) optional($student->studentInfo)->class_id === (string) $room->id;
-                                });
-
-                                $submittedCount = 0;
-                                foreach ($classStudents as $student) {
-                                    $latest = ($requestsByStudent[$student->id] ?? collect())->first();
-                                    if ($latest && $latest->status === 'submitted') {
-                                        $submittedCount++;
-                                    }
-                                }
-
-                                $totalCount = $classStudents->count();
-                                $pendingCount = max($totalCount - $submittedCount, 0);
-                            @endphp
+                        @foreach($classrooms as $room)
                             <tr>
                                 <td>{{ $room->room }}</td>
-                                <td>{{ $totalCount }}</td>
-                                <td><span class="badge-like success">{{ $submittedCount }}</span></td>
-                                <td><span class="badge-like warning">{{ $pendingCount }}</span></td>
+                                <td>{{ $room->total_count ?? 0 }}</td>
+                                <td><span class="badge-like success">{{ $room->submitted_count ?? 0 }}</span></td>
+                                <td><span class="badge-like warning">{{ $room->pending_count ?? 0 }}</span></td>
                                 <td>
                                     <a href="{{ route('professor.evaluation.class', ['classId' => $room->id]) }}" class="btn-eval btn-eval-outline">
                                         <i class="fa fa-list"></i> Show List
                                     </a>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center-shell muted-text">No classes found for your account.</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-            @if($classrooms->hasPages())
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
-                    <div style="font-size:12px; font-weight:600; color:var(--text-secondary);">
-                        Showing {{ $classrooms->firstItem() }} to {{ $classrooms->lastItem() }} of {{ $classrooms->total() }} classes
-                    </div>
-                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                        <a href="{{ $classrooms->previousPageUrl() ?: '#' }}" class="btn-eval btn-eval-outline {{ $classrooms->onFirstPage() ? 'disabled' : '' }}" style="padding:7px 10px;">
-                            <i class="fa fa-chevron-left"></i>
-                        </a>
-                        @for($page = 1; $page <= $classrooms->lastPage(); $page++)
-                            @if($page === $classrooms->currentPage())
-                                <span class="btn-eval btn-eval-primary" style="padding:7px 12px; pointer-events:none;">{{ $page }}</span>
-                            @else
-                                <a href="{{ $classrooms->url($page) }}" class="btn-eval btn-eval-outline" style="padding:7px 12px;">{{ $page }}</a>
-                            @endif
-                        @endfor
-                        <a href="{{ $classrooms->nextPageUrl() ?: '#' }}" class="btn-eval btn-eval-outline {{ $classrooms->hasMorePages() ? '' : 'disabled' }}" style="padding:7px 10px;">
-                            <i class="fa fa-chevron-right"></i>
-                        </a>
-                    </div>
-                </div>
-            @endif
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+        (function () {
+            if (typeof window.jQuery === 'undefined' || typeof jQuery.fn.DataTable === 'undefined' || !document.getElementById('classStatusTable')) {
+                return;
+            }
+
+            const classStatusTable = $('#classStatusTable').DataTable({
+                dom: 't<"history-bottom"ip>',
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50], [10, 25, 50]],
+                autoWidth: false,
+                language: {
+                    emptyTable: 'No classes found for your account.'
+                },
+                columnDefs: [
+                    { targets: [4], orderable: false, searchable: false }
+                ]
+            });
+
+            $('#classStatusPerPage').on('change', function () {
+                classStatusTable.page.len(Number(this.value)).draw();
+            });
+
+            $('#classStatusSearch').on('input', function () {
+                classStatusTable.search(this.value).draw();
+            });
+        })();
+
         (function () {
             const evaluationAiData = @json($evaluationAiData ?? []);
             const generateInsightBtn = document.getElementById('generateEvaluationInsightBtn');
