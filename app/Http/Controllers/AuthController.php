@@ -45,6 +45,32 @@ class AuthController extends Controller
         return view('auth.registration', compact('data','course','schedules'));
     }
 
+    public function checkEmailAvailability(Request $request)
+    {
+        $email = trim((string) $request->query('email', ''));
+
+        if ($email === '') {
+            return response()->json([
+                'available' => false,
+                'message' => 'Email is required.',
+            ], 422);
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Please enter a valid email address.',
+            ], 422);
+        }
+
+        $exists = User::where('email', $email)->exists();
+
+        return response()->json([
+            'available' => !$exists,
+            'message' => $exists ? 'This email is already in use.' : 'Email is available.',
+        ]);
+    }
+
     public function registerUser(Request $request){
         $request->validate([
             'first_name'=>'required',

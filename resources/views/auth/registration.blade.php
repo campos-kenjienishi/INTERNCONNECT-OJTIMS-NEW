@@ -353,30 +353,41 @@
         <!-- RIGHT PANEL -->
         <div class="right-panel">
 
-            {{-- header removed as requested --}}
+            @if(Session::has('success'))
+                <div class="reg-header" style="text-align:center; margin-bottom:24px;">
+                    <h2>Registration Complete</h2>
+                    <p>Your account has been created successfully.</p>
+                </div>
 
-            <!-- Step indicator -->
-            <div class="step-indicator">
-                <div class="step-dot active" id="dot1">1</div>
-                <div class="step-line" id="line1"></div>
-                <div class="step-dot" id="dot2">2</div>
-            </div>
-            <div class="step-label-row">
-                <span class="step-label active" id="label1">Personal Information</span>
-                <span class="step-label" id="label2">Academic Information</span>
-            </div>
+                <div class="alert alert-success">{{ Session::get('success') }}</div>
 
-            <form action="{{ route('register-user') }}" method="post" id="regForm">
-                @csrf
+                <div class="nav-btn-row" style="margin-top:18px;">
+                    <a href="{{ url('/login') }}" class="btn-proceed" style="text-decoration:none;">
+                        <i class="fa fa-arrow-right"></i> Proceed to Login
+                    </a>
+                </div>
+            @else
+                {{-- header removed as requested --}}
 
-                @if(Session::has('success'))
-                    <div class="alert alert-success">{{ Session::get('success') }}</div>
-                @endif
-                @if(Session::has('fail'))
-                    <div class="alert alert-danger">{{ Session::get('fail') }}</div>
-                @endif
+                <!-- Step indicator -->
+                <div class="step-indicator">
+                    <div class="step-dot active" id="dot1">1</div>
+                    <div class="step-line" id="line1"></div>
+                    <div class="step-dot" id="dot2">2</div>
+                </div>
+                <div class="step-label-row">
+                    <span class="step-label active" id="label1">Personal Information</span>
+                    <span class="step-label" id="label2">Academic Information</span>
+                </div>
 
-                <div class="form-steps-wrapper">
+                <form action="{{ route('register-user') }}" method="post" id="regForm">
+                    @csrf
+
+                    @if(Session::has('fail'))
+                        <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                    @endif
+
+                    <div class="form-steps-wrapper">
 
                     <!-- ═══ STEP 1 — Personal Info ═══ -->
                     <div class="form-step active" id="step1">
@@ -425,6 +436,7 @@
                                     <input type="text" placeholder="Enter email" name="email"
                                         id="reg_email" value="{{ old('email') }}">
                                 </div>
+                                <div id="emailRequirementNotice" style="display:none; margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;"></div>
                                 <span class="text-danger">@error('email') {{ $message }} @enderror</span>
                             </div>
 
@@ -445,6 +457,9 @@
                                     <input type="password" placeholder="Create password" name="password"
                                         id="reg_password">
                                     <i class="far fa-eye toggle-pw" id="toggleRegPassword"></i>
+                                </div>
+                                <div id="passwordRequirementNotice" style="display:none; margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
+                                    Password must be 8 to 12 characters long before you can proceed.
                                 </div>
                                 <span class="text-danger">@error('password') {{ $message }} @enderror</span>
                             </div>
@@ -523,7 +538,7 @@
                                 <label class="form-label">Professor</label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-chalkboard-teacher i-icon"></i>
-                                    <select name="adviser_name"required>
+                                    <select name="adviser_name" id="adviser_name" required>
                                         <option value="">Select Professor</option>
                                         @foreach($data as $professor)
                                             <option value="{{ $professor->full_name }}">{{ $professor->full_name }}</option>
@@ -571,8 +586,9 @@
 
                     </div>
 
-                </div>
-            </form>
+                    </div>
+                </form>
+            @endif
         </div>
 
     </div>
@@ -580,14 +596,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    let emailAvailabilityStatus = 'idle';
+    let emailCheckRequestCounter = 0;
 
-    function goToStep2() {
+    async function goToStep2() {
+        if (!document.getElementById('step1') || !document.getElementById('step2')) {
+            return;
+        }
+
         const firstName  = document.getElementById('first_name').value.trim();
         const middleName = document.getElementById('middle_name').value.trim();
         const lastName   = document.getElementById('last_name').value.trim();
         const email      = document.getElementById('reg_email').value.trim();
         const studentNum = document.getElementById('studentNum').value.trim();
         const password   = document.getElementById('reg_password').value.trim();
+        const emailNotice = document.getElementById('emailRequirementNotice');
+        const passwordNotice = document.getElementById('passwordRequirementNotice');
 
         const requiredFields = [
             { id: 'first_name',   val: firstName  },
@@ -609,6 +633,34 @@
                 el.style.boxShadow   = '';
             }
         });
+
+        const isPasswordLengthValid = password.length >= 8 && password.length <= 12;
+        const passwordInput = document.getElementById('reg_password');
+        const emailInput = document.getElementById('reg_email');
+
+        if (!isPasswordLengthValid && passwordInput) {
+            hasError = true;
+            passwordInput.style.borderColor = '#dc2626';
+            passwordInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+            if (passwordNotice) {
+                passwordNotice.style.display = 'block';
+            }
+        } else if (passwordNotice) {
+            passwordNotice.style.display = 'none';
+        }
+
+        if (email && emailInput) {
+            const emailCheck = await checkEmailAvailability(email, true);
+            if (!emailCheck.available) {
+                hasError = true;
+                emailInput.style.borderColor = '#dc2626';
+                emailInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                if (emailNotice) {
+                    emailNotice.textContent = emailCheck.message;
+                    emailNotice.style.display = 'block';
+                }
+            }
+        }
 
         if (hasError) return;
 
@@ -633,6 +685,10 @@
     }
 
     function goToStep1() {
+        if (!document.getElementById('step1') || !document.getElementById('step2')) {
+            return;
+        }
+
         const step2 = document.getElementById('step2');
         step2.classList.add('going-back');
         step2.classList.remove('active');
@@ -698,14 +754,88 @@
         return true;
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
+    async function checkEmailAvailability(email, forceCheck = false) {
+        const trimmedEmail = (email || '').trim();
 
-        document.getElementById('toggleRegPassword').addEventListener('click', function () {
-            const input = document.getElementById('reg_password');
-            input.type = input.type === 'password' ? 'text' : 'password';
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-        });
+        if (!trimmedEmail) {
+            emailAvailabilityStatus = 'idle';
+            return { available: false, message: 'Email is required.' };
+        }
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(trimmedEmail)) {
+            emailAvailabilityStatus = 'invalid';
+            return { available: false, message: 'Please enter a valid email address.' };
+        }
+
+        if (!forceCheck && emailAvailabilityStatus === 'checking') {
+            return { available: false, message: 'Checking email availability...' };
+        }
+
+        emailAvailabilityStatus = 'checking';
+        const requestId = ++emailCheckRequestCounter;
+
+        try {
+            const response = await fetch(`/check-email-availability?email=${encodeURIComponent(trimmedEmail)}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            const payload = await response.json();
+
+            if (requestId !== emailCheckRequestCounter) {
+                return { available: false, message: 'Checking email availability...' };
+            }
+
+            emailAvailabilityStatus = payload.available ? 'available' : 'taken';
+            return {
+                available: Boolean(payload.available),
+                message: payload.message || (payload.available ? 'Email is available.' : 'This email is already in use.')
+            };
+        } catch (error) {
+            emailAvailabilityStatus = 'error';
+            return { available: false, message: 'Unable to verify email right now. Please try again.' };
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const regForm = document.getElementById('regForm');
+        if (!regForm) {
+            return;
+        }
+
+        const emailInput = document.getElementById('reg_email');
+        const emailNotice = document.getElementById('emailRequirementNotice');
+        const toggleRegPassword = document.getElementById('toggleRegPassword');
+        const passwordInput = document.getElementById('reg_password');
+        const passwordNotice = document.getElementById('passwordRequirementNotice');
+        if (toggleRegPassword) {
+            toggleRegPassword.addEventListener('click', function () {
+                if (!passwordInput) {
+                    return;
+                }
+
+                passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function () {
+                const isPasswordLengthValid = this.value.length >= 8 && this.value.length <= 12;
+
+                if (passwordNotice) {
+                    passwordNotice.style.display = isPasswordLengthValid || this.value.length === 0 ? 'none' : 'block';
+                }
+
+                if (isPasswordLengthValid || this.value.length === 0) {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                }
+            });
+        }
 
         const nameFieldIds = ['first_name', 'middle_name', 'last_name'];
         nameFieldIds.forEach(function (fieldId) {
@@ -721,21 +851,69 @@
             });
         });
 
-        const regForm = document.getElementById('regForm');
-        if (regForm) {
-            regForm.addEventListener('submit', function (event) {
-                nameFieldIds.forEach(normalizeNameField);
+        if (emailInput) {
+            let emailCheckTimer = null;
 
-                if (!validateCapitalizedNameFields()) {
-                    event.preventDefault();
+            emailInput.addEventListener('input', function () {
+                const value = this.value.trim();
+                emailAvailabilityStatus = 'idle';
+
+                if (emailCheckTimer) {
+                    clearTimeout(emailCheckTimer);
                 }
+
+                if (!value) {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                    if (emailNotice) {
+                        emailNotice.style.display = 'none';
+                    }
+                    return;
+                }
+
+                emailCheckTimer = setTimeout(async () => {
+                    const result = await checkEmailAvailability(value);
+                    if (emailInput.value.trim() !== value) {
+                        return;
+                    }
+
+                    if (emailNotice) {
+                        if (!result.available) {
+                            emailNotice.textContent = result.message;
+                            emailNotice.style.display = 'block';
+                        } else {
+                            emailNotice.style.display = 'none';
+                        }
+                    }
+
+                    if (!result.available) {
+                        this.style.borderColor = '#dc2626';
+                        this.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                    } else {
+                        this.style.borderColor = '';
+                        this.style.boxShadow = '';
+                    }
+                }, 350);
             });
         }
+
+        regForm.addEventListener('submit', function (event) {
+            nameFieldIds.forEach(normalizeNameField);
+
+            if (!validateCapitalizedNameFields()) {
+                event.preventDefault();
+            }
+        });
 
         const startYearSelect   = document.getElementById('academic_year_start');
         const endYearSelect     = document.getElementById('academic_year_end');
         const semesterSelect    = document.getElementById('semester');
         const adviserNameSelect = document.getElementById('adviser_name');
+        const defaultProfessorOptions = adviserNameSelect.innerHTML;
+
+        if (!startYearSelect || !endYearSelect || !semesterSelect || !adviserNameSelect) {
+            return;
+        }
 
         function updateEndYearOptions() {
             const selectedStartYear = parseInt(startYearSelect.value);
@@ -761,10 +939,19 @@
         }
 
         function fetchProfessors(semester, startYear, endYear) {
-            if (!semester || !startYear || !endYear) return;
+            if (!semester || !startYear || !endYear) {
+                adviserNameSelect.innerHTML = defaultProfessorOptions;
+                return;
+            }
+
             fetch(`/fetch-professors/${semester}/${startYear}/${endYear}`)
                 .then(response => response.json())
                 .then(data => {
+                    if (!Array.isArray(data) || data.length === 0) {
+                        adviserNameSelect.innerHTML = defaultProfessorOptions;
+                        return;
+                    }
+
                     adviserNameSelect.innerHTML = '<option value="">Select Professor</option>';
                     data.forEach(professor => {
                         const option = document.createElement('option');
@@ -773,7 +960,10 @@
                         adviserNameSelect.appendChild(option);
                     });
                 })
-                .catch(error => console.error('Error fetching professors:', error));
+                .catch(error => {
+                    adviserNameSelect.innerHTML = defaultProfessorOptions;
+                    console.error('Error fetching professors:', error);
+                });
         }
 
         updateEndYearOptions();
