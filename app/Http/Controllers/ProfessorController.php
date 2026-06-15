@@ -50,7 +50,14 @@ public function class()
 
         // Get all rooms (classes) where this professor is adviser
         $classrooms = Classes::where('adviser_name', $data->full_name)->get();
-        $announcements = Announcements::where('announcer', $data->full_name)->latest()->get();
+        $announcements = Announcements::query()
+            ->when(
+                Schema::hasColumn('announcements', 'announcer_user_id'),
+                fn ($query) => $query->where('announcer_user_id', $data->id),
+                fn ($query) => $query->where('announcer', $data->full_name)
+            )
+            ->latest()
+            ->get();
 
         // For each room, preload students needing approval and all students
         foreach ($classrooms as $room) {
@@ -90,7 +97,12 @@ public function class()
                     ->get();
             } else {
                 // Legacy fallback when uploaded_files.class_id does not exist yet
-                $room->templateFiles = UploadedFile::where('uploader_name', $data->full_name)
+                $room->templateFiles = UploadedFile::query()
+                    ->when(
+                        Schema::hasColumn('uploaded_files', 'uploader_user_id'),
+                        fn ($query) => $query->where('uploader_user_id', $data->id),
+                        fn ($query) => $query->where('uploader_name', $data->full_name)
+                    )
                     ->latest()
                     ->get();
             }

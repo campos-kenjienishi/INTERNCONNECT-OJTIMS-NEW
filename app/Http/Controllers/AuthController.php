@@ -166,8 +166,21 @@ class AuthController extends Controller
         }
 
         $userName = $data->full_name ?? '';
-        $fileCount = UploadedFile::where('uploader_name', $userName)->count();
-        $announcements = Announcements::where('announcer', $userName)->latest()->get();
+        $fileCount = UploadedFile::query()
+            ->when(
+                $data && Schema::hasColumn('uploaded_files', 'uploader_user_id'),
+                fn ($query) => $query->where('uploader_user_id', $data->id),
+                fn ($query) => $query->where('uploader_name', $userName)
+            )
+            ->count();
+        $announcements = Announcements::query()
+            ->when(
+                $data && Schema::hasColumn('announcements', 'announcer_user_id'),
+                fn ($query) => $query->where('announcer_user_id', $data->id),
+                fn ($query) => $query->where('announcer', $userName)
+            )
+            ->latest()
+            ->get();
 
         $pendingStudents = User::where('role', 0)->where('status', 0)->count();
         $approvedStudents = User::where('role', 0)->where('status', 1)->count();

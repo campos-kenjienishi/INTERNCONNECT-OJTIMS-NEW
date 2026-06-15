@@ -830,7 +830,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     <div class="header-icon"><i class="fa fa-file-upload"></i></div>
                     <div>
                         <h2>Uploaded Templates</h2>
-                        <p>Manage all OJT document templates available for download</p>
+                        <p>Manage the OJT document templates that you uploaded</p>
                     </div>
                 </div>
                 <div class="file-count-badge">

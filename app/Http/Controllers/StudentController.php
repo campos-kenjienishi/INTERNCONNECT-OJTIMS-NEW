@@ -50,34 +50,62 @@ private function requireStudentSession()
 private function visibleAnnouncementsForStudent($data, $classRoomNames = [], $includeClassAnnouncements = false)
 {
     $coordinatorNames = User::where('role', 1)->pluck('full_name')->filter()->values()->all();
+    $coordinatorIds = User::where('role', 1)->pluck('id')->filter()->values()->all();
+    $professorIds = !empty($data->adviser_name)
+        ? User::where('role', 2)->where('full_name', $data->adviser_name)->pluck('id')->filter()->values()->all()
+        : [];
+    $hasAnnouncerUserIdColumn = Schema::hasColumn('announcements', 'announcer_user_id');
     $hasAudienceColumn = Schema::hasColumn('announcements', 'audience');
     $hasTargetCourseColumn = Schema::hasColumn('announcements', 'target_course');
     $hasTargetRoomColumn = Schema::hasColumn('announcements', 'target_room');
 
     if (!$hasAudienceColumn) {
-        return Announcements::where(function ($query) use ($data, $coordinatorNames, $includeClassAnnouncements) {
-            $query->whereIn('announcer', $coordinatorNames);
+        return Announcements::where(function ($query) use ($data, $coordinatorNames, $coordinatorIds, $professorIds, $includeClassAnnouncements, $hasAnnouncerUserIdColumn) {
+            if ($hasAnnouncerUserIdColumn) {
+                $query->whereIn('announcer_user_id', $coordinatorIds);
+            } else {
+                $query->whereIn('announcer', $coordinatorNames);
+            }
 
             if ($includeClassAnnouncements && !empty($data->adviser_name)) {
-                $query->orWhere('announcer', $data->adviser_name);
+                if ($hasAnnouncerUserIdColumn) {
+                    $query->orWhereIn('announcer_user_id', $professorIds);
+                } else {
+                    $query->orWhere('announcer', $data->adviser_name);
+                }
             }
         })->latest()->get();
     }
 
-    return Announcements::where(function ($query) use ($data, $classRoomNames, $coordinatorNames, $includeClassAnnouncements, $hasTargetCourseColumn, $hasTargetRoomColumn) {
-        $query->where(function ($coordinatorQuery) use ($coordinatorNames) {
-            $coordinatorQuery->where('audience', 'all_students')
-                ->whereIn('announcer', $coordinatorNames);
+    return Announcements::where(function ($query) use ($data, $classRoomNames, $coordinatorNames, $coordinatorIds, $professorIds, $includeClassAnnouncements, $hasTargetCourseColumn, $hasTargetRoomColumn, $hasAnnouncerUserIdColumn) {
+        $query->where(function ($coordinatorQuery) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn) {
+            $coordinatorQuery->where('audience', 'all_students');
+
+            if ($hasAnnouncerUserIdColumn) {
+                $coordinatorQuery->whereIn('announcer_user_id', $coordinatorIds);
+            } else {
+                $coordinatorQuery->whereIn('announcer', $coordinatorNames);
+            }
         })
-        ->orWhere(function ($legacyCoordinatorQuery) use ($coordinatorNames) {
-            $legacyCoordinatorQuery->whereNull('audience')
-                ->whereIn('announcer', $coordinatorNames);
+        ->orWhere(function ($legacyCoordinatorQuery) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn) {
+            $legacyCoordinatorQuery->whereNull('audience');
+
+            if ($hasAnnouncerUserIdColumn) {
+                $legacyCoordinatorQuery->whereIn('announcer_user_id', $coordinatorIds);
+            } else {
+                $legacyCoordinatorQuery->whereIn('announcer', $coordinatorNames);
+            }
         });
 
         if ($includeClassAnnouncements) {
-            $query->orWhere(function ($classQuery) use ($data, $classRoomNames, $hasTargetCourseColumn, $hasTargetRoomColumn) {
-                $classQuery->where('audience', 'class')
-                    ->where('announcer', $data->adviser_name);
+            $query->orWhere(function ($classQuery) use ($data, $classRoomNames, $professorIds, $hasTargetCourseColumn, $hasTargetRoomColumn, $hasAnnouncerUserIdColumn) {
+                $classQuery->where('audience', 'class');
+
+                if ($hasAnnouncerUserIdColumn) {
+                    $classQuery->whereIn('announcer_user_id', $professorIds);
+                } else {
+                    $classQuery->where('announcer', $data->adviser_name);
+                }
 
                 if ($hasTargetCourseColumn) {
                     $classQuery->where('target_course', $data->course);

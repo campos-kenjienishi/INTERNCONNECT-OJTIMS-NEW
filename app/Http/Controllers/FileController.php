@@ -26,29 +26,57 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
+use Illuminate\Database\Eloquent\Builder;
 
 class FileController extends Controller
 {
+    protected function getLoggedInUser()
+    {
+        if (!Session::has('loginId')) {
+            return null;
+        }
+
+        return User::where('id', Session::get('loginId'))->first();
+    }
+
+    protected function canManageUploadedFile(User $user, UploadedFile $file): bool
+    {
+        return $this->managedUploadedFilesQuery($user)
+            ->where('id', $file->id)
+            ->exists();
+    }
+
+    protected function managedUploadedFilesQuery(User $user): Builder
+    {
+        $query = UploadedFile::query();
+
+        if (Schema::hasColumn('uploaded_files', 'uploader_user_id')) {
+            $query->where('uploader_user_id', $user->id);
+        } else {
+            $query->where('uploader_name', $user->full_name);
+        }
+
+        if ((int) $user->role === 1 && Schema::hasColumn('uploaded_files', 'class_id')) {
+            $query->where(function ($scope) {
+                $scope->whereNull('class_id')
+                    ->orWhere('class_id', 0);
+            });
+        }
+
+        return $query;
+    }
+
     public function uploadpage()
     {
-        $user = null;
-
-        if (Session::has('loginId')) {
-            $user = User::where('id', Session::get('loginId'))->first();
-        }
+        $user = $this->getLoggedInUser();
 
         if (!$user) {
             return redirect('/login');
         }
 
-        // PROFESSOR: see only own uploads
-        if ($user->role === 'professor') {
-            $data = UploadedFile::where('uploader_name', $user->full_name)->latest()->get();
-        }
-        // COORDINATOR: see ALL uploads
-        else {
-            $data = UploadedFile::latest()->get();
-        }
+        $data = $this->managedUploadedFilesQuery($user)
+            ->latest()
+            ->get();
 
         return view('ojtCoordinator.upload', compact('data', 'user'));
     }
@@ -73,6 +101,9 @@ class FileController extends Controller
         $data->file = $filename;
         $data->name = $request->name;
         $data->uploader_name = $user->full_name;
+        if (Schema::hasColumn('uploaded_files', 'uploader_user_id')) {
+            $data->uploader_user_id = $user->id;
+        }
         if (Schema::hasColumn('uploaded_files', 'class_id')) {
             $data->class_id = $request->filled('class_id') ? $request->class_id : null;
         }
@@ -105,8 +136,15 @@ class FileController extends Controller
 
     public function view($id)
     {
+        $user = $this->getLoggedInUser();
+        if (!$user) {
+            return redirect('/login');
+        }
 
-        $data=UploadedFile::find($id);
+        $data = $this->managedUploadedFilesQuery($user)->find($id);
+        if (!$data) {
+            return redirect()->back()->with('error', 'File not found.');
+        }
 
         return view('ojtCoordinator.view',compact('data'));
     }
@@ -115,13 +153,12 @@ class FileController extends Controller
 
     public function remove($id)
     {
-
-        $user = null;
-        if (Session::has('loginId')) {
-            $user = User::where('id', Session::get('loginId'))->first();
+        $user = $this->getLoggedInUser();
+        if (!$user) {
+            return redirect('/login');
         }
 
-        $data = UploadedFile::find($id);
+        $data = $this->managedUploadedFilesQuery($user)->find($id);
 
         if (!$data) {
             return redirect()->back()->with('error', 'File not found.');
@@ -149,10 +186,7 @@ class FileController extends Controller
 
     public function removeProfessorTemplate($id)
     {
-        $user = null;
-        if (Session::has('loginId')) {
-            $user = User::where('id', Session::get('loginId'))->first();
-        }
+        $user = $this->getLoggedInUser();
 
         if (!$user || (int) $user->role !== 2) {
             return redirect()->back()->with('error', 'Unauthorized action.');
@@ -164,7 +198,7 @@ class FileController extends Controller
         }
 
         // Professors can only remove their own room-scoped templates.
-        if ($file->uploader_name !== $user->full_name) {
+        if (!$this->canManageUploadedFile($user, $file)) {
             return redirect()->back()->with('error', 'You can only remove your own templates.');
         }
 
@@ -201,9 +235,16 @@ class FileController extends Controller
     }
     
     public function search(Request $request){
+        $user = $this->getLoggedInUser();
+        if (!$user) {
+            return redirect('/login');
+        }
 
         if($request->search){
-            $searchFile = UploadedFile::where('name', 'LIKE', '%'.$request->search. '%')->latest()->paginate(15);
+            $searchFile = $this->managedUploadedFilesQuery($user)
+                ->where('name', 'LIKE', '%'.$request->search. '%')
+                ->latest()
+                ->paginate(15);
             return view('ojtCoordinator.search',compact('searchFile'));
         }
 

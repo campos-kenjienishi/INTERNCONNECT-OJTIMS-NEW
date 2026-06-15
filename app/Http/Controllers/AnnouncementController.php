@@ -26,6 +26,19 @@ use App\Helpers\AuditLogger;
 
 class AnnouncementController extends Controller
 {
+    protected function ownedAnnouncementsQuery(User $user)
+    {
+        $query = Announcements::query();
+
+        if (Schema::hasColumn('announcements', 'announcer_user_id')) {
+            $query->where('announcer_user_id', $user->id);
+        } else {
+            $query->where('announcer', $user->full_name);
+        }
+
+        return $query;
+    }
+
     public function announcement(Request $request)
     {
         if (!Session::has('loginId')) {
@@ -69,6 +82,9 @@ class AnnouncementController extends Controller
         $data->title=$request->title;
         $data->content=$request->content;
         $data->announcer=$user->full_name;
+        if (Schema::hasColumn('announcements', 'announcer_user_id')) {
+            $data->announcer_user_id = $user->id;
+        }
 
         if (Schema::hasColumn('announcements', 'audience')) {
             $data->audience = $audience;
@@ -107,8 +123,8 @@ class AnnouncementController extends Controller
             abort(403, 'Only coordinators and professors can delete announcements.');
         }
 
-        $announcement = Announcements::where('id', $id)
-            ->where('announcer', $user->full_name)
+        $announcement = $this->ownedAnnouncementsQuery($user)
+            ->where('id', $id)
             ->firstOrFail();
 
         $title = $announcement->title;
@@ -141,8 +157,8 @@ class AnnouncementController extends Controller
             'content' => ['required', 'string'],
         ]);
 
-        $announcement = Announcements::where('id', $id)
-            ->where('announcer', $user->full_name)
+        $announcement = $this->ownedAnnouncementsQuery($user)
+            ->where('id', $id)
             ->firstOrFail();
 
         $oldTitle = $announcement->title;
