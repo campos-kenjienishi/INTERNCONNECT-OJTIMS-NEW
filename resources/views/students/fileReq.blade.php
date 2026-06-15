@@ -320,6 +320,8 @@
             grid-template-columns: repeat(4, 1fr);  /* always 4 columns on desktop */
             gap: 16px;
             margin-bottom: 24px;
+            width: 100%;
+            max-width: 100%;
         }
         .stat-card {
             background: #fff;
@@ -330,6 +332,7 @@
             gap: 14px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             border: 1px solid rgba(0,0,0,0.04);
+            min-width: 0;
         }
 
         .stat-icon {
@@ -349,6 +352,15 @@
 
         .stat-num  { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
         .stat-name { font-size: 12px; color: #888; margin-top: 3px; }
+
+        .stat-card > div:last-child {
+            min-width: 0;
+        }
+
+        .stat-name {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
 
         /* Table card */
         .table-card {
@@ -813,6 +825,89 @@
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
+            .stats-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            html, body {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .page-content {
+                padding: 12px;
+                overflow-x: hidden;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-upload {
+                width: 100%;
+                justify-content: center;
+                white-space: normal;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+
+            .table-card {
+                overflow: hidden;
+            }
+
+            .table-card-body {
+                overflow: visible;
+            }
+
+            .table-card-body .dataTables_wrapper {
+                overflow: visible;
+            }
+
+            .table-card-body .dataTables_scroll {
+                width: 100%;
+            }
+
+            .table-card-body .dataTables_scrollBody {
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 10px 12px;
+            }
+
+            .stat-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 14px;
+            }
+
+            .stat-num {
+                font-size: 16px;
+            }
+
+            .stat-name {
+                font-size: 10.5px;
+            }
         }
         /* Dashboard Footer */
 .dashboard-footer {
@@ -1040,7 +1135,9 @@
                 <script>
                     $(document).ready(function () {
                         const fileTable = $('#fileTable').DataTable({
-                            "order": [[3, 'desc']]
+                            "order": [[3, 'desc']],
+                            "scrollX": true,
+                            "autoWidth": false
                         });
 
                         $('#fileTable tbody').on('click', '.remove-button', function (e) {

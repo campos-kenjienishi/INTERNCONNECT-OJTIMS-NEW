@@ -382,17 +382,26 @@ body {
     padding: 0 22px;
 }
 
-/* ── Step 3: The actual scroll container is the table-card-body ── */
+/* ── Step 3: Keep controls fixed; only the table area scrolls ── */
 .table-card-body {
     width: 100%;                      /* never exceed parent */
     max-width: 100%;                  /* hard cap */
-    overflow-x: auto;
-    overflow-y: visible;
+    overflow: visible;
     -webkit-overflow-scrolling: touch;
     position: relative;
     /* Kill any inherited width:fit-content or display:inline-block */
     display: block !important;
     box-sizing: border-box;
+}
+
+.table-card-body .dataTables_scroll {
+    width: 100%;
+}
+
+.table-card-body .dataTables_scrollBody {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ── Step 4: Table itself scrolls inside the body ── */
@@ -465,12 +474,17 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
 
 /* ── Step 8: Prevent page-level overflow ── */
 /* These are the parent containers — none should scroll horizontally */
-.table-card,
 .page-content,
 .main-content {
     max-width: 100%;
     overflow-x: hidden; /* hard stop — only table-card-body scrolls */
     box-sizing: border-box;
+}
+
+.table-card {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* ── Step 9: Stats row — deployment guard ── */
@@ -493,6 +507,10 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
     .table-card-body .dataTables_info,
     .table-card-body .dataTables_paginate {
         padding: 0 14px;
+    }
+
+    .table-card-body .dataTables_wrapper {
+        overflow: visible !important;
     }
 
     .dataTables_filter input {
