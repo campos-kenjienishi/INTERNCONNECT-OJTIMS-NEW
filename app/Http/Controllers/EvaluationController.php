@@ -269,29 +269,11 @@ class EvaluationController extends Controller
             ->get()
             ->groupBy('student_id');
 
-        $perPage = (int) request()->query('per_page', 10);
-        if (!in_array($perPage, [10, 25, 50], true)) {
-            $perPage = 10;
-        }
-
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $students->forPage($currentPage, $perPage)->values();
-
-        $students = new LengthAwarePaginator(
-            $currentItems,
-            $students->count(),
-            $perPage,
-            $currentPage,
-            [
-                'path' => request()->url(),
-                'query' => request()->query(),
-            ]
-        );
-
         return view('professor.evaluation_list', [
             'data' => $data,
             'classroom' => $classroom,
-            'students' => $students,
+            'students' => $students->values(),
+            'studentsTotal' => $students->count(),
             'requestsByStudent' => $requestsByStudent,
         ]);
     }
