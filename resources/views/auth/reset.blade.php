@@ -179,62 +179,68 @@ $email = $_GET['email'] ?? '';
                 <p>Your new password must be different from your previous password.</p>
             </div>
 
-            <form action="{{ url('/reset-password') }}?email={{ $email }}" method="post">
-                @csrf
-
-                @if(Session::has('success'))
-                    <div class="alert alert-success">{{ Session::get('success') }}</div>
-                @endif
-                @if(Session::has('fail'))
-                    <div class="alert alert-danger">{{ Session::get('fail') }}</div>
-                @endif
-
-                <!-- New Password -->
-                <div class="field-group">
-                    <label class="form-label">New Password</label>
-                    <div class="input-wrap">
-                        <i class="fa fa-lock i-icon"></i>
-                        <input type="password" placeholder="Enter new password" name="password" id="new_password">
-                        <i class="far fa-eye toggle-pw" id="toggleNewPassword"></i>
-                    </div>
-                    <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
-                        <strong>Password requirements:</strong> Use at least 8 characters and make it different from your previous password.
-                    </div>
-                    <!-- Strength bar -->
-                    <div class="strength-wrap">
-                        <div class="strength-bar-bg">
-                            <div class="strength-bar" id="strengthBar"></div>
-                        </div>
-                        <span class="strength-label" id="strengthLabel">Enter a password</span>
-                    </div>
-                </div>
-
-                <!-- Confirm Password -->
-                <div class="field-group">
-                    <label class="form-label">Confirm Password</label>
-                    <div class="input-wrap">
-                        <i class="fa fa-lock i-icon"></i>
-                        <input type="password" placeholder="Confirm new password" name="confirm_password" id="confirm_password">
-                        <i class="far fa-eye toggle-pw" id="toggleConfirmPassword"></i>
-                    </div>
-                    <div class="match-indicator" id="matchIndicator">
-                        <i class="fa fa-check-circle"></i>
-                        <span id="matchText">Passwords match</span>
-                    </div>
-                </div>
-
-                <!-- Reset Button -->
+            @if(Session::has('success'))
+                <div class="alert alert-success">{{ Session::get('success') }}</div>
                 <div class="btn-wrap">
-                    <button type="submit" class="btn-reset" id="resetBtn">
-                        <i class="fa fa-shield-alt me-2"></i> Reset Password
-                    </button>
+                    <a href="{{ url('/login') }}" class="btn-reset" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                        <i class="fa fa-arrow-right me-2"></i> Proceed to Login
+                    </a>
                 </div>
+            @else
+                <form action="{{ url('/reset-password') }}?email={{ $email }}" method="post">
+                    @csrf
 
-                <div class="footer-wrap">
-                    <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
-                </div>
+                    @if(Session::has('fail'))
+                        <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                    @endif
 
-            </form>
+                    <!-- New Password -->
+                    <div class="field-group">
+                        <label class="form-label">New Password</label>
+                        <div class="input-wrap">
+                            <i class="fa fa-lock i-icon"></i>
+                            <input type="password" placeholder="Enter new password" name="password" id="new_password">
+                            <i class="far fa-eye toggle-pw" id="toggleNewPassword"></i>
+                        </div>
+                        <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
+                            <strong>Password requirements:</strong> Use at least 8 characters and make it different from your previous password.
+                        </div>
+                        <!-- Strength bar -->
+                        <div class="strength-wrap">
+                            <div class="strength-bar-bg">
+                                <div class="strength-bar" id="strengthBar"></div>
+                            </div>
+                            <span class="strength-label" id="strengthLabel">Enter a password</span>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="field-group">
+                        <label class="form-label">Confirm Password</label>
+                        <div class="input-wrap">
+                            <i class="fa fa-lock i-icon"></i>
+                            <input type="password" placeholder="Confirm new password" name="confirm_password" id="confirm_password">
+                            <i class="far fa-eye toggle-pw" id="toggleConfirmPassword"></i>
+                        </div>
+                        <div class="match-indicator" id="matchIndicator">
+                            <i class="fa fa-check-circle"></i>
+                            <span id="matchText">Passwords match</span>
+                        </div>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <div class="btn-wrap">
+                        <button type="submit" class="btn-reset" id="resetBtn">
+                            <i class="fa fa-shield-alt me-2"></i> Reset Password
+                        </button>
+                    </div>
+
+                    <div class="footer-wrap">
+                        <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
+                    </div>
+
+                </form>
+            @endif
         </div>
 
     </div>
@@ -243,35 +249,36 @@ $email = $_GET['email'] ?? '';
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url('/frontend/js/script.js') }}"></script>
 <script>
-    // Toggle new password
-    document.getElementById('toggleNewPassword').addEventListener('click', function () {
-        const input = document.getElementById('new_password');
-        input.type = input.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-        this.classList.remove('toggled');
-        void this.offsetWidth;
-        this.classList.add('toggled');
-    });
-
-    // Toggle confirm password
-    document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
-        const input = document.getElementById('confirm_password');
-        input.type = input.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-        this.classList.remove('toggled');
-        void this.offsetWidth;
-        this.classList.add('toggled');
-    });
-
-    // Password strength checker
+    const toggleNewPassword = document.getElementById('toggleNewPassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
     const newPasswordInput  = document.getElementById('new_password');
     const confirmInput      = document.getElementById('confirm_password');
     const strengthBar       = document.getElementById('strengthBar');
     const strengthLabel     = document.getElementById('strengthLabel');
     const matchIndicator    = document.getElementById('matchIndicator');
     const matchText         = document.getElementById('matchText');
+
+    if (toggleNewPassword && newPasswordInput) {
+        toggleNewPassword.addEventListener('click', function () {
+            newPasswordInput.type = newPasswordInput.type === 'password' ? 'text' : 'password';
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+            this.classList.remove('toggled');
+            void this.offsetWidth;
+            this.classList.add('toggled');
+        });
+    }
+
+    if (toggleConfirmPassword && confirmInput) {
+        toggleConfirmPassword.addEventListener('click', function () {
+            confirmInput.type = confirmInput.type === 'password' ? 'text' : 'password';
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+            this.classList.remove('toggled');
+            void this.offsetWidth;
+            this.classList.add('toggled');
+        });
+    }
 
     function checkStrength(password) {
         let score = 0;
@@ -283,31 +290,11 @@ $email = $_GET['email'] ?? '';
         return score;
     }
 
-    newPasswordInput.addEventListener('input', function () {
-        const val   = this.value;
-        const score = checkStrength(val);
-
-        const levels = [
-            { width: '0%',   color: 'transparent',               label: 'Enter a password' },
-            { width: '20%',  color: '#ef4444',                   label: 'Very weak' },
-            { width: '40%',  color: '#f97316',                   label: 'Weak' },
-            { width: '60%',  color: '#eab308',                   label: 'Fair' },
-            { width: '80%',  color: '#84cc16',                   label: 'Strong' },
-            { width: '100%', color: '#22c55e',                   label: 'Very strong' },
-        ];
-
-        const level = val.length === 0 ? levels[0] : levels[Math.min(score, 5)];
-        strengthBar.style.width      = level.width;
-        strengthBar.style.background = level.color;
-        strengthLabel.textContent    = level.label;
-        strengthLabel.style.color    = val.length === 0 ? 'rgba(255,255,255,0.4)' : level.color;
-
-        checkMatch();
-    });
-
-    confirmInput.addEventListener('input', checkMatch);
-
     function checkMatch() {
+        if (!newPasswordInput || !confirmInput || !matchIndicator || !matchText) {
+            return;
+        }
+
         const pw  = newPasswordInput.value;
         const cpw = confirmInput.value;
 
@@ -329,6 +316,34 @@ $email = $_GET['email'] ?? '';
             matchIndicator.querySelector('i').className = 'fa fa-times-circle';
             matchText.textContent = 'Passwords do not match';
         }
+    }
+
+    if (newPasswordInput && strengthBar && strengthLabel) {
+        newPasswordInput.addEventListener('input', function () {
+            const val   = this.value;
+            const score = checkStrength(val);
+
+            const levels = [
+                { width: '0%',   color: 'transparent',               label: 'Enter a password' },
+                { width: '20%',  color: '#ef4444',                   label: 'Very weak' },
+                { width: '40%',  color: '#f97316',                   label: 'Weak' },
+                { width: '60%',  color: '#eab308',                   label: 'Fair' },
+                { width: '80%',  color: '#84cc16',                   label: 'Strong' },
+                { width: '100%', color: '#22c55e',                   label: 'Very strong' },
+            ];
+
+            const level = val.length === 0 ? levels[0] : levels[Math.min(score, 5)];
+            strengthBar.style.width      = level.width;
+            strengthBar.style.background = level.color;
+            strengthLabel.textContent    = level.label;
+            strengthLabel.style.color    = val.length === 0 ? 'rgba(255,255,255,0.4)' : level.color;
+
+            checkMatch();
+        });
+    }
+
+    if (confirmInput) {
+        confirmInput.addEventListener('input', checkMatch);
     }
 
     // Email from URL

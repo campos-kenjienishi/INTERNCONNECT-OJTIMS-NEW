@@ -22,7 +22,7 @@ use Illuminate\Support\Str;
 
 class EvaluationController extends Controller
 {
-    public function studentIndex(Request $request)
+    public function studentIndex()
     {
         $data = null;
         if (Session::has('loginId')) {
@@ -35,41 +35,16 @@ class EvaluationController extends Controller
 
         $student = Student::where('user_id', $data->id)->first();
         $expectedSupervisorEmail = $this->getExpectedSupervisorEmail($student);
-        $perPage = (int) $request->query('per_page', 5);
-        $search = trim((string) $request->query('search', ''));
-        $sort = trim((string) $request->query('sort', 'newest'));
-        if (!in_array($perPage, [5, 10, 25, 50], true)) {
-            $perPage = 5;
-        }
-
-        $requestsQuery = OjtEvaluationRequest::with(['template', 'evaluation'])
-            ->where('student_id', $data->id);
-
-        if ($search !== '') {
-            $requestsQuery->where(function ($query) use ($search) {
-                $query->where('supervisor_email', 'like', '%' . $search . '%')
-                    ->orWhere('supervisor_name', 'like', '%' . $search . '%')
-                    ->orWhere('status', 'like', '%' . $search . '%');
-            });
-        }
-
-        if (!in_array($sort, ['newest', 'oldest'], true)) {
-            $sort = 'newest';
-        }
-
-        $requests = $requestsQuery
-            ->orderBy('id', $sort === 'oldest' ? 'asc' : 'desc')
-            ->paginate($perPage)
-            ->withQueryString();
+        $requests = OjtEvaluationRequest::with(['template', 'evaluation'])
+            ->where('student_id', $data->id)
+            ->latest('id')
+            ->get();
 
         return view('students.evaluation', [
             'data' => $data,
             'student' => $student,
             'requests' => $requests,
             'expectedSupervisorEmail' => $expectedSupervisorEmail,
-            'perPage' => $perPage,
-            'search' => $search,
-            'sort' => $sort,
         ]);
     }
 

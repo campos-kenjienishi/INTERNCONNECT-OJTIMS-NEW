@@ -69,30 +69,27 @@
         </div>
         <div class="card-body-shell tight">
             <div class="shell-table-controls">
-                <form method="GET" action="{{ route('student.evaluation') }}" class="shell-length-form">
-                    <input type="hidden" name="search" value="{{ $search ?? '' }}">
-                    <input type="hidden" name="sort" value="{{ $sort ?? 'newest' }}">
+                <div class="shell-length-form">
                     <label for="historyPerPage">Show</label>
-                    <select id="historyPerPage" name="per_page" class="shell-length-select" onchange="this.form.submit()">
+                    <select id="historyPerPage" class="shell-length-select">
                         @foreach([5, 10, 25, 50] as $size)
-                            <option value="{{ $size }}" {{ (int) ($perPage ?? 5) === $size ? 'selected' : '' }}>{{ $size }}</option>
+                            <option value="{{ $size }}" {{ $size === 5 ? 'selected' : '' }}>{{ $size }}</option>
                         @endforeach
                     </select>
                     <span>entries</span>
-                </form>
-                <form method="GET" action="{{ route('student.evaluation') }}" class="shell-filter-form" id="historyFilterForm">
-                    <input type="hidden" name="per_page" value="{{ $perPage ?? 5 }}">
+                </div>
+                <div class="shell-filter-form">
                     <label for="historySearch" class="muted-text" style="font-size:13px; font-weight:500;">Search:</label>
-                    <input type="search" id="historySearch" name="search" value="{{ $search ?? '' }}" class="shell-filter-input" placeholder="Search email, name, or status">
+                    <input type="search" id="historySearch" class="shell-filter-input" placeholder="Search email, name, or status">
                     <label for="historySort" class="muted-text" style="font-size:13px; font-weight:500;">Date</label>
-                    <select id="historySort" name="sort" class="shell-filter-select" onchange="this.form.submit()">
-                        <option value="newest" {{ ($sort ?? 'newest') === 'newest' ? 'selected' : '' }}>Newest first</option>
-                        <option value="oldest" {{ ($sort ?? '') === 'oldest' ? 'selected' : '' }}>Oldest first</option>
+                    <select id="historySort" class="shell-filter-select">
+                        <option value="newest" selected>Newest first</option>
+                        <option value="oldest">Oldest first</option>
                     </select>
-                </form>
+                </div>
             </div>
-            <div class="table-wrap">
-                <table class="table-shell">
+            <div class="table-wrap history-datatable-wrap">
+                <table id="historyTable" class="display table-shell" style="width:100%">
                     <thead>
                         <tr>
                             <th>Supervisor Email</th>
@@ -113,8 +110,8 @@
                                         {{ strtoupper($row->status) }}
                                     </span>
                                 </td>
-                                <td>{{ optional($row->emailed_at)->format('M d, Y h:i A') ?: '-' }}</td>
-                                <td>{{ optional($row->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
+                                <td data-order="{{ optional($row->emailed_at)->timestamp ?? 0 }}">{{ optional($row->emailed_at)->format('M d, Y h:i A') ?: '-' }}</td>
+                                <td data-order="{{ optional($row->submitted_at)->timestamp ?? 0 }}">{{ optional($row->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
                                 <td>
                                     <div class="stacked-actions">
                                         @if($row->status === 'submitted' && $row->evaluation)
@@ -151,30 +148,45 @@
                     </tbody>
                 </table>
             </div>
-            <div class="shell-pagination">
-                <div class="shell-pagination-meta">
-                    Showing {{ $requests->firstItem() ?? 0 }} to {{ $requests->lastItem() ?? 0 }} of {{ $requests->total() }} requests
-                </div>
-                <div class="shell-pagination-nav">
-                    <a href="{{ $requests->onFirstPage() ? '#' : $requests->previousPageUrl() }}" class="shell-pagination-link {{ $requests->onFirstPage() ? 'disabled' : '' }}">
-                        Previous
-                    </a>
-                    @php($historyLastPage = max($requests->lastPage(), 1))
-                    @for($page = 1; $page <= $historyLastPage; $page++)
-                        <a href="{{ $requests->total() > 0 ? $requests->url($page) : '#' }}" class="shell-pagination-link {{ $page === $requests->currentPage() ? 'active' : '' }} {{ $requests->total() > 0 ? '' : 'disabled' }}">
-                            {{ $page }}
-                        </a>
-                    @endfor
-                    <a href="{{ $requests->hasMorePages() ? $requests->nextPageUrl() : '#' }}" class="shell-pagination-link {{ $requests->hasMorePages() ? '' : 'disabled' }}">
-                        Next
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        (function () {
+            if (typeof window.jQuery === 'undefined' || typeof jQuery.fn.DataTable === 'undefined' || !document.getElementById('historyTable')) {
+                return;
+            }
+
+            const historyTable = $('#historyTable').DataTable({
+                dom: 't<"history-bottom"ip>',
+                order: [[3, 'desc']],
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                autoWidth: false,
+                language: {
+                    emptyTable: 'No evaluation requests yet.'
+                },
+                columnDefs: [
+                    { targets: [5], orderable: false, searchable: false }
+                ]
+            });
+
+            $('#historyPerPage').on('change', function () {
+                historyTable.page.len(Number(this.value)).draw();
+            });
+
+            $('#historySearch').on('input', function () {
+                historyTable.search(this.value).draw();
+            });
+
+            $('#historySort').on('change', function () {
+                historyTable.order([[3, this.value === 'oldest' ? 'asc' : 'desc']]).draw();
+            });
+        })();
+
         (function () {
             const form = document.getElementById('sendEvaluationForm');
             if (!form) {
@@ -202,22 +214,6 @@
                     confirmInput.value = '1';
                 }
             });
-        })();
-
-        (function () {
-            const historyFilterForm = document.getElementById('historyFilterForm');
-            const historySearch = document.getElementById('historySearch');
-
-            if (historyFilterForm && historySearch) {
-                let historySearchTimer = null;
-
-                historySearch.addEventListener('input', function () {
-                    window.clearTimeout(historySearchTimer);
-                    historySearchTimer = window.setTimeout(function () {
-                        historyFilterForm.submit();
-                    }, 350);
-                });
-            }
         })();
 
         (function () {
