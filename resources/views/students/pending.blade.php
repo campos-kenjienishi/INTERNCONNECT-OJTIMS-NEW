@@ -93,7 +93,7 @@
                             <span class="icon">
                                 <ion-icon name="document-outline"></ion-icon>
                             </span>
-                            <span class="title">MOA</span>
+                            <span class="title">Notarized MOA</span>
                             <span class="icon" style="margin-left: 30%; font-size: 22px;">
                                 <ion-icon name="chevron-down-outline"></ion-icon>
                             </span>
@@ -341,7 +341,7 @@ $(document).ready(function() {
                             <span class="icon">
                                 <ion-icon name="document-outline"></ion-icon>
                             </span>
-                            <span class="title">MOA</span>
+                            <span class="title">Notarized MOA</span>
                             <span class="icon" style="margin-left: 30%; font-size: 22px;">
                                 <ion-icon name="chevron-down-outline"></ion-icon>
                             </span>

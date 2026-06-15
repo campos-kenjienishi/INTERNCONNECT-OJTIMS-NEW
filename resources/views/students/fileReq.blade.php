@@ -482,6 +482,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            min-width: 0;
         }
 
         .category-icon {
@@ -496,7 +497,12 @@
             flex-shrink: 0;
         }
 
-        .category-name { font-weight: 600; color: #1a1a1a; font-size: 13.5px; }
+        .category-name {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 13.5px;
+            line-height: 1.45;
+        }
 
         /* File cell */
         .file-cell {
@@ -513,32 +519,47 @@
         .status-badge {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 5px;
-            padding: 4px 12px;
+            min-width: 96px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .status-approved { background: #dcfce7; color: #16a34a; }
         .status-denied   { background: #fee2e2; color: var(--red); }
         .status-pending  { background: #fef9c3; color: #ca8a04; }
 
-        .denial-reason-note {
-            margin-top: 8px;
-            max-width: 280px;
+        .status-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-status-reason {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 9px;
             color: #7f1d1d;
             background: #fff5f5;
             border: 1px solid #fecaca;
-            border-radius: 8px;
-            padding: 7px 10px;
-            font-size: 11.5px;
-            line-height: 1.45;
+            border-radius: 999px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 10.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
 
-        .denial-reason-note i {
-            margin-right: 5px;
-            color: var(--red);
+        .btn-status-reason:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
         }
 
         /* Date cell */
@@ -1017,8 +1038,8 @@
         </a>
         <a href="{{ url('/student/MOA') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
-            <span class="nav-label">MOA</span>
-            <span class="tooltip-label">MOA</span>
+            <span class="nav-label">Notarized MOA</span>
+            <span class="tooltip-label">Notarized MOA</span>
         </a>
         <a href="{{ url('/student/requirements') }}" class="nav-item active">
             <span class="nav-icon"><i class="fa fa-cloud-upload-alt"></i></span>
@@ -1137,7 +1158,13 @@
                         const fileTable = $('#fileTable').DataTable({
                             "order": [[3, 'desc']],
                             "scrollX": true,
-                            "autoWidth": false
+                            "autoWidth": false,
+                            "columnDefs": [
+                                { "width": "32%", "targets": 0 },
+                                { "width": "18%", "targets": 2 },
+                                { "width": "14%", "targets": 3 },
+                                { "width": "18%", "targets": 4 }
+                            ]
                         });
 
                         $('#fileTable tbody').on('click', '.remove-button', function (e) {
@@ -1207,25 +1234,28 @@
                                 </div>
                             </td>
                             <td>
-                                @if ($files->status == 1)
-                                    <span class="status-badge status-approved">
-                                        <i class="fa fa-check-circle"></i> Approved
-                                    </span>
-                                @elseif ($files->status == 2)
-                                    <span class="status-badge status-denied">
-                                        <i class="fa fa-times-circle"></i> Denied
-                                    </span>
-                                    @if(!empty($files->denial_reason))
-                                        <div class="denial-reason-note">
-                                            <i class="fa fa-comment-alt"></i>
-                                            {{ $files->denial_reason }}
-                                        </div>
+                                <div class="status-cell">
+                                    @if ($files->status == 1)
+                                        <span class="status-badge status-approved">
+                                            <i class="fa fa-check-circle"></i> Approved
+                                        </span>
+                                    @elseif ($files->status == 2)
+                                        <span class="status-badge status-denied">
+                                            <i class="fa fa-times-circle"></i> Denied
+                                        </span>
+                                        @if(!empty($files->denial_reason))
+                                            <button type="button"
+                                                class="btn-status-reason"
+                                                onclick="showDenialReason({{ Illuminate\Support\Js::from($files->fileName) }}, {{ Illuminate\Support\Js::from($files->denial_reason) }})">
+                                                <i class="fa fa-comment-alt"></i> View Reason
+                                            </button>
+                                        @endif
+                                    @elseif ($files->status == 0)
+                                        <span class="status-badge status-pending">
+                                            <i class="fa fa-clock"></i> Pending
+                                        </span>
                                     @endif
-                                @elseif ($files->status == 0)
-                                    <span class="status-badge status-pending">
-                                        <i class="fa fa-clock"></i> Pending
-                                    </span>
-                                @endif
+                                </div>
                             </td>
                             <td>
                                 <div class="date-main">{{ \Carbon\Carbon::parse($files->created_at)->format('M d, Y') }}</div>
@@ -1394,6 +1424,19 @@
     });
 
     // SweetAlert remove confirmation
+    function showDenialReason(fileName, denialReason) {
+        Swal.fire({
+            title: 'Denial Reason',
+            html: '<div style="text-align:left; font-size:13px; line-height:1.6;">'
+                + '<div style="font-weight:700; margin-bottom:8px; color:#1f2937;">' + fileName + '</div>'
+                + '<div style="color:#4b5563;">' + denialReason + '</div>'
+                + '</div>',
+            icon: 'info',
+            confirmButtonColor: '#dc2626',
+            confirmButtonText: 'Close'
+        });
+    }
+
     function showRemoveConfirmation(fileId) {
         Swal.fire({
             title: 'Remove this requirement?',

@@ -718,8 +718,8 @@
             </a>
             <a href="{{ url('/student/MOA') }}" class="nav-item">
                 <span class="nav-icon"><i class="fa fa-file-alt"></i></span>
-                <span class="nav-label">MOA</span>
-                <span class="tooltip-label">MOA</span>
+                <span class="nav-label">Notarized MOA</span>
+                <span class="tooltip-label">Notarized MOA</span>
             </a>
             <a href="{{ url('/student/requirements') }}" class="nav-item">
                 <span class="nav-icon"><i class="fa fa-cloud-upload-alt"></i></span>

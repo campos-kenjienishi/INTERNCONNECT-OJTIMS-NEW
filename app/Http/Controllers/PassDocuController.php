@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use App\Helpers\AuditLogger; 
 
 class PassDocuController extends Controller
@@ -237,6 +238,29 @@ public function removeFile($id)
 
         if (!$data) {
             return redirect()->back()->with('error', 'File not found.');
+        }
+
+        if ($data->uploadedBy !== $sessionCheck->full_name) {
+            return redirect()->back()->with('error', 'You do not have permission to remove this file.');
+        }
+
+        if ($data->fileName === 'Notarized MOA' && !empty($data->file)) {
+            $company = Company::where('uploader_name', $data->uploadedBy)
+                ->where('file', $data->file)
+                ->first();
+
+            if ($company) {
+                DB::table('company_student')
+                    ->where('company_id', $company->id)
+                    ->delete();
+
+                $filePath = public_path('assets/' . $company->file);
+                if (!empty($company->file) && file_exists($filePath)) {
+                    @unlink($filePath);
+                }
+
+                $company->delete();
+            }
         }
     
         $data->delete();

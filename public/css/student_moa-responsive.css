@@ -167,10 +167,12 @@ img {
 
 .sidebar-overlay {
     pointer-events: none;
+    z-index: 995;
 }
 
 .sidebar-overlay.active {
     pointer-events: auto;
+    display: block;
 }
 .table-card,
 .table-card-body,

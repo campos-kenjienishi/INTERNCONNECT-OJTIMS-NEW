@@ -19,10 +19,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Models\FileRequirement;
 use App\Helpers\AuditLogger;
 
 class MOAUploadController extends Controller
 {
+    private function deleteLinkedNotarizedRequirement(?Company $company): void
+    {
+        if (!$company || empty($company->file) || empty($company->uploader_name)) {
+            return;
+        }
+
+        FileRequirement::where('uploadedBy', $company->uploader_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->delete();
+    }
+
     private function isReadableMoaFile(?Company $company): bool
     {
         if (!$company || empty($company->file)) {
@@ -63,6 +76,8 @@ class MOAUploadController extends Controller
     $company = Company::find($id);
 
     if ($company) {
+        $this->deleteLinkedNotarizedRequirement($company);
+
         if (!empty($company->file)) {
             $filePath = public_path('assets/' . $company->file);
             if (file_exists($filePath)) {
@@ -207,6 +222,8 @@ public function studentRemove($id)
     if (!$company) {
         return redirect()->back()->with('error', 'MOA not found or you do not have permission to remove it.');
     }
+
+    $this->deleteLinkedNotarizedRequirement($company);
 
     DB::table('company_student')
         ->where('company_id', $company->id)

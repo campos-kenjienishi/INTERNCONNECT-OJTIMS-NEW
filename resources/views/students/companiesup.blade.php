@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InternConnect - MOA</title>
+    <title>InternConnect - Notarized MOA</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -987,12 +987,8 @@
         </a>
         <a href="{{ url('/student/MOA') }}" class="nav-item active">
             <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
-            <span class="nav-label">MOA</span>
-            <span class="tooltip-label">MOA</span>
-        </a>
-        <a href="{{ url('/student/MOA') }}" class="nav-sub-item active">
-            <i class="fa fa-circle" style="font-size:6px;"></i>
-            Notarized MOA
+            <span class="nav-label">Notarized MOA</span>
+            <span class="tooltip-label">Notarized MOA</span>
         </a>
         <a href="{{ url('/student/requirements') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-cloud-upload-alt"></i></span>
@@ -1045,11 +1041,11 @@
         <!-- Page Header -->
         <div class="page-header">
             <div>
-                <h1>Memorandum of <span>Agreement</span></h1>
+                <h1>Notarized <span>MOA</span></h1>
                 <div class="breadcrumb">
                     <a href="{{ url('/student/home') }}"><i class="fa fa-home"></i> Home</a>
                     <i class="fa fa-chevron-right"></i>
-                    <span>MOA</span>
+                    <span>Notarized MOA</span>
                 </div>
             </div>
             <button class="btn-add-moa" data-bs-toggle="modal" data-bs-target="#addMoaModal">
@@ -1063,7 +1059,7 @@
                 <i class="fa fa-file-contract"></i>
             </div>
             <div class="info-banner-text">
-                <h3>Notarized MOA Submissions</h3>
+                <h3>Notarized MOA Submission</h3>
                 <p>Upload your company's Memorandum of Agreement here. Ensure the document is properly notarized before submission. You may download or print your MOA details anytime.</p>
             </div>
         </div>
@@ -1139,12 +1135,23 @@
                                         <i class="fa fa-download"></i> Download
                                     </a>
                                     <button class="btn-action btn-print"
-                                        onclick="openViewModal('{{ route('print-data', ['company' => $company->id]) }}')">
-                                        <i class="fa fa-print"></i> Print Details
+                                        onclick="openPdfPreview('{{ asset('assets/' . $company->file) }}')">
+                                        <i class="fa fa-print"></i> Print PDF
                                     </button>
-                                    <button class="btn-action btn-voucher"
-                                        onclick="openViewModal1('{{ route('voucher', ['company' => $company->id]) }}')">
-                                        <i class="fa fa-receipt"></i> Voucher
+                                    <button type="button"
+                                        class="btn-action"
+                                        style="background:#eff6ff; border-color:#bfdbfe; color:#2563eb;"
+                                        data-update-url="{{ route('student.moa.update', $company->id) }}"
+                                        data-company-name="{{ e($company->company_name) }}"
+                                        data-company-address="{{ e($company->company_address) }}"
+                                        data-company-rep="{{ e($company->company_rep) }}"
+                                        data-company-no="{{ e($company->companyNo) }}"
+                                        data-company-email="{{ e($company->company_email) }}"
+                                        data-school-year="{{ e($company->school_year) }}"
+                                        data-valid-until="{{ $company->valid_until ? \Carbon\Carbon::parse($company->valid_until)->format('Y-m-d') : '' }}"
+                                        data-file-name="{{ e($company->file) }}"
+                                        onclick="openEditMoaModal(this)">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
                                     <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
                                         onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}')">
@@ -1325,6 +1332,115 @@
     </div>
 </div>
 
+<!-- =============== EDIT MOA MODAL =============== -->
+<div class="modal fade" id="editMoaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-edit"></i> Edit Notarized MOA
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="editMoaForm" method="post" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="moa-form-grid">
+                        <div>
+                            <label class="modal-field-label">
+                                <i class="fa fa-building"></i> Company Name
+                            </label>
+                            <input class="modal-field-input" type="text" name="company_name" id="editCompanyName" required>
+
+                            <label class="modal-field-label">
+                                <i class="fa fa-map-marker-alt"></i> Company Address
+                            </label>
+                            <input class="modal-field-input" type="text" name="company_address" id="editCompanyAddress" required>
+
+                            <label class="modal-field-label">
+                                <i class="fa fa-user-tie"></i> Company Representative
+                            </label>
+                            <input class="modal-field-input" type="text" name="company_rep" id="editCompanyRep" required>
+
+                            <label class="modal-field-label">
+                                <i class="fa fa-phone"></i> Company Number
+                            </label>
+                            <input class="modal-field-input" type="text" name="companyNo" id="editCompanyNo" placeholder="e.g. 09XX-XXX-XXXX or N/A">
+                        </div>
+
+                        <div>
+                            <label class="modal-field-label">
+                                <i class="fa fa-envelope"></i> Company Email
+                            </label>
+                            <input class="modal-field-input" type="text" name="company_email" id="editCompanyEmail" required>
+
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+                                <span><i class="fa fa-calendar-alt"></i> School Year</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Input the current school year, example: <strong>2025-2026</strong>.
+                                </span>
+                            </label>
+                            <div class="school-year-row">
+                                <input type="text" name="school_year_start" id="editSchoolYearStart" placeholder="Start (e.g. 2024)" required>
+                                <span class="sep">-</span>
+                                <input type="text" name="school_year_end" id="editSchoolYearEnd" placeholder="End (e.g. 2025)" required>
+                            </div>
+
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                                <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Select the MOA expiry date.
+                                </span>
+                            </label>
+                            <input class="modal-field-input" type="date" name="valid_until" id="editValidUntil" required>
+
+                            <div style="
+                                background: #eff6ff;
+                                border: 1px solid #bfdbfe;
+                                border-left: 3px solid #2563eb;
+                                border-radius: 10px;
+                                padding: 12px 14px;
+                                margin-top: 6px;
+                            ">
+                                <div style="font-size: 12px; font-weight: 700; color: #2563eb; margin-bottom: 5px;">
+                                    <i class="fa fa-info-circle"></i> Optional PDF Replacement
+                                </div>
+                                <div style="font-size: 11.5px; color: #555; line-height: 1.6;" id="editMoaCurrentFile">
+                                    Leave the file empty if you only need to update the company details.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; background: #f0f0f0; margin: 20px 0;"></div>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-paperclip"></i> Replace MOA Document
+                    </label>
+                    <div class="file-upload-zone" id="editMoaDropZone">
+                        <input type="file" name="file" id="editMoaFileInput" data-max-size-mb="2" accept=".pdf,application/pdf">
+                        <i class="fa fa-cloud-upload-alt upload-icon"></i>
+                        <p id="editMoaFileLabel">Leave empty to keep the current notarized MOA PDF</p>
+                        <span>Supported: PDF only | Max file size: 2 MB</span>
+                        <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-modal-submit">
+                        <i class="fa fa-save me-1"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- =============== VIEW / PRINT MODAL =============== -->
 <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -1356,55 +1472,57 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    const sidebar     = document.getElementById('sidebar');
-const mainContent = document.getElementById('mainContent');
-const menuToggle  = document.getElementById('menuToggle');
-const overlay     = document.getElementById('sidebarOverlay');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const menuToggle = document.getElementById('menuToggle');
+    const overlay = document.getElementById('sidebarOverlay');
 
-menuToggle.addEventListener('click', function () {
-    const isMobile = window.innerWidth <= 900;
-
-    if (isMobile) {
-        sidebar.classList.toggle('mobile-open');
-        overlay.classList.toggle('active');
-    } else {
-        sidebar.classList.toggle('collapsed');
-        mainContent.classList.toggle('expanded');
-    }
-});
-
-// CLICK OUTSIDE = CLOSE
-overlay.addEventListener('click', function () {
-    sidebar.classList.remove('mobile-open');
-    overlay.classList.remove('active');
-});
-
-// ✅ ADD THIS (IMPORTANT FIX)
-window.addEventListener('resize', function () {
-    if (window.innerWidth > 900) {
+    function closeMobileSidebar() {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
     }
-});
 
-    // File label update
-    document.getElementById('moaFileInput').addEventListener('change', function () {
-        const label = document.getElementById('moaFileLabel');
-        const file = this.files.length > 0 ? this.files[0] : null;
+    function openMobileSidebar() {
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('active');
+    }
 
-        if (file && !file.name.toLowerCase().endsWith('.pdf')) {
-            this.value = '';
-            label.textContent = 'Click or drag your notarized MOA file here';
-            Swal.fire({
-                icon: 'error',
-                title: 'PDF only',
-                text: 'Please upload the notarized MOA as a PDF file.',
-                confirmButtonColor: '#d32f2f',
-            });
+    menuToggle.addEventListener('click', function (event) {
+        const isMobile = window.innerWidth <= 900;
+
+        if (isMobile) {
+            event.stopPropagation();
+
+            if (sidebar.classList.contains('mobile-open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        } else {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+    });
+
+    overlay.addEventListener('click', closeMobileSidebar);
+
+    document.addEventListener('click', function (event) {
+        if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
             return;
         }
 
-        label.textContent = file ? file.name : 'Click or drag your notarized MOA file here';
+        if (sidebar.contains(event.target) || menuToggle.contains(event.target)) {
+            return;
+        }
+
+        closeMobileSidebar();
+    });
+
+// ✅ ADD THIS (IMPORTANT FIX)
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 900) {
+            closeMobileSidebar();
+        }
     });
 
     function confirmStudentRemove(companyId, companyName) {
@@ -1424,19 +1542,63 @@ window.addEventListener('resize', function () {
         });
     }
 
-    // View modal
-    function openViewModal(url) {
+    // PDF preview / print modal
+    function openPdfPreview(url) {
         document.getElementById('viewIframe').src = url;
         new bootstrap.Modal(document.getElementById('viewModal')).show();
     }
 
-    function openViewModal1(url) {
-        document.getElementById('viewIframe').src = url;
-        new bootstrap.Modal(document.getElementById('viewModal')).show();
+    function openEditMoaModal(button) {
+        const form = document.getElementById('editMoaForm');
+        const schoolYear = (button.dataset.schoolYear || '').split('-');
+        const currentFile = button.dataset.fileName || '';
+
+        form.action = button.dataset.updateUrl;
+        document.getElementById('editCompanyName').value = button.dataset.companyName || '';
+        document.getElementById('editCompanyAddress').value = button.dataset.companyAddress || '';
+        document.getElementById('editCompanyRep').value = button.dataset.companyRep || '';
+        document.getElementById('editCompanyNo').value = button.dataset.companyNo || '';
+        document.getElementById('editCompanyEmail').value = button.dataset.companyEmail || '';
+        document.getElementById('editSchoolYearStart').value = schoolYear[0] || '';
+        document.getElementById('editSchoolYearEnd').value = schoolYear[1] || '';
+        document.getElementById('editValidUntil').value = button.dataset.validUntil || '';
+        document.getElementById('editMoaFileInput').value = '';
+        document.getElementById('editMoaFileLabel').textContent = 'Leave empty to keep the current notarized MOA PDF';
+        document.getElementById('editMoaCurrentFile').textContent = currentFile
+            ? 'Current file: ' + currentFile + '. Leave the file empty if you only need to update the company details.'
+            : 'Leave the file empty if you only need to update the company details.';
+
+        new bootstrap.Modal(document.getElementById('editMoaModal')).show();
     }
 
     function printRegularPreview() {
         document.getElementById('viewIframe').contentWindow.print();
+    }
+
+    function bindPdfInputValidation(inputId, labelId, emptyLabel) {
+        const input = document.getElementById(inputId);
+        if (!input) {
+            return;
+        }
+
+        input.addEventListener('change', function () {
+            const label = document.getElementById(labelId);
+            const file = this.files.length > 0 ? this.files[0] : null;
+
+            if (file && !file.name.toLowerCase().endsWith('.pdf')) {
+                this.value = '';
+                label.textContent = emptyLabel;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PDF only',
+                    text: 'Please upload the notarized MOA as a PDF file.',
+                    confirmButtonColor: '#d32f2f',
+                });
+                return;
+            }
+
+            label.textContent = file ? file.name : emptyLabel;
+        });
     }
 
     // Form validation
@@ -1455,31 +1617,36 @@ window.addEventListener('resize', function () {
             return valid;
         }
 
-        $('#studentMoaForm').on('submit', function (e) {
-            if (!validateForm($(this))) {
-                e.preventDefault();
-                return;
-            }
+        ['#studentMoaForm', '#editMoaForm'].forEach(function (selector) {
+            $(selector).on('submit', function (e) {
+                if (!validateForm($(this))) {
+                    e.preventDefault();
+                    return;
+                }
 
-            if (this.dataset.submitting === 'true') {
-                e.preventDefault();
-                return;
-            }
+                if (this.dataset.submitting === 'true') {
+                    e.preventDefault();
+                    return;
+                }
 
-            this.dataset.submitting = 'true';
+                this.dataset.submitting = 'true';
 
-            const submitButton = this.querySelector('button[type="submit"]');
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Uploading...';
-            }
+                const submitButton = this.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Saving...';
+                }
+            });
         });
+
+        bindPdfInputValidation('moaFileInput', 'moaFileLabel', 'Click or drag your notarized MOA file here');
+        bindPdfInputValidation('editMoaFileInput', 'editMoaFileLabel', 'Leave empty to keep the current notarized MOA PDF');
     });
     document.addEventListener('click', function(e) {
     const btn = e.target.closest('.view-btn');
     if (btn) {
         const url = btn.getAttribute('data-url');
-        openViewModal(url);
+        openPdfPreview(url);
     }
 });
 </script>

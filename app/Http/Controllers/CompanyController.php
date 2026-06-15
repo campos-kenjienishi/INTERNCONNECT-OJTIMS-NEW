@@ -332,10 +332,28 @@ public function companyUpdate(Request $request, $id)
         return back()->with('fail', 'MOA record not found.');
     }
 
-    $validator = Validator::make($request->all(), [
+    if ($data->role == 0 && $company->uploader_name !== $data->full_name) {
+        return back()->with('fail', 'You do not have permission to update this MOA.');
+    }
+
+    $rules = [
+        'company_name' => 'required|string|max:255',
+        'company_address' => 'required|string|max:255',
+        'company_rep' => 'required|string|max:255',
+        'companyNo' => 'nullable|string|max:255',
+        'company_email' => 'required|email|max:255',
+        'school_year_start' => 'required|string|max:4',
+        'school_year_end' => 'required|string|max:4',
         'file' => 'nullable|mimes:pdf|max:2048',
-        'course' => 'required|exists:courses,course',
-    ]);
+    ];
+
+    if ($data->role == 0) {
+        $rules['valid_until'] = 'required|date';
+    } else {
+        $rules['course'] = 'required|exists:courses,course';
+    }
+
+    $validator = Validator::make($request->all(), $rules);
 
     if ($validator->fails()) {
         return redirect()->back()
@@ -362,7 +380,16 @@ public function companyUpdate(Request $request, $id)
     $startYear = $request->input('school_year_start');
     $endYear = $request->input('school_year_end');
     $company->school_year = $startYear . '-' . $endYear;
-    $company->course = $request->input('course');
+    $company->valid_until = $data->role == 0
+        ? $request->input('valid_until')
+        : ($company->valid_until ?: now()->addYears(3));
+
+    if ($data->role != 0) {
+        $company->course = $request->input('course');
+    }
+
+    $oldFileName = $company->file;
+    $newFileName = $oldFileName;
 
     if ($request->hasFile('file')) {
         $file = $request->file('file');
@@ -375,12 +402,17 @@ public function companyUpdate(Request $request, $id)
         }
 
         $company->file = $filename;
+        $newFileName = $filename;
     }
 
     $selectedStudentNames = $request->input('student_names', []);
     $manualStudentNames = $request->input('manual_student_names', '');
     $parsedManualNames = array_values(array_unique(array_filter(array_map('trim', preg_split('/[\r\n,]+/', (string) $manualStudentNames)))));
     $studentNames = array_values(array_unique(array_filter(array_map('trim', array_merge($selectedStudentNames, $parsedManualNames)))));
+
+    if ($data->role == 0) {
+        $studentNames = [$data->full_name];
+    }
 
     $hasStudentDisplayColumn = Schema::hasColumn('companies', 'student_names_display');
 
@@ -395,7 +427,7 @@ public function companyUpdate(Request $request, $id)
     $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
     $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
 
-    if (!empty($studentNames)) {
+    if ($data->role != 0 && !empty($studentNames)) {
         $mismatchedStudents = $existingStudents->filter(function ($student) use ($company) {
             return $student->course !== $company->course;
         });
@@ -412,7 +444,16 @@ public function companyUpdate(Request $request, $id)
     }
 
     if ($company->save()) {
-        $company->students()->sync($existingStudents->pluck('id')->all());
+        if ($data->role != 0) {
+            $company->students()->sync($existingStudents->pluck('id')->all());
+        }
+
+        if (!empty($newFileName) && $oldFileName !== $newFileName) {
+            FileRequirement::where('uploadedBy', $company->uploader_name)
+                ->where('fileName', 'Notarized MOA')
+                ->where('file', $oldFileName)
+                ->update(['file' => $newFileName]);
+        }
 
         AuditLogger::log(
             'MOA Upload',
