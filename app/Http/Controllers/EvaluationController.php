@@ -37,7 +37,7 @@ class EvaluationController extends Controller
         $expectedSupervisorEmail = $this->getExpectedSupervisorEmail($student);
         $perPage = (int) $request->query('per_page', 5);
         $search = trim((string) $request->query('search', ''));
-        $status = trim((string) $request->query('status', ''));
+        $sort = trim((string) $request->query('sort', 'newest'));
         if (!in_array($perPage, [5, 10, 25, 50], true)) {
             $perPage = 5;
         }
@@ -53,14 +53,12 @@ class EvaluationController extends Controller
             });
         }
 
-        if (in_array($status, ['pending', 'submitted', 'expired', 'cancelled'], true)) {
-            $requestsQuery->where('status', $status);
-        } else {
-            $status = '';
+        if (!in_array($sort, ['newest', 'oldest'], true)) {
+            $sort = 'newest';
         }
 
         $requests = $requestsQuery
-            ->latest('id')
+            ->orderBy('id', $sort === 'oldest' ? 'asc' : 'desc')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -71,7 +69,7 @@ class EvaluationController extends Controller
             'expectedSupervisorEmail' => $expectedSupervisorEmail,
             'perPage' => $perPage,
             'search' => $search,
-            'status' => $status,
+            'sort' => $sort,
         ]);
     }
 

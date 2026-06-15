@@ -71,7 +71,7 @@
             <div class="shell-table-controls">
                 <form method="GET" action="{{ route('student.evaluation') }}" class="shell-length-form">
                     <input type="hidden" name="search" value="{{ $search ?? '' }}">
-                    <input type="hidden" name="status" value="{{ $status ?? '' }}">
+                    <input type="hidden" name="sort" value="{{ $sort ?? 'newest' }}">
                     <label for="historyPerPage">Show</label>
                     <select id="historyPerPage" name="per_page" class="shell-length-select" onchange="this.form.submit()">
                         @foreach([5, 10, 25, 50] as $size)
@@ -80,20 +80,15 @@
                     </select>
                     <span>entries</span>
                 </form>
-                <form method="GET" action="{{ route('student.evaluation') }}" class="shell-filter-form">
+                <form method="GET" action="{{ route('student.evaluation') }}" class="shell-filter-form" id="historyFilterForm">
                     <input type="hidden" name="per_page" value="{{ $perPage ?? 5 }}">
-                    <input type="search" name="search" value="{{ $search ?? '' }}" class="shell-filter-input" placeholder="Search email, name, or status">
-                    <select name="status" class="shell-filter-select" onchange="this.form.submit()">
-                        <option value="">All statuses</option>
-                        <option value="pending" {{ ($status ?? '') === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="submitted" {{ ($status ?? '') === 'submitted' ? 'selected' : '' }}>Submitted</option>
-                        <option value="expired" {{ ($status ?? '') === 'expired' ? 'selected' : '' }}>Expired</option>
-                        <option value="cancelled" {{ ($status ?? '') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    <label for="historySearch" class="muted-text" style="font-size:13px; font-weight:500;">Search:</label>
+                    <input type="search" id="historySearch" name="search" value="{{ $search ?? '' }}" class="shell-filter-input" placeholder="Search email, name, or status">
+                    <label for="historySort" class="muted-text" style="font-size:13px; font-weight:500;">Date</label>
+                    <select id="historySort" name="sort" class="shell-filter-select" onchange="this.form.submit()">
+                        <option value="newest" {{ ($sort ?? 'newest') === 'newest' ? 'selected' : '' }}>Newest first</option>
+                        <option value="oldest" {{ ($sort ?? '') === 'oldest' ? 'selected' : '' }}>Oldest first</option>
                     </select>
-                    <button type="submit" class="shell-filter-btn">Search</button>
-                    @if(($search ?? '') !== '' || ($status ?? '') !== '')
-                        <a href="{{ route('student.evaluation', ['per_page' => $perPage ?? 5]) }}" class="shell-filter-btn">Clear</a>
-                    @endif
                 </form>
             </div>
             <div class="table-wrap">
@@ -207,6 +202,22 @@
                     confirmInput.value = '1';
                 }
             });
+        })();
+
+        (function () {
+            const historyFilterForm = document.getElementById('historyFilterForm');
+            const historySearch = document.getElementById('historySearch');
+
+            if (historyFilterForm && historySearch) {
+                let historySearchTimer = null;
+
+                historySearch.addEventListener('input', function () {
+                    window.clearTimeout(historySearchTimer);
+                    historySearchTimer = window.setTimeout(function () {
+                        historyFilterForm.submit();
+                    }, 350);
+                });
+            }
         })();
 
         (function () {
