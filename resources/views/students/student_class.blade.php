@@ -1068,15 +1068,13 @@
             <h2>Room Templates</h2>
             <p>Templates uploaded by your professor for your current room</p>
         </div>
-        @if (!empty($data->class_id) && !$roomTemplates->isEmpty())
-            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                <label for="templateDateSort" style="font-size:13px;color:#666;margin-bottom:0;">Date</label>
-                <select id="templateDateSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:160px;">
-                    <option value="newest" selected>Newest first</option>
-                    <option value="oldest">Oldest first</option>
-                </select>
-            </div>
-        @endif
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <label for="templateDateSort" style="font-size:13px;color:#666;margin-bottom:0;">Date</label>
+            <select id="templateDateSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:160px;">
+                <option value="newest" selected>Newest first</option>
+                <option value="oldest">Oldest first</option>
+            </select>
+        </div>
     </div>
     <div class="table-card-body">
         @if (empty($data->class_id))
@@ -1087,6 +1085,17 @@
                 <p>You haven't joined a room yet.</p>
                 <span class="empty-hint">Join a room above to access room-specific templates.</span>
             </div>
+            <table id="templateTable" class="display rooms-table" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Template Name</th>
+                        <th>File</th>
+                        <th>Date Uploaded</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         @elseif ($roomTemplates->isEmpty())
             <div class="empty-state">
                 <div class="empty-icon-wrap">
@@ -1095,6 +1104,17 @@
                 <p>No room templates uploaded yet.</p>
                 <span class="empty-hint">Check back later — your adviser hasn't uploaded any templates.</span>
             </div>
+            <table id="templateTable" class="display rooms-table" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Template Name</th>
+                        <th>File</th>
+                        <th>Date Uploaded</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         @else
             <table id="templateTable" class="display rooms-table" style="width:100%">
                 <thead>
@@ -1162,12 +1182,23 @@
                         var templateTable = null;
 
                         if ($('#templateTable').length) {
+                            var templateEmptyMessage = @json(
+                                empty($data->class_id)
+                                    ? "You haven't joined a room yet."
+                                    : ($roomTemplates->isEmpty()
+                                        ? "No room templates uploaded yet."
+                                        : "No room templates found.")
+                            );
+
                             templateTable = $('#templateTable').DataTable({
                                 order: [[2, 'desc']],
                                 pageLength: 5,
                                 lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
                                 scrollX: true,
                                 autoWidth: false,
+                                language: {
+                                    emptyTable: templateEmptyMessage
+                                },
                                 columnDefs: [
                                     { targets: [2], type: 'num' },
                                     { targets: [3], orderable: false, searchable: false }

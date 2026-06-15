@@ -22,7 +22,7 @@ use Illuminate\Support\Str;
 
 class EvaluationController extends Controller
 {
-    public function studentIndex()
+    public function studentIndex(Request $request)
     {
         $data = null;
         if (Session::has('loginId')) {
@@ -35,17 +35,43 @@ class EvaluationController extends Controller
 
         $student = Student::where('user_id', $data->id)->first();
         $expectedSupervisorEmail = $this->getExpectedSupervisorEmail($student);
+        $perPage = (int) $request->query('per_page', 5);
+        $search = trim((string) $request->query('search', ''));
+        $status = trim((string) $request->query('status', ''));
+        if (!in_array($perPage, [5, 10, 25, 50], true)) {
+            $perPage = 5;
+        }
 
-        $requests = OjtEvaluationRequest::with(['template', 'evaluation'])
-            ->where('student_id', $data->id)
+        $requestsQuery = OjtEvaluationRequest::with(['template', 'evaluation'])
+            ->where('student_id', $data->id);
+
+        if ($search !== '') {
+            $requestsQuery->where(function ($query) use ($search) {
+                $query->where('supervisor_email', 'like', '%' . $search . '%')
+                    ->orWhere('supervisor_name', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%');
+            });
+        }
+
+        if (in_array($status, ['pending', 'submitted', 'expired', 'cancelled'], true)) {
+            $requestsQuery->where('status', $status);
+        } else {
+            $status = '';
+        }
+
+        $requests = $requestsQuery
             ->latest('id')
-            ->paginate(5);
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('students.evaluation', [
             'data' => $data,
             'student' => $student,
             'requests' => $requests,
             'expectedSupervisorEmail' => $expectedSupervisorEmail,
+            'perPage' => $perPage,
+            'search' => $search,
+            'status' => $status,
         ]);
     }
 

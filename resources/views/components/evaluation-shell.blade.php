@@ -842,6 +842,78 @@
             pointer-events: none;
         }
 
+        .shell-table-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 14px 18px 0;
+        }
+
+        .shell-length-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .shell-length-select {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .shell-filter-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .shell-filter-input,
+        .shell-filter-select {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 12px;
+            min-width: 150px;
+        }
+
+        .shell-filter-input {
+            min-width: 220px;
+        }
+
+        .shell-filter-input:focus,
+        .shell-filter-select:focus,
+        .shell-length-select:focus {
+            outline: none;
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+        }
+
+        .shell-filter-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         .status-badge {
             display: inline-flex;
             align-items: center;

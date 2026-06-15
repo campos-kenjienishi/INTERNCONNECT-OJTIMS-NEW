@@ -68,6 +68,34 @@
             <h2><span class="header-icon"><i class="fa fa-history"></i></span> Evaluation Request History</h2>
         </div>
         <div class="card-body-shell tight">
+            <div class="shell-table-controls">
+                <form method="GET" action="{{ route('student.evaluation') }}" class="shell-length-form">
+                    <input type="hidden" name="search" value="{{ $search ?? '' }}">
+                    <input type="hidden" name="status" value="{{ $status ?? '' }}">
+                    <label for="historyPerPage">Show</label>
+                    <select id="historyPerPage" name="per_page" class="shell-length-select" onchange="this.form.submit()">
+                        @foreach([5, 10, 25, 50] as $size)
+                            <option value="{{ $size }}" {{ (int) ($perPage ?? 5) === $size ? 'selected' : '' }}>{{ $size }}</option>
+                        @endforeach
+                    </select>
+                    <span>entries</span>
+                </form>
+                <form method="GET" action="{{ route('student.evaluation') }}" class="shell-filter-form">
+                    <input type="hidden" name="per_page" value="{{ $perPage ?? 5 }}">
+                    <input type="search" name="search" value="{{ $search ?? '' }}" class="shell-filter-input" placeholder="Search email, name, or status">
+                    <select name="status" class="shell-filter-select" onchange="this.form.submit()">
+                        <option value="">All statuses</option>
+                        <option value="pending" {{ ($status ?? '') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="submitted" {{ ($status ?? '') === 'submitted' ? 'selected' : '' }}>Submitted</option>
+                        <option value="expired" {{ ($status ?? '') === 'expired' ? 'selected' : '' }}>Expired</option>
+                        <option value="cancelled" {{ ($status ?? '') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    </select>
+                    <button type="submit" class="shell-filter-btn">Search</button>
+                    @if(($search ?? '') !== '' || ($status ?? '') !== '')
+                        <a href="{{ route('student.evaluation', ['per_page' => $perPage ?? 5]) }}" class="shell-filter-btn">Clear</a>
+                    @endif
+                </form>
+            </div>
             <div class="table-wrap">
                 <table class="table-shell">
                     <thead>
@@ -128,26 +156,25 @@
                     </tbody>
                 </table>
             </div>
-            @if($requests->hasPages())
-                <div class="shell-pagination">
-                    <div class="shell-pagination-meta">
-                        Showing {{ $requests->firstItem() }} to {{ $requests->lastItem() }} of {{ $requests->total() }} requests
-                    </div>
-                    <div class="shell-pagination-nav">
-                        <a href="{{ $requests->onFirstPage() ? '#' : $requests->previousPageUrl() }}" class="shell-pagination-link {{ $requests->onFirstPage() ? 'disabled' : '' }}">
-                            Previous
-                        </a>
-                        @for($page = 1; $page <= $requests->lastPage(); $page++)
-                            <a href="{{ $requests->url($page) }}" class="shell-pagination-link {{ $page === $requests->currentPage() ? 'active' : '' }}">
-                                {{ $page }}
-                            </a>
-                        @endfor
-                        <a href="{{ $requests->hasMorePages() ? $requests->nextPageUrl() : '#' }}" class="shell-pagination-link {{ $requests->hasMorePages() ? '' : 'disabled' }}">
-                            Next
-                        </a>
-                    </div>
+            <div class="shell-pagination">
+                <div class="shell-pagination-meta">
+                    Showing {{ $requests->firstItem() ?? 0 }} to {{ $requests->lastItem() ?? 0 }} of {{ $requests->total() }} requests
                 </div>
-            @endif
+                <div class="shell-pagination-nav">
+                    <a href="{{ $requests->onFirstPage() ? '#' : $requests->previousPageUrl() }}" class="shell-pagination-link {{ $requests->onFirstPage() ? 'disabled' : '' }}">
+                        Previous
+                    </a>
+                    @php($historyLastPage = max($requests->lastPage(), 1))
+                    @for($page = 1; $page <= $historyLastPage; $page++)
+                        <a href="{{ $requests->total() > 0 ? $requests->url($page) : '#' }}" class="shell-pagination-link {{ $page === $requests->currentPage() ? 'active' : '' }} {{ $requests->total() > 0 ? '' : 'disabled' }}">
+                            {{ $page }}
+                        </a>
+                    @endfor
+                    <a href="{{ $requests->hasMorePages() ? $requests->nextPageUrl() : '#' }}" class="shell-pagination-link {{ $requests->hasMorePages() ? '' : 'disabled' }}">
+                        Next
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
