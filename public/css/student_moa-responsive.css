@@ -459,3 +459,182 @@ input[type="date"].modal-field-input {
 .modal-body .moa-form-grid > div {
     position: relative;
 }
+/* ══════════════════════════════════════════
+   SCHOOL YEAR ROW — mobile stack fix
+══════════════════════════════════════════ */
+
+/* Stack vertically on mobile by default */
+.school-year-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+/* Hide the dash separator on mobile */
+.school-year-row .sep {
+    display: none;
+}
+
+/* Each input takes full width */
+.school-year-row input {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+    background: #fafafa;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 10px;
+    color: #1a1a1a;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    padding: 11px 42px 11px 14px; /* right padding for mic button */
+    outline: none;
+    transition: all 0.25s;
+    box-sizing: border-box;
+}
+
+.school-year-row input:focus {
+    border-color: var(--red);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.07);
+}
+
+/* Wrapper that voice-input.js injects — full width on mobile */
+.school-year-row .voice-input-wrapper {
+    width: 100%;
+    flex: none;
+    margin-bottom: 0;
+}
+
+/* Tablet and above — restore side-by-side layout */
+@media (min-width: 577px) {
+    .school-year-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .school-year-row .sep {
+        display: inline;
+        flex-shrink: 0;
+        font-size: 16px;
+        color: #aaa;
+        font-weight: 600;
+    }
+
+    .school-year-row input {
+        flex: 1 1 0;
+        width: auto;
+    }
+
+    .school-year-row .voice-input-wrapper {
+        flex: 1 1 0;
+        width: auto;
+    }
+}
+
+/* ══════════════════════════════════════════
+   VALIDITY PERIOD DATE INPUT — normalize height
+══════════════════════════════════════════ */
+
+/* Target the date input specifically */
+input[type="date"].modal-field-input {
+    width: 100%;
+    height: auto;
+    min-height: unset;
+    padding: 11px 42px 11px 14px; /* match other inputs, right pad for mic */
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.4;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 10px;
+    background: #fafafa;
+    color: #1a1a1a;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    margin-bottom: 16px;
+}
+
+input[type="date"].modal-field-input:focus {
+    border-color: var(--red);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.07);
+    outline: none;
+}
+
+/* Fix for iOS Safari which renders date inputs taller */
+@supports (-webkit-touch-callout: none) {
+    input[type="date"].modal-field-input {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        line-height: normal;
+    }
+}
+
+/* ══════════════════════════════════════════
+   PREVENT HORIZONTAL OVERFLOW — global fix
+══════════════════════════════════════════ */
+@media (max-width: 576px) {
+
+    /* Stop anything inside the modal from overflowing */
+    #addMoaModal .modal-body {
+        overflow-x: hidden;
+    }
+
+    #addMoaModal .modal-body * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ensure the grid column never goes wider than viewport */
+    .moa-form-grid {
+        grid-template-columns: 1fr;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .moa-form-grid > div {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* All inputs full width with consistent sizing */
+    .modal-field-input,
+    .modal-body input,
+    .modal-body select {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 13px !important;
+        padding: 11px 42px 11px 14px !important;
+        border-radius: 10px !important;
+    }
+
+    /* Voice input wrapper — keep mic inside the field */
+    .voice-input-wrapper {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .voice-input-wrapper input,
+    .voice-input-wrapper .modal-field-input {
+        width: 100% !important;
+        padding-right: 42px !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* The global floating mic button — push it away from the form */
+    /* This targets the page-level mic (the big red one at bottom right) */
+    .voice-input-btn,
+    #voiceInputBtn,
+    button[id*="voice"],
+    button[class*="voice-float"] {
+        bottom: 80px !important; /* above mobile browser navigation bar */
+        right: 16px !important;
+    }
+}

@@ -327,46 +327,140 @@
 }
 /* ══════════════════════════════════════════
    TABLE HORIZONTAL SCROLL + STICKY COLUMN
+   DEPLOYMENT-SAFE VERSION
 ══════════════════════════════════════════ */
 
+/* ── Step 1: Wrapper padding removed so sticky flush ── */
 .table-card-body .dataTables_wrapper {
-    padding: 16px 0;
+    padding: 16px 0 16px 0;
+    /* NO overflow here — overflow on wrapper breaks page width */
+}
+
+/* ── Step 2: Controls keep their own padding ── */
+.table-card-body .dataTables_filter,
+.table-card-body .dataTables_length,
+.table-card-body .dataTables_info,
+.table-card-body .dataTables_paginate {
+    padding: 0 22px;
+}
+
+/* ── Step 3: The actual scroll container is the table-card-body ── */
+.table-card-body {
+    width: 100%;                      /* never exceed parent */
+    max-width: 100%;                  /* hard cap */
     overflow-x: auto;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
+    position: relative;
+    /* Kill any inherited width:fit-content or display:inline-block */
+    display: block !important;
+    box-sizing: border-box;
 }
 
+/* ── Step 4: Table itself scrolls inside the body ── */
 .table-card-body table.dataTable {
-    min-width: 600px;
+    min-width: 560px;                 /* triggers scroll on narrow screens */
+    margin: 0 !important;            /* remove DataTables auto-margin */
+    width: 100% !important;
+    box-sizing: border-box;
+    /* Prevent table from blowing out parent width */
+    table-layout: auto;
 }
 
-/* Sticky first column */
-.table-card-body table.dataTable thead th:first-child,
+/* ── Step 5: RESET all columns — no sticky bleed ── */
+.table-card-body table.dataTable thead th,
+.table-card-body table.dataTable tbody td {
+    position: static;
+    z-index: auto;
+    box-shadow: none;
+}
+
+/* ── Step 6: Sticky Category column (first-child) ── */
+.table-card-body table.dataTable thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: #fafafa !important;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.08);
+    border-right: 2px solid #e5e5e5;
+    /* Critical: no width:fit-content, no min-width:max-content */
+}
+
 .table-card-body table.dataTable tbody td:first-child {
     position: sticky;
     left: 0;
-    z-index: 2;
-    background: #fafafa;
+    z-index: 9;
+    background: #ffffff !important;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.06);
+    border-right: 2px solid #f0f0f0;
 }
 
-.table-card-body table.dataTable tbody td:first-child {
-    background: #fff;
+.table-card-body table.dataTable tbody tr:nth-child(even) td:first-child {
+    background: #fafafa !important;
 }
 
 .table-card-body table.dataTable tbody tr:hover td:first-child {
-    background: #fff5f5;
+    background: #fff5f5 !important;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Shadow on sticky column to indicate scrollability */
-.table-card-body table.dataTable thead th:first-child::after,
-.table-card-body table.dataTable tbody td:first-child::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: -8px;
-    width: 8px;
-    height: 100%;
-    background: linear-gradient(to right, rgba(0,0,0,0.06), transparent);
-    pointer-events: none;
+/* ── Step 7: Dark mode sticky ── */
+body.dark-mode .table-card-body table.dataTable thead th:first-child {
+    background: #2a2a2a !important;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.6);
+    border-right: 2px solid #3a3a3a;
+}
+
+body.dark-mode .table-card-body table.dataTable tbody td:first-child {
+    background: #2a2a2a !important;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.6);
+    border-right: 2px solid #3a3a3a;
+}
+
+body.dark-mode .table-card-body table.dataTable tbody tr:nth-child(even) td:first-child {
+    background: #252525 !important;
+}
+
+body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
+    background: rgba(220, 38, 38, 0.1) !important;
+}
+
+/* ── Step 8: Prevent page-level overflow ── */
+/* These are the parent containers — none should scroll horizontally */
+.table-card,
+.page-content,
+.main-content {
+    max-width: 100%;
+    overflow-x: hidden; /* hard stop — only table-card-body scrolls */
+    box-sizing: border-box;
+}
+
+/* ── Step 9: Stats row — deployment guard ── */
+/* Ensure stats never go wider than viewport */
+.stats-row {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.stat-card {
+    min-width: 0;       /* allow flex/grid children to shrink */
+    box-sizing: border-box;
+}
+
+/* ── Step 10: Mobile — tighten controls padding ── */
+@media (max-width: 600px) {
+    .table-card-body .dataTables_filter,
+    .table-card-body .dataTables_length,
+    .table-card-body .dataTables_info,
+    .table-card-body .dataTables_paginate {
+        padding: 0 14px;
+    }
+
+    .dataTables_filter input {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
 }
 
 /* ══════════════════════════════════════════
