@@ -1068,6 +1068,15 @@
             <h2>Room Templates</h2>
             <p>Templates uploaded by your professor for your current room</p>
         </div>
+        @if (!empty($data->class_id) && !$roomTemplates->isEmpty())
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <label for="templateDateSort" style="font-size:13px;color:#666;margin-bottom:0;">Date</label>
+                <select id="templateDateSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:160px;">
+                    <option value="newest" selected>Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                </select>
+            </div>
+        @endif
     </div>
     <div class="table-card-body">
         @if (empty($data->class_id))
@@ -1087,7 +1096,7 @@
                 <span class="empty-hint">Check back later — your adviser hasn't uploaded any templates.</span>
             </div>
         @else
-            <table class="rooms-table" style="width:100%">
+            <table id="templateTable" class="display rooms-table" style="width:100%">
                 <thead>
                     <tr>
                         <th>Template Name</th>
@@ -1113,7 +1122,7 @@
                                     {{ $template->file }}
                                 </span>
                             </td>
-                            <td style="color:#888; font-size:13px;">
+                            <td data-order="{{ \Carbon\Carbon::parse($template->created_at)->timestamp }}" style="color:#888; font-size:13px;">
                                 {{ \Carbon\Carbon::parse($template->created_at)->format('M d, Y h:i A') }}
                             </td>
                             <td>
@@ -1150,6 +1159,28 @@
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
+                        var templateTable = null;
+
+                        if ($('#templateTable').length) {
+                            templateTable = $('#templateTable').DataTable({
+                                order: [[2, 'desc']],
+                                pageLength: 5,
+                                lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                                scrollX: true,
+                                autoWidth: false,
+                                columnDefs: [
+                                    { targets: [2], type: 'num' },
+                                    { targets: [3], orderable: false, searchable: false }
+                                ]
+                            });
+
+                            $('#templateDateSort').on('change', function () {
+                                templateTable
+                                    .order([[2, this.value === 'oldest' ? 'asc' : 'desc']])
+                                    .draw();
+                            });
+                        }
+
                         var announcementTable = $('#ATable').DataTable({
                             order: [[2, 'desc']],
                             scrollX: true,

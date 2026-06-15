@@ -785,6 +785,63 @@
         .table-shell tbody tr:hover td { background: var(--row-hover); }
         .table-shell tbody tr:last-child td { border-bottom: none; }
 
+        .shell-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 14px 18px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .shell-pagination-meta {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .shell-pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .shell-pagination-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .shell-pagination-link:hover {
+            border-color: rgba(220, 38, 38, 0.25);
+            background: #fff5f5;
+            color: #b91c1c;
+        }
+
+        .shell-pagination-link.active {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .shell-pagination-link.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
         .status-badge {
             display: inline-flex;
             align-items: center;

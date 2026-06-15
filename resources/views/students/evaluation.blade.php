@@ -128,6 +128,26 @@
                     </tbody>
                 </table>
             </div>
+            @if($requests->hasPages())
+                <div class="shell-pagination">
+                    <div class="shell-pagination-meta">
+                        Showing {{ $requests->firstItem() }} to {{ $requests->lastItem() }} of {{ $requests->total() }} requests
+                    </div>
+                    <div class="shell-pagination-nav">
+                        <a href="{{ $requests->onFirstPage() ? '#' : $requests->previousPageUrl() }}" class="shell-pagination-link {{ $requests->onFirstPage() ? 'disabled' : '' }}">
+                            Previous
+                        </a>
+                        @for($page = 1; $page <= $requests->lastPage(); $page++)
+                            <a href="{{ $requests->url($page) }}" class="shell-pagination-link {{ $page === $requests->currentPage() ? 'active' : '' }}">
+                                {{ $page }}
+                            </a>
+                        @endfor
+                        <a href="{{ $requests->hasMorePages() ? $requests->nextPageUrl() : '#' }}" class="shell-pagination-link {{ $requests->hasMorePages() ? '' : 'disabled' }}">
+                            Next
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 

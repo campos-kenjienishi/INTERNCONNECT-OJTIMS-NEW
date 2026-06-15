@@ -39,7 +39,7 @@ class EvaluationController extends Controller
         $requests = OjtEvaluationRequest::with(['template', 'evaluation'])
             ->where('student_id', $data->id)
             ->latest('id')
-            ->get();
+            ->paginate(5);
 
         return view('students.evaluation', [
             'data' => $data,
