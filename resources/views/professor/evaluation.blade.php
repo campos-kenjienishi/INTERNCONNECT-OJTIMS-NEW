@@ -10,6 +10,218 @@
     pageTitleHtml="Class <span>Evaluation</span>"
     :pageSubtitleHtml="$evaluationSubtitleHtml"
 >
+    <style>
+        .question-confirm-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.48);
+            backdrop-filter: blur(6px);
+            z-index: 1200;
+        }
+
+        .question-confirm-overlay.open {
+            display: flex;
+        }
+
+        .question-confirm-dialog {
+            width: min(100%, 440px);
+            border-radius: 22px;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at top right, rgba(220, 38, 38, 0.18), transparent 38%),
+                linear-gradient(180deg, #ffffff 0%, #fff7f7 100%);
+            border: 1px solid rgba(220, 38, 38, 0.14);
+            box-shadow: 0 28px 70px rgba(15, 23, 42, 0.22);
+        }
+
+        .question-confirm-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 22px 24px 10px;
+        }
+
+        .question-confirm-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: #fff;
+            box-shadow: 0 14px 28px rgba(220, 38, 38, 0.26);
+            font-size: 18px;
+        }
+
+        .question-confirm-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .question-confirm-subtitle {
+            margin: 4px 0 0;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #6b7280;
+        }
+
+        .question-confirm-body {
+            padding: 0 24px 18px;
+        }
+
+        .question-confirm-message {
+            margin: 0;
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.84);
+            border: 1px solid rgba(220, 38, 38, 0.1);
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .question-confirm-preview {
+            margin-top: 14px;
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px dashed rgba(220, 38, 38, 0.22);
+        }
+
+        .question-confirm-preview-label {
+            margin: 0 0 10px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #b91c1c;
+        }
+
+        .question-confirm-preview-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .question-confirm-preview-item {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(248, 250, 252, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .question-confirm-preview-item span {
+            display: block;
+        }
+
+        .question-confirm-preview-key {
+            margin-bottom: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+
+        .question-confirm-preview-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .question-confirm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 0 24px 24px;
+        }
+
+        .question-confirm-btn {
+            border: 0;
+            border-radius: 14px;
+            padding: 11px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+        }
+
+        .question-confirm-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .question-confirm-cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .question-confirm-cancel:hover {
+            box-shadow: 0 10px 20px rgba(148, 163, 184, 0.2);
+        }
+
+        .question-confirm-delete {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: #fff;
+            box-shadow: 0 12px 24px rgba(220, 38, 38, 0.24);
+        }
+
+        .question-confirm-delete:hover {
+            box-shadow: 0 16px 30px rgba(220, 38, 38, 0.3);
+        }
+
+        body.dark-mode .question-confirm-dialog {
+            background:
+                radial-gradient(circle at top right, rgba(248, 113, 113, 0.18), transparent 42%),
+                linear-gradient(180deg, #22252f 0%, #1c1f27 100%);
+            border-color: rgba(248, 113, 113, 0.14);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+        }
+
+        body.dark-mode .question-confirm-title {
+            color: #f9fafb;
+        }
+
+        body.dark-mode .question-confirm-subtitle,
+        body.dark-mode .question-confirm-message {
+            color: #d1d5db;
+        }
+
+        body.dark-mode .question-confirm-message {
+            background: rgba(31, 41, 55, 0.82);
+            border-color: rgba(248, 113, 113, 0.12);
+        }
+
+        body.dark-mode .question-confirm-cancel {
+            background: #374151;
+            color: #f3f4f6;
+        }
+
+        body.dark-mode .question-confirm-preview {
+            background: rgba(17, 24, 39, 0.92);
+            border-color: rgba(248, 113, 113, 0.22);
+        }
+
+        body.dark-mode .question-confirm-preview-item {
+            background: rgba(31, 41, 55, 0.9);
+            border-color: rgba(75, 85, 99, 0.35);
+        }
+
+        body.dark-mode .question-confirm-preview-key {
+            color: #9ca3af;
+        }
+
+        body.dark-mode .question-confirm-preview-value {
+            color: #f9fafb;
+        }
+    </style>
+
     @if(session('success'))
         <div class="flash-alert success">{{ session('success') }}</div>
     @endif
@@ -63,6 +275,10 @@
                         <button type="button" class="btn-eval btn-eval-primary" id="addQuestionBlockBtn">
                             <i class="fa fa-plus"></i> Add Question Block
                         </button>
+                    </div>
+
+                    <div id="questionBlockNotice" class="panel-note" style="display:none; margin-bottom:14px; border-left-color:var(--danger); background:rgba(185, 28, 28, 0.08); color:var(--text-primary);">
+                        Question block added.
                     </div>
 
                     <div class="section-gap rating-list" id="ratingQuestionList">
@@ -241,6 +457,44 @@
         </div>
     </div>
 
+    <div class="question-confirm-overlay" id="removeQuestionConfirm" aria-hidden="true">
+        <div class="question-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="removeQuestionConfirmTitle">
+            <div class="question-confirm-header">
+                <div class="question-confirm-icon">
+                    <i class="fa fa-trash"></i>
+                </div>
+                <div>
+                    <h3 class="question-confirm-title" id="removeQuestionConfirmTitle">Remove Question Block?</h3>
+                    <p class="question-confirm-subtitle">This removes the block from the editor before you save the template.</p>
+                </div>
+            </div>
+            <div class="question-confirm-body">
+                <p class="question-confirm-message">
+                    The selected question block will be removed from the current template draft. Submitted evaluations are not affected.
+                </p>
+                <div class="question-confirm-preview">
+                    <p class="question-confirm-preview-label">Block Preview</p>
+                    <div class="question-confirm-preview-grid">
+                        <div class="question-confirm-preview-item">
+                            <span class="question-confirm-preview-key">Section</span>
+                            <span class="question-confirm-preview-value" id="removeQuestionPreviewSection">-</span>
+                        </div>
+                        <div class="question-confirm-preview-item">
+                            <span class="question-confirm-preview-key">Question</span>
+                            <span class="question-confirm-preview-value" id="removeQuestionPreviewLabel">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="question-confirm-actions">
+                <button type="button" class="question-confirm-btn question-confirm-cancel" id="removeQuestionCancelBtn">Keep Block</button>
+                <button type="button" class="question-confirm-btn question-confirm-delete" id="removeQuestionConfirmBtn">
+                    <i class="fa fa-trash"></i> Remove Block
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
@@ -359,6 +613,14 @@
             const questionList = document.getElementById('ratingQuestionList');
             const addButton = document.getElementById('addQuestionBlockBtn');
             const template = document.getElementById('questionBlockTemplate');
+            const questionBlockNotice = document.getElementById('questionBlockNotice');
+            const removeQuestionConfirm = document.getElementById('removeQuestionConfirm');
+            const removeQuestionCancelBtn = document.getElementById('removeQuestionCancelBtn');
+            const removeQuestionConfirmBtn = document.getElementById('removeQuestionConfirmBtn');
+            const removeQuestionPreviewSection = document.getElementById('removeQuestionPreviewSection');
+            const removeQuestionPreviewLabel = document.getElementById('removeQuestionPreviewLabel');
+            let questionNoticeTimeout = null;
+            let pendingRemoveRow = null;
 
             if (!questionList || !addButton || !template) {
                 return;
@@ -366,6 +628,54 @@
 
             function makeKey() {
                 return 'new_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+            }
+
+            function showQuestionBlockNotice(message) {
+                if (!questionBlockNotice) return;
+
+                questionBlockNotice.textContent = message;
+                questionBlockNotice.style.display = 'block';
+
+                if (questionNoticeTimeout) {
+                    clearTimeout(questionNoticeTimeout);
+                }
+
+                questionNoticeTimeout = window.setTimeout(function () {
+                    questionBlockNotice.style.display = 'none';
+                }, 2500);
+            }
+
+            function closeRemoveConfirm() {
+                if (!removeQuestionConfirm) return;
+
+                removeQuestionConfirm.classList.remove('open');
+                removeQuestionConfirm.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                pendingRemoveRow = null;
+            }
+
+            function openRemoveConfirm(row) {
+                if (!removeQuestionConfirm) return;
+
+                const sectionInput = row ? row.querySelector('input[name="item_sections[]"]') : null;
+                const labelInput = row ? row.querySelector('input[name="item_labels[]"]') : null;
+                const sectionText = sectionInput && sectionInput.value.trim() ? sectionInput.value.trim() : 'No section entered';
+                const labelText = labelInput && labelInput.value.trim() ? labelInput.value.trim() : 'No question entered';
+
+                pendingRemoveRow = row;
+                if (removeQuestionPreviewSection) {
+                    removeQuestionPreviewSection.textContent = sectionText;
+                }
+                if (removeQuestionPreviewLabel) {
+                    removeQuestionPreviewLabel.textContent = labelText;
+                }
+                removeQuestionConfirm.classList.add('open');
+                removeQuestionConfirm.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+
+                if (removeQuestionConfirmBtn) {
+                    removeQuestionConfirmBtn.focus();
+                }
             }
 
             function bindRemoveButtons() {
@@ -376,7 +686,7 @@
                             alert('At least one question block is required.');
                             return;
                         }
-                        button.closest('.template-question-row').remove();
+                        openRemoveConfirm(button.closest('.template-question-row'));
                     };
                 });
             }
@@ -386,9 +696,38 @@
                 const html = template.innerHTML.replace(/__KEY__/g, key);
                 questionList.insertAdjacentHTML('beforeend', html);
                 bindRemoveButtons();
+                showQuestionBlockNotice('Question block added.');
             });
 
             bindRemoveButtons();
+
+            if (removeQuestionCancelBtn) {
+                removeQuestionCancelBtn.addEventListener('click', closeRemoveConfirm);
+            }
+
+            if (removeQuestionConfirmBtn) {
+                removeQuestionConfirmBtn.addEventListener('click', function () {
+                    if (pendingRemoveRow) {
+                        pendingRemoveRow.remove();
+                    }
+
+                    closeRemoveConfirm();
+                });
+            }
+
+            if (removeQuestionConfirm) {
+                removeQuestionConfirm.addEventListener('click', function (event) {
+                    if (event.target === removeQuestionConfirm) {
+                        closeRemoveConfirm();
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && removeQuestionConfirm && removeQuestionConfirm.classList.contains('open')) {
+                    closeRemoveConfirm();
+                }
+            });
         })();
     </script>
 </x-evaluation-shell>
