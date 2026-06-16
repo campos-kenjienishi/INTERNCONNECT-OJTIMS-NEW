@@ -511,6 +511,10 @@
             font-family: 'Poppins', sans-serif; overflow: hidden;
         }
 
+        .modal-dialog.modal-template-dialog {
+            max-width: 720px;
+        }
+
         .modal-header {
             background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%);
             border-bottom: none; padding: 20px 24px;
@@ -524,6 +528,11 @@
         .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
 
         .modal-body { padding: 24px; background: #fff; }
+
+        .template-modal-body {
+            max-height: min(72vh, 760px);
+            overflow-y: auto;
+        }
 
         .modal-field-label {
             font-size: 13px; font-weight: 600; color: #444;
@@ -552,6 +561,195 @@
         }
 
         .modal-field-textarea { resize: vertical; min-height: 100px; }
+
+        .template-list-panel {
+            margin-top: 16px;
+            border: 1px solid #ececec;
+            border-radius: 14px;
+            background: #fcfcfc;
+            overflow: hidden;
+        }
+
+        .template-list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .template-list-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .template-list-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #444;
+        }
+
+        .template-list-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: var(--red);
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .template-search-wrap {
+            position: relative;
+            min-width: 220px;
+        }
+
+        .template-search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .template-search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border-radius: 10px;
+            border: 1px solid #dbe3f0;
+            background: #fff;
+            color: #1f2937;
+            font-size: 12.5px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .template-search-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        }
+
+        .template-list-scroll {
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 10px 12px;
+        }
+
+        .template-list-empty {
+            font-size: 12.5px;
+            color: #888;
+            padding: 4px 2px;
+        }
+
+        .template-list-empty-state {
+            display: none;
+            padding: 18px 10px 10px;
+            text-align: center;
+            font-size: 12.5px;
+            color: #888;
+        }
+
+        .template-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .template-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 1px solid #f1f1f1;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .template-list-item-main {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .template-list-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #eff6ff;
+            color: #2563eb;
+            flex-shrink: 0;
+        }
+
+        .template-list-name {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #1f2937;
+            overflow-wrap: anywhere;
+        }
+
+        .template-list-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        .btn-template-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-template-download:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .btn-remove-template {
+            border: none;
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-remove-template:hover {
+            background: #fecaca;
+        }
 
         .modal-footer {
             background: #fafafa; border-top: 1px solid #f0f0f0;
@@ -792,6 +990,22 @@
         body.dark-mode .dashboard-footer a { color: #999; }
         body.dark-mode .dashboard-footer a:hover { color: var(--red); }
         body.dark-mode .dashboard-footer .divider { color: #555; }
+        body.dark-mode .template-list-panel { background: #242424; border-color: #3a3a3a; }
+        body.dark-mode .template-list-header { background: #303030; border-bottom-color: #3a3a3a; }
+        body.dark-mode .template-list-title { color: #f3f4f6; }
+        body.dark-mode .template-list-count { background: rgba(220,38,38,0.18); color: #ff6b6b; }
+        body.dark-mode .template-search-input { background: #262626; border-color: #434343; color: #f3f4f6; }
+        body.dark-mode .template-search-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.18); }
+        body.dark-mode .template-search-wrap i { color: #94a3b8; }
+        body.dark-mode .template-list-item { background: #2a2a2a; border-color: #3a3a3a; }
+        body.dark-mode .template-list-name { color: #f3f4f6; }
+        body.dark-mode .template-list-empty { color: #aaa; }
+        body.dark-mode .template-list-empty-state { color: #aaa; }
+        body.dark-mode .template-list-icon { background: rgba(37,99,235,0.18); color: #93c5fd; }
+        body.dark-mode .btn-template-download { background: rgba(37,99,235,0.12); border-color: rgba(96,165,250,0.35); color: #93c5fd; }
+        body.dark-mode .btn-template-download:hover { background: #2563eb; border-color: #2563eb; color: #fff; }
+        body.dark-mode .btn-remove-template { background: rgba(220,38,38,0.16); color: #ff6b6b; }
+        body.dark-mode .btn-remove-template:hover { background: rgba(220,38,38,0.26); }
 
     </style>
 </head>
@@ -1038,7 +1252,7 @@
                                 </button>
 
                                 <div class="modal fade" id="templateModal{{ $loop->index }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-template-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">
@@ -1051,7 +1265,7 @@
                                             <form method="POST" action="{{ url('/uploadfile') }}" enctype="multipart/form-data">
                                                 @csrf
                                                 <input type="hidden" name="class_id" value="{{ $room->id }}">
-                                                <div class="modal-body">
+                                                <div class="modal-body template-modal-body">
                                                     <label class="modal-field-label"><i class="fa fa-tag"></i> Template Name</label>
                                                     <input class="modal-field-input" type="text" name="name" placeholder="Enter template name" required>
 
@@ -1062,27 +1276,56 @@
                                                     </div>
                                                     <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
 
-                                                    <div style="margin-top:12px;">
-                                                        <strong style="font-size:13px; color:#555;">Uploaded in this room:</strong>
-                                                        @if ($room->templateFiles->isEmpty())
-                                                            <p style="font-size:12px; color:#888; margin-top:6px;">No templates yet.</p>
-                                                        @else
-                                                            <ul style="margin-top:8px; padding-left:18px; max-height:120px; overflow:auto;">
-                                                                @foreach ($room->templateFiles as $template)
-                                                                    <li style="font-size:12px; margin-bottom:6px;">
-                                                                        {{ $template->name }}
-                                                                        <a href="{{ url('/download', $template->file) }}" style="margin-left:8px;">Download</a>
-                                                                        <button
-                                                                            type="button"
-                                                                            class="btn-remove-template"
-                                                                            data-action="{{ url('/professor/template/remove', $template->id) }}"
-                                                                            style="margin-left:8px;border:none;background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">
-                                                                            Remove
-                                                                        </button>
-                                                                    </li>
-                                                                @endforeach
-                                                            </ul>
-                                                        @endif
+                                                    <div class="template-list-panel">
+                                                        <div class="template-list-header">
+                                                            <strong class="template-list-title">Uploaded in this room</strong>
+                                                            <div class="template-list-toolbar">
+                                                                <label class="template-search-wrap">
+                                                                    <i class="fa fa-search"></i>
+                                                                    <input
+                                                                        type="search"
+                                                                        class="template-search-input"
+                                                                        placeholder="Search templates"
+                                                                        data-template-search>
+                                                                </label>
+                                                                <span class="template-list-count">
+                                                                    <i class="fa fa-folder-open"></i>
+                                                                    {{ $room->templateFiles->count() }} template{{ $room->templateFiles->count() === 1 ? '' : 's' }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="template-list-scroll">
+                                                            @if ($room->templateFiles->isEmpty())
+                                                                <p class="template-list-empty">No templates yet.</p>
+                                                            @else
+                                                                <ul class="template-list" data-template-list>
+                                                                    @foreach ($room->templateFiles as $template)
+                                                                        <li class="template-list-item" data-template-item data-template-name="{{ strtolower($template->name) }}">
+                                                                            <div class="template-list-item-main">
+                                                                                <span class="template-list-icon">
+                                                                                    <i class="fa fa-file-alt"></i>
+                                                                                </span>
+                                                                                <span class="template-list-name">{{ $template->name }}</span>
+                                                                            </div>
+                                                                            <div class="template-list-actions">
+                                                                                <a href="{{ url('/download', $template->file) }}" class="btn-template-download">
+                                                                                    <i class="fa fa-download"></i> Download
+                                                                                </a>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="btn-remove-template"
+                                                                                    data-action="{{ url('/professor/template/remove', $template->id) }}">
+                                                                                    Remove
+                                                                                </button>
+                                                                            </div>
+                                                                        </li>
+                                                                    @endforeach
+                                                                </ul>
+                                                                <div class="template-list-empty-state" data-template-empty-state>
+                                                                    No matching templates found.
+                                                                </div>
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -1518,6 +1761,30 @@
     });
 
     $(document).ready(function () {
+        document.querySelectorAll('[data-template-search]').forEach(function (input) {
+            input.addEventListener('input', function () {
+                const panel = input.closest('.template-list-panel');
+                if (!panel) return;
+
+                const list = panel.querySelector('[data-template-list]');
+                const emptyState = panel.querySelector('[data-template-empty-state]');
+                if (!list) return;
+
+                const query = (input.value || '').trim().toLowerCase();
+                let visibleCount = 0;
+
+                list.querySelectorAll('[data-template-item]').forEach(function (item) {
+                    const name = item.getAttribute('data-template-name') || '';
+                    const matches = query === '' || name.includes(query);
+                    item.style.display = matches ? '' : 'none';
+                    if (matches) visibleCount++;
+                });
+
+                if (emptyState) {
+                    emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+                }
+            });
+        });
 
         function buildScheduleMapFromArray(scheduleArray) {
             const map = {};

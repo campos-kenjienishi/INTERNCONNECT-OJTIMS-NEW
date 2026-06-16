@@ -521,7 +521,7 @@
                 align-items: center;
                 gap: 6px;
                 padding: 8px 16px;
-                background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                 border: none;
                 border-radius: 8px;
                 color: #fff;
@@ -531,12 +531,12 @@
                 cursor: pointer;
                 text-decoration: none;
                 transition: all 0.25s;
-                box-shadow: 0 3px 10px rgba(22,163,74,0.2);
+                box-shadow: 0 3px 10px rgba(37,99,235,0.2);
             }
 
             .btn-download:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 18px rgba(22,163,74,0.3);
+                box-shadow: 0 6px 18px rgba(37,99,235,0.3);
                 color: #fff;
                 text-decoration: none;
             }

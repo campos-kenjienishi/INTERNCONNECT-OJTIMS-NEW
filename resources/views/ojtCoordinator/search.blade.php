@@ -217,7 +217,7 @@
                                 </td>
                                 
                                 <td>
-                                    <button style="background-color: green;border-radius: 12px;padding: 5px 10px;border-color : green">
+                                    <button style="background-color: #2563eb;border-radius: 12px;padding: 5px 10px;border-color: #2563eb">
                                         <a href="{{url('/download',$data->file)}}" style="color:white;font-family: 'Poppins', sans-serif;text-decoration:none;">Download</a>
                                     </button>
 
@@ -293,7 +293,6 @@
 </body>
 
 </html>
-
 
 
 
