@@ -23,8 +23,14 @@
             <h2><span class="header-icon"><i class="fa fa-file-signature"></i></span> {{ optional($requestRow->template)->title ?: 'OJT Evaluation Form' }}</h2>
         </div>
         <div class="card-body-shell">
-            @if($expired)
-                <div class="flash-alert warning">This evaluation link has expired.</div>
+            @if($cancelled ?? false)
+                <div class="flash-alert warning">
+                    This evaluation request was cancelled by the student. If you believe this was cancelled by mistake, please contact the student before taking any further action.
+                </div>
+            @elseif($expired)
+                <div class="flash-alert warning">
+                    This evaluation link has expired. Please contact the student and ask them to resend the evaluation form if you still need to complete it.
+                </div>
             @elseif($submitted)
                 <div class="flash-alert success">This evaluation has already been submitted. Thank you.</div>
             @else

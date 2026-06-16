@@ -328,7 +328,6 @@ class EvaluationController extends Controller
         }
 
         $requestRow->status = 'cancelled';
-        $requestRow->token = Str::random(64);
         $requestRow->token_expires_at = now();
         $requestRow->save();
 
@@ -443,7 +442,11 @@ class EvaluationController extends Controller
             abort(404);
         }
 
-        if ($requestRow->token_expires_at && now()->greaterThan($requestRow->token_expires_at) && $requestRow->status !== 'submitted') {
+        if (
+            $requestRow->token_expires_at
+            && now()->greaterThan($requestRow->token_expires_at)
+            && !in_array($requestRow->status, ['submitted', 'cancelled'], true)
+        ) {
             $requestRow->status = 'expired';
             $requestRow->save();
         }
@@ -458,6 +461,7 @@ class EvaluationController extends Controller
             'requestRow' => $requestRow,
             'submitted' => $requestRow->status === 'submitted',
             'expired' => $requestRow->status === 'expired',
+            'cancelled' => $requestRow->status === 'cancelled',
         ]);
     }
 
@@ -472,7 +476,11 @@ class EvaluationController extends Controller
             return back()->with('error', 'This evaluation has already been submitted.');
         }
 
-        if ($requestRow->token_expires_at && now()->greaterThan($requestRow->token_expires_at)) {
+        if ($requestRow->status === 'cancelled') {
+            return back()->with('error', 'This evaluation request has been cancelled by the student.');
+        }
+
+        if ($requestRow->token_expires_at && now()->greaterThan($requestRow->token_expires_at) && $requestRow->status !== 'cancelled') {
             $requestRow->status = 'expired';
             $requestRow->save();
             return back()->with('error', 'This evaluation link has expired.');
@@ -519,7 +527,11 @@ class EvaluationController extends Controller
             return back()->with('error', 'This evaluation has already been submitted.');
         }
 
-        if ($requestRow->token_expires_at && now()->greaterThan($requestRow->token_expires_at)) {
+        if ($requestRow->status === 'cancelled') {
+            return back()->with('error', 'This evaluation request has been cancelled by the student.');
+        }
+
+        if ($requestRow->token_expires_at && now()->greaterThan($requestRow->token_expires_at) && $requestRow->status !== 'cancelled') {
             $requestRow->status = 'expired';
             $requestRow->save();
             return back()->with('error', 'This evaluation link has expired.');
