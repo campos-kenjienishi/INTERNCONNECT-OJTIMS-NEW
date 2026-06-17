@@ -592,15 +592,32 @@
             margin: 0 2px;
         }
 
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
         @media (max-width: 960px) {
-            .app-layout {
-                display: block;
-            }
+            .app-layout { display: block; }
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: static;
+                width: 260px;
+                height: 100vh;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 1000;
+                transform: translateX(-100%);
+                transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
             }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-area { width: 100%; }
             .topbar-title { display: none; }
             .analytics-grid { grid-template-columns: 1fr; }
             .panel.full { grid-column: auto; }
@@ -646,8 +663,10 @@
     </style>
 </head>
 <body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="app-layout">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <a href="{{ url('/dashboard') }}" class="sidebar-brand">
                 <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
                 <div class="sidebar-brand-text">
@@ -730,7 +749,7 @@
         <div class="main-area">
     <div class="topbar">
         <div class="topbar-left">
-            <button class="menu-toggle" type="button" aria-label="Toggle sidebar">
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle sidebar">
                 <i class="fa fa-bars"></i>
             </button>
             <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode" type="button">
@@ -1247,6 +1266,30 @@
         const darkToggle = document.getElementById('darkmodeToggle');
         const darkIcon = document.getElementById('darkmodeIcon');
         const darkKey = 'internconnect_darkmode';
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        if (menuToggle && sidebar && sidebarOverlay) {
+            menuToggle.addEventListener('click', function () {
+                if (window.innerWidth <= 960) {
+                    sidebar.classList.toggle('mobile-open');
+                    sidebarOverlay.classList.toggle('active');
+                }
+            });
+
+            sidebarOverlay.addEventListener('click', function () {
+                sidebar.classList.remove('mobile-open');
+                sidebarOverlay.classList.remove('active');
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 960) {
+                    sidebar.classList.remove('mobile-open');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+        }
 
         const applyDarkMode = (isDark) => {
             document.body.classList.toggle('dark-mode', isDark);

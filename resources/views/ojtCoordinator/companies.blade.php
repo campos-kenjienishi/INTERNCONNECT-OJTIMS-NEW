@@ -423,7 +423,22 @@
         .scrollable-modal-body iframe { width: 100%; height: 100%; border: none; }
 
         /* Mobile overlay */
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .sidebar-overlay {
+            display: none !important;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55) !important;
+            z-index: 1999 !important;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
 
         /* ===== DARK MODE: COMPREHENSIVE STYLING ===== */
         body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
@@ -546,9 +561,8 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
         @media (max-width: 900px) {
-            .sidebar { width: var(--sidebar-w); transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+            .sidebar { width: var(--sidebar-w); z-index: 2000; transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
             .sidebar.mobile-open { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
@@ -557,17 +571,31 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
             /* Mobile table scrolling */
             .table-card-body {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                overflow-x: hidden;
                 min-width: 0;
-            }
-
-            .table-card-body table.dataTable {
-                min-width: 700px;
             }
 
             .table-card-body .dataTables_wrapper {
                 padding: 12px 16px;
+                overflow: visible !important;
+            }
+
+            .table-card-body .dataTables_scroll,
+            .table-card-body .dataTables_scrollHead,
+            .table-card-body .dataTables_scrollHeadInner,
+            .table-card-body .dataTables_scrollBody {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .table-card-body .dataTables_scrollBody {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-card-body table.dataTable,
+            .table-card-body .dataTables_scrollHeadInner table {
+                min-width: 700px;
             }
         }
         /* Dashboard Footer */
@@ -1360,11 +1388,17 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
     const menuToggle  = document.getElementById('menuToggle');
     const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
+    menuToggle.addEventListener('click', function (event) {
+        event.stopPropagation();
         const isMobile = window.innerWidth <= 900;
         if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
+            if (sidebar.classList.contains('mobile-open')) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('mobile-open');
+                overlay.classList.add('active');
+            }
         } else {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
@@ -1376,11 +1410,40 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         overlay.classList.remove('active');
     });
 
+    const closeMobileSidebar = function () {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    };
+
+    ['click', 'touchstart'].forEach(function (eventName) {
+        document.addEventListener(eventName, function (event) {
+            if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
+                return;
+            }
+
+            const clickedInsideSidebar = sidebar.contains(event.target);
+            const clickedMenuToggle = menuToggle.contains(event.target);
+
+            if (!clickedInsideSidebar && !clickedMenuToggle) {
+                closeMobileSidebar();
+            }
+        });
+    });
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 900) {
+            closeMobileSidebar();
+        }
+    });
+
     $(document).ready(function () {
 
         // DataTable - keep server-side ordering by school year
         $('#companyTable').DataTable({
             order: [],
+            scrollX: true,
+            scrollCollapse: true,
+            autoWidth: false,
             columnDefs: [{ targets: 0, visible: false }]
         });
 

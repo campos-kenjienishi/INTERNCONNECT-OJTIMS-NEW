@@ -867,6 +867,19 @@
         .sidebar-overlay {
             display: none;
             position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
         /* ===== DARK MODE: COMPREHENSIVE STYLING ===== */
         body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
         body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
@@ -980,7 +993,6 @@ body.dark-mode .dashboard-footer .footer-logo {
                 transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
             }
             .sidebar.mobile-open { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
@@ -1484,11 +1496,13 @@ body.dark-mode .dashboard-footer .footer-logo {
     const menuToggle  = document.getElementById('menuToggle');
     const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
+    menuToggle.addEventListener('click', function (event) {
+        event.stopPropagation();
         const isMobile = window.innerWidth <= 900;
         if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
+            const shouldOpen = !sidebar.classList.contains('mobile-open');
+            sidebar.classList.toggle('mobile-open', shouldOpen);
+            overlay.classList.toggle('active', shouldOpen);
         } else {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
@@ -1498,6 +1512,32 @@ body.dark-mode .dashboard-footer .footer-logo {
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
+    });
+
+    const closeMobileSidebar = function () {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    };
+
+    ['click', 'touchstart'].forEach(function (eventName) {
+        document.addEventListener(eventName, function (event) {
+            if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
+                return;
+            }
+
+            const clickedInsideSidebar = sidebar.contains(event.target);
+            const clickedMenuToggle = menuToggle.contains(event.target);
+
+            if (!clickedInsideSidebar && !clickedMenuToggle) {
+                closeMobileSidebar();
+            }
+        });
+    });
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 900) {
+            closeMobileSidebar();
+        }
     });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>

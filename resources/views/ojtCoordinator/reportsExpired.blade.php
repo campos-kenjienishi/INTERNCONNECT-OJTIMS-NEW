@@ -495,6 +495,24 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
 @media (max-width: 900px) {
     .table-card-body .dataTables_wrapper {
         padding: 12px 0;
+        overflow: visible !important;
+    }
+
+    .table-card-body {
+        overflow-x: hidden;
+    }
+
+    .table-card-body .dataTables_scroll,
+    .table-card-body .dataTables_scrollHead,
+    .table-card-body .dataTables_scrollHeadInner,
+    .table-card-body .dataTables_scrollBody {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .table-card-body .dataTables_scrollBody {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
     }
 }
     </style>
@@ -1134,6 +1152,9 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
             searching: true,
             info: true,
+            scrollX: true,
+            scrollCollapse: true,
+            autoWidth: false,
             dom: 'lfrtip',
             columnDefs: [
                 { targets: 0, visible: false },

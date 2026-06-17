@@ -987,17 +987,31 @@
 
             /* Mobile table scrolling */
             .table-card-body {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                overflow-x: hidden;
                 min-width: 0;
-            }
-
-            .table-card-body table.dataTable {
-                min-width: 700px;
             }
 
             .table-card-body .dataTables_wrapper {
                 padding: 12px 16px;
+                overflow: visible !important;
+            }
+
+            .table-card-body .dataTables_scroll,
+            .table-card-body .dataTables_scrollHead,
+            .table-card-body .dataTables_scrollHeadInner,
+            .table-card-body .dataTables_scrollBody {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .table-card-body .dataTables_scrollBody {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-card-body table.dataTable,
+            .table-card-body .dataTables_scrollHeadInner table {
+                min-width: 700px;
             }
 
             .table-card-header-right {
@@ -1723,7 +1737,12 @@ body.dark-mode .dashboard-footer .footer-copy {
 
     $(document).ready(function () {
         // DataTable
-        const table = $('#fileTable').DataTable({ order: [] });
+        const table = $('#fileTable').DataTable({
+            order: [],
+            scrollX: true,
+            scrollCollapse: true,
+            autoWidth: false
+        });
 
         $('#courseFilter').on('change', function () {
             const value = $(this).val();

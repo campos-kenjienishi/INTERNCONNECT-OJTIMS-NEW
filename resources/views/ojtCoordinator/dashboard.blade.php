@@ -570,8 +570,17 @@
 
             /* Mobile overlay */
             .sidebar-overlay {
-                display: none; position: fixed; inset: 0;
-                background: rgba(0,0,0,0.5); z-index: 999;
+                display: none !important; position: fixed; inset: 0;
+                background: rgba(0,0,0,0.55) !important; z-index: 1999 !important;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease;
+            }
+
+            .sidebar-overlay.active {
+                display: block !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
             }
 
             @media (max-width: 1100px) {
@@ -581,11 +590,11 @@
             @media (max-width: 900px) {
                 .sidebar {
                     width: var(--sidebar-w);
+                    z-index: 2000;
                     transform: translateX(-100%);
                     transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
                 }
                 .sidebar.mobile-open { transform: translateX(0); }
-                .sidebar-overlay.active { display: block; }
                 .main-content { margin-left: 0 !important; }
                 .page-content { padding: 18px; }
                 .topbar-title { display: none; }
@@ -1774,6 +1783,9 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
             const coordinatorAnnouncementTable = $('#coordinatorAnnouncementTable').DataTable({
                 pageLength: 5,
                 lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                scrollX: true,
+                scrollCollapse: true,
+                autoWidth: false,
                 order: [[2, 'desc']],
                 columnDefs: [
                     { orderable: false, targets: 3 }
@@ -1794,11 +1806,17 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         const menuToggle  = document.getElementById('menuToggle');
         const overlay     = document.getElementById('sidebarOverlay');
 
-        menuToggle.addEventListener('click', function () {
+        menuToggle.addEventListener('click', function (event) {
+            event.stopPropagation();
             const isMobile = window.innerWidth <= 900;
             if (isMobile) {
-                sidebar.classList.toggle('mobile-open');
-                overlay.classList.toggle('active');
+                if (sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
+                } else {
+                    sidebar.classList.add('mobile-open');
+                    overlay.classList.add('active');
+                }
             } else {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
@@ -1808,6 +1826,32 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         overlay.addEventListener('click', function () {
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
+        });
+
+        const closeMobileSidebar = function () {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        };
+
+        ['click', 'touchstart'].forEach(function (eventName) {
+            document.addEventListener(eventName, function (event) {
+                if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
+                    return;
+                }
+
+                const clickedInsideSidebar = sidebar.contains(event.target);
+                const clickedMenuToggle = menuToggle.contains(event.target);
+
+                if (!clickedInsideSidebar && !clickedMenuToggle) {
+                    closeMobileSidebar();
+                }
+            });
+        });
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 900) {
+                closeMobileSidebar();
+            }
         });
 
         document.querySelectorAll('.delete-announcement-form').forEach(function (form) {

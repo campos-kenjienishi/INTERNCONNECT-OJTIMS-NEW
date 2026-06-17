@@ -583,17 +583,31 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
             /* Mobile table scrolling */
             .table-card-body {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                overflow-x: hidden;
                 min-width: 0;
-            }
-
-            .table-card-body table.dataTable {
-                min-width: 700px;
             }
 
             .table-card-body .dataTables_wrapper {
                 padding: 12px 16px;
+                overflow: visible !important;
+            }
+
+            .table-card-body .dataTables_scroll,
+            .table-card-body .dataTables_scrollHead,
+            .table-card-body .dataTables_scrollHeadInner,
+            .table-card-body .dataTables_scrollBody {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .table-card-body .dataTables_scrollBody {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-card-body table.dataTable,
+            .table-card-body .dataTables_scrollHeadInner table {
+                min-width: 700px;
             }
         }
         /* Dashboard Footer */
@@ -1008,7 +1022,12 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
     $(document).ready(function () {
 
         // DataTable
-        $('#fileTable').DataTable({ order: [] });
+        $('#fileTable').DataTable({
+            order: [],
+            scrollX: true,
+            scrollCollapse: true,
+            autoWidth: false
+        });
 
         // File input: show selected filename in dropzone
         $('#fileInput').on('change', function () {
