@@ -33,6 +33,22 @@
                 min-height: 100vh;
             }
 
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.55);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease;
+                z-index: 1998;
+            }
+
+            body.mobile-sidebar-open::before {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
             /* =============== SIDEBAR =============== */
             .sidebar {
                 position: fixed; top: 0; left: 0;
@@ -1813,9 +1829,11 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 if (sidebar.classList.contains('mobile-open')) {
                     sidebar.classList.remove('mobile-open');
                     overlay.classList.remove('active');
+                    document.body.classList.remove('mobile-sidebar-open');
                 } else {
                     sidebar.classList.add('mobile-open');
                     overlay.classList.add('active');
+                    document.body.classList.add('mobile-sidebar-open');
                 }
             } else {
                 sidebar.classList.toggle('collapsed');
@@ -1826,11 +1844,13 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         overlay.addEventListener('click', function () {
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
+            document.body.classList.remove('mobile-sidebar-open');
         });
 
         const closeMobileSidebar = function () {
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
+            document.body.classList.remove('mobile-sidebar-open');
         };
 
         ['click', 'touchstart'].forEach(function (eventName) {

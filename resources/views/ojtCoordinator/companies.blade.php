@@ -28,6 +28,22 @@
 
         body { font-family: 'Poppins', sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
 
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 1998;
+        }
+
+        body.mobile-sidebar-open::before {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         body.dark-mode { background: #000000; color: #e0e0e0; }
         body.dark-mode .main-content { background: #000000; }
         body.dark-mode .sidebar { box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
@@ -1395,9 +1411,11 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             if (sidebar.classList.contains('mobile-open')) {
                 sidebar.classList.remove('mobile-open');
                 overlay.classList.remove('active');
+                document.body.classList.remove('mobile-sidebar-open');
             } else {
                 sidebar.classList.add('mobile-open');
                 overlay.classList.add('active');
+                document.body.classList.add('mobile-sidebar-open');
             }
         } else {
             sidebar.classList.toggle('collapsed');
@@ -1408,11 +1426,13 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
+        document.body.classList.remove('mobile-sidebar-open');
     });
 
     const closeMobileSidebar = function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
+        document.body.classList.remove('mobile-sidebar-open');
     };
 
     ['click', 'touchstart'].forEach(function (eventName) {
