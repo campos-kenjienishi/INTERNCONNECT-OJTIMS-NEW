@@ -77,7 +77,7 @@ class AccountInfo extends Controller
 {
     $request->validate([
         'current_password' => 'required|min:8|max:12',
-        'confirm_password' => 'required|min:8|max:12',
+        'confirm_password' => 'required|min:8|max:12|same:new_password',
         'new_password' => 'required|min:8|max:12',
     ]);
 

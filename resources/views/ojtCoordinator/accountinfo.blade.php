@@ -395,6 +395,13 @@
 
         .btn-modal-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.3); }
 
+        .btn-modal-submit:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Validation errors */
         .alert-errors {
             background: #fef2f2; border: 1px solid #fecaca;
@@ -903,6 +910,9 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                         <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
                             <strong>Password requirements:</strong> Use 8 to 12 characters and do not share your password.
                         </div>
+                        <div class="pw-error" id="newPasswordRequirementError" style="display:none;">
+                            New password must be 8 to 12 characters long.
+                        </div>
                         @error('new_password')
                             <div class="pw-error">{{ $message }}</div>
                         @enderror
@@ -918,6 +928,9 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                                 <i class="fa fa-eye"></i>
                             </button>
                         </div>
+                        <div class="pw-error" id="confirmPasswordMatchError" style="display:none;">
+                            Confirmation password must match the new password.
+                        </div>
                         @error('confirm_password')
                             <div class="pw-error">{{ $message }}</div>
                         @enderror
@@ -928,7 +941,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
                         <i class="fa fa-times me-1"></i> Close
                     </button>
-                    <button type="submit" class="btn-modal-submit">
+                    <button type="submit" class="btn-modal-submit" id="updatePasswordButton" disabled>
                         <i class="fa fa-save me-1"></i> Update Password
                     </button>
                 </div>
@@ -982,6 +995,50 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         setupToggle('toggleCurrent', 'current_password');
         setupToggle('toggleNew',     'new_password');
         setupToggle('toggleConfirm', 'confirm_password');
+
+        const currentPasswordInput = document.getElementById('current_password');
+        const newPasswordInput = document.getElementById('new_password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const updatePasswordButton = document.getElementById('updatePasswordButton');
+        const newPasswordRequirementError = document.getElementById('newPasswordRequirementError');
+        const confirmPasswordMatchError = document.getElementById('confirmPasswordMatchError');
+
+        function isPasswordLengthValid(value) {
+            return value.length >= 8 && value.length <= 12;
+        }
+
+        function syncPasswordModalState() {
+            if (!currentPasswordInput || !newPasswordInput || !confirmPasswordInput || !updatePasswordButton) {
+                return;
+            }
+
+            const currentPassword = currentPasswordInput.value.trim();
+            const newPassword = newPasswordInput.value.trim();
+            const confirmPassword = confirmPasswordInput.value.trim();
+
+            const isCurrentPasswordValid = isPasswordLengthValid(currentPassword);
+            const isNewPasswordValid = isPasswordLengthValid(newPassword);
+            const isConfirmPasswordValid = isPasswordLengthValid(confirmPassword);
+            const isConfirmPasswordMatching = newPassword === confirmPassword && confirmPassword.length > 0;
+            const canSubmit = isCurrentPasswordValid && isNewPasswordValid && isConfirmPasswordValid && isConfirmPasswordMatching;
+
+            updatePasswordButton.disabled = !canSubmit;
+
+            if (newPasswordRequirementError) {
+                newPasswordRequirementError.style.display = newPassword.length > 0 && !isNewPasswordValid ? 'block' : 'none';
+            }
+
+            if (confirmPasswordMatchError) {
+                confirmPasswordMatchError.style.display = confirmPassword.length > 0 && !isConfirmPasswordMatching ? 'block' : 'none';
+            }
+        }
+
+        [currentPasswordInput, newPasswordInput, confirmPasswordInput].forEach(function (input) {
+            if (!input) return;
+            input.addEventListener('input', syncPasswordModalState);
+        });
+
+        syncPasswordModalState();
 
         // Auto-open password modal if there are validation errors
         @if ($errors->any())

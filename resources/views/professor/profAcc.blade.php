@@ -502,6 +502,13 @@
 
         .btn-modal-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(220,38,38,0.3); }
 
+        .btn-modal-submit:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Mobile overlay */
         .sidebar-overlay {
             display: none; position: fixed; inset: 0;
@@ -1013,6 +1020,9 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                     <div style="margin-top:8px; margin-bottom:2px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
                         <strong>Password requirements:</strong> Use 8 to 12 characters and do not share your password.
                     </div>
+                    <div style="color:var(--red);font-size:12px;margin-top:4px;display:none;" id="newPasswordRequirementError">
+                        New password must be 8 to 12 characters long.
+                    </div>
                     @error('new_password')
                         <div style="color:var(--red);font-size:12px;margin-top:4px;">{{ $message }}</div>
                     @enderror
@@ -1027,6 +1037,9 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                             <i class="fa fa-eye"></i>
                         </button>
                     </div>
+                    <div style="color:var(--red);font-size:12px;margin-top:4px;display:none;" id="confirmPasswordMatchError">
+                        Confirmation password must match the new password.
+                    </div>
                     @error('confirm_password')
                         <div style="color:var(--red);font-size:12px;margin-top:4px;">{{ $message }}</div>
                     @enderror
@@ -1037,7 +1050,7 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                     <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
                         <i class="fa fa-times me-1"></i> Close
                     </button>
-                    <button type="submit" class="btn-modal-submit">
+                    <button type="submit" class="btn-modal-submit" id="updatePasswordButton" disabled>
                         <i class="fa fa-save me-1"></i> Update Password
                     </button>
                 </div>
@@ -1090,6 +1103,50 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         setupToggle('toggleCurrent', 'current_password');
         setupToggle('toggleNew',     'new_password');
         setupToggle('toggleConfirm', 'confirm_password');
+
+        const currentPasswordInput = document.getElementById('current_password');
+        const newPasswordInput = document.getElementById('new_password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const updatePasswordButton = document.getElementById('updatePasswordButton');
+        const newPasswordRequirementError = document.getElementById('newPasswordRequirementError');
+        const confirmPasswordMatchError = document.getElementById('confirmPasswordMatchError');
+
+        function isPasswordLengthValid(value) {
+            return value.length >= 8 && value.length <= 12;
+        }
+
+        function syncPasswordModalState() {
+            if (!currentPasswordInput || !newPasswordInput || !confirmPasswordInput || !updatePasswordButton) {
+                return;
+            }
+
+            const currentPassword = currentPasswordInput.value.trim();
+            const newPassword = newPasswordInput.value.trim();
+            const confirmPassword = confirmPasswordInput.value.trim();
+
+            const isCurrentPasswordValid = isPasswordLengthValid(currentPassword);
+            const isNewPasswordValid = isPasswordLengthValid(newPassword);
+            const isConfirmPasswordValid = isPasswordLengthValid(confirmPassword);
+            const isConfirmPasswordMatching = newPassword === confirmPassword && confirmPassword.length > 0;
+            const canSubmit = isCurrentPasswordValid && isNewPasswordValid && isConfirmPasswordValid && isConfirmPasswordMatching;
+
+            updatePasswordButton.disabled = !canSubmit;
+
+            if (newPasswordRequirementError) {
+                newPasswordRequirementError.style.display = newPassword.length > 0 && !isNewPasswordValid ? 'block' : 'none';
+            }
+
+            if (confirmPasswordMatchError) {
+                confirmPasswordMatchError.style.display = confirmPassword.length > 0 && !isConfirmPasswordMatching ? 'block' : 'none';
+            }
+        }
+
+        [currentPasswordInput, newPasswordInput, confirmPasswordInput].forEach(function (input) {
+            if (!input) return;
+            input.addEventListener('input', syncPasswordModalState);
+        });
+
+        syncPasswordModalState();
 
         // Auto-open password modal if there are validation errors
         @if ($errors->any())
