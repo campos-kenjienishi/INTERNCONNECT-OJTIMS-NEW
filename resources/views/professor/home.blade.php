@@ -35,6 +35,22 @@
             flex-direction: column;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 1998;
+        }
+
+        body.mobile-sidebar-open::before {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         /* =============== SIDEBAR =============== */
         .sidebar {
             position: fixed;
@@ -953,16 +969,20 @@
             inset: 0;
             background: rgba(0,0,0,0.5);
             z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
         }
 
         @media (max-width: 900px) {
             .sidebar {
                 width: var(--sidebar-w);
+                z-index: 2000;
                 transform: translateX(-100%);
                 transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
             }
             .sidebar.mobile-open { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
+            .sidebar-overlay.active { display: block; opacity: 1; pointer-events: auto; }
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
@@ -971,6 +991,34 @@
             .welcome-icon { display: none; }
             .welcome-actions { width: 100%; }
             .welcome-video-btn { width: 100%; justify-content: center; }
+
+            .table-card-body {
+                overflow-x: hidden !important;
+            }
+
+            .table-card-body .dataTables_wrapper {
+                overflow: visible !important;
+                padding: 12px 16px;
+            }
+
+            .table-card-body .dataTables_scroll,
+            .table-card-body .dataTables_scrollHead,
+            .table-card-body .dataTables_scrollHeadInner,
+            .table-card-body .dataTables_scrollBody {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .table-card-body .dataTables_scrollBody {
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-card-body table.dataTable,
+            .table-card-body .dataTables_scrollHeadInner table {
+                min-width: 760px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1342,6 +1390,9 @@ $(document).ready(function() {
         "info": false,
         "lengthChange": false,
         "pageLength": 8,
+        "scrollX": true,
+        "scrollCollapse": true,
+        "autoWidth": false,
         "order": [[0, 'asc']],
         "language": {
             "emptyTable": "No students to display"
@@ -1403,8 +1454,15 @@ $(document).ready(function() {
             
             const isMobile = window.innerWidth <= 900;
             if (isMobile) {
-                sidebar.classList.toggle('mobile-open');
-                overlay.classList.toggle('active');
+                if (sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
+                    document.body.classList.remove('mobile-sidebar-open');
+                } else {
+                    sidebar.classList.add('mobile-open');
+                    overlay.classList.add('active');
+                    document.body.classList.add('mobile-sidebar-open');
+                }
             } else {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
@@ -1415,13 +1473,34 @@ $(document).ready(function() {
         overlay.addEventListener('click', function () {
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
+            document.body.classList.remove('mobile-sidebar-open');
+        });
+
+        const closeMobileSidebar = function () {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+            document.body.classList.remove('mobile-sidebar-open');
+        };
+
+        ['click', 'touchstart'].forEach(function (eventName) {
+            document.addEventListener(eventName, function (event) {
+                if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
+                    return;
+                }
+
+                const clickedInsideSidebar = sidebar.contains(event.target);
+                const clickedMenuToggle = menuToggle.contains(event.target);
+
+                if (!clickedInsideSidebar && !clickedMenuToggle) {
+                    closeMobileSidebar();
+                }
+            });
         });
 
         // Handle window resize
         window.addEventListener('resize', function () {
             if (window.innerWidth > 900) {
-                sidebar.classList.remove('mobile-open');
-                overlay.classList.remove('active');
+                closeMobileSidebar();
             } else {
                 if (!sidebar.classList.contains('mobile-open')) {
                     sidebar.classList.remove('collapsed');

@@ -19,6 +19,10 @@
             --topbar-h: 64px;
         }
         body { font-family: 'Poppins', sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
+        body::before { content:''; position:fixed; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:1998; }
+        body.mobile-sidebar-open::before { opacity:1; pointer-events:auto; }
+        .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1999; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+        .sidebar-overlay.active { display:block; opacity:1; pointer-events:auto; }
         .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); height: 100vh; background: linear-gradient(160deg, #1a0000 0%, #4a0000 50%, #7f0000 100%); z-index: 1000; transition: width .3s; overflow: hidden; box-shadow: 4px 0 24px rgba(0,0,0,.18); display: flex; flex-direction: column; }
         .sidebar.collapsed { width: var(--sidebar-w-collapsed); }
         .sidebar-brand, .sidebar-user, .nav-item { display: flex; align-items: center; gap: 12px; text-decoration: none; }
@@ -267,7 +271,7 @@
         body.dark-mode .darkmode-toggle:hover { background: rgba(220,38,38,.2); color: #ff6b6b; border-color: rgba(220,38,38,.3); }
         body.dark-mode .topbar-badge { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); color: #ff6b6b; }
         @media (max-width: 900px) {
-            .sidebar { transform: translateX(-100%); }
+            .sidebar { transform: translateX(-100%); z-index: 2000; }
             .sidebar.mobile-open { transform: translateX(0); }
             .main-content, .main-content.expanded { margin-left: 0; }
             .page-content { padding: 20px 14px; }
@@ -336,6 +340,7 @@
         ];
     });
 @endphp
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div class="sidebar" id="sidebar">
     <a href="{{ url('/professor/home') }}" class="sidebar-brand">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
@@ -830,12 +835,51 @@
 <script>
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
-    document.getElementById('menuToggle').addEventListener('click', function () {
+    const menuToggle = document.getElementById('menuToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    const closeMobileSidebar = function () {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+        document.body.classList.remove('mobile-sidebar-open');
+    };
+
+    document.getElementById('menuToggle').addEventListener('click', function (event) {
+        event.stopPropagation();
         if (window.innerWidth <= 900) {
-            sidebar.classList.toggle('mobile-open');
+            if (sidebar.classList.contains('mobile-open')) {
+                closeMobileSidebar();
+            } else {
+                sidebar.classList.add('mobile-open');
+                overlay.classList.add('active');
+                document.body.classList.add('mobile-sidebar-open');
+            }
         } else {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
+        }
+    });
+
+    overlay.addEventListener('click', closeMobileSidebar);
+
+    ['click', 'touchstart'].forEach(function (eventName) {
+        document.addEventListener(eventName, function (event) {
+            if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
+                return;
+            }
+
+            const clickedInsideSidebar = sidebar.contains(event.target);
+            const clickedMenuToggle = menuToggle.contains(event.target);
+
+            if (!clickedInsideSidebar && !clickedMenuToggle) {
+                closeMobileSidebar();
+            }
+        });
+    });
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 900) {
+            closeMobileSidebar();
         }
     });
 
