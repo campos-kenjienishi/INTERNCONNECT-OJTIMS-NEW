@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}" onerror="this.onerror=null;this.href='{{ url('/public/css/dark-mode.css') }}';">
-    <link rel="stylesheet" href="{{ asset('css/student_class-responsive.css') }}" onerror="this.onerror=null;this.href='{{ url('/public/css/student_class-responsive.css') }}';">
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/student_class-responsive.css') }}">
     
 
     <style>
