@@ -195,6 +195,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
 Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::get('/download/{file}', [FileController::class,'download']);
     Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
+    Route::post('/change_password/verify-current/{id}', [AccountInfo::class,'verifyCurrentPassword']);
     Route::post('/announcements', [AnnouncementController::class,'announcement']);
     Route::get('/companyCreate', function () {
         $user = User::where('id', session('loginId'))->first();

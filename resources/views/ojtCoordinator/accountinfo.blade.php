@@ -289,6 +289,7 @@
         .fields-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 
         .field-group { display: flex; flex-direction: column; gap: 5px; }
+        .field-group.has-bubble { overflow: visible; }
         .field-group.full { grid-column: 1 / -1; }
 
         .field-label { font-size: 12px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 5px; }
@@ -304,6 +305,48 @@
         .field-input:focus {
             border-color: var(--red); background: #fff;
             box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
+        }
+
+        .field-input-wrap { position: relative; }
+
+        .field-bubble {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: calc(100% + 10px);
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+            background: #fff7f7;
+            color: var(--red-dark);
+            font-size: 11.5px;
+            line-height: 1.45;
+            box-shadow: 0 12px 24px rgba(127, 0, 0, 0.12);
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .field-bubble.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .field-bubble::after {
+            content: '';
+            position: absolute;
+            left: 22px;
+            top: 100%;
+            width: 14px;
+            height: 14px;
+            background: #fff7f7;
+            border-right: 1px solid #fecaca;
+            border-bottom: 1px solid #fecaca;
+            transform: rotate(45deg) translateY(-7px);
         }
 
         .form-card-footer {
@@ -347,6 +390,7 @@
         .pw-field-label i { color: var(--red); font-size: 11px; }
 
         .pw-input-wrap { position: relative; }
+        .pw-input-wrap.has-bubble { overflow: visible; }
 
         .pw-input {
             width: 100%; background: #fafafa; border: 1.5px solid #e8e8e8;
@@ -369,6 +413,46 @@
         .pw-toggle:hover { color: var(--red); }
 
         .pw-error { font-size: 11.5px; color: var(--red); margin-top: 3px; }
+
+        .pw-bubble {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: calc(100% + 10px);
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+            background: #fff7f7;
+            color: var(--red-dark);
+            font-size: 11.5px;
+            line-height: 1.45;
+            box-shadow: 0 12px 24px rgba(127, 0, 0, 0.12);
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .pw-bubble.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pw-bubble::after {
+            content: '';
+            position: absolute;
+            left: 22px;
+            top: 100%;
+            width: 14px;
+            height: 14px;
+            background: #fff7f7;
+            border-right: 1px solid #fecaca;
+            border-bottom: 1px solid #fecaca;
+            transform: rotate(45deg) translateY(-7px);
+        }
 
         .modal-footer {
             background: #fafafa; border-top: 1px solid #f0f0f0;
@@ -762,7 +846,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     </div>
                 </div>
 
-                <form action="{{ url('/edit', $data->email) }}" method="post">
+                <form action="{{ url('/edit', $data->email) }}" method="post" id="coordinatorProfileForm" data-email-check-url="{{ route('check-email-availability') }}" data-current-user-id="{{ $data->id }}">
                     @csrf
                     @method('PUT')
 
@@ -773,20 +857,29 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                         </div>
 
                         <div class="fields-grid-4">
-                            <div class="field-group">
+                            <div class="field-group has-bubble">
                                 <label class="field-label"><i class="fa fa-user"></i> First Name</label>
-                                <input class="field-input" type="text" name="first_name"
-                                       value="{{ $data->first_name }}" placeholder="First name">
+                                <div class="field-input-wrap">
+                                    <div class="field-bubble" id="firstNameBubble"></div>
+                                    <input class="field-input" type="text" id="first_name" name="first_name"
+                                           value="{{ $data->first_name }}" placeholder="First name" autocapitalize="words" spellcheck="false">
+                                </div>
                             </div>
-                            <div class="field-group">
+                            <div class="field-group has-bubble">
                                 <label class="field-label"><i class="fa fa-user"></i> Middle Name</label>
-                                <input class="field-input" type="text" name="middle_name"
-                                       value="{{ $data->middle_name }}" placeholder="Middle name">
+                                <div class="field-input-wrap">
+                                    <div class="field-bubble" id="middleNameBubble"></div>
+                                    <input class="field-input" type="text" id="middle_name" name="middle_name"
+                                           value="{{ $data->middle_name }}" placeholder="Middle name" autocapitalize="words" spellcheck="false">
+                                </div>
                             </div>
-                            <div class="field-group">
+                            <div class="field-group has-bubble">
                                 <label class="field-label"><i class="fa fa-user"></i> Last Name</label>
-                                <input class="field-input" type="text" name="last_name"
-                                       value="{{ $data->last_name }}" placeholder="Last name">
+                                <div class="field-input-wrap">
+                                    <div class="field-bubble" id="lastNameBubble"></div>
+                                    <input class="field-input" type="text" id="last_name" name="last_name"
+                                           value="{{ $data->last_name }}" placeholder="Last name" autocapitalize="words" spellcheck="false">
+                                </div>
                             </div>
                             <div class="field-group">
                                 <label class="field-label"><i class="fa fa-tag"></i> Suffix</label>
@@ -810,10 +903,13 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                                 <input class="field-input" type="date" name="date_of_birth"
                                        value="{{ $data->date_of_birth }}">
                             </div>
-                            <div class="field-group">
+                            <div class="field-group has-bubble">
                                 <label class="field-label"><i class="fa fa-envelope"></i> Email Address</label>
-                                <input class="field-input" type="email" name="email"
-                                       value="{{ $data->email }}" placeholder="email@example.com">
+                                <div class="field-input-wrap">
+                                    <div class="field-bubble" id="emailBubble"></div>
+                                    <input class="field-input" type="email" id="email" name="email"
+                                           value="{{ $data->email }}" placeholder="email@example.com">
+                                </div>
                             </div>
                         </div>
 
@@ -867,7 +963,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 <h5 class="modal-title"><i class="fa fa-lock"></i> Change Password</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ url('/change_password', $data->id) }}" method="post">
+            <form action="{{ url('/change_password', $data->id) }}" method="post" data-verify-current-url="{{ url('/change_password/verify-current', $data->id) }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -885,7 +981,8 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     <!-- Current Password -->
                     <div class="pw-field-group">
                         <label class="pw-field-label"><i class="fa fa-lock"></i> Current Password</label>
-                        <div class="pw-input-wrap">
+                        <div class="pw-input-wrap has-bubble">
+                            <div class="pw-bubble" id="currentPasswordBubble"></div>
                             <input type="password" class="pw-input" id="current_password"
                                    name="current_password" placeholder="Enter current password">
                             <button type="button" class="pw-toggle" id="toggleCurrent">
@@ -900,18 +997,13 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     <!-- New Password -->
                     <div class="pw-field-group">
                         <label class="pw-field-label"><i class="fa fa-key"></i> New Password</label>
-                        <div class="pw-input-wrap">
+                        <div class="pw-input-wrap has-bubble">
+                            <div class="pw-bubble" id="newPasswordBubble"></div>
                             <input type="password" class="pw-input" id="new_password"
                                    name="new_password" placeholder="Enter new password">
                             <button type="button" class="pw-toggle" id="toggleNew">
                                 <i class="fa fa-eye"></i>
                             </button>
-                        </div>
-                        <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
-                            <strong>Password requirements:</strong> Use 8 to 12 characters and do not share your password.
-                        </div>
-                        <div class="pw-error" id="newPasswordRequirementError" style="display:none;">
-                            New password must be 8 to 12 characters long.
                         </div>
                         @error('new_password')
                             <div class="pw-error">{{ $message }}</div>
@@ -921,15 +1013,13 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                     <!-- Confirm Password -->
                     <div class="pw-field-group">
                         <label class="pw-field-label"><i class="fa fa-check-circle"></i> Confirm New Password</label>
-                        <div class="pw-input-wrap">
+                        <div class="pw-input-wrap has-bubble">
+                            <div class="pw-bubble" id="confirmPasswordBubble"></div>
                             <input type="password" class="pw-input" id="confirm_password"
                                    name="confirm_password" placeholder="Re-enter new password">
                             <button type="button" class="pw-toggle" id="toggleConfirm">
                                 <i class="fa fa-eye"></i>
                             </button>
-                        </div>
-                        <div class="pw-error" id="confirmPasswordMatchError" style="display:none;">
-                            Confirmation password must match the new password.
                         </div>
                         @error('confirm_password')
                             <div class="pw-error">{{ $message }}</div>
@@ -1000,11 +1090,124 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
         const newPasswordInput = document.getElementById('new_password');
         const confirmPasswordInput = document.getElementById('confirm_password');
         const updatePasswordButton = document.getElementById('updatePasswordButton');
-        const newPasswordRequirementError = document.getElementById('newPasswordRequirementError');
-        const confirmPasswordMatchError = document.getElementById('confirmPasswordMatchError');
+        const passwordForm = document.querySelector('#changePasswordModal form');
+        const currentPasswordBubble = document.getElementById('currentPasswordBubble');
+        const newPasswordBubble = document.getElementById('newPasswordBubble');
+        const confirmPasswordBubble = document.getElementById('confirmPasswordBubble');
+        const verifyCurrentUrl = passwordForm ? passwordForm.dataset.verifyCurrentUrl : '';
+        let currentPasswordState = 'idle';
+        let verifyCurrentPasswordTimer = null;
+        let verifyCurrentPasswordSequence = 0;
 
-        function isPasswordLengthValid(value) {
-            return value.length >= 8 && value.length <= 12;
+        function isNewPasswordValid(value) {
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/.test(value);
+        }
+
+        function getNewPasswordUnmetRules(value) {
+            const unmetRules = [];
+
+            if (value.length < 8 || value.length > 12) {
+                unmetRules.push('Use 8 to 12 characters.');
+            }
+            if (!/[A-Z]/.test(value)) {
+                unmetRules.push('Add an uppercase letter.');
+            }
+            if (!/[a-z]/.test(value)) {
+                unmetRules.push('Add a lowercase letter.');
+            }
+            if (!/\d/.test(value)) {
+                unmetRules.push('Add a number.');
+            }
+            if (!/[!@#$%^&*]/.test(value)) {
+                unmetRules.push('Add one symbol: ! @ # $ % ^ & *.');
+            }
+            if (/[^A-Za-z\d!@#$%^&*]/.test(value)) {
+                unmetRules.push('Use only these symbols: ! @ # $ % ^ & *.');
+            }
+
+            return unmetRules;
+        }
+
+        function showBubble(bubble, messages) {
+            if (!bubble) {
+                return;
+            }
+
+            if (!messages.length) {
+                bubble.innerHTML = '';
+                bubble.classList.remove('active');
+                return;
+            }
+
+            bubble.innerHTML = messages.map(function (message) {
+                return '<div>' + message + '</div>';
+            }).join('');
+            bubble.classList.add('active');
+        }
+
+        function verifyCurrentPassword() {
+            if (!currentPasswordInput || !verifyCurrentUrl) {
+                return;
+            }
+
+            const currentPassword = currentPasswordInput.value.trim();
+
+            if (!currentPassword.length) {
+                currentPasswordState = 'idle';
+                showBubble(currentPasswordBubble, []);
+                syncPasswordModalState();
+                return;
+            }
+
+            currentPasswordState = 'checking';
+            syncPasswordModalState();
+
+            const requestSequence = ++verifyCurrentPasswordSequence;
+
+            fetch(verifyCurrentUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                }),
+            })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Verification failed.');
+                }
+
+                return response.json();
+            })
+            .then(function (data) {
+                if (requestSequence !== verifyCurrentPasswordSequence) {
+                    return;
+                }
+
+                currentPasswordState = data.valid ? 'valid' : 'invalid';
+                showBubble(currentPasswordBubble, data.valid ? [] : [data.message || 'Current password is incorrect.']);
+                syncPasswordModalState();
+            })
+            .catch(function () {
+                if (requestSequence !== verifyCurrentPasswordSequence) {
+                    return;
+                }
+
+                currentPasswordState = 'idle';
+                showBubble(currentPasswordBubble, ['We could not verify the current password right now.']);
+                syncPasswordModalState();
+            });
+        }
+
+        function queueCurrentPasswordVerification() {
+            if (verifyCurrentPasswordTimer) {
+                clearTimeout(verifyCurrentPasswordTimer);
+            }
+
+            verifyCurrentPasswordTimer = setTimeout(verifyCurrentPassword, 350);
         }
 
         function syncPasswordModalState() {
@@ -1016,21 +1219,23 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             const newPassword = newPasswordInput.value.trim();
             const confirmPassword = confirmPasswordInput.value.trim();
 
-            const isCurrentPasswordValid = isPasswordLengthValid(currentPassword);
-            const isNewPasswordValid = isPasswordLengthValid(newPassword);
-            const isConfirmPasswordValid = isPasswordLengthValid(confirmPassword);
+            const isCurrentPasswordPresent = currentPassword.length > 0;
+            const isCurrentPasswordValid = currentPasswordState === 'valid';
+            const unmetRules = getNewPasswordUnmetRules(newPassword);
+            const hasValidNewPassword = newPassword.length > 0 && unmetRules.length === 0 && isNewPasswordValid(newPassword);
             const isConfirmPasswordMatching = newPassword === confirmPassword && confirmPassword.length > 0;
-            const canSubmit = isCurrentPasswordValid && isNewPasswordValid && isConfirmPasswordValid && isConfirmPasswordMatching;
+            const canSubmit = isCurrentPasswordValid && hasValidNewPassword && isConfirmPasswordMatching;
 
             updatePasswordButton.disabled = !canSubmit;
 
-            if (newPasswordRequirementError) {
-                newPasswordRequirementError.style.display = newPassword.length > 0 && !isNewPasswordValid ? 'block' : 'none';
+            if (!isCurrentPasswordPresent) {
+                showBubble(currentPasswordBubble, []);
+            } else if (currentPasswordState === 'checking') {
+                showBubble(currentPasswordBubble, ['Checking current password...']);
             }
 
-            if (confirmPasswordMatchError) {
-                confirmPasswordMatchError.style.display = confirmPassword.length > 0 && !isConfirmPasswordMatching ? 'block' : 'none';
-            }
+            showBubble(newPasswordBubble, newPassword.length > 0 && !hasValidNewPassword ? unmetRules : []);
+            showBubble(confirmPasswordBubble, confirmPassword.length > 0 && !isConfirmPasswordMatching ? ['Confirmation password must match the new password.'] : []);
         }
 
         [currentPasswordInput, newPasswordInput, confirmPasswordInput].forEach(function (input) {
@@ -1038,13 +1243,249 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             input.addEventListener('input', syncPasswordModalState);
         });
 
+        if (currentPasswordInput) {
+            currentPasswordInput.addEventListener('input', function () {
+                currentPasswordState = currentPasswordInput.value.trim().length ? 'checking' : 'idle';
+                queueCurrentPasswordVerification();
+            });
+            currentPasswordInput.addEventListener('blur', verifyCurrentPassword);
+        }
+
         syncPasswordModalState();
 
         // Auto-open password modal if there are validation errors
-        @if ($errors->any())
+        @if ($errors->has('current_password') || $errors->has('new_password') || $errors->has('confirm_password'))
             var modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
             modal.show();
         @endif
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileForm = document.getElementById('coordinatorProfileForm');
+        if (!profileForm) {
+            return;
+        }
+
+        const emailCheckUrl = profileForm.dataset.emailCheckUrl || '';
+        const currentUserId = profileForm.dataset.currentUserId || '';
+        const nameFieldConfig = [
+            { id: 'first_name', bubbleId: 'firstNameBubble', optional: false },
+            { id: 'middle_name', bubbleId: 'middleNameBubble', optional: true },
+            { id: 'last_name', bubbleId: 'lastNameBubble', optional: false },
+        ];
+        const emailInput = document.getElementById('email');
+        let emailCheckTimer = null;
+        let emailRequestCounter = 0;
+
+        function setInputErrorState(input, hasError) {
+            if (!input) return;
+            input.style.borderColor = hasError ? '#dc2626' : '';
+            input.style.boxShadow = hasError ? '0 0 0 3px rgba(220,38,38,0.1)' : '';
+        }
+
+        function showFieldBubble(bubbleId, message) {
+            const bubble = document.getElementById(bubbleId);
+            if (!bubble) return;
+
+            if (!message) {
+                bubble.innerHTML = '';
+                bubble.classList.remove('active');
+                return;
+            }
+
+            const messages = Array.isArray(message) ? message : [message];
+            bubble.innerHTML = messages.map(function (item) {
+                return '<div>' + item + '</div>';
+            }).join('');
+            bubble.classList.add('active');
+        }
+
+        function sanitizeNameValue(value) {
+            let sanitized = (value || '').replace(/[^\p{L}\s'\-]/gu, '');
+            sanitized = sanitized.replace(/\s+/g, ' ');
+            sanitized = sanitized.replace(/\s*-\s*/g, '-');
+            sanitized = sanitized.replace(/\s*'\s*/g, "'");
+            sanitized = sanitized.replace(/-{2,}/g, '-');
+            sanitized = sanitized.replace(/'{2,}/g, "'");
+            sanitized = sanitized.trim();
+
+            return sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
+                return separator + character.toUpperCase();
+            });
+        }
+
+        function getNameValidationError(value, isOptional) {
+            const trimmed = (value || '').trim();
+            if (!trimmed) {
+                return isOptional ? '' : 'This field is required.';
+            }
+
+            if (!/^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u.test(trimmed)) {
+                return 'Use letters only. Apostrophes and hyphens are allowed.';
+            }
+
+            if (!/^[\p{Lu}]/u.test(trimmed)) {
+                return 'Name must start with a capital letter.';
+            }
+
+            return '';
+        }
+
+        async function checkEmailAvailability(email) {
+            const trimmedEmail = (email || '').trim();
+
+            if (!trimmedEmail) {
+                return { available: false, message: 'Email is required.' };
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+                return { available: false, message: 'Please enter a valid email address.' };
+            }
+
+            const requestId = ++emailRequestCounter;
+
+            try {
+                const response = await fetch(emailCheckUrl + '?email=' + encodeURIComponent(trimmedEmail) + '&ignore_id=' + encodeURIComponent(currentUserId), {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const payload = await response.json();
+
+                if (requestId !== emailRequestCounter) {
+                    return { available: false, message: 'Checking email availability...' };
+                }
+
+                return {
+                    available: Boolean(payload.available),
+                    message: payload.message || (payload.available ? 'Email is available.' : 'This email is already in use.')
+                };
+            } catch (error) {
+                return { available: false, message: 'Unable to verify email right now. Please try again.' };
+            }
+        }
+
+        nameFieldConfig.forEach(function (field) {
+            const input = document.getElementById(field.id);
+            if (!input) return;
+
+            function syncNameField(showBubble) {
+                input.value = sanitizeNameValue(input.value);
+                const validationError = getNameValidationError(input.value, field.optional);
+                input.setCustomValidity(validationError);
+                setInputErrorState(input, Boolean(validationError));
+                showFieldBubble(field.bubbleId, showBubble ? validationError : '');
+            }
+
+            input.addEventListener('input', function () {
+                syncNameField(false);
+            });
+
+            input.addEventListener('blur', function () {
+                syncNameField(Boolean(input.value.trim()));
+            });
+        });
+
+        if (emailInput) {
+            emailInput.addEventListener('input', function () {
+                const value = emailInput.value.trim();
+
+                if (emailCheckTimer) {
+                    clearTimeout(emailCheckTimer);
+                }
+
+                if (!value) {
+                    emailInput.setCustomValidity('Email is required.');
+                    setInputErrorState(emailInput, false);
+                    showFieldBubble('emailBubble', '');
+                    return;
+                }
+
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    emailInput.setCustomValidity('Please enter a valid email address.');
+                    setInputErrorState(emailInput, true);
+                    showFieldBubble('emailBubble', 'Please enter a valid email address.');
+                    return;
+                }
+
+                emailInput.setCustomValidity('');
+                setInputErrorState(emailInput, false);
+                showFieldBubble('emailBubble', '');
+
+                emailCheckTimer = setTimeout(async function () {
+                    const result = await checkEmailAvailability(value);
+                    if (emailInput.value.trim() !== value) {
+                        return;
+                    }
+
+                    if (!result.available) {
+                        emailInput.setCustomValidity(result.message);
+                        setInputErrorState(emailInput, true);
+                        showFieldBubble('emailBubble', result.message);
+                    } else {
+                        emailInput.setCustomValidity('');
+                        setInputErrorState(emailInput, false);
+                        showFieldBubble('emailBubble', '');
+                    }
+                }, 350);
+            });
+        }
+
+        profileForm.addEventListener('submit', async function (event) {
+            if (profileForm.dataset.submitting === 'true') {
+                return;
+            }
+
+            event.preventDefault();
+            let hasError = false;
+
+            nameFieldConfig.forEach(function (field) {
+                const input = document.getElementById(field.id);
+                if (!input) return;
+
+                input.value = sanitizeNameValue(input.value);
+                const validationError = getNameValidationError(input.value, field.optional);
+                input.setCustomValidity(validationError);
+                setInputErrorState(input, Boolean(validationError));
+                showFieldBubble(field.bubbleId, validationError);
+                if (validationError) {
+                    hasError = true;
+                }
+            });
+
+            if (emailInput) {
+                const value = emailInput.value.trim();
+
+                if (!value) {
+                    emailInput.setCustomValidity('Email is required.');
+                    setInputErrorState(emailInput, true);
+                    showFieldBubble('emailBubble', 'Email is required.');
+                    hasError = true;
+                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    emailInput.setCustomValidity('Please enter a valid email address.');
+                    setInputErrorState(emailInput, true);
+                    showFieldBubble('emailBubble', 'Please enter a valid email address.');
+                    hasError = true;
+                } else {
+                    const result = await checkEmailAvailability(value);
+                    if (!result.available) {
+                        emailInput.setCustomValidity(result.message);
+                        setInputErrorState(emailInput, true);
+                        showFieldBubble('emailBubble', result.message);
+                        hasError = true;
+                    } else {
+                        emailInput.setCustomValidity('');
+                        setInputErrorState(emailInput, false);
+                        showFieldBubble('emailBubble', '');
+                    }
+                }
+            }
+
+            if (hasError) {
+                return;
+            }
+
+            profileForm.dataset.submitting = 'true';
+            profileForm.submit();
+        });
     });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>

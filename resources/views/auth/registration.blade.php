@@ -14,6 +14,103 @@
         #step2 .input-wrap input,
         #step2 .input-wrap select { padding: 10px 40px; font-size: 14px; }
         #step2 .nav-btn-row { margin-top: 8px; gap: 8px; }
+
+        #step1 .fields-grid {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 12px 14px;
+            align-items: start;
+        }
+
+        #step1 .field-group.compact .input-wrap input {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        #step1 .field-group.span-2 {
+            grid-column: span 2;
+        }
+
+        #step1 .field-group.span-3 {
+            grid-column: span 3;
+        }
+
+        #step1 .field-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .input-wrap.has-bubble {
+            overflow: visible;
+        }
+
+        .field-bubble {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: calc(100% + 8px);
+            z-index: 30;
+            padding: 8px 11px;
+            border-radius: 12px;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            color: #9a3412;
+            font-size: 11.5px;
+            line-height: 1.35;
+            box-shadow: 0 10px 24px rgba(59, 0, 0, 0.18);
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            pointer-events: none;
+        }
+
+        .field-bubble.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .field-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 22px;
+            width: 12px;
+            height: 12px;
+            background: #fff7ed;
+            border-bottom: 1px solid #fdba74;
+            border-right: 1px solid #fdba74;
+            transform: rotate(45deg);
+        }
+
+        @media (max-width: 1023px) {
+            #step1 .fields-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            #step1 .field-group.compact,
+            #step1 .field-group.span-2,
+            #step1 .field-group.span-3,
+            #step1 .field-group.full-width {
+                grid-column: auto;
+            }
+
+            #step1 .field-group.full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #step1 .fields-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #step1 .field-group.compact,
+            #step1 .field-group.span-2,
+            #step1 .field-group.span-3,
+            #step1 .field-group.full-width {
+                grid-column: 1;
+            }
+        }
     </style>
 
     <meta charset="UTF-8">
@@ -447,7 +544,7 @@
 
                         <div class="fields-grid">
 
-                            <div class="field-group">
+                            <div class="field-group span-2">
                                 <label class="form-label">First Name</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
@@ -457,8 +554,8 @@
                                 <span class="text-danger">@error('first_name') {{ $message }} @enderror</span>
                             </div>
 
-                            <div class="field-group">
-                                <label class="form-label">Middle Name</label>
+                            <div class="field-group span-2">
+                                <label class="form-label">Middle Name <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(Optional)</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" placeholder="eg. Dela" name="middle_name"
@@ -467,7 +564,7 @@
                                 <span class="text-danger">@error('middle_name') {{ $message }} @enderror</span>
                             </div>
 
-                            <div class="field-group">
+                            <div class="field-group span-2">
                                 <label class="form-label">Last Name</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
@@ -477,39 +574,50 @@
                                 <span class="text-danger">@error('last_name') {{ $message }} @enderror</span>
                             </div>
 
-                            <div class="field-group">
+                            <div class="field-group span-3">
                                 <label class="form-label">E-mail Address</label>
-                                <div class="input-wrap">
+                                <div class="input-wrap has-bubble">
                                     <i class="fa fa-envelope i-icon"></i>
                                     <input type="text" placeholder="Enter email" name="email"
                                         id="reg_email" value="{{ old('email') }}">
+                                    <div id="emailBubble" class="field-bubble"></div>
                                 </div>
-                                <div id="emailRequirementNotice" style="display:none; margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;"></div>
                                 <span class="text-danger">@error('email') {{ $message }} @enderror</span>
                             </div>
 
-                            <div class="field-group">
-                                <label class="form-label">Student No.</label>
-                                <div class="input-wrap">
+                            <div class="field-group span-3">
+                                <label class="form-label">Student No. <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(Format: YYYY-12345-TG-0)</span></label>
+                                <div class="input-wrap has-bubble">
                                     <i class="fa fa-id-card i-icon"></i>
-                                    <input type="text" placeholder="202X-000XX-TG-0" name="studentNum"
-                                        id="studentNum">
+                                    <input type="text" placeholder="Enter student number" name="studentNum"
+                                        id="studentNum" value="{{ old('studentNum') }}" maxlength="16" autocapitalize="characters" spellcheck="false">
+                                    <div id="studentNumBubble" class="field-bubble"></div>
                                 </div>
                                 <span class="text-danger">@error('studentNum') {{ $message }} @enderror</span>
                             </div>
 
-                            <div class="field-group">
-                                <label class="form-label">Password <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(8-12 characters)</span></label>
-                                <div class="input-wrap">
+                            <div class="field-group span-3">
+                                <label class="form-label">Password <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(8-12 chars, upper/lower/number/!@#$%^&*)</span></label>
+                                <div class="input-wrap has-bubble">
                                     <i class="fa fa-lock i-icon"></i>
                                     <input type="password" placeholder="Create password" name="password"
-                                        id="reg_password">
+                                        id="reg_password" minlength="8" maxlength="12">
                                     <i class="far fa-eye toggle-pw" id="toggleRegPassword"></i>
-                                </div>
-                                <div id="passwordRequirementNotice" style="display:none; margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
-                                    Password must be 8 to 12 characters long before you can proceed.
+                                    <div id="passwordBubble" class="field-bubble"></div>
                                 </div>
                                 <span class="text-danger">@error('password') {{ $message }} @enderror</span>
+                            </div>
+
+                            <div class="field-group span-3">
+                                <label class="form-label">Confirm Password</label>
+                                <div class="input-wrap has-bubble">
+                                    <i class="fa fa-lock i-icon"></i>
+                                    <input type="password" placeholder="Re-enter password" name="confirm_password"
+                                        id="reg_confirm_password" minlength="8" maxlength="12">
+                                    <i class="far fa-eye toggle-pw" id="toggleRegConfirmPassword"></i>
+                                    <div id="confirmPasswordBubble" class="field-bubble"></div>
+                                </div>
+                                <span class="text-danger">@error('confirm_password') {{ $message }} @enderror</span>
                             </div>
 
                         </div>
@@ -608,11 +716,13 @@
                             </div>
 
                             <div class="field-group">
-                                <label class="form-label">Year and Section</label>
-                                <div class="input-wrap">
+                                <label class="form-label">Year and Section <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(Format: 4-1)</span></label>
+                                <div class="input-wrap has-bubble">
                                     <i class="fa fa-users i-icon"></i>
-                                    <input type="text" placeholder="e.g. 4-1" name="year_and_section">
+                                    <input type="text" placeholder="e.g. 4-1" name="year_and_section" id="year_and_section" value="{{ old('year_and_section') }}" maxlength="10" spellcheck="false">
+                                    <div id="yearSectionBubble" class="field-bubble"></div>
                                 </div>
+                                <span class="text-danger">@error('year_and_section') {{ $message }} @enderror</span>
                             </div>
 
                         </div>
@@ -647,6 +757,94 @@
     let emailAvailabilityStatus = 'idle';
     let emailCheckRequestCounter = 0;
 
+    function evaluatePasswordRequirements(password) {
+        const unmet = [];
+        if (password.length < 8 || password.length > 12) {
+            unmet.push('Use 8 to 12 characters.');
+        }
+        if (!/[A-Z]/.test(password)) {
+            unmet.push('Add an uppercase letter.');
+        }
+        if (!/[a-z]/.test(password)) {
+            unmet.push('Add a lowercase letter.');
+        }
+        if (!/\d/.test(password)) {
+            unmet.push('Add a number.');
+        }
+        if (!/[!@#$%^&*]/.test(password)) {
+            unmet.push('Add one symbol: ! @ # $ % ^ & *.');
+        }
+        if (/[^A-Za-z\d!@#$%^&*]/.test(password)) {
+            unmet.push('Use only these symbols: ! @ # $ % ^ & *.');
+        }
+
+        return {
+            isValid: unmet.length === 0,
+            unmet,
+        };
+    }
+
+    function showFieldBubble(bubbleId, message) {
+        const bubble = document.getElementById(bubbleId);
+        if (!bubble) {
+            return;
+        }
+
+        if (!message) {
+            bubble.textContent = '';
+            bubble.classList.remove('active');
+            return;
+        }
+
+        const messages = Array.isArray(message) ? message : [message];
+        bubble.innerHTML = messages.map(item => `<div>${item}</div>`).join('');
+        bubble.classList.add('active');
+    }
+
+    function hideFieldBubble(bubbleId) {
+        showFieldBubble(bubbleId, '');
+    }
+
+    function getStudentNumberValidationError(value) {
+        const trimmed = (value || '').trim().toUpperCase();
+        if (!trimmed) {
+            return 'Student number is required.';
+        }
+
+        if (!/^\d{4}-\d{5}-TG-0$/.test(trimmed)) {
+            return 'Use this format: YYYY-12345-TG-0.';
+        }
+
+        return '';
+    }
+
+    function sanitizeYearAndSectionValue(value) {
+        let sanitized = (value || '').replace(/[^\d-]/g, '');
+        sanitized = sanitized.replace(/-{2,}/g, '-');
+
+        const firstHyphenIndex = sanitized.indexOf('-');
+        if (firstHyphenIndex !== -1) {
+            const before = sanitized.slice(0, firstHyphenIndex + 1);
+            const after = sanitized.slice(firstHyphenIndex + 1).replace(/-/g, '');
+            sanitized = before + after;
+        }
+
+        return sanitized;
+    }
+
+    function getYearAndSectionValidationError(value) {
+        const trimmed = (value || '').trim();
+        if (!trimmed) {
+            return 'Year and section is required.';
+        }
+
+        if (!/^\d+-\d+$/.test(trimmed)) {
+            return 'Use this format: 4-1.';
+        }
+
+        return '';
+    }
+
     async function goToStep2() {
         if (!document.getElementById('step1') || !document.getElementById('step2')) {
             return;
@@ -658,8 +856,7 @@
         const email      = document.getElementById('reg_email').value.trim();
         const studentNum = document.getElementById('studentNum').value.trim();
         const password   = document.getElementById('reg_password').value.trim();
-        const emailNotice = document.getElementById('emailRequirementNotice');
-        const passwordNotice = document.getElementById('passwordRequirementNotice');
+        const confirmPassword = document.getElementById('reg_confirm_password').value.trim();
 
         const requiredFields = [
             { id: 'first_name',   val: firstName  },
@@ -667,6 +864,7 @@
             { id: 'reg_email',    val: email      },
             { id: 'studentNum',   val: studentNum },
             { id: 'reg_password', val: password   },
+            { id: 'reg_confirm_password', val: confirmPassword },
         ];
 
         let hasError = false;
@@ -682,19 +880,29 @@
             }
         });
 
-        const isPasswordLengthValid = password.length >= 8 && password.length <= 12;
+        const passwordValidation = evaluatePasswordRequirements(password);
         const passwordInput = document.getElementById('reg_password');
+        const confirmPasswordInput = document.getElementById('reg_confirm_password');
         const emailInput = document.getElementById('reg_email');
+        const studentNumInput = document.getElementById('studentNum');
+        const studentNumValidationError = getStudentNumberValidationError(studentNum);
 
-        if (!isPasswordLengthValid && passwordInput) {
+        if (!passwordValidation.isValid && passwordInput) {
             hasError = true;
             passwordInput.style.borderColor = '#dc2626';
             passwordInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
-            if (passwordNotice) {
-                passwordNotice.style.display = 'block';
-            }
-        } else if (passwordNotice) {
-            passwordNotice.style.display = 'none';
+            showFieldBubble('passwordBubble', passwordValidation.unmet);
+        } else {
+            hideFieldBubble('passwordBubble');
+        }
+
+        if (confirmPassword && password !== confirmPassword && confirmPasswordInput) {
+            hasError = true;
+            confirmPasswordInput.style.borderColor = '#dc2626';
+            confirmPasswordInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+            showFieldBubble('confirmPasswordBubble', 'Password confirmation does not match.');
+        } else {
+            hideFieldBubble('confirmPasswordBubble');
         }
 
         if (email && emailInput) {
@@ -703,11 +911,19 @@
                 hasError = true;
                 emailInput.style.borderColor = '#dc2626';
                 emailInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
-                if (emailNotice) {
-                    emailNotice.textContent = emailCheck.message;
-                    emailNotice.style.display = 'block';
-                }
+                showFieldBubble('emailBubble', emailCheck.message);
+            } else {
+                hideFieldBubble('emailBubble');
             }
+        }
+
+        if (studentNumValidationError && studentNumInput) {
+            hasError = true;
+            studentNumInput.style.borderColor = '#dc2626';
+            studentNumInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+            showFieldBubble('studentNumBubble', studentNumValidationError);
+        } else {
+            hideFieldBubble('studentNumBubble');
         }
 
         if (hasError) return;
@@ -755,29 +971,45 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function sanitizeNameValue(value) {
+        let sanitized = (value || '').replace(/[^\p{L}\s'\-]/gu, '');
+        sanitized = sanitized.replace(/\s+/g, ' ');
+        sanitized = sanitized.replace(/\s*-\s*/g, '-');
+        sanitized = sanitized.replace(/\s*'\s*/g, "'");
+        sanitized = sanitized.replace(/-{2,}/g, '-');
+        sanitized = sanitized.replace(/'{2,}/g, "'");
+        sanitized = sanitized.trim();
+
+        return sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
+            return separator + character.toUpperCase();
+        });
+    }
+
+    function getNameValidationError(value, isOptional = false) {
+        const trimmed = (value || '').trim();
+        if (!trimmed) {
+            return isOptional ? '' : 'This field is required.';
+        }
+
+        if (!/^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u.test(trimmed)) {
+            return "Use letters only. Apostrophes and hyphens are allowed.";
+        }
+
+        if (!/^[\p{Lu}]/u.test(trimmed)) {
+            return 'Name must start with a capital letter.';
+        }
+
+        return '';
+    }
+
     function normalizeNameField(fieldId) {
         const input = document.getElementById(fieldId);
         if (!input) return;
 
-        const value = input.value.replace(/\s+/g, ' ').trim();
-        if (!value) {
-            input.value = '';
-            return;
-        }
-
-        input.value = value.charAt(0).toUpperCase() + value.slice(1);
+        input.value = sanitizeNameValue(input.value);
     }
 
-    function isCapitalizedName(value) {
-        const trimmed = value.replace(/\s+/g, ' ').trim();
-        if (!trimmed) {
-            return false;
-        }
-
-        return /^[\p{Lu}][\p{L}\s'\-]*$/u.test(trimmed);
-    }
-
-    function validateCapitalizedNameFields() {
+    function validateNameFields() {
         const fieldIds = ['first_name', 'middle_name', 'last_name'];
 
         for (const fieldId of fieldIds) {
@@ -786,9 +1018,11 @@
 
             const value = input.value.trim();
             input.setCustomValidity('');
+            const isOptional = fieldId === 'middle_name';
+            const validationError = getNameValidationError(value, isOptional);
 
-            if (value && !isCapitalizedName(value)) {
-                input.setCustomValidity('Name must start with a capital letter.');
+            if (validationError) {
+                input.setCustomValidity(validationError);
                 input.reportValidity();
                 input.style.borderColor = '#dc2626';
                 input.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
@@ -854,10 +1088,12 @@
         }
 
         const emailInput = document.getElementById('reg_email');
-        const emailNotice = document.getElementById('emailRequirementNotice');
+        const studentNumInput = document.getElementById('studentNum');
+        const yearAndSectionInput = document.getElementById('year_and_section');
         const toggleRegPassword = document.getElementById('toggleRegPassword');
+        const toggleRegConfirmPassword = document.getElementById('toggleRegConfirmPassword');
         const passwordInput = document.getElementById('reg_password');
-        const passwordNotice = document.getElementById('passwordRequirementNotice');
+        const confirmPasswordInput = document.getElementById('reg_confirm_password');
         if (toggleRegPassword) {
             toggleRegPassword.addEventListener('click', function () {
                 if (!passwordInput) {
@@ -870,19 +1106,65 @@
             });
         }
 
-        if (passwordInput) {
-            passwordInput.addEventListener('input', function () {
-                const isPasswordLengthValid = this.value.length >= 8 && this.value.length <= 12;
-
-                if (passwordNotice) {
-                    passwordNotice.style.display = isPasswordLengthValid || this.value.length === 0 ? 'none' : 'block';
+        if (toggleRegConfirmPassword) {
+            toggleRegConfirmPassword.addEventListener('click', function () {
+                if (!confirmPasswordInput) {
+                    return;
                 }
 
-                if (isPasswordLengthValid || this.value.length === 0) {
-                    this.style.borderColor = '';
-                    this.style.boxShadow = '';
-                }
+                confirmPasswordInput.type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
             });
+        }
+
+        function syncPasswordValidationState() {
+            if (!passwordInput || !confirmPasswordInput) {
+                return;
+            }
+
+            const passwordValidation = evaluatePasswordRequirements(passwordInput.value);
+            const hasPasswordValue = passwordInput.value.length > 0;
+            const hasConfirmValue = confirmPasswordInput.value.length > 0;
+            const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+
+            if (!hasPasswordValue && !hasConfirmValue) {
+                hideFieldBubble('passwordBubble');
+                hideFieldBubble('confirmPasswordBubble');
+                passwordInput.style.borderColor = '';
+                passwordInput.style.boxShadow = '';
+                confirmPasswordInput.style.borderColor = '';
+                confirmPasswordInput.style.boxShadow = '';
+                return;
+            }
+
+            if (!passwordValidation.isValid) {
+                showFieldBubble('passwordBubble', passwordValidation.unmet);
+                passwordInput.style.borderColor = '#dc2626';
+                passwordInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+            } else {
+                hideFieldBubble('passwordBubble');
+                passwordInput.style.borderColor = '';
+                passwordInput.style.boxShadow = '';
+            }
+
+            if (hasConfirmValue && !passwordsMatch) {
+                showFieldBubble('confirmPasswordBubble', 'Password confirmation does not match.');
+                confirmPasswordInput.style.borderColor = '#dc2626';
+                confirmPasswordInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+            } else {
+                hideFieldBubble('confirmPasswordBubble');
+                confirmPasswordInput.style.borderColor = '';
+                confirmPasswordInput.style.boxShadow = '';
+            }
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', syncPasswordValidationState);
+        }
+
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('input', syncPasswordValidationState);
         }
 
         const nameFieldIds = ['first_name', 'middle_name', 'last_name'];
@@ -892,12 +1174,74 @@
 
             input.addEventListener('input', function () {
                 normalizeNameField(fieldId);
+                const validationError = getNameValidationError(input.value, fieldId === 'middle_name');
+                input.setCustomValidity(validationError);
             });
 
             input.addEventListener('blur', function () {
                 normalizeNameField(fieldId);
+                const validationError = getNameValidationError(input.value, fieldId === 'middle_name');
+                input.setCustomValidity(validationError);
             });
         });
+
+        if (studentNumInput) {
+            studentNumInput.addEventListener('input', function () {
+                const validationError = getStudentNumberValidationError(studentNumInput.value);
+                studentNumInput.setCustomValidity(validationError);
+
+                if (validationError && studentNumInput.value.trim()) {
+                    showFieldBubble('studentNumBubble', validationError);
+                    studentNumInput.style.borderColor = '#dc2626';
+                    studentNumInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                } else {
+                    hideFieldBubble('studentNumBubble');
+                    studentNumInput.style.borderColor = '';
+                    studentNumInput.style.boxShadow = '';
+                }
+            });
+
+            studentNumInput.addEventListener('blur', function () {
+                const validationError = getStudentNumberValidationError(studentNumInput.value);
+                studentNumInput.setCustomValidity(validationError);
+
+                if (validationError && studentNumInput.value.trim()) {
+                    showFieldBubble('studentNumBubble', validationError);
+                } else {
+                    hideFieldBubble('studentNumBubble');
+                }
+            });
+        }
+
+        if (yearAndSectionInput) {
+            yearAndSectionInput.addEventListener('input', function () {
+                yearAndSectionInput.value = sanitizeYearAndSectionValue(yearAndSectionInput.value);
+                const validationError = getYearAndSectionValidationError(yearAndSectionInput.value);
+                yearAndSectionInput.setCustomValidity(validationError);
+
+                if (validationError && yearAndSectionInput.value.trim()) {
+                    showFieldBubble('yearSectionBubble', validationError);
+                    yearAndSectionInput.style.borderColor = '#dc2626';
+                    yearAndSectionInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                } else {
+                    hideFieldBubble('yearSectionBubble');
+                    yearAndSectionInput.style.borderColor = '';
+                    yearAndSectionInput.style.boxShadow = '';
+                }
+            });
+
+            yearAndSectionInput.addEventListener('blur', function () {
+                yearAndSectionInput.value = sanitizeYearAndSectionValue(yearAndSectionInput.value);
+                const validationError = getYearAndSectionValidationError(yearAndSectionInput.value);
+                yearAndSectionInput.setCustomValidity(validationError);
+
+                if (validationError && yearAndSectionInput.value.trim()) {
+                    showFieldBubble('yearSectionBubble', validationError);
+                } else {
+                    hideFieldBubble('yearSectionBubble');
+                }
+            });
+        }
 
         if (emailInput) {
             let emailCheckTimer = null;
@@ -913,9 +1257,7 @@
                 if (!value) {
                     this.style.borderColor = '';
                     this.style.boxShadow = '';
-                    if (emailNotice) {
-                        emailNotice.style.display = 'none';
-                    }
+                    hideFieldBubble('emailBubble');
                     return;
                 }
 
@@ -925,21 +1267,14 @@
                         return;
                     }
 
-                    if (emailNotice) {
-                        if (!result.available) {
-                            emailNotice.textContent = result.message;
-                            emailNotice.style.display = 'block';
-                        } else {
-                            emailNotice.style.display = 'none';
-                        }
-                    }
-
                     if (!result.available) {
                         this.style.borderColor = '#dc2626';
                         this.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                        showFieldBubble('emailBubble', result.message);
                     } else {
                         this.style.borderColor = '';
                         this.style.boxShadow = '';
+                        hideFieldBubble('emailBubble');
                     }
                 }, 350);
             });
@@ -948,7 +1283,64 @@
         regForm.addEventListener('submit', function (event) {
             nameFieldIds.forEach(normalizeNameField);
 
-            if (!validateCapitalizedNameFields()) {
+            if (passwordInput) {
+                const passwordValidation = evaluatePasswordRequirements(passwordInput.value.trim());
+                const confirmPasswordValue = confirmPasswordInput ? confirmPasswordInput.value.trim() : '';
+                if (!passwordValidation.isValid) {
+                    event.preventDefault();
+                    passwordInput.style.borderColor = '#dc2626';
+                    passwordInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                    showFieldBubble('passwordBubble', passwordValidation.unmet);
+                } else {
+                    hideFieldBubble('passwordBubble');
+                }
+
+                if (confirmPasswordInput && passwordInput.value.trim() !== confirmPasswordValue) {
+                    event.preventDefault();
+                    confirmPasswordInput.style.borderColor = '#dc2626';
+                    confirmPasswordInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                    showFieldBubble('confirmPasswordBubble', 'Password confirmation does not match.');
+                } else {
+                    hideFieldBubble('confirmPasswordBubble');
+                    if (confirmPasswordInput) {
+                        confirmPasswordInput.style.borderColor = '';
+                        confirmPasswordInput.style.boxShadow = '';
+                    }
+                }
+            }
+
+            if (studentNumInput) {
+                const validationError = getStudentNumberValidationError(studentNumInput.value);
+                studentNumInput.setCustomValidity(validationError);
+                if (validationError) {
+                    event.preventDefault();
+                    studentNumInput.style.borderColor = '#dc2626';
+                    studentNumInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                    showFieldBubble('studentNumBubble', validationError);
+                } else {
+                    hideFieldBubble('studentNumBubble');
+                    studentNumInput.style.borderColor = '';
+                    studentNumInput.style.boxShadow = '';
+                }
+            }
+
+            if (yearAndSectionInput) {
+                yearAndSectionInput.value = sanitizeYearAndSectionValue(yearAndSectionInput.value);
+                const validationError = getYearAndSectionValidationError(yearAndSectionInput.value);
+                yearAndSectionInput.setCustomValidity(validationError);
+                if (validationError) {
+                    event.preventDefault();
+                    yearAndSectionInput.style.borderColor = '#dc2626';
+                    yearAndSectionInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                    showFieldBubble('yearSectionBubble', validationError);
+                } else {
+                    hideFieldBubble('yearSectionBubble');
+                    yearAndSectionInput.style.borderColor = '';
+                    yearAndSectionInput.style.boxShadow = '';
+                }
+            }
+
+            if (!validateNameFields()) {
                 event.preventDefault();
             }
         });

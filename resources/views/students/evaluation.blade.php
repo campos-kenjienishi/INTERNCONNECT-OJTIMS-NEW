@@ -6,6 +6,53 @@
     :headerActionUrl="url('/student/home')"
     headerActionLabel="Back to Home"
 >
+    <style>
+        .email-bubble-wrap {
+            position: relative;
+            overflow: visible;
+        }
+
+        .field-bubble-shell {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: calc(100% + 8px);
+            z-index: 20;
+            padding: 8px 11px;
+            border-radius: 12px;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            color: #9a3412;
+            font-size: 11.5px;
+            line-height: 1.35;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            pointer-events: none;
+        }
+
+        .field-bubble-shell.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .field-bubble-shell::before {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 22px;
+            width: 12px;
+            height: 12px;
+            background: #fff7ed;
+            border-bottom: 1px solid #fdba74;
+            border-right: 1px solid #fdba74;
+            transform: rotate(45deg);
+        }
+    </style>
+
     @if(session('success'))
         <div class="flash-alert success">{{ session('success') }}</div>
     @endif
@@ -49,13 +96,16 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label-shell">Supervisor Email</label>
-                        <input type="email" name="supervisor_email" class="form-control-shell" value="{{ old('supervisor_email', $expectedSupervisorEmail ?? '') }}" placeholder="name@company.com" required>
+                        <div class="email-bubble-wrap">
+                            <input type="email" name="supervisor_email" class="form-control-shell" value="{{ old('supervisor_email', $expectedSupervisorEmail ?? '') }}" placeholder="name@company.com" required>
+                            <div id="supervisorEmailBubble" class="field-bubble-shell"></div>
+                        </div>
                         <div class="form-hint">If you use an email different from your MOA entry, the system will ask for confirmation.</div>
                     </div>
                 </div>
 
                 <div class="section-gap stacked-actions">
-                    <button type="submit" class="btn-eval btn-eval-primary">
+                    <button type="submit" class="btn-eval btn-eval-primary" id="sendEvaluationButton">
                         <i class="fa fa-envelope"></i> Send Evaluation Form
                     </button>
                 </div>
@@ -191,10 +241,68 @@
 
             const emailInput = form.querySelector('input[name="supervisor_email"]');
             const confirmInput = document.getElementById('confirmEmailMismatch');
+            const submitButton = document.getElementById('sendEvaluationButton');
+            const emailBubble = document.getElementById('supervisorEmailBubble');
             const expectedEmail = (form.dataset.expectedEmail || '').trim().toLowerCase();
+            const ownEmail = @json(strtolower((string) ($data->email ?? '')));
+
+            function showEmailBubble(message) {
+                if (!emailBubble) {
+                    return;
+                }
+
+                if (!message) {
+                    emailBubble.textContent = '';
+                    emailBubble.classList.remove('active');
+                    return;
+                }
+
+                emailBubble.textContent = message;
+                emailBubble.classList.add('active');
+            }
+
+            function syncSupervisorEmailGuard() {
+                if (!emailInput) {
+                    return false;
+                }
+
+                const entered = (emailInput.value || '').trim().toLowerCase();
+                const isOwnEmail = Boolean(ownEmail) && entered !== '' && entered === ownEmail;
+
+                if (submitButton) {
+                    submitButton.disabled = isOwnEmail;
+                    submitButton.style.opacity = isOwnEmail ? '0.6' : '';
+                    submitButton.style.cursor = isOwnEmail ? 'not-allowed' : '';
+                }
+
+                if (isOwnEmail) {
+                    emailInput.setCustomValidity('Do not use your own student email.');
+                    emailInput.style.borderColor = '#dc2626';
+                    emailInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+                    showEmailBubble("Don't use your own student email. Enter your supervisor's email.");
+                    return true;
+                }
+
+                emailInput.setCustomValidity('');
+                emailInput.style.borderColor = '';
+                emailInput.style.boxShadow = '';
+                showEmailBubble('');
+                return false;
+            }
+
+            if (emailInput) {
+                emailInput.addEventListener('input', syncSupervisorEmailGuard);
+                emailInput.addEventListener('blur', syncSupervisorEmailGuard);
+                syncSupervisorEmailGuard();
+            }
 
             form.addEventListener('submit', function (event) {
                 if (!emailInput || !confirmInput) {
+                    return;
+                }
+
+                if (syncSupervisorEmailGuard()) {
+                    event.preventDefault();
                     return;
                 }
 
@@ -202,12 +310,35 @@
                 const entered = (emailInput.value || '').trim().toLowerCase();
 
                 if (expectedEmail && entered && expectedEmail !== entered) {
-                    const proceed = window.confirm('The entered email does not match the email from your submitted MOA. Are you sure you want to continue?');
-                    if (!proceed) {
-                        event.preventDefault();
+                    event.preventDefault();
+
+                    const proceed = function () {
+                        confirmInput.value = '1';
+                        form.submit();
+                    };
+
+                    if (typeof Swal === 'undefined') {
+                        if (window.confirm('The entered email does not match the email from your submitted MOA. Are you sure you want to continue?')) {
+                            proceed();
+                        }
                         return;
                     }
-                    confirmInput.value = '1';
+
+                    Swal.fire({
+                        title: 'Use different supervisor email?',
+                        html: 'The email you entered does not match the supervisor email from your submitted MOA.<br><br>Only continue if this is intentional.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Yes, continue',
+                        cancelButtonText: 'Go back',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            proceed();
+                        }
+                    });
                 }
             });
         })();

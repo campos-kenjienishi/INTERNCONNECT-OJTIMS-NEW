@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 use App\Models\Company; // ADD THIS at the top
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -180,6 +181,24 @@ public function home()
         if (!$user) {
             return back()->with('error', 'User not found.');
         }
+
+        $request->validate([
+            'first_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'middle_name' => ['nullable', 'regex:' . $this->nameValidationPattern()],
+            'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
+            'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
+        ], array_merge(
+            $this->nameValidationMessages(),
+            $this->studentNumberValidationMessages(),
+            $this->yearAndSectionValidationMessages(),
+            [
+                'email.required' => 'Email is required.',
+                'email.email' => 'Please enter a valid email address.',
+                'email.unique' => 'This email is already in use.',
+            ]
+        ));
  
 
 
@@ -221,6 +240,45 @@ public function home()
     
             return back()->with('success', 'You have updated the information successfully!');
       
+    }
+
+    protected function nameValidationPattern(): string
+    {
+        return "/^[\\p{L}]+(?:[ '\\-][\\p{L}]+)*$/u";
+    }
+
+    protected function nameValidationMessages(): array
+    {
+        return [
+            'first_name.regex' => "First name may only contain letters, spaces, apostrophes, and hyphens.",
+            'middle_name.regex' => "Middle name may only contain letters, spaces, apostrophes, and hyphens.",
+            'last_name.regex' => "Last name may only contain letters, spaces, apostrophes, and hyphens.",
+        ];
+    }
+
+    protected function studentNumberValidationPattern(): string
+    {
+        return "/^\\d{4}-\\d{5}-TG-0$/";
+    }
+
+    protected function studentNumberValidationMessages(): array
+    {
+        return [
+            'studentNum.regex' => 'Student number must follow this format: YYYY-12345-TG-0.',
+        ];
+    }
+
+    protected function yearAndSectionValidationPattern(): string
+    {
+        return "/^\\d+-\\d+$/";
+    }
+
+    protected function yearAndSectionValidationMessages(): array
+    {
+        return [
+            'year_and_section.required' => 'Year and section is required.',
+            'year_and_section.regex' => 'Year and section must follow this format: 4-1.',
+        ];
     }
 
     public function class()

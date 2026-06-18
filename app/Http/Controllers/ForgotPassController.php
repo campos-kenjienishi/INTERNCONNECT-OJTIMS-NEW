@@ -47,7 +47,19 @@ class ForgotPassController extends Controller
         $email = $request->query('email');
         
         $request->validate([
-            'confirm_password' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:12',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/',
+            ],
+            'confirm_password' => 'required|same:password',
+        ], [
+            'password.min' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            'password.max' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            'password.regex' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            'confirm_password.same' => 'Password confirmation does not match.',
         ]);
         
         $user = User::where('email', $email)->first();
@@ -56,7 +68,7 @@ class ForgotPassController extends Controller
             return back()->with('fail', 'Email not found');
         }
         
-        $user->password = Hash::make($request->input('confirm_password'));
+        $user->password = Hash::make($request->input('password'));
         $res = $user->save();
         
         if ($res) {
@@ -71,4 +83,3 @@ class ForgotPassController extends Controller
 
  
 }
-

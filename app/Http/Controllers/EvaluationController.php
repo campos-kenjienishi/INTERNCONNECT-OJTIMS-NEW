@@ -68,6 +68,13 @@ class EvaluationController extends Controller
 
         $expectedSupervisorEmail = $this->getExpectedSupervisorEmail($student);
         $enteredEmail = trim((string) $request->supervisor_email);
+
+        if (strcasecmp($enteredEmail, (string) $user->email) === 0) {
+            return back()
+                ->withInput()
+                ->with('error', 'Do not use your own student email for the supervisor evaluation request.');
+        }
+
         if (
             !empty($expectedSupervisorEmail)
             && strcasecmp($enteredEmail, $expectedSupervisorEmail) !== 0

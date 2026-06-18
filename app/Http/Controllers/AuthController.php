@@ -48,6 +48,7 @@ class AuthController extends Controller
     public function checkEmailAvailability(Request $request)
     {
         $email = trim((string) $request->query('email', ''));
+        $ignoreId = (int) $request->query('ignore_id', 0);
 
         if ($email === '') {
             return response()->json([
@@ -63,7 +64,11 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $exists = User::where('email', $email)->exists();
+        $exists = User::where('email', $email)
+            ->when($ignoreId > 0, function ($query) use ($ignoreId) {
+                $query->where('id', '!=', $ignoreId);
+            })
+            ->exists();
 
         return response()->json([
             'available' => !$exists,
@@ -73,16 +78,25 @@ class AuthController extends Controller
 
     public function registerUser(Request $request){
         $request->validate([
-            'first_name'=>'required',
-            'last_name'=>'required',
+            'first_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'middle_name' => ['nullable', 'regex:' . $this->nameValidationPattern()],
+            'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
             'email'=>'required|email|unique:users,email',
-            'studentNum'=>'required',
-            'password'=>'required|min:8|max:12'
-        ]);
+            'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
+            'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
+            'password' => $this->passwordRules(),
+            'confirm_password' => 'required|same:password',
+        ], array_merge(
+            $this->nameValidationMessages(),
+            $this->studentNumberValidationMessages(),
+            $this->yearAndSectionValidationMessages(),
+            $this->passwordValidationMessages('password', 'confirm_password')
+        ));
         $student = new OJTInformation();
         $user =new User();
         $studentE =new Student();
         $user->first_name = $request->first_name;
+        $user->middle_name = $request->middle_name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
@@ -841,8 +855,8 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'subject_code' => 'required|string|max:255',
             'subject_description' => 'required|string|max:255',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+            'password' => $this->passwordRules(true),
+        ], $this->passwordValidationMessages('password'));
 
         $user = new User();
         $professor = new Professor();
@@ -1436,6 +1450,74 @@ class AuthController extends Controller
             'uploaded_templates' => $templates,
             'announcements' => $announcements,
         ], $highlights, $watchouts, $actions);
+    }
+
+    protected function passwordRules(bool $confirmed = false): array
+    {
+        $rules = [
+            'required',
+            'string',
+            'min:8',
+            'max:12',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/',
+        ];
+
+        if ($confirmed) {
+            $rules[] = 'confirmed';
+        }
+
+        return $rules;
+    }
+
+    protected function nameValidationPattern(): string
+    {
+        return "/^[\\p{L}]+(?:[ '\\-][\\p{L}]+)*$/u";
+    }
+
+    protected function nameValidationMessages(): array
+    {
+        return [
+            'first_name.regex' => "First name may only contain letters, spaces, apostrophes, and hyphens.",
+            'middle_name.regex' => "Middle name may only contain letters, spaces, apostrophes, and hyphens.",
+            'last_name.regex' => "Last name may only contain letters, spaces, apostrophes, and hyphens.",
+        ];
+    }
+
+    protected function studentNumberValidationPattern(): string
+    {
+        return "/^\\d{4}-\\d{5}-TG-0$/";
+    }
+
+    protected function studentNumberValidationMessages(): array
+    {
+        return [
+            'studentNum.regex' => 'Student number must follow this format: 2023-00098-TG-0.',
+        ];
+    }
+
+    protected function yearAndSectionValidationPattern(): string
+    {
+        return "/^\\d+-\\d+$/";
+    }
+
+    protected function yearAndSectionValidationMessages(): array
+    {
+        return [
+            'year_and_section.required' => 'Year and section is required.',
+            'year_and_section.regex' => 'Year and section must follow this format: 4-1.',
+        ];
+    }
+
+    protected function passwordValidationMessages(string $field = 'password', string $confirmField = 'password_confirmation'): array
+    {
+        return [
+            $field . '.min' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            $field . '.max' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            $field . '.regex' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            $field . '.confirmed' => 'Password confirmation does not match.',
+            $confirmField . '.required' => 'Please confirm your password.',
+            $confirmField . '.same' => 'Password confirmation does not match.',
+        ];
     }
 
     protected function countExpiredMoaRecords(): int

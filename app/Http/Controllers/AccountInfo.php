@@ -10,6 +10,7 @@ use App\Models\Student;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Helpers\AuditLogger;
+use Illuminate\Validation\Rule;
 
 
 
@@ -34,6 +35,20 @@ class AccountInfo extends Controller
         if (!$user) {
             return back()->with('error', 'User not found.');
         }
+
+        $request->validate([
+            'first_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'middle_name' => ['nullable', 'regex:' . $this->nameValidationPattern()],
+            'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+        ], array_merge(
+            $this->nameValidationMessages(),
+            [
+                'email.required' => 'Email is required.',
+                'email.email' => 'Please enter a valid email address.',
+                'email.unique' => 'This email is already in use.',
+            ]
+        ));
     
         $professor = Professor::where('email', $email)->first();
     
@@ -76,9 +91,20 @@ class AccountInfo extends Controller
     public function change_password(Request $request, $id)
 {
     $request->validate([
-        'current_password' => 'required|min:8|max:12',
-        'confirm_password' => 'required|min:8|max:12|same:new_password',
-        'new_password' => 'required|min:8|max:12',
+        'current_password' => 'required',
+        'confirm_password' => 'required|same:new_password',
+        'new_password' => [
+            'required',
+            'string',
+            'min:8',
+            'max:12',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/',
+        ],
+    ], [
+        'new_password.min' => 'New password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+        'new_password.max' => 'New password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+        'new_password.regex' => 'New password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+        'confirm_password.same' => 'Password confirmation does not match.',
     ]);
 
     $user = User::find($id);
@@ -103,6 +129,33 @@ class AccountInfo extends Controller
     }
 }
 
+    public function verifyCurrentPassword(Request $request, $id)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+        ]);
+
+        if ((int) Session::get('loginId') !== (int) $id) {
+            abort(403);
+        }
+
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Unable to verify the current password.',
+            ], 404);
+        }
+
+        $isValid = Hash::check($request->current_password, $user->password);
+
+        return response()->json([
+            'valid' => $isValid,
+            'message' => $isValid ? '' : 'Current password is incorrect.',
+        ]);
+    }
+
     public function profAcc()
     {
         $data=array();
@@ -123,6 +176,20 @@ class AccountInfo extends Controller
         if (!$user) {
             return back()->with('error', 'User not found.');
         }
+
+        $request->validate([
+            'first_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'middle_name' => ['nullable', 'regex:' . $this->nameValidationPattern()],
+            'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+        ], array_merge(
+            $this->nameValidationMessages(),
+            [
+                'email.required' => 'Email is required.',
+                'email.email' => 'Please enter a valid email address.',
+                'email.unique' => 'This email is already in use.',
+            ]
+        ));
     
       
     
@@ -174,5 +241,19 @@ class AccountInfo extends Controller
         );    
         return back()->with('success', 'You have updated the information successfully!');
 
+    }
+
+    protected function nameValidationPattern(): string
+    {
+        return "/^[\\p{L}]+(?:[ '\\-][\\p{L}]+)*$/u";
+    }
+
+    protected function nameValidationMessages(): array
+    {
+        return [
+            'first_name.regex' => "First name may only contain letters, spaces, apostrophes, and hyphens.",
+            'middle_name.regex' => "Middle name may only contain letters, spaces, apostrophes, and hyphens.",
+            'last_name.regex' => "Last name may only contain letters, spaces, apostrophes, and hyphens.",
+        ];
     }
 }

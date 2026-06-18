@@ -55,6 +55,9 @@
                     </div>
 
                     <div class="section-gap rating-list">
+                        <div class="flash-alert info" style="margin:0 0 14px 0;">
+                            Rating guide: <strong>1 = lowest</strong>, <strong>5 = highest</strong>.
+                        </div>
                         @php $currentSection = null; @endphp
                         @foreach($requestRow->template->items as $item)
                             @if($item->section !== $currentSection)
