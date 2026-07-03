@@ -32,6 +32,34 @@ use App\Helpers\AuditLogger;
 
 class PassDocuController extends Controller
 {
+    private function updateCompanyStudentDisplay(Company $company, ?string $removedName = null): void
+    {
+        if (!Schema::hasColumn('companies', 'student_names_display')) {
+            return;
+        }
+
+        $existingNames = collect(explode(',', (string) ($company->student_names_display ?? '')))
+            ->map(fn ($name) => trim((string) $name))
+            ->filter();
+
+        $linkedNames = $company->students()->with('user')->get()
+            ->pluck('full_name')
+            ->map(fn ($name) => trim((string) $name))
+            ->filter();
+
+        $manualNames = $existingNames->reject(function ($name) use ($linkedNames, $removedName) {
+            return $linkedNames->contains($name) || (!empty($removedName) && $name === trim($removedName));
+        });
+
+        $company->student_names_display = $manualNames
+            ->merge($linkedNames)
+            ->filter()
+            ->unique()
+            ->implode(', ');
+
+        $company->save();
+    }
+
     private function requireStudentSession()
     {
         if (!Session::has('loginId')) {
@@ -48,6 +76,44 @@ class PassDocuController extends Controller
         }
 
         return $user;
+    }
+
+    private function propagateSharedNotarizedMoaStatus(FileRequirement $fileRequirement, int $status, ?string $reason = null): void
+    {
+        if ($fileRequirement->fileName !== 'Notarized MOA' || empty($fileRequirement->file)) {
+            $fileRequirement->status = $status;
+            if (Schema::hasColumn('file_requirements', 'denial_reason')) {
+                $fileRequirement->denial_reason = $status === 2 ? $reason : null;
+            }
+            $fileRequirement->save();
+            return;
+        }
+
+        $company = Company::with('students')
+            ->where('file', $fileRequirement->file)
+            ->first();
+
+        $uploadedByNames = collect([$fileRequirement->uploadedBy]);
+
+        if ($company) {
+            $uploadedByNames = $company->students->pluck('full_name')
+                ->filter()
+                ->push($company->uploader_name)
+                ->unique()
+                ->values();
+        }
+
+        $query = FileRequirement::where('fileName', 'Notarized MOA')
+            ->where('file', $fileRequirement->file)
+            ->whereIn('uploadedBy', $uploadedByNames);
+
+        $updates = ['status' => $status];
+
+        if (Schema::hasColumn('file_requirements', 'denial_reason')) {
+            $updates['denial_reason'] = $status === 2 ? $reason : null;
+        }
+
+        $query->update($updates);
     }
 
     public function maintainFileCategory() {
@@ -245,21 +311,43 @@ public function removeFile($id)
         }
 
         if ($data->fileName === 'Notarized MOA' && !empty($data->file)) {
-            $company = Company::where('uploader_name', $data->uploadedBy)
+            $student = Student::where('user_id', $sessionCheck->id)->first();
+            $company = Company::with('students')
                 ->where('file', $data->file)
+                ->where(function ($query) use ($data, $student) {
+                    $query->where('uploader_name', $data->uploadedBy);
+
+                    if ($student) {
+                        $query->orWhereHas('students', function ($studentQuery) use ($student) {
+                            $studentQuery->where('students.id', $student->id);
+                        });
+                    }
+                })
                 ->first();
 
             if ($company) {
-                DB::table('company_student')
-                    ->where('company_id', $company->id)
-                    ->delete();
-
-                $filePath = public_path('assets/' . $company->file);
-                if (!empty($company->file) && file_exists($filePath)) {
-                    @unlink($filePath);
+                if ($student && $company->students->contains('id', $student->id)) {
+                    $company->students()->detach($student->id);
+                    $company = $company->fresh('students');
+                    $this->updateCompanyStudentDisplay($company, $sessionCheck->full_name);
                 }
 
-                $company->delete();
+                if ($company->students->isEmpty()) {
+                    $ownerRequirement = FileRequirement::where('uploadedBy', $company->uploader_name)
+                        ->where('fileName', 'Notarized MOA')
+                        ->where('file', $company->file);
+
+                    if ($data->uploadedBy !== $company->uploader_name) {
+                        $ownerRequirement->delete();
+                    }
+
+                    $filePath = public_path('assets/' . $company->file);
+                    if (!empty($company->file) && file_exists($filePath)) {
+                        @unlink($filePath);
+                    }
+
+                    $company->delete();
+                }
             }
         }
     
@@ -360,8 +448,7 @@ public function removeFile($id)
                 $fileRequirement = FileRequirement::findOrFail($id);
         
                 // Update the status based on the request data
-                $fileRequirement->status = 1;
-                $fileRequirement->save();
+                $this->propagateSharedNotarizedMoaStatus($fileRequirement, 1);
                 AuditLogger::log(
                     'PassDocu',
                     'Update',
@@ -400,8 +487,7 @@ public function removeFile($id)
                 }
 
                 foreach ($files as $fileRequirement) {
-                    $fileRequirement->status = 1;
-                    $fileRequirement->save();
+                    $this->propagateSharedNotarizedMoaStatus($fileRequirement, 1);
                 }
 
                 AuditLogger::log(
@@ -425,11 +511,7 @@ public function removeFile($id)
                 $fileRequirement = FileRequirement::findOrFail($id);
         
                 // Update the status based on the request data
-                $fileRequirement->status = 2;
-                if (Schema::hasColumn('file_requirements', 'denial_reason')) {
-                    $fileRequirement->denial_reason = $validated['reason'];
-                }
-                $fileRequirement->save();
+                $this->propagateSharedNotarizedMoaStatus($fileRequirement, 2, $validated['reason']);
 
                 $student = User::where('role', 0)
                     ->where('full_name', $fileRequirement->uploadedBy)

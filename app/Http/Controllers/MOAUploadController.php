@@ -24,6 +24,60 @@ use App\Helpers\AuditLogger;
 
 class MOAUploadController extends Controller
 {
+    private function updateCompanyStudentDisplay(Company $company, ?string $removedName = null): void
+    {
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('companies', 'student_names_display')) {
+            return;
+        }
+
+        $existingNames = collect(explode(',', (string) ($company->student_names_display ?? '')))
+            ->map(fn ($name) => trim((string) $name))
+            ->filter();
+
+        $linkedNames = $company->students()->with('user')->get()
+            ->pluck('full_name')
+            ->map(fn ($name) => trim((string) $name))
+            ->filter();
+
+        $manualNames = $existingNames->reject(function ($name) use ($linkedNames, $removedName) {
+            return $linkedNames->contains($name) || (!empty($removedName) && $name === trim($removedName));
+        });
+
+        $company->student_names_display = $manualNames
+            ->merge($linkedNames)
+            ->filter()
+            ->unique()
+            ->implode(', ');
+
+        $company->save();
+    }
+
+    private function deleteStudentNotarizedRequirement(User $user, Company $company): void
+    {
+        FileRequirement::where('uploadedBy', $user->full_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->delete();
+    }
+
+    private function deleteCompanyAssets(Company $company): void
+    {
+        $this->deleteLinkedNotarizedRequirement($company);
+
+        if (!empty($company->file)) {
+            $filePath = public_path('assets/' . $company->file);
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        }
+
+        DB::table('company_student')
+            ->where('company_id', $company->id)
+            ->delete();
+
+        $company->delete();
+    }
+
     private function deleteLinkedNotarizedRequirement(?Company $company): void
     {
         if (!$company || empty($company->file) || empty($company->uploader_name)) {
@@ -215,39 +269,34 @@ public function studentRemove($id)
         return redirect()->back()->with('error', 'Unauthorized.');
     }
 
-    $company = Company::where('id', $id)
-        ->where('uploader_name', $user->full_name)
-        ->first();
+    $student = Student::where('user_id', $user->id)->first();
+    $company = Company::with('students')->find($id);
 
-    if (!$company) {
+    if (!$company || !$student || !$company->students->contains('id', $student->id)) {
         return redirect()->back()->with('error', 'MOA not found or you do not have permission to remove it.');
     }
 
-    $this->deleteLinkedNotarizedRequirement($company);
+    $isOwner = $company->uploader_name === $user->full_name;
 
-    DB::table('company_student')
-        ->where('company_id', $company->id)
-        ->delete();
+    $this->deleteStudentNotarizedRequirement($user, $company);
+    $company->students()->detach($student->id);
+    $company = $company->fresh('students');
+    $this->updateCompanyStudentDisplay($company, $user->full_name);
 
-    if (!empty($company->file)) {
-        $filePath = public_path('assets/' . $company->file);
-        if (file_exists($filePath)) {
-            @unlink($filePath);
-        }
+    if ($company->students->isEmpty()) {
+        $this->deleteCompanyAssets($company);
     }
-
-    $company->delete();
 
     AuditLogger::log(
         'MOA Upload',
         'Delete',
-        'Student deleted own MOA: ' . $company->company_name,
+        ($isOwner ? 'Student removed own MOA: ' : 'Student unlinked shared MOA: ') . $company->company_name,
         Session::get('loginId') ?? null,
         ['company_id' => $company->id],
         null
     );
 
-    return redirect()->back()->with('success', 'MOA removed successfully.');
+    return redirect()->back()->with('success', $isOwner ? 'MOA removed successfully.' : 'MOA unlinked successfully.');
 }
 
 

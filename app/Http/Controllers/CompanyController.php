@@ -24,6 +24,83 @@ use App\Helpers\AuditLogger;
 
 class CompanyController extends Controller
 {
+private function studentProfileForUser(User $user): ?Student
+{
+    return Student::where('user_id', $user->id)->first();
+}
+
+private function updateCompanyStudentDisplay(Company $company, ?string $removedName = null): void
+{
+    if (!Schema::hasColumn('companies', 'student_names_display')) {
+        return;
+    }
+
+    $existingNames = collect(explode(',', (string) ($company->student_names_display ?? '')))
+        ->map(fn ($name) => trim((string) $name))
+        ->filter();
+
+    $linkedNames = $company->students()->with('user')->get()
+        ->pluck('full_name')
+        ->map(fn ($name) => trim((string) $name))
+        ->filter();
+
+    $manualNames = $existingNames->reject(function ($name) use ($linkedNames, $removedName) {
+        return $linkedNames->contains($name) || (!empty($removedName) && $name === trim($removedName));
+    });
+
+    $company->student_names_display = $manualNames
+        ->merge($linkedNames)
+        ->filter()
+        ->unique()
+        ->implode(', ');
+
+    $company->save();
+}
+
+private function syncLinkedNotarizedRequirement(Company $company, User $user): void
+{
+    $requirement = FileRequirement::where('uploadedBy', $user->full_name)
+        ->where('fileName', 'Notarized MOA')
+        ->where('file', $company->file)
+        ->first();
+
+    $sourceRequirement = FileRequirement::where('uploadedBy', $company->uploader_name)
+        ->where('fileName', 'Notarized MOA')
+        ->where('file', $company->file)
+        ->latest('id')
+        ->first();
+
+    $requirement = $requirement ?: new FileRequirement();
+    $requirement->fileName = 'Notarized MOA';
+    $requirement->file = $company->file;
+    $requirement->status = $sourceRequirement->status ?? 0;
+    $requirement->adviser = $user->adviser_name;
+    $requirement->uploadedBy = $user->full_name;
+
+    if (Schema::hasColumn('file_requirements', 'denial_reason')) {
+        $requirement->denial_reason = $sourceRequirement->denial_reason ?? null;
+    }
+
+    if (Schema::hasColumn('file_requirements', 'professor_id') && isset($sourceRequirement->professor_id)) {
+        $requirement->professor_id = $sourceRequirement->professor_id;
+    }
+
+    $requirement->save();
+}
+
+private function ensureCompanyVoucher(Company $company): void
+{
+    if (Voucher::where('company_id', $company->id)->exists()) {
+        return;
+    }
+
+    $voucher = new Voucher();
+    $voucher->company_id = $company->id;
+    $voucher->filename = $this->generateVoucherCode(10);
+    $voucher->uploader_name = $company->uploader_name;
+    $voucher->save();
+}
+
 private function requireStudentSession()
 {
     if (!Session::has('loginId')) {
@@ -139,8 +216,39 @@ public function companiesup(Request $request)
 
     $user = $sessionCheck;
 
-    // Retrieve the companies where the current user is the uploader
-    $companies = Company::where('uploader_name', $user->full_name)->get();
+    $studentProfile = $this->studentProfileForUser($user);
+
+    $companies = Company::with('students')
+        ->where(function ($query) use ($user, $studentProfile) {
+            if ($studentProfile) {
+                $query->whereHas('students', function ($studentQuery) use ($studentProfile) {
+                    $studentQuery->where('students.id', $studentProfile->id);
+                })->orWhere(function ($ownerQuery) use ($user) {
+                    $ownerQuery->where('uploader_name', $user->full_name)
+                        ->whereDoesntHave('students');
+                });
+            } else {
+                $query->where('uploader_name', $user->full_name);
+            }
+        })
+        ->orderByDesc('created_at')
+        ->get()
+        ->unique('id')
+        ->values();
+
+    $linkedCompanyIds = $companies->pluck('id');
+
+    $availableLinkableCompanies = Company::with('students')
+        ->whereNotIn('id', $linkedCompanyIds)
+        ->when(!empty($studentProfile?->course), function ($query) use ($studentProfile) {
+            $query->where('course', $studentProfile->course);
+        })
+        ->orderBy('company_name')
+        ->get()
+        ->filter(function ($company) {
+            return !empty($company->file);
+        })
+        ->values();
     $stu= Student::all();
 
     $companyNames = $companies->pluck('company_name')->toArray(); // Get an array of company names
@@ -151,7 +259,59 @@ public function companiesup(Request $request)
     })->get();
     $ojt = OJTInformation::where('studentNum', $user->studentNum)->get();
 
-    return view('students.companiesup', compact('companies', 'students', 'user','stu','ojt'));
+    return view('students.companiesup', compact('companies', 'students', 'user','stu','ojt', 'availableLinkableCompanies'));
+}
+
+public function linkExistingMoa(Request $request)
+{
+    $sessionCheck = $this->requireStudentSession();
+
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
+    }
+
+    $user = $sessionCheck;
+    $studentProfile = $this->studentProfileForUser($user);
+
+    if (!$studentProfile) {
+        return back()->with('fail', 'Student profile not found.');
+    }
+
+    $validated = $request->validate([
+        'company_id' => 'required|exists:companies,id',
+    ]);
+
+    $company = Company::with('students')->find($validated['company_id']);
+
+    if (!$company || empty($company->file)) {
+        return back()->with('fail', 'Selected MOA is unavailable.');
+    }
+
+    if (!empty($company->course) && !empty($studentProfile->course) && $company->course !== $studentProfile->course) {
+        return back()->with('fail', 'The selected MOA does not match your course.');
+    }
+
+    if ($company->students->contains('id', $studentProfile->id)) {
+        return back()->with('fail', 'This MOA is already linked to your account.');
+    }
+
+    $company->students()->attach($studentProfile->id);
+    $this->updateCompanyStudentDisplay($company->fresh(), null);
+    $this->syncLinkedNotarizedRequirement($company, $user);
+    $this->ensureCompanyVoucher($company);
+
+    AuditLogger::log(
+        'MOA Upload',
+        'Link',
+        'Linked existing MOA: ' . $company->company_name . ' to student ' . $user->full_name,
+        Session::get('loginId') ?? null,
+        ['company_id' => $company->id],
+        ['student_id' => $studentProfile->id]
+    );
+
+    return back()
+        ->with('success', 'Existing MOA linked successfully.')
+        ->with('showVoucherModal', route('voucher', $company->id));
 }
 
 
@@ -164,9 +324,19 @@ public function companyCreate(Request $request)
     }
 
     $validator = Validator::make($request->all(), [
-                        
+        'school_year_start' => 'required|integer|digits:4',
+        'school_year_end' => 'required|integer|digits:4',
         'file' => 'required|mimes:pdf|max:2048', // max:2048 is the maximum file size in kilobytes (2 MB)
     ]);
+
+    $validator->after(function ($validator) use ($request) {
+        $startYear = (int) $request->input('school_year_start');
+        $endYear = (int) $request->input('school_year_end');
+
+        if ($startYear && $endYear && $endYear !== $startYear + 1) {
+            $validator->errors()->add('school_year_end', 'School year must be two continuous years.');
+        }
+    });
 
     if ($validator->fails()) {
         return redirect()->back()
@@ -310,7 +480,9 @@ $res = $fileup->save();
 
     
 
-        return back()->with('success', 'Company and students have been successfully associated.');
+        return back()
+            ->with('success', 'Company and students have been successfully associated.')
+            ->with('showVoucherModal', route('voucher', $com->id));
     } 
     
     else {
@@ -342,8 +514,8 @@ public function companyUpdate(Request $request, $id)
         'company_rep' => 'required|string|max:255',
         'companyNo' => 'nullable|string|max:255',
         'company_email' => 'required|email|max:255',
-        'school_year_start' => 'required|string|max:4',
-        'school_year_end' => 'required|string|max:4',
+        'school_year_start' => 'required|integer|digits:4',
+        'school_year_end' => 'required|integer|digits:4',
         'file' => 'nullable|mimes:pdf|max:2048',
     ];
 
@@ -354,6 +526,15 @@ public function companyUpdate(Request $request, $id)
     }
 
     $validator = Validator::make($request->all(), $rules);
+
+    $validator->after(function ($validator) use ($request) {
+        $startYear = (int) $request->input('school_year_start');
+        $endYear = (int) $request->input('school_year_end');
+
+        if ($startYear && $endYear && $endYear !== $startYear + 1) {
+            $validator->errors()->add('school_year_end', 'School year must be two continuous years.');
+        }
+    });
 
     if ($validator->fails()) {
         return redirect()->back()
@@ -449,9 +630,15 @@ public function companyUpdate(Request $request, $id)
         }
 
         if (!empty($newFileName) && $oldFileName !== $newFileName) {
-            FileRequirement::where('uploadedBy', $company->uploader_name)
+            $linkedStudentNames = $company->students()->with('user')->get()
+                ->pluck('full_name')
+                ->filter()
+                ->push($company->uploader_name)
+                ->unique()
+                ->values();
+
+            FileRequirement::whereIn('uploadedBy', $linkedStudentNames)
                 ->where('fileName', 'Notarized MOA')
-                ->where('file', $oldFileName)
                 ->update(['file' => $newFileName]);
         }
 

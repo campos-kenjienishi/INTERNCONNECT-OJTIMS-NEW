@@ -709,6 +709,113 @@
             color: #6ee7b7;
         }
 
+        .moa-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 180px;
+        }
+
+        .moa-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            width: fit-content;
+            min-width: 148px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+
+        .moa-pill.uploaded {
+            background: #fef3c7;
+            color: #a16207;
+        }
+
+        .moa-pill.approved {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .moa-pill.denied {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .moa-pill.empty {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        body.dark-mode .moa-pill.uploaded {
+            background: rgba(245,158,11,0.16);
+            color: #fcd34d;
+        }
+
+        body.dark-mode .moa-pill.approved {
+            background: rgba(22,163,74,0.18);
+            color: #6ee7b7;
+        }
+
+        body.dark-mode .moa-pill.denied {
+            background: rgba(220,38,38,0.18);
+            color: #fca5a5;
+        }
+
+        body.dark-mode .moa-pill.empty {
+            background: #3a3a3a;
+            color: #a3a3a3;
+        }
+
+        .moa-meta {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        body.dark-mode .moa-meta {
+            color: #8f959e;
+        }
+
+        .moa-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            padding: 7px 12px;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        .moa-link-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(37,99,235,0.12);
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        body.dark-mode .moa-link-btn {
+            background: rgba(37,99,235,0.16);
+            border-color: rgba(96,165,250,0.35);
+            color: #93c5fd;
+        }
+
+        body.dark-mode .moa-link-btn:hover {
+            background: rgba(37,99,235,0.24);
+            color: #bfdbfe;
+            box-shadow: 0 6px 14px rgba(37,99,235,0.2);
+        }
+
         /* Status badges */
         .status-badge {
             display: inline-flex; align-items: center; gap: 5px;
@@ -800,7 +907,51 @@
             box-shadow: 0 4px 12px rgba(220,38,38,0.5);
         }
 
-        .actions-wrap { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .actions-wrap { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+
+        .action-icon-btn {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: 11px;
+            justify-content: center;
+            gap: 0;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .action-icon-btn i {
+            font-size: 14px;
+        }
+
+        .action-icon-btn .action-label {
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 8px);
+            transform: translateX(-50%);
+            background: #111827;
+            color: #fff;
+            padding: 5px 8px;
+            border-radius: 7px;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s ease;
+            z-index: 20;
+        }
+
+        .action-icon-btn:hover .action-label,
+        .action-icon-btn:focus-visible .action-label {
+            opacity: 1;
+        }
+
+        body.dark-mode .action-icon-btn .action-label {
+            background: #f3f4f6;
+            color: #111827;
+        }
 
         /* =============== MODAL =============== */
         .modal-content {
@@ -1357,6 +1508,12 @@ body.dark-mode .dashboard-footer .footer-copy {
                 ->unique()
                 ->sort()
                 ->values();
+            $schoolYearOptions = collect($studentData)
+                ->pluck('school_year_label')
+                ->filter(fn ($value) => !empty($value) && $value !== '—')
+                ->unique()
+                ->sortDesc()
+                ->values();
         @endphp
 
         <!-- Students Table -->
@@ -1379,6 +1536,15 @@ body.dark-mode .dashboard-footer .footer-copy {
                             @endforeach
                         </select>
                     </div>
+                    <div class="table-inline-filter">
+                        <label for="schoolYearFilter" class="table-inline-filter-label">Filter by school year</label>
+                        <select id="schoolYearFilter" class="table-inline-filter-select">
+                            <option value="">All School Years</option>
+                            @foreach ($schoolYearOptions as $schoolYearOption)
+                                <option value="{{ $schoolYearOption }}">{{ $schoolYearOption }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="student-count-badge">
                         <i class="fa fa-users"></i>
                         {{ $totalStudents }} {{ $totalStudents == 1 ? 'student' : 'students' }}
@@ -1394,7 +1560,10 @@ body.dark-mode .dashboard-footer .footer-copy {
                             <th>Course</th>
                             <th>Year &amp; Section</th>
                             <th>Professor</th>
-                            <th>Subject Code(s)</th>
+                            <th>School Year</th>
+                            <th>Notarized MOA</th>
+                            <th style="display:none;">Legacy Subject</th>
+                            <th style="display:none;">Filter School Year</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1431,7 +1600,59 @@ body.dark-mode .dashboard-footer .footer-copy {
                                 {{ $data['student']->adviser_name ?? '—' }}
                             </td>
 
-                            <!-- Subjects -->
+                            <!-- School Year -->
+                            <td>
+                                <span class="section-badge">{{ $data['school_year_label'] ?? 'â€”' }}</span>
+                            </td>
+
+                            <!-- Notarized MOA -->
+                            <td>
+                                @php
+                                    $moaRequirement = $data['moa_requirement'] ?? null;
+                                    $moaCompany = $data['moa_company'] ?? null;
+                                    $moaStatus = 'Not Uploaded';
+                                    $moaStatusClass = 'empty';
+                                    $moaLinkUrl = null;
+
+                                    if ($moaRequirement) {
+                                        if ((int) $moaRequirement->status === 1) {
+                                            $moaStatus = 'Approved';
+                                            $moaStatusClass = 'approved';
+                                        } elseif ((int) $moaRequirement->status === 2) {
+                                            $moaStatus = 'Denied';
+                                            $moaStatusClass = 'denied';
+                                        } else {
+                                            $moaStatus = 'Uploaded';
+                                            $moaStatusClass = 'uploaded';
+                                        }
+                                    } elseif ($moaCompany) {
+                                        $moaStatus = 'Uploaded';
+                                        $moaStatusClass = 'uploaded';
+                                    }
+
+                                    if ($moaCompany) {
+                                        $moaLinkUrl = route('moa.view', ['companyId' => $moaCompany->id]);
+                                    } elseif ($moaRequirement && !empty($moaRequirement->file)) {
+                                        $moaLinkUrl = url('/moa/download', $moaRequirement->file);
+                                    }
+                                @endphp
+
+                                <div class="moa-cell">
+                                    <span class="moa-pill {{ $moaStatusClass }}">
+                                        <i class="fa fa-file-signature" style="font-size:10px;"></i>
+                                        {{ $moaStatus }}
+                                    </span>
+
+                                    @if($moaLinkUrl)
+                                        <a href="{{ $moaLinkUrl }}" class="moa-link-btn">
+                                            <i class="fa fa-eye"></i> Open MOA
+                                        </a>
+                                    @else
+                                        <span class="moa-meta">No proof yet</span>
+                                    @endif
+                                </div>
+                            </td>
+
                             <td>
                                 @if(isset($data['subjects']) && count($data['subjects']) > 0)
                                     @foreach($data['subjects'] as $subject)
@@ -1442,24 +1663,29 @@ body.dark-mode .dashboard-footer .footer-copy {
                                 @endif
                             </td>
 
+                            <td style="display:none;">{{ $data['school_year_label'] ?? '—' }}</td>
+
                             <!-- Actions -->
                            <td>
-    <div class="actions-wrap" style="flex-wrap:nowrap;">
+    <div class="actions-wrap">
 
         <!-- Personal Info -->
-        <button class="btn-action view-personal btn-view-personal"
+        <button class="btn-action action-icon-btn view-personal btn-view-personal"
             data-bs-toggle="modal" data-bs-target="#personalModal"
             data-full-name="{{ $data['student']->full_name }}"
             data-contact-number="{{ $data['student']->contact_number }}"
             data-email="{{ $data['student']->email }}"
             data-address="{{ $data['student']->address }}"
             data-date-of-birth="{{ $data['student']->date_of_birth }}"
-            data-student-num="{{ $data['ojt']->studentNum ?? '' }}">
-            <i class="fa fa-user"></i> Personal
+            data-student-num="{{ $data['ojt']->studentNum ?? '' }}"
+            title="Personal Info"
+            aria-label="Personal Info">
+            <i class="fa fa-user"></i>
+            <span class="action-label">Personal</span>
         </button>
 
         <!-- OJT Info -->
-        <button class="btn-action view-ojt btn-view-ojt"
+        <button class="btn-action action-icon-btn view-ojt btn-view-ojt"
             data-bs-toggle="modal" data-bs-target="#ojtModal"
             data-full-name="{{ $data['student']->full_name }}"
             data-company-name="{{ $data['ojt']->company_name ?? '' }}"
@@ -1472,17 +1698,23 @@ body.dark-mode .dashboard-footer .footer-copy {
             data-report-time="{{ $data['ojt']->report_time ?? '' }}"
             data-contact-name="{{ $data['ojt']->contact_name ?? '' }}"
             data-contact-position="{{ $data['ojt']->contact_position ?? '' }}"
-            data-contact-number="{{ $data['ojt']->contact_number ?? '' }}">
-            <i class="fa fa-briefcase"></i> OJT Info
+            data-contact-number="{{ $data['ojt']->contact_number ?? '' }}"
+            title="OJT Info"
+            aria-label="OJT Info">
+            <i class="fa fa-briefcase"></i>
+            <span class="action-label">OJT Info</span>
         </button>
 
         <!-- Status + Notify side by side -->
-        <button class="btn-action status btn-status"
+        <button class="btn-action action-icon-btn status btn-status"
             data-bs-toggle="modal" data-bs-target="#statusModal"
             data-student="{{ $data['ojt']->studentNum ?? '' }}"
             data-status="{{ $data['ojt']->status ?? '' }}"
-            data-name="{{ $data['student']->full_name }}">
-            <i class="fa fa-info-circle"></i> Status
+            data-name="{{ $data['student']->full_name }}"
+            title="Status"
+            aria-label="Status">
+            <i class="fa fa-info-circle"></i>
+            <span class="action-label">Status</span>
         </button>
 
         @php
@@ -1494,14 +1726,17 @@ body.dark-mode .dashboard-footer .footer-copy {
                   action="{{ url('/notify', $data['ojt']->studentNum) }}"
                   method="POST">
                 @csrf
-                <button type="submit" class="btn-action notify">
-                    <i class="fa fa-bell"></i> Notify
+                <button type="submit" class="btn-action action-icon-btn notify" title="Notify Student" aria-label="Notify Student">
+                    <i class="fa fa-bell"></i>
+                    <span class="action-label">Notify</span>
                 </button>
             </form>
         @else
-            <button type="button" class="btn-action notify" disabled
+            <button type="button" class="btn-action action-icon-btn notify" disabled
+                    aria-label="Notify unavailable"
                     title="No OJT information is saved yet for this student.">
-                <i class="fa fa-bell"></i> Notify
+                <i class="fa fa-bell"></i>
+                <span class="action-label">Notify</span>
             </button>
         @endif
 
@@ -1741,12 +1976,21 @@ body.dark-mode .dashboard-footer .footer-copy {
             order: [],
             scrollX: true,
             scrollCollapse: true,
-            autoWidth: false
+            autoWidth: false,
+            columnDefs: [
+                { targets: 6, visible: false, searchable: false },
+                { targets: 7, visible: false, searchable: true }
+            ]
         });
 
         $('#courseFilter').on('change', function () {
             const value = $(this).val();
             table.column(1).search(value || '', false, true).draw();
+        });
+
+        $('#schoolYearFilter').on('change', function () {
+            const value = $(this).val();
+            table.column(7).search(value || '', false, true).draw();
         });
 
         // Personal Info Modal

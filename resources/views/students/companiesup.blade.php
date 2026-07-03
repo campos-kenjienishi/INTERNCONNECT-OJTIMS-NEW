@@ -1099,6 +1099,7 @@
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
+                        @php $isOwner = $company->uploader_name === $user->full_name; @endphp
                         <tr>
                             <td>
                                 <div class="company-cell">
@@ -1107,7 +1108,14 @@
                                     </div>
                                     <div>
                                         <div class="company-name-text">{{ $company->company_name }}</div>
-                                        <div class="company-sub">{{ $company->company_address }}</div>
+                                        <div class="company-sub">
+                                            {{ $company->company_address }}
+                                            @if(!$isOwner)
+                                                <span style="display:inline-flex; align-items:center; gap:5px; margin-left:8px; padding:3px 8px; border-radius:999px; background:#eff6ff; color:#2563eb; font-size:11px; font-weight:700;">
+                                                    <i class="fa fa-link"></i> Linked
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -1134,28 +1142,35 @@
                                     <a href="{{ url('/moa/download', $company->file) }}" class="btn-action btn-download">
                                         <i class="fa fa-download"></i> Download
                                     </a>
+                                    <button type="button"
+                                        class="btn-action btn-voucher"
+                                        onclick="openVoucherModal('{{ route('voucher', $company->id) }}')">
+                                        <i class="fa fa-ticket-alt"></i> Voucher
+                                    </button>
                                     <button class="btn-action btn-print"
                                         onclick="openPdfPreview('{{ asset('assets/' . $company->file) }}')">
                                         <i class="fa fa-print"></i> Print PDF
                                     </button>
-                                    <button type="button"
-                                        class="btn-action"
-                                        style="background:#eff6ff; border-color:#bfdbfe; color:#2563eb;"
-                                        data-update-url="{{ route('student.moa.update', $company->id) }}"
-                                        data-company-name="{{ e($company->company_name) }}"
-                                        data-company-address="{{ e($company->company_address) }}"
-                                        data-company-rep="{{ e($company->company_rep) }}"
-                                        data-company-no="{{ e($company->companyNo) }}"
-                                        data-company-email="{{ e($company->company_email) }}"
-                                        data-school-year="{{ e($company->school_year) }}"
-                                        data-valid-until="{{ $company->valid_until ? \Carbon\Carbon::parse($company->valid_until)->format('Y-m-d') : '' }}"
-                                        data-file-name="{{ e($company->file) }}"
-                                        onclick="openEditMoaModal(this)">
-                                        <i class="fa fa-edit"></i> Edit
-                                    </button>
+                                    @if($isOwner)
+                                        <button type="button"
+                                            class="btn-action"
+                                            style="background:#eff6ff; border-color:#bfdbfe; color:#2563eb;"
+                                            data-update-url="{{ route('student.moa.update', $company->id) }}"
+                                            data-company-name="{{ e($company->company_name) }}"
+                                            data-company-address="{{ e($company->company_address) }}"
+                                            data-company-rep="{{ e($company->company_rep) }}"
+                                            data-company-no="{{ e($company->companyNo) }}"
+                                            data-company-email="{{ e($company->company_email) }}"
+                                            data-school-year="{{ e($company->school_year) }}"
+                                            data-valid-until="{{ $company->valid_until ? \Carbon\Carbon::parse($company->valid_until)->format('Y-m-d') : '' }}"
+                                            data-file-name="{{ e($company->file) }}"
+                                            onclick="openEditMoaModal(this)">
+                                            <i class="fa fa-edit"></i> Edit
+                                        </button>
+                                    @endif
                                     <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
-                                        onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}')">
-                                        <i class="fa fa-trash"></i> Remove
+                                        onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}', {{ $isOwner ? 'true' : 'false' }})">
+                                        <i class="fa fa-trash"></i> {{ $isOwner ? 'Remove' : 'Unlink' }}
                                     </button>
                                     <form id="student-remove-form-{{ $company->id }}" action="{{ route('student.moa.remove', $company->id) }}" method="POST" style="display:none;">
                                         @csrf
@@ -1205,6 +1220,13 @@
 
 </div>
 
+@php
+    $schoolYearBase = now()->year;
+    $schoolYearOptions = range($schoolYearBase - 5, $schoolYearBase + 5);
+    $selectedCreateStartYear = old('school_year_start', $schoolYearBase);
+    $selectedCreateEndYear = old('school_year_end', $selectedCreateStartYear + 1);
+@endphp
+
 <!-- =============== ADD MOA MODAL =============== -->
 <div class="modal fade" id="addMoaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1216,9 +1238,72 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
+            <form id="linkExistingMoaForm" action="{{ route('student.moa.link') }}" method="POST" style="display:none;">
+                @csrf
+                <input type="hidden" name="company_id" id="linkExistingMoaCompanyId">
+            </form>
+
             <form id="studentMoaForm" action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
+
+                    <div style="margin-bottom: 20px; padding: 16px; border: 1px solid #fde2e2; border-radius: 14px; background: linear-gradient(180deg, #fffefe 0%, #fff7f7 100%);">
+                        <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom: 12px;">
+                            <div style="width:42px; height:42px; border-radius:12px; background:#fee2e2; color:var(--red); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <i class="fa fa-link"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:16px; font-weight:800; color:#111827;">Use Existing MOA First</div>
+                                <div style="font-size:12.5px; color:#6b7280; line-height:1.6;">
+                                    Search the company name below. If the notarized MOA is already in the system, you can link it to your account instead of uploading a duplicate file.
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="text" id="existingMoaSearch" class="modal-field-input" placeholder="Search company name...">
+
+                        <div id="existingMoaList" style="margin-top: 12px; max-height: 220px; overflow-y: auto; display: grid; gap: 10px;">
+                            @forelse ($availableLinkableCompanies as $linkableCompany)
+                                <div class="existing-moa-item" data-company-name="{{ strtolower($linkableCompany->company_name) }}">
+                                    <div style="display:flex; justify-content:space-between; gap:14px; align-items:center; padding:14px; border:1px solid #f1d5d5; border-radius:12px; background:#fff;">
+                                        <div style="min-width:0;">
+                                            <div style="font-size:14px; font-weight:800; color:#111827;">{{ $linkableCompany->company_name }}</div>
+                                            <div style="font-size:12px; color:#6b7280; margin-top:4px;">{{ $linkableCompany->company_address }}</div>
+                                            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+                                                <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; background:#fef3c7; color:#92400e; font-size:11px; font-weight:700;">
+                                                    <i class="fa fa-calendar-alt"></i> {{ $linkableCompany->school_year }}
+                                                </span>
+                                                @if(!empty($linkableCompany->course))
+                                                    <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; background:#eff6ff; color:#1d4ed8; font-size:11px; font-weight:700;">
+                                                        <i class="fa fa-graduation-cap"></i> {{ $linkableCompany->course }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-modal-submit existing-moa-link-btn" data-company-id="{{ $linkableCompany->id }}" style="min-width: 150px; justify-content:center; padding-inline: 16px;">
+                                            <i class="fa fa-link me-1"></i> Use This MOA
+                                        </button>
+                                    </div>
+                                </div>
+                            @empty
+                                <div id="existingMoaEmptyState" style="padding:14px; border:1px dashed #f3b3b3; border-radius:12px; color:#6b7280; font-size:12.5px; background:#fff;">
+                                    No existing MOA is available to link right now. You can continue with a new upload below.
+                                </div>
+                            @endforelse
+                        </div>
+
+                        @if ($availableLinkableCompanies->isNotEmpty())
+                            <div id="existingMoaNoResults" style="display:none; margin-top:12px; padding:14px; border:1px dashed #f3b3b3; border-radius:12px; color:#6b7280; font-size:12.5px; background:#fff;">
+                                No matching company found. You can continue with a new upload below.
+                            </div>
+                        @endif
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:10px; margin: 0 0 18px;">
+                        <div style="flex:1; height:1px; background:#ececec;"></div>
+                        <span style="font-size:11px; font-weight:800; color:#9ca3af; letter-spacing:0.12em;">OR UPLOAD A NEW MOA</span>
+                        <div style="flex:1; height:1px; background:#ececec;"></div>
+                    </div>
 
                     <!-- Two-column grid -->
                     <div class="moa-form-grid">
@@ -1261,15 +1346,21 @@
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-calendar-alt"></i> School Year</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Input the current school year, example: <strong>2025-2026</strong>.
+                                    Select the current school year, example: <strong>2025-2026</strong>.
                                 </span>
                             </label>
                             <div class="school-year-row">
-                                <input type="text" name="school_year_start"
-                                    placeholder="Start (e.g. 2024)" required>
+                                <select name="school_year_start" id="schoolYearStart" class="modal-field-input" required>
+                                    @foreach ($schoolYearOptions as $year)
+                                        <option value="{{ $year }}" {{ (string) $selectedCreateStartYear === (string) $year ? 'selected' : '' }}>
+                                            {{ $year }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <span class="sep">–</span>
-                                <input type="text" name="school_year_end"
-                                    placeholder="End (e.g. 2025)" required>
+                                <select name="school_year_end" id="schoolYearEnd" class="modal-field-input" required>
+                                    <option value="{{ $selectedCreateEndYear }}" selected>{{ $selectedCreateEndYear }}</option>
+                                </select>
                             </div>
 
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
@@ -1379,13 +1470,17 @@
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-calendar-alt"></i> School Year</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Input the current school year, example: <strong>2025-2026</strong>.
+                                    Select the current school year, example: <strong>2025-2026</strong>.
                                 </span>
                             </label>
                             <div class="school-year-row">
-                                <input type="text" name="school_year_start" id="editSchoolYearStart" placeholder="Start (e.g. 2024)" required>
+                                <select name="school_year_start" id="editSchoolYearStart" class="modal-field-input" required>
+                                    @foreach ($schoolYearOptions as $year)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endforeach
+                                </select>
                                 <span class="sep">-</span>
-                                <input type="text" name="school_year_end" id="editSchoolYearEnd" placeholder="End (e.g. 2025)" required>
+                                <select name="school_year_end" id="editSchoolYearEnd" class="modal-field-input" required></select>
                             </div>
 
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
@@ -1466,6 +1561,28 @@
     </div>
 </div>
 
+<!-- =============== VOUCHER MODAL =============== -->
+<div class="modal fade" id="voucherModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-ticket-alt"></i> Voucher Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 0; height: 70vh; background:#f8fafc;">
+                <iframe id="voucherIframe" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -1525,15 +1642,21 @@
         }
     });
 
-    function confirmStudentRemove(companyId, companyName) {
+    function confirmStudentRemove(companyId, companyName, isOwner) {
+        const title = isOwner ? 'Remove MOA?' : 'Unlink MOA?';
+        const html = isOwner
+            ? 'This will remove your notarized MOA record for <strong>' + companyName + '</strong>.'
+            : 'This will unlink <strong>' + companyName + '</strong> from your account.';
+        const confirmText = isOwner ? 'Yes, remove it' : 'Yes, unlink it';
+
         Swal.fire({
-            title: 'Remove MOA?',
-            html: 'This will permanently delete your MOA for <strong>' + companyName + '</strong>.',
+            title: title,
+            html: html,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc2626',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, remove it',
+            confirmButtonText: confirmText,
             cancelButtonText: 'Cancel',
         }).then(function (result) {
             if (result.isConfirmed) {
@@ -1548,6 +1671,36 @@
         new bootstrap.Modal(document.getElementById('viewModal')).show();
     }
 
+    function openVoucherModal(url) {
+        document.getElementById('voucherIframe').src = url;
+        new bootstrap.Modal(document.getElementById('voucherModal')).show();
+    }
+
+    function syncSchoolYearEnd(startId, endId, selectedEndYear = null) {
+        const startSelect = document.getElementById(startId);
+        const endSelect = document.getElementById(endId);
+
+        if (!startSelect || !endSelect || !startSelect.value) {
+            return;
+        }
+
+        const startYear = parseInt(startSelect.value, 10);
+
+        if (Number.isNaN(startYear)) {
+            return;
+        }
+
+        const endYear = selectedEndYear ? parseInt(selectedEndYear, 10) : startYear + 1;
+        endSelect.innerHTML = '';
+
+        const option = document.createElement('option');
+        option.value = String(endYear);
+        option.textContent = String(endYear);
+        option.selected = true;
+        endSelect.appendChild(option);
+        endSelect.value = String(endYear);
+    }
+
     function openEditMoaModal(button) {
         const form = document.getElementById('editMoaForm');
         const schoolYear = (button.dataset.schoolYear || '').split('-');
@@ -1560,7 +1713,7 @@
         document.getElementById('editCompanyNo').value = button.dataset.companyNo || '';
         document.getElementById('editCompanyEmail').value = button.dataset.companyEmail || '';
         document.getElementById('editSchoolYearStart').value = schoolYear[0] || '';
-        document.getElementById('editSchoolYearEnd').value = schoolYear[1] || '';
+        syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd', schoolYear[1] || '');
         document.getElementById('editValidUntil').value = button.dataset.validUntil || '';
         document.getElementById('editMoaFileInput').value = '';
         document.getElementById('editMoaFileLabel').textContent = 'Leave empty to keep the current notarized MOA PDF';
@@ -1641,6 +1794,56 @@
 
         bindPdfInputValidation('moaFileInput', 'moaFileLabel', 'Click or drag your notarized MOA file here');
         bindPdfInputValidation('editMoaFileInput', 'editMoaFileLabel', 'Leave empty to keep the current notarized MOA PDF');
+
+        syncSchoolYearEnd('schoolYearStart', 'schoolYearEnd', @json($selectedCreateEndYear));
+        syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd');
+
+        $('#schoolYearStart').on('change', function () {
+            syncSchoolYearEnd('schoolYearStart', 'schoolYearEnd');
+        });
+
+        $('#editSchoolYearStart').on('change', function () {
+            syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd');
+        });
+
+        const existingMoaSearch = document.getElementById('existingMoaSearch');
+        if (existingMoaSearch) {
+            existingMoaSearch.addEventListener('input', function () {
+                const query = this.value.trim().toLowerCase();
+                const items = Array.from(document.querySelectorAll('.existing-moa-item'));
+                let visibleCount = 0;
+
+                items.forEach(function (item) {
+                    const companyName = item.dataset.companyName || '';
+                    const matches = companyName.includes(query);
+                    item.style.display = matches ? '' : 'none';
+                    if (matches) {
+                        visibleCount += 1;
+                    }
+                });
+
+                const noResults = document.getElementById('existingMoaNoResults');
+                if (noResults) {
+                    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+                }
+            });
+        }
+
+        document.querySelectorAll('.existing-moa-link-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const companyIdInput = document.getElementById('linkExistingMoaCompanyId');
+                const linkForm = document.getElementById('linkExistingMoaForm');
+
+                if (!companyIdInput || !linkForm) {
+                    return;
+                }
+
+                companyIdInput.value = this.dataset.companyId || '';
+                this.disabled = true;
+                this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Linking...';
+                linkForm.submit();
+            });
+        });
     });
     document.addEventListener('click', function(e) {
     const btn = e.target.closest('.view-btn');
@@ -1649,6 +1852,12 @@
         openPdfPreview(url);
     }
 });
+
+@if(session('showVoucherModal'))
+    window.addEventListener('load', function () {
+        openVoucherModal(@json(session('showVoucherModal')));
+    });
+@endif
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>

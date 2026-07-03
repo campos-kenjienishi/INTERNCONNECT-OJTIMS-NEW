@@ -17,6 +17,7 @@ use App\Models\UploadedFile;
 use Illuminate\Http\Request;
 use App\Models\Announcements;
 use App\Models\OJTInformation;
+use App\Models\FileRequirement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -493,6 +494,35 @@ public function StuList()
 
     foreach ($students as $student) {
         $ojt = OJTInformation::where('studentNum', $student->studentNum)->first();
+        $studentProfile = Student::with('companies')->where('user_id', $student->id)->first();
+        $moaRequirement = FileRequirement::where('uploadedBy', $student->full_name)
+            ->where('fileName', 'Notarized MOA')
+            ->latest('id')
+            ->first();
+
+        $linkedMoa = null;
+
+        if ($moaRequirement && !empty($moaRequirement->file)) {
+            $linkedMoa = Company::when($studentProfile, function ($query) use ($studentProfile) {
+                    $query->whereHas('students', function ($studentQuery) use ($studentProfile) {
+                        $studentQuery->where('students.id', $studentProfile->id);
+                    });
+                })
+                ->where('file', $moaRequirement->file)
+                ->latest('id')
+                ->first();
+        }
+
+        if (!$linkedMoa && $studentProfile) {
+            $linkedMoa = $studentProfile->companies->sortByDesc('created_at')->first();
+        }
+
+        $schoolYearLabel = '—';
+        if ($studentProfile && !empty($studentProfile->school_year_start) && !empty($studentProfile->school_year_end)) {
+            $schoolYearLabel = trim($studentProfile->school_year_start . '-' . $studentProfile->school_year_end);
+        } elseif ($linkedMoa && !empty($linkedMoa->school_year)) {
+            $schoolYearLabel = trim((string) $linkedMoa->school_year);
+        }
     
         // Find the professor associated with the logged-in user's adviser_name
         $professor = Professor::where('full_name', $student->adviser_name)->first();
@@ -517,6 +547,9 @@ public function StuList()
         $studentData[] = [
             'student' => $student,
             'ojt' => $ojt,
+            'moa_requirement' => $moaRequirement,
+            'moa_company' => $linkedMoa,
+            'school_year_label' => $schoolYearLabel,
             'subjects' => $subjectData, // Include subject data here
         ];
     }
