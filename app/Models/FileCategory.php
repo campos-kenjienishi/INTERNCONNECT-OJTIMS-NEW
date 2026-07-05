@@ -9,7 +9,7 @@ class FileCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fileName', 'uploadedBy', 'professor_id'];
+    protected $fillable = ['fileName', 'uploadedBy', 'professor_id', 'phase'];
 
     public function professor()
     {

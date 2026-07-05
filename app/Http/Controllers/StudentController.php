@@ -165,6 +165,8 @@ public function home()
                     $data->studentNum = $studentProfile->studentNum;
                     $data->course = $studentProfile->course;
                     $data->year_and_section = $studentProfile->year_and_section;
+                    $data->school_year_start = $studentProfile->school_year_start;
+                    $data->school_year_end = $studentProfile->school_year_end;
                     $data->adviser_name = $studentProfile->adviser_name;
                     $data->address = $studentProfile->address;
                     $data->contact_number = $studentProfile->contact_number;
@@ -189,6 +191,8 @@ public function home()
             'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
+            'academic_year_start' => ['required', 'integer'],
+            'academic_year_end' => ['required', 'integer', 'gt:academic_year_start'],
             'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
         ], array_merge(
             $this->nameValidationMessages(),
@@ -198,6 +202,11 @@ public function home()
                 'email.required' => 'Email is required.',
                 'email.email' => 'Please enter a valid email address.',
                 'email.unique' => 'This email is already in use.',
+                'academic_year_start.required' => 'Start year is required.',
+                'academic_year_start.integer' => 'Start year must be a valid year.',
+                'academic_year_end.required' => 'End year is required.',
+                'academic_year_end.integer' => 'End year must be a valid year.',
+                'academic_year_end.gt' => 'End year must be later than the start year.',
             ]
         ));
  
@@ -227,6 +236,8 @@ public function home()
                 $student->date_of_birth = $request->date_of_birth;
                 $student->course = $request->course;
                 $student->year_and_section = $request->year_and_section;
+                $student->school_year_start = $request->academic_year_start;
+                $student->school_year_end = $request->academic_year_end;
                 $student->studentNum = $request->studentNum;
                 $student->adviser_name = $request->adviser_name ?: $student->adviser_name;
                 $student->user_id = $user->id;
@@ -293,7 +304,8 @@ public function home()
         $data = $sessionCheck;
 
         $sched = []; 
-        $class = [];
+        $class = collect();
+        $currentClass = null;
         $roomTemplates = collect();
         $course=Courses::all();
        
@@ -304,9 +316,18 @@ public function home()
 
             // Check if $data is not empty before accessing the property
             if (!empty($data) && isset($data->adviser_name)) {
-                $class = Classes::where('adviser_name', $data->adviser_name)
-                               ->where('course', $data->course)
-                               ->get();
+                $classQuery = Classes::where('adviser_name', $data->adviser_name)
+                    ->where('course', $data->course);
+
+                if (Schema::hasColumn('classes', 'school_year_start')) {
+                    $classQuery->orderByDesc('school_year_start');
+                }
+                if (Schema::hasColumn('classes', 'school_year_end')) {
+                    $classQuery->orderByDesc('school_year_end');
+                }
+                $classQuery->latest('created_at')->latest('id');
+
+                $class = $classQuery->get();
 
                 $hasScheduleClassId = Schema::hasTable('schedules') && Schema::hasColumn('schedules', 'class_id');
                 $hasClassScheduleDay = Schema::hasColumn('classes', 'schedule_day');
@@ -346,6 +367,38 @@ public function home()
                         ->get();
                 }
 
+                if (!empty($data->class_id)) {
+                    $currentClass = $class->firstWhere('id', $data->class_id) ?? Classes::find($data->class_id);
+
+                    if ($currentClass) {
+                        if ($hasScheduleClassId) {
+                            $roomSchedule = Schedule::where('class_id', $currentClass->id)->latest('id')->first();
+                            if ($roomSchedule) {
+                                $currentClass->schedule_day = $roomSchedule->schedule_day;
+                                $currentClass->schedule_time = $roomSchedule->schedule_time;
+                            }
+                        }
+
+                        if (!$hasScheduleClassId) {
+                            if (!$hasClassScheduleDay) {
+                                $currentClass->schedule_day = null;
+                            }
+                            if (!$hasClassScheduleTime) {
+                                $currentClass->schedule_time = null;
+                            }
+                        }
+
+                        $currentClass->schedule_slots = !empty($currentClass->schedule_time) ? (int) $currentClass->schedule_time : 1;
+                        $currentClass->schedule_parsed = [];
+                        if (!empty($currentClass->schedule_day)) {
+                            $decodedSchedule = json_decode($currentClass->schedule_day, true);
+                            if (is_array($decodedSchedule)) {
+                                $currentClass->schedule_parsed = $decodedSchedule;
+                            }
+                        }
+                    }
+                }
+
                 $professor = Professor::where('full_name', $data->adviser_name)->with('subjects')->get();
 
             // Iterate over each professor to retrieve subjects and related schedules
@@ -361,7 +414,7 @@ public function home()
         //    $class = Classes::where('adviser_name', $data->adviser_name)->get();
 
 
-        $classRoomNames = $class->pluck('room')->filter()->values()->all();
+        $classRoomNames = collect([$currentClass])->filter()->pluck('room')->values()->all();
         $announce = $this->visibleAnnouncementsForStudent(
             $data,
             $classRoomNames,
@@ -370,7 +423,7 @@ public function home()
         
 
     // Pass the $professor and $students variables to the view
-    return view('students.student_class', compact('data', 'course', 'class', 'announce', 'sched', 'roomTemplates'));
+    return view('students.student_class', compact('data', 'course', 'class', 'currentClass', 'announce', 'sched', 'roomTemplates'));
 
 
 }

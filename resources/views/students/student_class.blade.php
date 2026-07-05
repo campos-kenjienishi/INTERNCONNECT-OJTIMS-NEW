@@ -898,12 +898,93 @@
             <div class="table-card-header">
                 <div class="header-icon"><i class="fa fa-door-open"></i></div>
                 <div>
-                    <h2>Available Rooms</h2>
-                    <p>Join or view your assigned class room</p>
+                    <h2>{{ $currentClass ? 'Current Class' : 'Available Rooms' }}</h2>
+                    <p>{{ $currentClass ? 'View your assigned class information or leave this room' : 'Join or view your assigned class room' }}</p>
                 </div>
             </div>
             <div class="table-card-body">
-                <table class="rooms-table">
+                @if ($currentClass)
+                    <div style="padding:24px;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                            <div style="border:1px solid #f0f0f0;border-radius:14px;padding:18px;background:#fffaf9;">
+                                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;">Course</div>
+                                <div style="margin-top:8px;font-size:16px;font-weight:700;color:#1a1a1a;">{{ $currentClass->course }}</div>
+                            </div>
+                            <div style="border:1px solid #f0f0f0;border-radius:14px;padding:18px;background:#fffaf9;">
+                                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;">Room</div>
+                                <div style="margin-top:8px;font-size:16px;font-weight:700;color:#1a1a1a;">{{ $currentClass->room }}</div>
+                            </div>
+                            <div style="border:1px solid #f0f0f0;border-radius:14px;padding:18px;background:#fffaf9;">
+                                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;">School Year</div>
+                                <div style="margin-top:8px;font-size:16px;font-weight:700;color:#1a1a1a;">{{ $currentClass->school_year_start && $currentClass->school_year_end ? $currentClass->school_year_start . ' - ' . $currentClass->school_year_end : 'N/A' }}</div>
+                            </div>
+                            <div style="border:1px solid #f0f0f0;border-radius:14px;padding:18px;background:#fffaf9;">
+                                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;">Status</div>
+                                <div style="margin-top:8px;">
+                                    @if ($data->status == 1)
+                                        <span class="status-badge status-approved"><i class="fa fa-check-circle"></i> Approved</span>
+                                    @elseif ($data->status == 2)
+                                        <span class="status-badge status-denied"><i class="fa fa-times-circle"></i> Denied</span>
+                                    @elseif ($data->status == 3)
+                                        <span class="status-badge status-pending"><i class="fa fa-clock"></i> Pending</span>
+                                    @else
+                                        <span class="status-badge status-default"><i class="fa fa-minus-circle"></i> Not Joined</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px;">
+                            <div style="border:1px solid #f0f0f0;border-radius:14px;padding:18px;background:#fff;">
+                                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;">Professor</div>
+                                <div style="margin-top:8px;font-size:15px;font-weight:600;color:#1a1a1a;">{{ $currentClass->adviser_name }}</div>
+                            </div>
+                            <div style="border:1px solid #f0f0f0;border-radius:14px;padding:18px;background:#fff;">
+                                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;">Semester</div>
+                                <div style="margin-top:8px;font-size:15px;font-weight:600;color:#1a1a1a;">{{ $currentClass->semester ?? 'N/A' }}</div>
+                            </div>
+                            <div style="border:1px solid #f0f0f0;border-radius:14px;padding:18px;background:#fff;grid-column:1 / -1;">
+                                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;">Schedule</div>
+                                <div style="margin-top:8px;font-size:14px;color:#333;">
+                                    @if (empty($currentClass->schedule_parsed))
+                                        <span style="color:#888;">No schedule available</span>
+                                    @else
+                                        @php
+                                            $groupedSchedule = [];
+                                            foreach ($currentClass->schedule_parsed as $slot) {
+                                                if (!empty($slot['day'])) {
+                                                    $startRaw = $slot['start_time'] ?? '';
+                                                    $endRaw = $slot['end_time'] ?? '';
+                                                    $startFormatted = !empty($startRaw) ? date('g:i A', strtotime($startRaw)) : '';
+                                                    $endFormatted = !empty($endRaw) ? date('g:i A', strtotime($endRaw)) : '';
+                                                    $groupedSchedule[$slot['day']][] = trim($startFormatted . ' - ' . $endFormatted);
+                                                }
+                                            }
+                                        @endphp
+                                        @foreach ($groupedSchedule as $day => $times)
+                                            <div><strong>{{ $day }}:</strong> {{ implode(', ', array_filter($times)) }}</div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+                            <button class="btn-leave" onclick="leaveStudent()">
+                                <i class="fa fa-sign-out-alt"></i> Leave
+                            </button>
+                        </div>
+                    </div>
+                @elseif ($class->isEmpty())
+                    <div class="empty-state">
+                        <div class="empty-icon-wrap">
+                            <i class="fa fa-door-closed"></i>
+                        </div>
+                        <p>No class matched your academic details yet.</p>
+                        <span class="empty-hint">Once your professor creates the matching class for your course and school year, it can appear here automatically.</span>
+                    </div>
+                @else
+                <table id="roomsTable" class="display rooms-table" style="width:100%">
                     <thead>
                         <tr>
                             <th>Course</th>
@@ -1057,6 +1138,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                @endif
             </div>
         </div>
 
@@ -1179,7 +1261,31 @@
                 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
                 <script>
                     $(document).ready(function () {
+                        var roomsTable = null;
                         var templateTable = null;
+
+                        if ($('#roomsTable').length) {
+                            roomsTable = $('#roomsTable').DataTable({
+                                order: [[2, 'desc'], [1, 'desc']],
+                                pageLength: 5,
+                                lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                                scrollX: true,
+                                autoWidth: false,
+                                columnDefs: [
+                                    { targets: [4], orderable: false, searchable: false }
+                                ]
+                            });
+
+                            $('#roomsTable_filter input')
+                                .attr('placeholder', 'Search rooms, course, professor, school year')
+                                .css({
+                                    padding: '6px 12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e5e5e5',
+                                    fontSize: '13px',
+                                    fontFamily: 'Poppins, sans-serif'
+                                });
+                        }
 
                         if ($('#templateTable').length) {
                             var templateEmptyMessage = @json(

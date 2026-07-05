@@ -83,6 +83,10 @@ class AuthController extends Controller
             'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
             'email'=>'required|email|unique:users,email',
             'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
+            'course' => ['required', 'string', 'max:255'],
+            'adviser_name' => ['required', 'string', 'max:255'],
+            'academic_year_start' => ['required', 'integer'],
+            'academic_year_end' => ['required', 'integer', 'gt:academic_year_start'],
             'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
             'password' => $this->passwordRules(),
             'confirm_password' => 'required|same:password',
@@ -90,6 +94,15 @@ class AuthController extends Controller
             $this->nameValidationMessages(),
             $this->studentNumberValidationMessages(),
             $this->yearAndSectionValidationMessages(),
+            [
+                'course.required' => 'Course is required.',
+                'adviser_name.required' => 'Professor is required.',
+                'academic_year_start.required' => 'Start year is required.',
+                'academic_year_start.integer' => 'Start year must be a valid year.',
+                'academic_year_end.required' => 'End year is required.',
+                'academic_year_end.integer' => 'End year must be a valid year.',
+                'academic_year_end.gt' => 'End year must be later than the start year.',
+            ],
             $this->passwordValidationMessages('password', 'confirm_password')
         ));
         $student = new OJTInformation();
@@ -114,6 +127,10 @@ class AuthController extends Controller
         $student->save();
         $studentE->save();
 
+        if ($res) {
+            $this->autoAssignStudentToMatchingClass($user, $studentE);
+        }
+
         if($res){
             AuditLogger::log(
                 'Student Account',
@@ -126,6 +143,65 @@ class AuthController extends Controller
         else{
             return back()->with('fail','Oh no! Something went wrong.');
         }
+    }
+
+    protected function autoAssignStudentToMatchingClass(User $user, Student $studentProfile): void
+    {
+        if (!Schema::hasColumn('students', 'class_id')) {
+            return;
+        }
+
+        $baseQuery = Classes::query()
+            ->where('adviser_name', $studentProfile->adviser_name)
+            ->where('course', $studentProfile->course);
+
+        $matchingClasses = collect();
+
+        if (
+            Schema::hasColumn('classes', 'school_year_start')
+            && Schema::hasColumn('classes', 'school_year_end')
+            && !empty($studentProfile->school_year_start)
+            && !empty($studentProfile->school_year_end)
+        ) {
+            $matchingClasses = (clone $baseQuery)
+                ->where('school_year_start', $studentProfile->school_year_start)
+                ->where('school_year_end', $studentProfile->school_year_end);
+            $matchingClasses = $matchingClasses->get();
+        }
+
+        if ($matchingClasses->count() !== 1) {
+            $fallbackQuery = clone $baseQuery;
+
+            if (Schema::hasColumn('classes', 'school_year_start')) {
+                $fallbackQuery->orderByDesc('school_year_start');
+            }
+            if (Schema::hasColumn('classes', 'school_year_end')) {
+                $fallbackQuery->orderByDesc('school_year_end');
+            }
+
+            $matchingClasses = $fallbackQuery
+                ->latest('created_at')
+                ->latest('id')
+                ->get();
+        }
+
+        if ($matchingClasses->count() !== 1) {
+            return;
+        }
+
+        $matchedClass = $matchingClasses->first();
+        $studentProfile->class_id = $matchedClass->id;
+        $studentProfile->save();
+
+        $user->status = 3;
+        $user->save();
+
+        AuditLogger::log(
+            'Student Account',
+            'join',
+            'Student auto-joined class after registration: ' . $matchedClass->room . ' (' . $matchedClass->course . ')',
+            $user->id
+        );
     }
 
     public function loginUser(Request $request){

@@ -676,7 +676,7 @@
                                         <select name="academic_year_start" id="academic_year_start" required>
                                             <option value="">Start Year</option>
                                             @for ($year = (date('Y') - 10); $year <= (date('Y') + 10); $year++)
-                                                <option value="{{ $year }}">{{ $year }}</option>
+                                                <option value="{{ $year }}" {{ old('academic_year_start') == $year ? 'selected' : '' }}>{{ $year }}</option>
                                             @endfor
                                         </select>
                                     </div>
@@ -1357,7 +1357,6 @@
 
         function updateEndYearOptions() {
             const selectedStartYear = parseInt(startYearSelect.value);
-            const selectedEndYear   = parseInt(endYearSelect.value);
             endYearSelect.innerHTML = '';
 
             const defaultOption = document.createElement('option');
@@ -1366,15 +1365,16 @@
             endYearSelect.appendChild(defaultOption);
 
             if (!isNaN(selectedStartYear)) {
-                for (let year = selectedStartYear + 1; year <= (selectedStartYear + 10); year++) {
-                    const option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    endYearSelect.appendChild(option);
-                }
+                const nextYear = selectedStartYear + 1;
+                const option = document.createElement('option');
+                option.value = nextYear;
+                option.textContent = nextYear;
+                endYearSelect.appendChild(option);
+                endYearSelect.value = String(nextYear);
+            } else {
+                endYearSelect.value = '';
             }
 
-            if (selectedEndYear <= selectedStartYear) endYearSelect.value = '';
             fetchProfessors(semesterSelect.value, startYearSelect.value, endYearSelect.value);
         }
 

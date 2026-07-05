@@ -532,6 +532,204 @@
         .status-approved { background: #dcfce7; color: #16a34a; }
         .status-denied   { background: #fee2e2; color: var(--red); }
         .status-pending  { background: #fef9c3; color: #ca8a04; }
+        .status-default  { background: #f3f4f6; color: #6b7280; }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .phase-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: #fff;
+            padding: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .phase-panel.basic {
+            background: linear-gradient(180deg, #fff8f6 0%, #ffffff 100%);
+        }
+
+        .phase-panel-header {
+            display: grid;
+            margin-bottom: 14px;
+        }
+
+        .phase-panel-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .phase-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.2;
+        }
+
+        .phase-panel-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        .phase-header-badge {
+            flex-shrink: 0;
+            font-size: 10.5px;
+            padding: 5px 10px;
+            white-space: nowrap;
+        }
+
+        .phase-summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .phase-summary-stat {
+            padding: 11px 12px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+        }
+
+        .phase-summary-stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            margin-bottom: 4px;
+        }
+
+        .phase-summary-stat-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.2;
+        }
+
+        .phase-summary-actions {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .phase-view-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #fecaca;
+            background: #fff;
+            color: var(--red);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all .2s ease;
+            cursor: pointer;
+        }
+
+        .phase-view-btn:hover {
+            background: #fff5f5;
+            border-color: #fca5a5;
+            color: var(--red-dark);
+        }
+
+        .phase-progress-list {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .phase-progress-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 11px 12px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .phase-note {
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .phase-note.warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .phase-note.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .phase-note-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            margin-bottom: 8px;
+        }
+
+        .phase-note-list {
+            display: grid;
+            gap: 6px;
+        }
+
+        .phase-modal-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .phase-modal-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+        }
+
+        .phase-modal-item-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .phase-modal-item-name span:last-child {
+            word-break: break-word;
+        }
+
+        @media (max-width: 768px) {
+            .upload-modal-layout {
+                grid-template-columns: 1fr;
+            }
+        }
 
         .status-cell {
             display: flex;
@@ -680,7 +878,7 @@
             border: none;
             box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             font-family: 'Poppins', sans-serif;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .modal-header {
@@ -700,7 +898,13 @@
 
         .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
 
-        .modal-body { padding: 24px; background: #fff; }
+        .modal-body {
+            padding: 24px;
+            background: #fff;
+            overflow: visible;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
 
         .modal-field-label {
             font-size: 13px;
@@ -730,6 +934,18 @@
             appearance: none;
         }
 
+        .modal-field-select {
+            background-image:
+                linear-gradient(45deg, transparent 50%, #b91c1c 50%),
+                linear-gradient(135deg, #b91c1c 50%, transparent 50%);
+            background-position:
+                calc(100% - 18px) calc(50% - 3px),
+                calc(100% - 12px) calc(50% - 3px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+            padding-right: 40px;
+        }
+
         .modal-field-input:focus,
         .modal-field-select:focus {
             border-color: var(--red);
@@ -737,21 +953,408 @@
             box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
         }
 
+        .upload-modal-form {
+            background:
+                radial-gradient(circle at top right, rgba(254, 226, 226, 0.8), transparent 26%),
+                linear-gradient(180deg, #ffffff 0%, #fff9f9 100%);
+        }
+
+        .upload-modal-dialog {
+            max-width: 980px;
+        }
+
+        .upload-modal-body {
+            display: grid;
+            gap: 14px;
+            overflow: visible;
+        }
+
+        .upload-modal-layout {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.9fr) minmax(460px, 1.3fr);
+            gap: 18px;
+            align-items: stretch;
+            overflow: visible;
+        }
+
+        .upload-modal-left {
+            display: grid;
+            gap: 14px;
+            align-content: start;
+            overflow: visible;
+        }
+
+        .upload-modal-right {
+            min-width: 0;
+        }
+
+        .upload-modal-right .upload-modal-section.file {
+            height: 100%;
+        }
+
+        .upload-modal-section {
+            background: rgba(255,255,255,0.94);
+            border: 1px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+            overflow: visible;
+        }
+
+        .upload-modal-section.phase {
+            background: linear-gradient(180deg, #fff5f5 0%, #ffffff 100%);
+            border-color: #fee2e2;
+        }
+
+        .upload-modal-section.file {
+            background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+            border-color: #ffedd5;
+        }
+
+        .upload-modal-section-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .upload-modal-section-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fee2e2;
+            color: var(--red);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .upload-modal-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.2;
+        }
+
+        .upload-modal-section-subtitle {
+            font-size: 11.5px;
+            color: #6b7280;
+            margin-top: 3px;
+            line-height: 1.5;
+        }
+
+        .upload-modal-help-row {
+            margin-top: -4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-modal-help {
+            margin-top: 0;
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #fee2e2;
+            font-size: 11.5px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .phase-lock-hint {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            border-radius: 999px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #c2410c;
+            font-size: 12px;
+            cursor: help;
+        }
+
+        .phase-lock-tooltip {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            width: 230px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #7f1d1d;
+            color: #fff;
+            font-size: 11.5px;
+            font-weight: 500;
+            line-height: 1.5;
+            box-shadow: 0 16px 30px rgba(127, 29, 29, 0.28);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: all 0.2s ease;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .phase-lock-tooltip::before {
+            content: "";
+            position: absolute;
+            right: 10px;
+            bottom: 100%;
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent #7f1d1d transparent;
+        }
+
+        .phase-lock-hint:hover .phase-lock-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .phase-dropdown {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .phase-dropdown-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #fafafa;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 10px;
+            color: #1a1a1a;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            padding: 11px 14px;
+            transition: all 0.25s;
+            cursor: pointer;
+        }
+
+        .phase-dropdown-trigger:hover,
+        .phase-dropdown.open .phase-dropdown-trigger {
+            border-color: var(--red);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
+        }
+
+        .phase-dropdown-trigger-text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        .phase-dropdown-trigger-icon {
+            color: #b91c1c;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .phase-dropdown.open .phase-dropdown-trigger-icon {
+            transform: rotate(180deg);
+        }
+
+        .phase-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #f1d3d3;
+            border-radius: 14px;
+            box-shadow: 0 18px 38px rgba(15, 23, 42, 0.14);
+            padding: 8px;
+            display: grid;
+            gap: 6px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: all 0.2s ease;
+            z-index: 40;
+        }
+
+        .category-dropdown-menu-scroll {
+            max-height: 176px;
+            overflow-y: auto;
+        }
+
+        .category-dropdown-menu-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .category-dropdown-menu-scroll::-webkit-scrollbar-thumb {
+            background: #f3c7c7;
+            border-radius: 999px;
+        }
+
+        .category-dropdown-menu-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .phase-dropdown.open .phase-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .phase-dropdown-option {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            background: #fff;
+            color: #1f2937;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .phase-dropdown-option:hover {
+            background: #fff5f5;
+            border-color: #fecaca;
+            color: var(--red-dark);
+        }
+
+        .phase-dropdown-option.active {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.18);
+        }
+
+        .phase-dropdown-option.active .phase-dropdown-option-meta {
+            color: rgba(255,255,255,0.85);
+        }
+
+        .phase-dropdown-option.locked {
+            background: #fffaf0;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .phase-dropdown-option-label {
+            display: grid;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .phase-dropdown-option-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .phase-dropdown-option-meta {
+            font-size: 11px;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        .phase-dropdown-option-status {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 5px 8px;
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .phase-dropdown-option-tooltip {
+            position: absolute;
+            left: calc(100% + 10px);
+            top: 50%;
+            width: 220px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #7f1d1d;
+            color: #fff;
+            font-size: 11.5px;
+            font-weight: 500;
+            line-height: 1.5;
+            box-shadow: 0 16px 30px rgba(127, 29, 29, 0.28);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-50%) translateX(-4px);
+            transition: all 0.2s ease;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .phase-dropdown-option-tooltip::before {
+            content: "";
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent #7f1d1d transparent transparent;
+        }
+
+        .phase-dropdown-option.locked:hover .phase-dropdown-option-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .category-dropdown-option.empty {
+            cursor: default;
+            color: #9ca3af;
+            background: #f8fafc;
+            border-color: #e5e7eb;
+        }
+
+        .category-dropdown-option.empty:hover {
+            color: #9ca3af;
+            background: #f8fafc;
+            border-color: #e5e7eb;
+        }
+
         /* File upload zone */
         .file-upload-zone {
-            border: 2px dashed #e8e8e8;
-            border-radius: 12px;
-            padding: 24px;
+            border: 2px dashed #f3c7c7;
+            border-radius: 16px;
+            padding: 24px 20px;
+            min-height: 250px;
             text-align: center;
             cursor: pointer;
             transition: all 0.25s;
-            margin-bottom: 18px;
+            margin-bottom: 0;
             position: relative;
+            background:
+                radial-gradient(circle at top, rgba(254, 242, 242, 0.9), transparent 65%),
+                #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .file-upload-zone:hover {
             border-color: var(--red);
-            background: #fff5f5;
+            background:
+                radial-gradient(circle at top, rgba(254, 226, 226, 0.95), transparent 68%),
+                #fffafa;
+            transform: translateY(-1px);
         }
 
         .file-upload-zone input[type="file"] {
@@ -764,23 +1367,37 @@
         }
 
         .file-upload-zone .upload-icon {
-            font-size: 28px;
-            color: #ccc;
-            margin-bottom: 8px;
-            transition: color 0.25s;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 20px;
+            color: #f87171;
+            background: #fff1f2;
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.12);
+            transition: all 0.25s;
         }
 
-        .file-upload-zone:hover .upload-icon { color: var(--red); }
+        .file-upload-zone:hover .upload-icon {
+            color: var(--red);
+            background: #fee2e2;
+        }
 
         .file-upload-zone p {
-            font-size: 13px;
-            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
             margin: 0;
         }
 
         .file-upload-zone span {
-            font-size: 12px;
-            color: #bbb;
+            display: block;
+            font-size: 11.5px;
+            color: #94a3b8;
+            margin-top: 6px;
         }
 
         .modal-footer {
@@ -790,6 +1407,9 @@
             display: flex;
             gap: 10px;
             justify-content: flex-end;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            background-clip: padding-box;
         }
 
         .btn-modal-close {
@@ -1136,6 +1756,148 @@
             </div>
         </div>
 
+        <div class="stats-row" style="margin-top:-6px;">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa fa-unlock-alt"></i></div>
+                <div>
+                    <div class="stat-num">{{ $submittedBasicNames->count() }}/{{ $basicCategories->count() }}</div>
+                    <div class="stat-name">Basic Requirements Submitted</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon {{ $hasSubmittedNotarizedMoa ? 'green' : 'amber' }}"><i class="fa fa-file-contract"></i></div>
+                <div>
+                    <div class="stat-num">{{ $hasSubmittedNotarizedMoa ? 'Yes' : 'No' }}</div>
+                    <div class="stat-name">Notarized MOA Submitted</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon {{ $otherRequirementsUnlocked ? 'green' : 'gray' }}"><i class="fa fa-layer-group"></i></div>
+                <div>
+                    <div class="stat-num">{{ $otherRequirementsUnlocked ? 'Unlocked' : 'Locked' }}</div>
+                    <div class="stat-name">Other Requirements</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card" style="margin-bottom:24px;">
+            <div class="table-card-header">
+                <div class="table-card-header-left">
+                    <div class="header-icon"><i class="fa fa-stream"></i></div>
+                    <div>
+                        <h2>Requirement Phases</h2>
+                        <p>Finish the basic set and submit your Notarized MOA to unlock the rest</p>
+                    </div>
+                </div>
+            </div>
+            <div class="table-card-body" style="padding:20px;">
+                <div style="margin-bottom:16px;padding:14px 16px;border-radius:14px;background:#fff8f1;border:1px solid #fed7aa;font-size:13px;color:#9a3412;line-height:1.6;">
+                    Upload the basic requirements first, then submit your Notarized MOA to unlock the during-OJT and after-OJT files.
+                </div>
+
+                <div class="phase-grid">
+                    <div class="phase-panel basic">
+                        <div class="phase-panel-header">
+                            <div class="phase-panel-title-row">
+                                <div class="phase-panel-title">Basic Requirements</div>
+                                <span class="status-badge status-approved phase-header-badge"><i class="fa fa-unlock"></i> Always Open</span>
+                            </div>
+                            <div class="phase-panel-subtitle">Required before you start your OJT.</div>
+                        </div>
+
+                        <div class="phase-summary-stats">
+                            <div class="phase-summary-stat">
+                                <div class="phase-summary-stat-label">Submitted</div>
+                                <div class="phase-summary-stat-value">{{ $submittedBasicNames->count() }}/{{ $basicCategories->count() }}</div>
+                            </div>
+                            <div class="phase-summary-stat">
+                                <div class="phase-summary-stat-label">Status</div>
+                                <div class="phase-summary-stat-value">{{ $missingBasicCategories->isEmpty() ? 'Completed' : 'In Progress' }}</div>
+                            </div>
+                        </div>
+
+                        <div class="phase-summary-actions">
+                            <button type="button" class="phase-view-btn" data-bs-toggle="modal" data-bs-target="#basicRequirementsModal">
+                                <i class="fa fa-eye"></i> View Requirements
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="phase-panel">
+                        <div class="phase-panel-header">
+                            <div class="phase-panel-title-row">
+                                <div class="phase-panel-title">Other Requirements</div>
+                                <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-pending' }} phase-header-badge">
+                                    <i class="fa {{ $otherRequirementsUnlocked ? 'fa-unlock' : 'fa-lock' }}"></i>
+                                    {{ $otherRequirementsUnlocked ? 'Unlocked' : 'Locked' }}
+                                </span>
+                            </div>
+                            <div class="phase-panel-subtitle">These open after the basics and Notarized MOA are done.</div>
+                        </div>
+
+                        <div class="phase-summary-stats">
+                            <div class="phase-summary-stat">
+                                <div class="phase-summary-stat-label">Requirements</div>
+                                <div class="phase-summary-stat-value">{{ $otherCategories->count() }}</div>
+                            </div>
+                            <div class="phase-summary-stat">
+                                <div class="phase-summary-stat-label">Access</div>
+                                <div class="phase-summary-stat-value">{{ $otherRequirementsUnlocked ? 'Available' : 'Locked' }}</div>
+                            </div>
+                        </div>
+
+                        <div class="phase-summary-actions">
+                            <button type="button" class="phase-view-btn" data-bs-toggle="modal" data-bs-target="#otherRequirementsModal">
+                                <i class="fa fa-eye"></i> View Requirements
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="phase-panel">
+                        <div class="phase-panel-header" style="margin-bottom:12px;">
+                            <div>
+                                <div class="phase-panel-title">Unlock Progress</div>
+                                <div class="phase-panel-subtitle">Track what is still needed before the next phase opens.</div>
+                            </div>
+                        </div>
+
+                        <div class="phase-progress-list">
+                            <div class="phase-progress-item">
+                                <span>Basic requirements completed</span>
+                                <span class="status-badge {{ $missingBasicCategories->isEmpty() ? 'status-approved' : 'status-pending' }}">
+                                    {{ $submittedBasicNames->count() }}/{{ $basicCategories->count() ?: 0 }}
+                                </span>
+                            </div>
+                            <div class="phase-progress-item">
+                                <span>Notarized MOA submitted</span>
+                                <span class="status-badge {{ $hasSubmittedNotarizedMoa ? 'status-approved' : 'status-pending' }}">
+                                    {{ $hasSubmittedNotarizedMoa ? 'Yes' : 'No' }}
+                                </span>
+                            </div>
+                            <div class="phase-progress-item">
+                                <span>Other requirements access</span>
+                                <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-pending' }}">
+                                    {{ $otherRequirementsUnlocked ? 'Unlocked' : 'Locked' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        @if (!$otherRequirementsUnlocked)
+                            <div class="phase-summary-actions" style="margin-top:2px;">
+                                <button type="button" class="phase-view-btn" data-bs-toggle="modal" data-bs-target="#unlockRequirementsModal">
+                                    <i class="fa fa-clipboard-list"></i> What Still Needs To Be Submitted
+                                </button>
+                            </div>
+                        @else
+                            <div class="phase-note success">
+                                Other requirements are unlocked. You can now submit the during-OJT and after-OJT files.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Requirements Table Card -->
         <div class="table-card">
             <div class="table-card-header">
@@ -1305,7 +2067,7 @@
 
 <!-- =============== UPLOAD MODAL =============== -->
 <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered upload-modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
@@ -1314,30 +2076,104 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form action="{{ url('/uploadReq') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ url('/uploadReq') }}" method="post" enctype="multipart/form-data" class="upload-modal-form">
                 @csrf
 
-                <div class="modal-body">
+                <div class="modal-body upload-modal-body">
 
-                    <label class="modal-field-label">
-                        <i class="fa fa-tag"></i> Category
-                    </label>
-                    <select class="modal-field-select" name="fileName" required>
-                        <option value="">Select a category</option>
-                        @foreach($fileCategories as $category)
-                            <option value="{{ $category->fileName }}">{{ $category->fileName }}</option>
-                        @endforeach
-                    </select>
+                    <div class="upload-modal-layout">
+                        <div class="upload-modal-left">
+                            <div class="upload-modal-section phase">
+                                <div class="upload-modal-section-head">
+                                    <div class="upload-modal-section-icon"><i class="fa fa-stream"></i></div>
+                                    <div>
+                                        <div class="upload-modal-section-title">Requirement Phase</div>
+                                        <div class="upload-modal-section-subtitle">Choose which phase this requirement belongs to.</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="phase" id="requirementPhaseSelect" value="basic">
+                                <div class="phase-dropdown" id="phaseDropdown">
+                                    <button type="button" class="phase-dropdown-trigger" id="phaseDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="phase-dropdown-trigger-text" id="phaseDropdownTriggerText">Basic Requirements</span>
+                                        <i class="fa fa-chevron-down phase-dropdown-trigger-icon"></i>
+                                    </button>
+                                    <div class="phase-dropdown-menu" id="phaseDropdownMenu" role="listbox" aria-label="Requirement Phase">
+                                        <button type="button" class="phase-dropdown-option active" data-value="basic">
+                                            <span class="phase-dropdown-option-label">
+                                                <span class="phase-dropdown-option-title">Basic Requirements</span>
+                                                <span class="phase-dropdown-option-meta">Upload these before starting OJT.</span>
+                                            </span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="phase-dropdown-option {{ $otherRequirementsUnlocked ? '' : 'locked' }}"
+                                            data-value="other"
+                                            {{ $otherRequirementsUnlocked ? '' : 'data-locked=true' }}
+                                        >
+                                            <span class="phase-dropdown-option-label">
+                                                <span class="phase-dropdown-option-title">Other Requirements</span>
+                                                <span class="phase-dropdown-option-meta">During-OJT and after-OJT uploads.</span>
+                                            </span>
+                                            @if (!$otherRequirementsUnlocked)
+                                                <span class="phase-dropdown-option-status">Locked</span>
+                                                <div class="phase-dropdown-option-tooltip">
+                                                    Upload all basic requirements first before the other requirements phase becomes available.
+                                                </div>
+                                            @endif
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="upload-modal-help-row">
+                                    <div id="phaseHelpText" class="upload-modal-help">
+                                        Upload your basic requirements first.
+                                    </div>
+                                </div>
+                            </div>
 
-                    <label class="modal-field-label">
-                        <i class="fa fa-paperclip"></i> Choose File
-                    </label>
-                    <div class="file-upload-zone" id="dropZone">
-                        <input type="file" name="file" required id="fileInput" data-max-size-mb="2" accept="application/pdf,.pdf">
-                        <div class="upload-icon"><i class="fa fa-cloud-upload-alt"></i></div>
-                        <p id="fileLabel">Click or drag a file here to upload</p>
-                        <span>Accepts PDF files only | Max file size: 2 MB</span>
-                        <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
+                            <div class="upload-modal-section">
+                                <div class="upload-modal-section-head">
+                                    <div class="upload-modal-section-icon"><i class="fa fa-tag"></i></div>
+                                    <div>
+                                        <div class="upload-modal-section-title">Category</div>
+                                        <div class="upload-modal-section-subtitle">Select the exact requirement you are uploading.</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="fileName" id="requirementCategorySelect" value="">
+                                <div class="phase-dropdown" id="categoryDropdown">
+                                    <button type="button" class="phase-dropdown-trigger" id="categoryDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="phase-dropdown-trigger-text" id="categoryDropdownTriggerText">Select a category</span>
+                                        <i class="fa fa-chevron-down phase-dropdown-trigger-icon"></i>
+                                    </button>
+                                    <div class="phase-dropdown-menu category-dropdown-menu-scroll" id="categoryDropdownMenu" role="listbox" aria-label="Requirement Category">
+                                        <div class="phase-dropdown-option category-dropdown-option empty">
+                                            <span class="phase-dropdown-option-label">
+                                                <span class="phase-dropdown-option-title">Select a category</span>
+                                                <span class="phase-dropdown-option-meta">Choose a phase first to load the available categories.</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-modal-right">
+                            <div class="upload-modal-section file">
+                                <div class="upload-modal-section-head">
+                                    <div class="upload-modal-section-icon"><i class="fa fa-paperclip"></i></div>
+                                    <div>
+                                        <div class="upload-modal-section-title">Choose File</div>
+                                        <div class="upload-modal-section-subtitle">Upload a clear PDF copy of your requirement.</div>
+                                    </div>
+                                </div>
+                                <div class="file-upload-zone" id="dropZone">
+                                    <input type="file" name="file" required id="fileInput" data-max-size-mb="2" accept="application/pdf,.pdf">
+                                    <div class="upload-icon"><i class="fa fa-cloud-upload-alt"></i></div>
+                                    <p id="fileLabel">Click or drag a file here to upload</p>
+                                    <span>Accepts PDF files only | Max file size: 2 MB</span>
+                                    <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <input type="hidden" name="uploadedBy" value="{{ $user->full_name }}">
@@ -1355,6 +2191,131 @@
                 </div>
 
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="basicRequirementsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-list-ul"></i> Basic Requirements
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:16px;">
+                    These are the requirements you need to complete before starting your OJT.
+                </div>
+                <div class="phase-modal-list">
+                    @forelse ($basicCategories as $category)
+                        @php
+                            $isSubmittedBasic = $submittedBasicNames->contains($category->fileName);
+                        @endphp
+                        <div class="phase-modal-item">
+                            <div class="phase-modal-item-name">
+                                <i class="fa {{ $isSubmittedBasic ? 'fa-check-circle' : 'fa-file-alt' }}" style="color:{{ $isSubmittedBasic ? '#16a34a' : '#64748b' }};"></i>
+                                <span>{{ $category->fileName }}</span>
+                            </div>
+                            <span class="status-badge {{ $isSubmittedBasic ? 'status-approved' : 'status-default' }}">
+                                {{ $isSubmittedBasic ? 'Submitted' : 'Pending' }}
+                            </span>
+                        </div>
+                    @empty
+                        <div style="font-size:13px;color:#6b7280;">No basic requirements configured yet.</div>
+                    @endforelse
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="otherRequirementsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-layer-group"></i> Other Requirements
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:16px;">
+                    These will be available after all basic requirements are submitted and your Notarized MOA is completed.
+                </div>
+                <div class="phase-modal-list">
+                    @forelse ($otherCategories as $category)
+                        <div class="phase-modal-item">
+                            <div class="phase-modal-item-name">
+                                <i class="fa fa-file-alt" style="color:#64748b;"></i>
+                                <span>{{ $category->fileName }}</span>
+                            </div>
+                            <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-default' }}">
+                                {{ $otherRequirementsUnlocked ? 'Available' : 'Locked' }}
+                            </span>
+                        </div>
+                    @empty
+                        <div style="font-size:13px;color:#6b7280;">No other requirements configured yet.</div>
+                    @endforelse
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="unlockRequirementsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-clipboard-list"></i> What Still Needs To Be Submitted
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:16px;">
+                    Complete these items to unlock the other requirements phase.
+                </div>
+                <div class="phase-modal-list">
+                    @if ($missingBasicCategories->isNotEmpty())
+                        <div class="phase-modal-item">
+                            <div class="phase-modal-item-name">
+                                <i class="fa fa-file-alt" style="color:#64748b;"></i>
+                                <span>Basic requirements left: {{ $missingBasicCategories->pluck('fileName')->implode(', ') }}</span>
+                            </div>
+                            <span class="status-badge status-pending">Pending</span>
+                        </div>
+                    @endif
+                    @if (!$hasSubmittedNotarizedMoa)
+                        <div class="phase-modal-item">
+                            <div class="phase-modal-item-name">
+                                <i class="fa fa-file-contract" style="color:#64748b;"></i>
+                                <span>Submit your Notarized MOA from the MOA page.</span>
+                            </div>
+                            <span class="status-badge status-pending">Pending</span>
+                        </div>
+                    @endif
+                    @if ($missingBasicCategories->isEmpty() && $hasSubmittedNotarizedMoa)
+                        <div style="font-size:13px;color:#16a34a;">All required items are completed.</div>
+                    @endif
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i> Close
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -1422,6 +2383,212 @@
             ? this.files[0].name
             : 'Click or drag a file here to upload';
     });
+
+    const requirementPhaseSelect = document.getElementById('requirementPhaseSelect');
+    const phaseDropdown = document.getElementById('phaseDropdown');
+    const phaseDropdownTrigger = document.getElementById('phaseDropdownTrigger');
+    const phaseDropdownTriggerText = document.getElementById('phaseDropdownTriggerText');
+    const phaseDropdownOptions = phaseDropdown ? Array.from(phaseDropdown.querySelectorAll('.phase-dropdown-option')) : [];
+    const requirementCategorySelect = document.getElementById('requirementCategorySelect');
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    const categoryDropdownTrigger = document.getElementById('categoryDropdownTrigger');
+    const categoryDropdownTriggerText = document.getElementById('categoryDropdownTriggerText');
+    const categoryDropdownMenu = document.getElementById('categoryDropdownMenu');
+    const phaseHelpText = document.getElementById('phaseHelpText');
+    const requirementCategoriesByPhase = {
+        basic: @json($basicCategories->map(fn ($category) => ['fileName' => $category->fileName])->values()),
+        other: @json($otherCategories->map(fn ($category) => ['fileName' => $category->fileName])->values()),
+    };
+    const otherRequirementsUnlocked = @json($otherRequirementsUnlocked);
+    const missingBasicRequirementNames = @json($missingBasicCategories->pluck('fileName')->values());
+    const hasSubmittedNotarizedMoa = @json($hasSubmittedNotarizedMoa);
+
+    function setPhaseDropdownValue(value) {
+        if (!requirementPhaseSelect || !phaseDropdownOptions.length) {
+            return;
+        }
+
+        requirementPhaseSelect.value = value;
+
+        phaseDropdownOptions.forEach(function (option) {
+            const isActive = option.dataset.value === value;
+            option.classList.toggle('active', isActive);
+            if (isActive && phaseDropdownTriggerText) {
+                const title = option.querySelector('.phase-dropdown-option-title');
+                phaseDropdownTriggerText.textContent = title ? title.textContent.trim() : option.textContent.trim();
+            }
+        });
+    }
+
+    function closePhaseDropdown() {
+        if (!phaseDropdown || !phaseDropdownTrigger) {
+            return;
+        }
+
+        phaseDropdown.classList.remove('open');
+        phaseDropdownTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function openPhaseDropdown() {
+        if (!phaseDropdown || !phaseDropdownTrigger) {
+            return;
+        }
+
+        phaseDropdown.classList.add('open');
+        phaseDropdownTrigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function setCategoryDropdownValue(value, label) {
+        if (!requirementCategorySelect || !categoryDropdownTriggerText) {
+            return;
+        }
+
+        requirementCategorySelect.value = value || '';
+        categoryDropdownTriggerText.textContent = label || 'Select a category';
+
+        if (!categoryDropdownMenu) {
+            return;
+        }
+
+        Array.from(categoryDropdownMenu.querySelectorAll('.phase-dropdown-option[data-value]')).forEach(function (option) {
+            option.classList.toggle('active', option.dataset.value === (value || ''));
+        });
+    }
+
+    function closeCategoryDropdown() {
+        if (!categoryDropdown || !categoryDropdownTrigger) {
+            return;
+        }
+
+        categoryDropdown.classList.remove('open');
+        categoryDropdownTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function openCategoryDropdown() {
+        if (!categoryDropdown || !categoryDropdownTrigger) {
+            return;
+        }
+
+        categoryDropdown.classList.add('open');
+        categoryDropdownTrigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function updateRequirementCategoryOptions() {
+        if (!requirementPhaseSelect || !requirementCategorySelect || !categoryDropdownMenu) {
+            return;
+        }
+
+        const selectedPhase = requirementPhaseSelect.value || 'basic';
+        const categories = requirementCategoriesByPhase[selectedPhase] || [];
+
+        categoryDropdownMenu.innerHTML = '';
+
+        if (!categories.length) {
+            categoryDropdownMenu.innerHTML = ''
+                + '<div class="phase-dropdown-option category-dropdown-option empty">'
+                + '  <span class="phase-dropdown-option-label">'
+                + '    <span class="phase-dropdown-option-title">No categories available</span>'
+                + '    <span class="phase-dropdown-option-meta">Ask your professor to set up requirement categories for this phase.</span>'
+                + '  </span>'
+                + '</div>';
+            setCategoryDropdownValue('', 'Select a category');
+        } else {
+            categories.forEach(function (category, index) {
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'phase-dropdown-option category-dropdown-option';
+                option.dataset.value = category.fileName;
+                option.innerHTML = ''
+                    + '<span class="phase-dropdown-option-label">'
+                    + '  <span class="phase-dropdown-option-title">' + category.fileName + '</span>'
+                    + '</span>';
+
+                option.addEventListener('click', function () {
+                    setCategoryDropdownValue(category.fileName, category.fileName);
+                    closeCategoryDropdown();
+                });
+
+                categoryDropdownMenu.appendChild(option);
+
+                if (index === 0) {
+                    setCategoryDropdownValue('', 'Select a category');
+                }
+            });
+        }
+
+        if (!phaseHelpText) {
+            return;
+        }
+
+        if (selectedPhase === 'other') {
+            if (otherRequirementsUnlocked) {
+                phaseHelpText.textContent = 'Other requirements are now unlocked. You can upload them here.';
+            } else {
+                const missingParts = [];
+                if (missingBasicRequirementNames.length) {
+                    missingParts.push('Basic requirements remaining: ' + missingBasicRequirementNames.join(', '));
+                }
+                if (!hasSubmittedNotarizedMoa) {
+                    missingParts.push('Submit your Notarized MOA from the MOA page first.');
+                }
+                phaseHelpText.textContent = missingParts.join(' ');
+            }
+        } else {
+            phaseHelpText.textContent = 'Upload your basic requirements first.';
+        }
+    }
+
+    if (phaseDropdownTrigger && phaseDropdown) {
+        phaseDropdownTrigger.addEventListener('click', function () {
+            if (phaseDropdown.classList.contains('open')) {
+                closePhaseDropdown();
+            } else {
+                openPhaseDropdown();
+            }
+        });
+
+        phaseDropdownOptions.forEach(function (option) {
+            option.addEventListener('click', function () {
+                const value = option.dataset.value;
+                const isLocked = option.dataset.locked === 'true';
+
+                if (isLocked) {
+                    return;
+                }
+
+                setPhaseDropdownValue(value);
+                closePhaseDropdown();
+                updateRequirementCategoryOptions();
+            });
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!phaseDropdown.contains(event.target)) {
+                closePhaseDropdown();
+            }
+        });
+    }
+
+    if (categoryDropdownTrigger && categoryDropdown) {
+        categoryDropdownTrigger.addEventListener('click', function () {
+            if (categoryDropdown.classList.contains('open')) {
+                closeCategoryDropdown();
+            } else {
+                openCategoryDropdown();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!categoryDropdown.contains(event.target)) {
+                closeCategoryDropdown();
+            }
+        });
+    }
+
+    if (requirementPhaseSelect) {
+        setPhaseDropdownValue(requirementPhaseSelect.value || 'basic');
+        updateRequirementCategoryOptions();
+    }
 
     // SweetAlert remove confirmation
     function showDenialReason(fileName, denialReason) {

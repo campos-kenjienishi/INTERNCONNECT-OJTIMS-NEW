@@ -299,6 +299,21 @@
             font-size: 12.5px; font-weight: 700;
         }
 
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-approved { background: #dcfce7; color: #16a34a; }
+        .status-pending { background: #fef9c3; color: #ca8a04; }
+
         /* DataTables */
         .table-card-body { padding: 0; }
 
@@ -448,6 +463,14 @@
             margin-bottom: 7px; display: flex; align-items: center; gap: 6px;
         }
 
+        .modal-field-label-note {
+            font-size: 11.5px;
+            font-weight: 500;
+            color: #777;
+            margin-left: 4px;
+            line-height: 1.4;
+        }
+
         .modal-field-label i { color: var(--red); font-size: 12px; }
 
         .modal-field-input {
@@ -460,6 +483,38 @@
 
         .modal-field-input:focus {
             border-color: var(--red); background: #fff;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
+        }
+
+        .modal-field-select {
+            width: 100%;
+            background: #fafafa;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 10px;
+            color: #1a1a1a;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            font-weight: 500;
+            padding: 11px 42px 11px 14px;
+            outline: none;
+            transition: all 0.25s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #991b1b 50%),
+                linear-gradient(135deg, #991b1b 50%, transparent 50%);
+            background-position:
+                calc(100% - 18px) calc(50% - 3px),
+                calc(100% - 12px) calc(50% - 3px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+        }
+
+        .modal-field-select:focus {
+            border-color: var(--red);
+            background-color: #fff;
             box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
         }
 
@@ -615,6 +670,14 @@
 
         body.dark-mode .modal-body { background: #2a2a2a; }
         body.dark-mode .modal-field-input { background: #3a3a3a; border-color: #555; color: #e0e0e0; }
+        body.dark-mode .modal-field-select {
+            background-color: #3a3a3a;
+            border-color: #555;
+            color: #e0e0e0;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #fca5a5 50%),
+                linear-gradient(135deg, #fca5a5 50%, transparent 50%);
+        }
         body.dark-mode .modal-footer { background: #3a3a3a; border-top: 1px solid #555; }
         body.dark-mode .btn-modal-close { background: #3a3a3a; border-color: #555; color: #e0e0e0; }
         body.dark-mode .btn-modal-close:hover { background: rgba(220,38,38,0.2); border-color: var(--red); color: #ff6b6b; }
@@ -759,15 +822,15 @@
             <div class="stat-card">
                 <div class="stat-icon blue"><i class="fa fa-tags"></i></div>
                 <div>
-                    <div class="stat-num">OJT</div>
-                    <div class="stat-name">Requirement Types</div>
+                    <div class="stat-num">{{ $files->where('phase', 'basic')->count() }}</div>
+                    <div class="stat-name">Basic Requirements</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon green"><i class="fa fa-check-circle"></i></div>
                 <div>
-                    <div class="stat-num">Active</div>
-                    <div class="stat-name">All Categories</div>
+                    <div class="stat-num">{{ $files->where('phase', '!=', 'basic')->count() }}</div>
+                    <div class="stat-name">Other Requirements</div>
                 </div>
             </div>
         </div>
@@ -796,6 +859,7 @@
                     <thead>
                         <tr>
                             <th>Category Name</th>
+                            <th>Phase</th>
                             <th>Created By</th>
                             <th>Action</th>
                         </tr>
@@ -812,6 +876,12 @@
                                 </div>
                             </td>
                             <td>
+                                <span class="status-badge {{ ($file->phase ?? 'other') === 'basic' ? 'status-pending' : 'status-approved' }}">
+                                    <i class="fa {{ ($file->phase ?? 'other') === 'basic' ? 'fa-unlock-alt' : 'fa-layer-group' }}"></i>
+                                    {{ ($file->phase ?? 'other') === 'basic' ? 'Basic Requirements' : 'Other Requirements' }}
+                                </span>
+                            </td>
+                            <td>
                                 <div class="uploader-cell">
                                     <div class="uploader-avatar">
                                         <i class="fa fa-user-tie"></i>
@@ -826,6 +896,7 @@
                                         class="btn-edit edit-button"
                                         data-file-id="{{ $file->id }}"
                                         data-file-name="{{ e($file->fileName) }}"
+                                        data-file-phase="{{ $file->phase ?? 'other' }}"
                                     >
                                         <i class="fa fa-edit"></i> Edit
                                     </button>
@@ -883,6 +954,14 @@
                     <input class="modal-field-input" type="text" name="fileName" id="editCategoryName"
                            placeholder="e.g. Endorsement Letter, Daily Time Record..."
                            required>
+                    <label class="modal-field-label" style="margin-top:14px;">
+                        <i class="fa fa-sitemap"></i> Requirement Phase
+                        <span class="modal-field-label-note">Basic = before OJT, Other = during/after OJT</span>
+                    </label>
+                    <select class="modal-field-select" name="phase" id="editCategoryPhase" required>
+                        <option value="basic">Basic Requirements</option>
+                        <option value="other">Other Requirements</option>
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
@@ -916,6 +995,14 @@
                     <input class="modal-field-input" type="text" name="fileName"
                            placeholder="e.g. Endorsement Letter, Daily Time Record..."
                            required>
+                    <label class="modal-field-label" style="margin-top:14px;">
+                        <i class="fa fa-sitemap"></i> Requirement Phase
+                        <span class="modal-field-label-note">Basic = before OJT, Other = during/after OJT</span>
+                    </label>
+                    <select class="modal-field-select" name="phase" required>
+                        <option value="basic" selected>Basic Requirements</option>
+                        <option value="other">Other Requirements</option>
+                    </select>
                     <input type="hidden" name="uploadedBy" value="{{ $userName }}">
                 </div>
                 <div class="modal-footer">
@@ -970,9 +1057,11 @@
         $('.edit-button').on('click', function () {
             const fileId = $(this).data('file-id');
             const fileName = $(this).data('file-name');
+            const filePhase = $(this).data('file-phase');
 
             $('#editCategoryForm').attr('action', '/fileCategory/' + fileId);
             $('#editCategoryName').val(fileName);
+            $('#editCategoryPhase').val(filePhase || 'other');
             editCategoryModal.show();
         });
 

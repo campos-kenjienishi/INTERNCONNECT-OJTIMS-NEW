@@ -32,6 +32,68 @@ use App\Helpers\AuditLogger;
 
 class PassDocuController extends Controller
 {
+    private function normalizeRequirementPhase(?string $phase): string
+    {
+        return $phase === 'basic' ? 'basic' : 'other';
+    }
+
+    private function sortCategoriesByPhaseAndName($categories)
+    {
+        return $categories
+            ->sortBy(function ($category) {
+                $phaseOrder = $this->normalizeRequirementPhase($category->phase ?? null) === 'basic' ? 0 : 1;
+                return sprintf('%d-%s', $phaseOrder, mb_strtolower(trim((string) $category->fileName)));
+            }, SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+    }
+
+    private function buildRequirementPhaseState(User $user, ?Student $student, ?Professor $professor): array
+    {
+        $fileCategories = $professor
+            ? $this->sortCategoriesByPhaseAndName(
+                FileCategory::where('professor_id', $professor->id)->get()
+            )
+            : collect();
+
+        $basicCategories = $fileCategories
+            ->filter(fn ($category) => $this->normalizeRequirementPhase($category->phase ?? null) === 'basic')
+            ->values();
+        $otherCategories = $fileCategories
+            ->filter(fn ($category) => $this->normalizeRequirementPhase($category->phase ?? null) !== 'basic')
+            ->values();
+
+        $submittedRequirements = FileRequirement::where('uploadedBy', $user->full_name)->get();
+        $validSubmittedNames = $submittedRequirements
+            ->filter(fn ($requirement) => (int) ($requirement->status ?? 0) !== 2)
+            ->pluck('fileName')
+            ->filter()
+            ->map(fn ($name) => mb_strtolower(trim((string) $name)))
+            ->unique()
+            ->values();
+
+        $submittedBasicNames = $basicCategories
+            ->filter(fn ($category) => $validSubmittedNames->contains(mb_strtolower(trim((string) $category->fileName))))
+            ->pluck('fileName')
+            ->values();
+        $missingBasicCategories = $basicCategories
+            ->reject(fn ($category) => $validSubmittedNames->contains(mb_strtolower(trim((string) $category->fileName))))
+            ->values();
+
+        $hasSubmittedNotarizedMoa = $validSubmittedNames->contains(mb_strtolower('Notarized MOA'));
+        $otherRequirementsUnlocked = $missingBasicCategories->isEmpty() && $hasSubmittedNotarizedMoa;
+
+        return [
+            'fileCategories' => $fileCategories,
+            'basicCategories' => $basicCategories,
+            'otherCategories' => $otherCategories,
+            'submittedRequirements' => $submittedRequirements,
+            'submittedBasicNames' => $submittedBasicNames,
+            'missingBasicCategories' => $missingBasicCategories,
+            'hasSubmittedNotarizedMoa' => $hasSubmittedNotarizedMoa,
+            'otherRequirementsUnlocked' => $otherRequirementsUnlocked,
+        ];
+    }
+
     private function updateCompanyStudentDisplay(Company $company, ?string $removedName = null): void
     {
         if (!Schema::hasColumn('companies', 'student_names_display')) {
@@ -129,10 +191,9 @@ class PassDocuController extends Controller
         // Fetch only file categories created by this professor
         $professor = Professor::where('user_id', $data->id)->first();
         $files = $professor
-            ? FileCategory::where('professor_id', $professor->id)
-                ->get()
-                ->sortBy('fileName', SORT_NATURAL | SORT_FLAG_CASE)
-                ->values()
+            ? $this->sortCategoriesByPhaseAndName(
+                FileCategory::where('professor_id', $professor->id)->get()
+            )
             : collect();
 
         return view('professor.fileCategory', compact('data', 'userName', 'files'));
@@ -140,8 +201,14 @@ class PassDocuController extends Controller
 
 
     public function fileCategory(Request $request){
+        $request->validate([
+            'fileName' => 'required|string|max:255',
+            'phase' => 'required|in:basic,other',
+        ]);
+
         $files = new FileCategory();
         $files->fileName = $request->fileName;
+        $files->phase = $this->normalizeRequirementPhase($request->phase);
         $files->uploadedBy = $request->uploadedBy;
         // Attach professor_id
         $user = User::where('id', Session::get('loginId'))->first();
@@ -156,7 +223,7 @@ class PassDocuController extends Controller
                 'Added new file category: ' . $files->fileName,
                 Session::get('loginId') ?? null,
                 null,
-                ['fileName' => $files->fileName, 'uploadedBy' => $files->uploadedBy, 'professor_id' => $files->professor_id]
+                ['fileName' => $files->fileName, 'phase' => $files->phase, 'uploadedBy' => $files->uploadedBy, 'professor_id' => $files->professor_id]
             );
             return back()->with('success','You have added the course successfully!');
         }
@@ -197,6 +264,7 @@ class PassDocuController extends Controller
     {
         $request->validate([
             'fileName' => 'required|string|max:255',
+            'phase' => 'required|in:basic,other',
         ]);
 
         $category = FileCategory::find($id);
@@ -206,6 +274,7 @@ class PassDocuController extends Controller
         }
 
         $category->fileName = $request->fileName;
+        $category->phase = $this->normalizeRequirementPhase($request->phase);
         $category->save();
 
         AuditLogger::log(
@@ -229,20 +298,15 @@ class PassDocuController extends Controller
 
         $user = $sessionCheck;
 
-        // Fetch only file categories from student's professor
         $student = Student::where('user_id', $user->id)->first();
         $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
-        $fileCategories = $professor
-            ? FileCategory::where('professor_id', $professor->id)
-                ->get()
-                ->sortBy('fileName', SORT_NATURAL | SORT_FLAG_CASE)
-                ->values()
-            : collect();
+        $phaseState = $this->buildRequirementPhaseState($user, $student, $professor);
+        $data = $phaseState['submittedRequirements'];
 
-        // Student's own uploaded files
-        $data = FileRequirement::where('uploadedBy', '=', $user->full_name)->get();
-
-        return view('students.fileReq', compact('user', 'fileCategories', 'data'));
+        return view('students.fileReq', array_merge($phaseState, [
+            'user' => $user,
+            'data' => $data,
+        ]));
     }
 
 public function fileReqCreate(Request $request){
@@ -254,12 +318,36 @@ public function fileReqCreate(Request $request){
 
     $request->validate([
         'fileName' => 'required|string',
+        'phase' => 'required|in:basic,other',
         'file' => 'required|file|mimes:pdf|max:2048',
         'uploadedBy' => 'required|string',
         'adviser' => 'required|string',
     ], [
         'file.mimes' => 'Only PDF files are accepted for requirement uploads.',
     ]);
+
+    $user = $sessionCheck;
+    $student = Student::where('user_id', $user->id)->first();
+    $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
+    $phaseState = $this->buildRequirementPhaseState($user, $student, $professor);
+
+    $category = $phaseState['fileCategories']->first(function ($item) use ($request) {
+        return trim((string) $item->fileName) === trim((string) $request->fileName);
+    });
+
+    if (!$category) {
+        return back()->with('fail', 'Selected requirement category is not assigned to your professor.');
+    }
+
+    $categoryPhase = $this->normalizeRequirementPhase($category->phase ?? null);
+
+    if ($request->phase !== $categoryPhase) {
+        return back()->with('fail', 'Selected requirement category does not belong to the chosen phase.');
+    }
+
+    if ($categoryPhase === 'other' && !$phaseState['otherRequirementsUnlocked']) {
+        return back()->with('fail', 'Submit all basic requirements and your Notarized MOA first before uploading other requirements.');
+    }
     
     // Create a new instance of FileRequirement model
     $fileup = new FileRequirement();
@@ -282,7 +370,7 @@ public function fileReqCreate(Request $request){
             'Uploaded file: ' . $fileup->fileName,
             Session::get('loginId') ?? null,
             null,
-            ['fileName' => $fileup->fileName, 'file' => $fileup->file, 'uploadedBy' => $fileup->uploadedBy]
+            ['fileName' => $fileup->fileName, 'phase' => $categoryPhase, 'file' => $fileup->file, 'uploadedBy' => $fileup->uploadedBy]
         );
         return back()->with('success', 'File uploaded successfully!');
     } else {

@@ -962,6 +962,13 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                         </div>
                     </div>
                     <div class="profile-info-row">
+                        <div class="profile-info-icon"><i class="fa fa-calendar-alt"></i></div>
+                        <div>
+                            <div class="profile-info-label">School Year</div>
+                            <div class="profile-info-value">{{ !empty($data->school_year_start) && !empty($data->school_year_end) ? $data->school_year_start . ' - ' . $data->school_year_end : '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="profile-info-row">
                         <div class="profile-info-icon"><i class="fa fa-envelope"></i></div>
                         <div>
                             <div class="profile-info-label">Email</div>
@@ -1103,6 +1110,21 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                                     <div class="field-input-wrap">
                                         <div class="field-bubble" id="yearSectionBubble"></div>
                                         <input class="field-input" type="text" id="year_and_section" name="year_and_section" value="{{ $data->year_and_section }}" placeholder="eg. 4-1" maxlength="10" spellcheck="false">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year</label>
+                                    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;">
+                                        <select name="academic_year_start" id="academic_year_start" class="field-select" required>
+                                            <option value="">Start Year</option>
+                                            @for ($year = (date('Y') - 10); $year <= (date('Y') + 10); $year++)
+                                                <option value="{{ $year }}" {{ (string) ($data->school_year_start ?? '') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
+                                            @endfor
+                                        </select>
+                                        <span style="color:#888;font-weight:700;">-</span>
+                                        <select name="academic_year_end" id="academic_year_end" class="field-select" required>
+                                            <option value="">End Year</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -1437,6 +1459,9 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         const emailInput = document.getElementById('email');
         const studentNumInput = document.getElementById('studentNum');
         const yearAndSectionInput = document.getElementById('year_and_section');
+        const startYearSelect = document.getElementById('academic_year_start');
+        const endYearSelect = document.getElementById('academic_year_end');
+        const initialEndYear = @json((string) ($data->school_year_end ?? ''));
         let emailCheckTimer = null;
         let emailRequestCounter = 0;
         let emailState = 'idle';
@@ -1540,6 +1565,36 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
             return '';
         }
 
+        function updateAcademicYearEndOptions() {
+            if (!startYearSelect || !endYearSelect) {
+                return;
+            }
+
+            const selectedStartYear = parseInt(startYearSelect.value, 10);
+            endYearSelect.innerHTML = '';
+
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'End Year';
+            endYearSelect.appendChild(defaultOption);
+
+            if (!isNaN(selectedStartYear)) {
+                const nextYear = selectedStartYear + 1;
+                const option = document.createElement('option');
+                option.value = String(nextYear);
+                option.textContent = String(nextYear);
+                endYearSelect.appendChild(option);
+
+                if (initialEndYear !== '' && initialEndYear === String(nextYear)) {
+                    endYearSelect.value = initialEndYear;
+                } else {
+                    endYearSelect.value = String(nextYear);
+                }
+            } else {
+                endYearSelect.value = '';
+            }
+        }
+
         async function checkEmailAvailability(email) {
             const trimmedEmail = (email || '').trim();
 
@@ -1628,6 +1683,11 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 yearAndSectionInput.setCustomValidity(validationError);
                 showFieldBubble('yearSectionBubble', validationError && yearAndSectionInput.value.trim() ? validationError : '');
             });
+        }
+
+        if (startYearSelect && endYearSelect) {
+            updateAcademicYearEndOptions();
+            startYearSelect.addEventListener('change', updateAcademicYearEndOptions);
         }
 
         if (emailInput) {

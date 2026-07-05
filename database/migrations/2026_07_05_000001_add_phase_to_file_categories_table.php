@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (!Schema::hasColumn('file_categories', 'phase')) {
+            Schema::table('file_categories', function (Blueprint $table) {
+                $table->string('phase', 20)->default('other')->after('fileName');
+            });
+        }
+
+        DB::table('file_categories')
+            ->whereNull('phase')
+            ->orWhere('phase', '')
+            ->update(['phase' => 'other']);
+    }
+
+    public function down(): void
+    {
+        if (Schema::hasColumn('file_categories', 'phase')) {
+            Schema::table('file_categories', function (Blueprint $table) {
+                $table->dropColumn('phase');
+            });
+        }
+    }
+};
