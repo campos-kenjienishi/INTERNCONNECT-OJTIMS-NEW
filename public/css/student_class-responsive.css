@@ -231,11 +231,6 @@
    2XL — 1536px and above (large desktops / TVs)
 ───────────────────────────────────────────── */
 @media (min-width: 1536px) {
-    .page-content {
-        max-width: 1400px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-    }
     .page-header h1 { font-size: 28px !important; }
     .table-card-header h2 { font-size: 18px !important; }
     .rooms-table thead th,
