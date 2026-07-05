@@ -176,13 +176,18 @@
         /* =============== MAIN =============== */
         .main-content {
             margin-left: var(--sidebar-w);
-            transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
+            width: calc(100% - var(--sidebar-w));
+            max-width: none !important;
+            transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s cubic-bezier(0.4,0,0.2,1);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        .main-content.expanded { margin-left: var(--sidebar-w-collapsed); }
+        .main-content.expanded {
+            margin-left: var(--sidebar-w-collapsed);
+            width: calc(100% - var(--sidebar-w-collapsed));
+        }
 
         .topbar {
             height: var(--topbar-h);
@@ -271,7 +276,13 @@
         }
 
         /* =============== PAGE =============== */
-        .page-content { padding: 28px; flex: 1; }
+        .page-content {
+            padding: 28px;
+            flex: 1;
+            width: 100%;
+            max-width: none !important;
+            margin: 0 !important;
+        }
 
         .page-header {
             display: flex;
@@ -298,6 +309,8 @@
             border: 1px solid rgba(0,0,0,0.04);
             overflow: hidden;
             margin-bottom: 22px;
+            width: 100%;
+            max-width: none !important;
         }
 
         .table-card-header {
