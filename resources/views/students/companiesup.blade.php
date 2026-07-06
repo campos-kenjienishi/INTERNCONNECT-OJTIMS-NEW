@@ -1280,9 +1280,20 @@
                                                 @endif
                                             </div>
                                         </div>
-                                        <button type="button" class="btn-modal-submit existing-moa-link-btn" data-company-id="{{ $linkableCompany->id }}" style="min-width: 150px; justify-content:center; padding-inline: 16px;">
-                                            <i class="fa fa-link me-1"></i> Use This MOA
-                                        </button>
+                                        <div style="display:flex; flex-direction:column; gap:8px; align-items:stretch; min-width: 150px;">
+                                            <button type="button"
+                                                class="btn-modal-close view-btn"
+                                                data-url="{{ asset('assets/' . $linkableCompany->file) }}"
+                                                style="justify-content:center; padding-inline: 16px; white-space: nowrap;">
+                                                <i class="fa fa-eye me-1"></i> View MOA
+                                            </button>
+                                            <button type="button"
+                                                class="btn-modal-submit existing-moa-link-btn"
+                                                data-company-id="{{ $linkableCompany->id }}"
+                                                style="justify-content:center; padding-inline: 16px; white-space: nowrap;">
+                                                <i class="fa fa-link me-1"></i> Use This MOA
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             @empty
