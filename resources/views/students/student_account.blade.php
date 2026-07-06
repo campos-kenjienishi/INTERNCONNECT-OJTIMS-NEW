@@ -1289,14 +1289,14 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
         let verifyCurrentPasswordSequence = 0;
 
         function isNewPasswordValid(value) {
-            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/.test(value);
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(value);
         }
 
         function getNewPasswordUnmetRules(value) {
             const unmetRules = [];
 
-            if (value.length < 8 || value.length > 12) {
-                unmetRules.push('Use 8 to 12 characters.');
+            if (value.length < 8) {
+                unmetRules.push('Use at least 8 characters.');
             }
             if (!/[A-Z]/.test(value)) {
                 unmetRules.push('Add an uppercase letter.');
@@ -1531,8 +1531,8 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 return 'Student number is required.';
             }
 
-            if (!/^\d{4}-\d{5}-TG-0$/.test(trimmed)) {
-                return 'Use this format: YYYY-12345-TG-0.';
+            if (!/^\d{4}-\d{5}-TG-[01]$/.test(trimmed)) {
+                return 'Use this format: YYYY-12345-TG-0 or YYYY-12345-TG-1.';
             }
 
             return '';

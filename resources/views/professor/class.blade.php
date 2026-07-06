@@ -1804,7 +1804,7 @@
             const map = {};
             if (!form) return map;
 
-            const timeInputs = form.querySelectorAll('input[type="time"][name]');
+            const timeInputs = form.querySelectorAll('.schedule-time-input[name]');
             timeInputs.forEach(input => {
                 const startMatch = input.name.match(/^(.*)_start_time_(\d+)$/);
                 const endMatch = input.name.match(/^(.*)_end_time_(\d+)$/);
@@ -1829,9 +1829,48 @@
             return map;
         }
 
+        function buildTimeOptions() {
+            let options = '';
+
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute = 0; minute < 60; minute += 15) {
+                    const value = String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
+                    options += '<option value="' + value + '"></option>';
+                }
+            }
+
+            return options;
+        }
+
+        function ensureTimeSuggestions() {
+            if (document.getElementById('scheduleTimeSuggestions')) {
+                return;
+            }
+
+            const datalist = document.createElement('datalist');
+            datalist.id = 'scheduleTimeSuggestions';
+            datalist.innerHTML = buildTimeOptions();
+            document.body.appendChild(datalist);
+        }
+
+        function buildTimeInput(name, selectedValue) {
+            return '<input class="modal-field-select schedule-time-input" ' +
+                'type="text" ' +
+                'name="' + name + '" ' +
+                'value="' + (selectedValue || '') + '" ' +
+                'placeholder="HH:MM" ' +
+                'inputmode="numeric" ' +
+                'list="scheduleTimeSuggestions" ' +
+                'pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" ' +
+                'title="Enter time in 24-hour format like 08:00 or 13:30" ' +
+                'required>';
+        }
+
         function renderScheduleInputs(daySelector, slotSelectId, containerId, fallbackScheduleMap) {
             const container = document.getElementById(containerId);
             if (!container) return;
+
+            ensureTimeSuggestions();
 
             const slotSelect = document.getElementById(slotSelectId);
             const slots = parseInt((slotSelect && slotSelect.value) ? slotSelect.value : '1', 10);
@@ -1857,8 +1896,8 @@
                     const existing = scheduleMap[day] && scheduleMap[day][i - 1] ? scheduleMap[day][i - 1] : { start_time: '', end_time: '' };
 
                     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">';
-                    html += '<input class="modal-field-input" type="time" name="' + startName + '" value="' + (existing.start_time || '') + '" required>';
-                    html += '<input class="modal-field-input" type="time" name="' + endName + '" value="' + (existing.end_time || '') + '" required>';
+                    html += buildTimeInput(startName, existing.start_time || '');
+                    html += buildTimeInput(endName, existing.end_time || '');
                     html += '</div>';
                 }
 
@@ -1897,6 +1936,13 @@
             if (roomId) {
                 renderEditRoomScheduleInputs(roomId);
             }
+        });
+
+        $(document).on('input change', '.schedule-time-input', function () {
+            const isValid = /^([01]\d|2[0-3]):([0-5]\d)$/.test(this.value.trim());
+            this.setCustomValidity(this.value.trim() === '' || isValid
+                ? ''
+                : 'Use HH:MM in 24-hour format, like 08:00 or 13:30.');
         });
 
         $('[id^="editRoomModal"]').on('shown.bs.modal', function () {

@@ -97,13 +97,11 @@ class AccountInfo extends Controller
             'required',
             'string',
             'min:8',
-            'max:12',
-            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/',
         ],
     ], [
-        'new_password.min' => 'New password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
-        'new_password.max' => 'New password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
-        'new_password.regex' => 'New password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+        'new_password.min' => 'New password must be at least 8 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+        'new_password.regex' => 'New password must be at least 8 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
         'confirm_password.same' => 'Password confirmation does not match.',
     ]);
 

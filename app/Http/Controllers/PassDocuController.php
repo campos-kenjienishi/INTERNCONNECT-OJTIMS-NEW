@@ -32,6 +32,22 @@ use App\Helpers\AuditLogger;
 
 class PassDocuController extends Controller
 {
+    private function resolveUserFromStudent(Student $student): ?User
+    {
+        $student->loadMissing('user');
+
+        if ($student->user) {
+            return $student->user;
+        }
+
+        $fullName = trim((string) ($student->full_name ?? ''));
+        if ($fullName === '') {
+            return null;
+        }
+
+        return User::where('full_name', $fullName)->first();
+    }
+
     private function normalizeRequirementPhase(?string $phase): string
     {
         return $phase === 'basic' ? 'basic' : 'other';
@@ -120,6 +136,108 @@ class PassDocuController extends Controller
             ->implode(', ');
 
         $company->save();
+    }
+
+    private function syncStudentNotarizedRequirement(Company $company, Student $student, ?FileRequirement $sourceRequirement = null): void
+    {
+        $user = $this->resolveUserFromStudent($student);
+
+        if (!$user) {
+            return;
+        }
+
+        $sourceRequirement = $sourceRequirement ?: FileRequirement::where('uploadedBy', $company->uploader_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->latest('id')
+            ->first();
+
+        $requirement = FileRequirement::where('uploadedBy', $user->full_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->first();
+
+        $requirement = $requirement ?: new FileRequirement();
+        $requirement->fileName = 'Notarized MOA';
+        $requirement->file = $company->file;
+        $requirement->status = $sourceRequirement->status ?? 0;
+        $requirement->adviser = $user->adviser_name;
+        $requirement->uploadedBy = $user->full_name;
+
+        if (Schema::hasColumn('file_requirements', 'denial_reason')) {
+            $requirement->denial_reason = $sourceRequirement->denial_reason ?? null;
+        }
+
+        if (Schema::hasColumn('file_requirements', 'professor_id') && isset($sourceRequirement->professor_id)) {
+            $requirement->professor_id = $sourceRequirement->professor_id;
+        }
+
+        $requirement->save();
+    }
+
+    private function reconcileStudentNotarizedRequirements(User $user): void
+    {
+        $student = Student::where('user_id', $user->id)->first();
+
+        if (!$student) {
+            FileRequirement::where('uploadedBy', $user->full_name)
+                ->where('fileName', 'Notarized MOA')
+                ->delete();
+            return;
+        }
+
+        $linkedCompanies = $student->companies()->get()->filter(fn ($company) => !empty($company->file))->values();
+        $validFiles = $linkedCompanies->pluck('file')->filter()->unique()->values();
+
+        $query = FileRequirement::where('uploadedBy', $user->full_name)
+            ->where('fileName', 'Notarized MOA');
+
+        if ($validFiles->isEmpty()) {
+            $query->delete();
+            return;
+        }
+
+        $query->whereNotIn('file', $validFiles)->delete();
+
+        foreach ($linkedCompanies as $linkedCompany) {
+            $this->syncStudentNotarizedRequirement($linkedCompany, $student);
+        }
+    }
+
+    private function transferCompanyOwnership(Company $company, ?FileRequirement $sourceRequirement = null): ?string
+    {
+        $company->loadMissing('students.user');
+
+        $newOwner = $company->students->first(function ($student) {
+            return !empty(trim((string) ($student->full_name ?? ''))) || $this->resolveUserFromStudent($student);
+        });
+
+        if (!$newOwner) {
+            return null;
+        }
+
+        $newOwnerUser = $this->resolveUserFromStudent($newOwner);
+        $newOwnerName = trim((string) ($newOwnerUser->full_name ?? $newOwner->full_name ?? ''));
+
+        if ($newOwnerName === '') {
+            return null;
+        }
+
+        $company->uploader_name = $newOwnerName;
+        $company->save();
+
+        if (class_exists(\App\Models\Voucher::class)) {
+            \App\Models\Voucher::where('company_id', $company->id)
+                ->update(['uploader_name' => $newOwnerName]);
+        }
+
+        $this->syncStudentNotarizedRequirement($company, $newOwner, $sourceRequirement);
+
+        if ($newOwnerUser) {
+            $this->reconcileStudentNotarizedRequirements($newOwnerUser);
+        }
+
+        return $newOwnerName;
     }
 
     private function requireStudentSession()
@@ -414,11 +532,16 @@ public function removeFile($id)
                 ->first();
 
             if ($company) {
+                $isOwner = $company->uploader_name === $sessionCheck->full_name;
+                $ownerRequirement = $isOwner ? clone $data : null;
+
                 if ($student && $company->students->contains('id', $student->id)) {
                     $company->students()->detach($student->id);
                     $company = $company->fresh('students');
                     $this->updateCompanyStudentDisplay($company, $sessionCheck->full_name);
                 }
+
+                $this->reconcileStudentNotarizedRequirements($sessionCheck);
 
                 if ($company->students->isEmpty()) {
                     $ownerRequirement = FileRequirement::where('uploadedBy', $company->uploader_name)
@@ -435,6 +558,18 @@ public function removeFile($id)
                     }
 
                     $company->delete();
+                } elseif ($isOwner) {
+                    $newOwnerName = $this->transferCompanyOwnership($company, $ownerRequirement);
+                    if ($newOwnerName) {
+                        AuditLogger::log(
+                            'PassDocu',
+                            'Transfer Ownership',
+                            'Transferred MOA ownership for ' . $company->company_name . ' to ' . $newOwnerName,
+                            Session::get('loginId') ?? null,
+                            ['previous_owner' => $sessionCheck->full_name],
+                            ['new_owner' => $newOwnerName]
+                        );
+                    }
                 }
             }
         }

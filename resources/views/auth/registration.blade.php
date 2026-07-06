@@ -548,7 +548,7 @@
                                 <label class="form-label">First Name</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
-                                    <input type="text" placeholder="eg. Juan" name="first_name"
+                                    <input type="text" placeholder="eg. Maria Clara" name="first_name"
                                         id="first_name" value="{{ old('first_name') }}" autocapitalize="words" autocomplete="given-name" spellcheck="false">
                                 </div>
                                 <span class="text-danger">@error('first_name') {{ $message }} @enderror</span>
@@ -586,7 +586,7 @@
                             </div>
 
                             <div class="field-group span-3">
-                                <label class="form-label">Student No. <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(Format: YYYY-12345-TG-0)</span></label>
+                                <label class="form-label">Student No. <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(Format: YYYY-12345-TG-0 or TG-1)</span></label>
                                 <div class="input-wrap has-bubble">
                                     <i class="fa fa-id-card i-icon"></i>
                                     <input type="text" placeholder="Enter student number" name="studentNum"
@@ -597,11 +597,11 @@
                             </div>
 
                             <div class="field-group span-3">
-                                <label class="form-label">Password <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(8-12 chars, upper/lower/number/!@#$%^&*)</span></label>
+                                <label class="form-label">Password <span style="font-size:11px; color:#888; font-weight:500; margin-left:4px;">(min. 8 chars, upper/lower/number/!@#$%^&*)</span></label>
                                 <div class="input-wrap has-bubble">
                                     <i class="fa fa-lock i-icon"></i>
                                     <input type="password" placeholder="Create password" name="password"
-                                        id="reg_password" minlength="8" maxlength="12">
+                                        id="reg_password" minlength="8">
                                     <i class="far fa-eye toggle-pw" id="toggleRegPassword"></i>
                                     <div id="passwordBubble" class="field-bubble"></div>
                                 </div>
@@ -613,7 +613,7 @@
                                 <div class="input-wrap has-bubble">
                                     <i class="fa fa-lock i-icon"></i>
                                     <input type="password" placeholder="Re-enter password" name="confirm_password"
-                                        id="reg_confirm_password" minlength="8" maxlength="12">
+                                        id="reg_confirm_password" minlength="8">
                                     <i class="far fa-eye toggle-pw" id="toggleRegConfirmPassword"></i>
                                     <div id="confirmPasswordBubble" class="field-bubble"></div>
                                 </div>
@@ -759,8 +759,8 @@
 
     function evaluatePasswordRequirements(password) {
         const unmet = [];
-        if (password.length < 8 || password.length > 12) {
-            unmet.push('Use 8 to 12 characters.');
+        if (password.length < 8) {
+            unmet.push('Use at least 8 characters.');
         }
         if (!/[A-Z]/.test(password)) {
             unmet.push('Add an uppercase letter.');
@@ -811,8 +811,8 @@
             return 'Student number is required.';
         }
 
-        if (!/^\d{4}-\d{5}-TG-0$/.test(trimmed)) {
-            return 'Use this format: YYYY-12345-TG-0.';
+        if (!/^\d{4}-\d{5}-TG-[01]$/.test(trimmed)) {
+            return 'Use this format: YYYY-12345-TG-0 or YYYY-12345-TG-1.';
         }
 
         return '';
@@ -971,7 +971,8 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function sanitizeNameValue(value) {
+    function sanitizeNameValue(value, preserveTrailingSeparator = false) {
+        const endsWithSeparator = preserveTrailingSeparator && /[\s'-]$/.test(value || '');
         let sanitized = (value || '').replace(/[^\p{L}\s'\-]/gu, '');
         sanitized = sanitized.replace(/\s+/g, ' ');
         sanitized = sanitized.replace(/\s*-\s*/g, '-');
@@ -980,9 +981,18 @@
         sanitized = sanitized.replace(/'{2,}/g, "'");
         sanitized = sanitized.trim();
 
-        return sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
+        sanitized = sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
             return separator + character.toUpperCase();
         });
+
+        if (endsWithSeparator && sanitized) {
+            const trailingCharacter = (value || '').slice(-1);
+            if (!/[\s'-]$/.test(sanitized)) {
+                sanitized += trailingCharacter;
+            }
+        }
+
+        return sanitized;
     }
 
     function getNameValidationError(value, isOptional = false) {
@@ -1173,7 +1183,7 @@
             if (!input) return;
 
             input.addEventListener('input', function () {
-                normalizeNameField(fieldId);
+                input.value = sanitizeNameValue(input.value, true);
                 const validationError = getNameValidationError(input.value, fieldId === 'middle_name');
                 input.setCustomValidity(validationError);
             });

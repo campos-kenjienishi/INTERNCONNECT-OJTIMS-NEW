@@ -24,6 +24,22 @@ use App\Helpers\AuditLogger;
 
 class MOAUploadController extends Controller
 {
+    private function resolveUserFromStudent(Student $student): ?User
+    {
+        $student->loadMissing('user');
+
+        if ($student->user) {
+            return $student->user;
+        }
+
+        $fullName = trim((string) ($student->full_name ?? ''));
+        if ($fullName === '') {
+            return null;
+        }
+
+        return User::where('full_name', $fullName)->first();
+    }
+
     private function updateCompanyStudentDisplay(Company $company, ?string $removedName = null): void
     {
         if (!\Illuminate\Support\Facades\Schema::hasColumn('companies', 'student_names_display')) {
@@ -60,6 +76,108 @@ class MOAUploadController extends Controller
             ->delete();
     }
 
+    private function syncStudentNotarizedRequirement(Company $company, Student $student, ?FileRequirement $sourceRequirement = null): void
+    {
+        $user = $this->resolveUserFromStudent($student);
+
+        if (!$user) {
+            return;
+        }
+
+        $sourceRequirement = $sourceRequirement ?: FileRequirement::where('uploadedBy', $company->uploader_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->latest('id')
+            ->first();
+
+        $requirement = FileRequirement::where('uploadedBy', $user->full_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->first();
+
+        $requirement = $requirement ?: new FileRequirement();
+        $requirement->fileName = 'Notarized MOA';
+        $requirement->file = $company->file;
+        $requirement->status = $sourceRequirement->status ?? 0;
+        $requirement->adviser = $user->adviser_name;
+        $requirement->uploadedBy = $user->full_name;
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('file_requirements', 'denial_reason')) {
+            $requirement->denial_reason = $sourceRequirement->denial_reason ?? null;
+        }
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('file_requirements', 'professor_id') && isset($sourceRequirement->professor_id)) {
+            $requirement->professor_id = $sourceRequirement->professor_id;
+        }
+
+        $requirement->save();
+    }
+
+    private function reconcileStudentNotarizedRequirements(User $user): void
+    {
+        $student = Student::where('user_id', $user->id)->first();
+
+        if (!$student) {
+            FileRequirement::where('uploadedBy', $user->full_name)
+                ->where('fileName', 'Notarized MOA')
+                ->delete();
+            return;
+        }
+
+        $linkedCompanies = $student->companies()->get()->filter(fn ($company) => !empty($company->file))->values();
+        $validFiles = $linkedCompanies->pluck('file')->filter()->unique()->values();
+
+        $query = FileRequirement::where('uploadedBy', $user->full_name)
+            ->where('fileName', 'Notarized MOA');
+
+        if ($validFiles->isEmpty()) {
+            $query->delete();
+            return;
+        }
+
+        $query->whereNotIn('file', $validFiles)->delete();
+
+        foreach ($linkedCompanies as $linkedCompany) {
+            $this->syncStudentNotarizedRequirement($linkedCompany, $student);
+        }
+    }
+
+    private function transferCompanyOwnership(Company $company, ?FileRequirement $sourceRequirement = null): ?string
+    {
+        $company->loadMissing('students.user');
+
+        $newOwner = $company->students->first(function ($student) {
+            return !empty(trim((string) ($student->full_name ?? ''))) || $this->resolveUserFromStudent($student);
+        });
+
+        if (!$newOwner) {
+            return null;
+        }
+
+        $newOwnerUser = $this->resolveUserFromStudent($newOwner);
+        $newOwnerName = trim((string) ($newOwnerUser->full_name ?? $newOwner->full_name ?? ''));
+
+        if ($newOwnerName === '') {
+            return null;
+        }
+
+        $company->uploader_name = $newOwnerName;
+        $company->save();
+
+        if (class_exists(\App\Models\Voucher::class)) {
+            \App\Models\Voucher::where('company_id', $company->id)
+                ->update(['uploader_name' => $newOwnerName]);
+        }
+
+        $this->syncStudentNotarizedRequirement($company, $newOwner, $sourceRequirement);
+
+        if ($newOwnerUser) {
+            $this->reconcileStudentNotarizedRequirements($newOwnerUser);
+        }
+
+        return $newOwnerName;
+    }
+
     private function deleteCompanyAssets(Company $company): void
     {
         $this->deleteLinkedNotarizedRequirement($company);
@@ -85,6 +203,35 @@ class MOAUploadController extends Controller
         }
 
         FileRequirement::where('uploadedBy', $company->uploader_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->delete();
+    }
+
+    private function deleteAllLinkedNotarizedRequirements(?Company $company): void
+    {
+        if (!$company || empty($company->file)) {
+            return;
+        }
+
+        $company->loadMissing('students.user');
+
+        $linkedNames = $company->students
+            ->map(function ($student) {
+                $user = $this->resolveUserFromStudent($student);
+
+                return trim((string) ($user->full_name ?? $student->full_name ?? ''));
+            })
+            ->push(trim((string) $company->uploader_name))
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($linkedNames->isEmpty()) {
+            return;
+        }
+
+        FileRequirement::whereIn('uploadedBy', $linkedNames->all())
             ->where('fileName', 'Notarized MOA')
             ->where('file', $company->file)
             ->delete();
@@ -130,7 +277,7 @@ class MOAUploadController extends Controller
     $company = Company::find($id);
 
     if ($company) {
-        $this->deleteLinkedNotarizedRequirement($company);
+        $this->deleteAllLinkedNotarizedRequirements($company);
 
         if (!empty($company->file)) {
             $filePath = public_path('assets/' . $company->file);
@@ -277,14 +424,34 @@ public function studentRemove($id)
     }
 
     $isOwner = $company->uploader_name === $user->full_name;
+    $ownerRequirement = $isOwner
+        ? FileRequirement::where('uploadedBy', $user->full_name)
+            ->where('fileName', 'Notarized MOA')
+            ->where('file', $company->file)
+            ->latest('id')
+            ->first()
+        : null;
 
     $this->deleteStudentNotarizedRequirement($user, $company);
     $company->students()->detach($student->id);
     $company = $company->fresh('students');
     $this->updateCompanyStudentDisplay($company, $user->full_name);
+    $this->reconcileStudentNotarizedRequirements($user);
 
     if ($company->students->isEmpty()) {
         $this->deleteCompanyAssets($company);
+    } elseif ($isOwner) {
+        $newOwnerName = $this->transferCompanyOwnership($company, $ownerRequirement);
+        if ($newOwnerName) {
+            AuditLogger::log(
+                'MOA Upload',
+                'Transfer Ownership',
+                'Transferred MOA ownership for ' . $company->company_name . ' to ' . $newOwnerName,
+                Session::get('loginId') ?? null,
+                ['previous_owner' => $user->full_name],
+                ['new_owner' => $newOwnerName]
+            );
+        }
     }
 
     AuditLogger::log(

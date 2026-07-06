@@ -270,13 +270,13 @@ public function home()
 
     protected function studentNumberValidationPattern(): string
     {
-        return "/^\\d{4}-\\d{5}-TG-0$/";
+        return "/^\\d{4}-\\d{5}-TG-[01]$/";
     }
 
     protected function studentNumberValidationMessages(): array
     {
         return [
-            'studentNum.regex' => 'Student number must follow this format: YYYY-12345-TG-0.',
+            'studentNum.regex' => 'Student number must follow this format: YYYY-12345-TG-0 or YYYY-12345-TG-1.',
         ];
     }
 

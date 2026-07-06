@@ -252,7 +252,7 @@ $email = $_GET['email'] ?? '';
                             <i class="far fa-eye toggle-pw" id="toggleNewPassword"></i>
                         </div>
                         <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
-                            <strong>Password requirements:</strong> Use 8 to 12 characters with uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.
+                            <strong>Password requirements:</strong> Use at least 8 characters with uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.
                         </div>
                         <!-- Strength bar -->
                         <div class="strength-wrap">

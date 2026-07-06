@@ -926,13 +926,21 @@ class AuthController extends Controller
 
     public function professorCreate(Request $request){
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'first_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
+            'email' => ['required', 'email', 'unique:users,email'],
             'subject_code' => 'required|string|max:255',
             'subject_description' => 'required|string|max:255',
             'password' => $this->passwordRules(true),
-        ], $this->passwordValidationMessages('password'));
+        ], array_merge(
+            $this->nameValidationMessages(),
+            $this->passwordValidationMessages('password', 'password_confirmation'),
+            [
+                'email.required' => 'Email is required.',
+                'email.email' => 'Please enter a valid email address.',
+                'email.unique' => 'This email is already in use.',
+            ]
+        ));
 
         $user = new User();
         $professor = new Professor();
@@ -1534,8 +1542,7 @@ class AuthController extends Controller
             'required',
             'string',
             'min:8',
-            'max:12',
-            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/',
         ];
 
         if ($confirmed) {
@@ -1561,13 +1568,13 @@ class AuthController extends Controller
 
     protected function studentNumberValidationPattern(): string
     {
-        return "/^\\d{4}-\\d{5}-TG-0$/";
+        return "/^\\d{4}-\\d{5}-TG-[01]$/";
     }
 
     protected function studentNumberValidationMessages(): array
     {
         return [
-            'studentNum.regex' => 'Student number must follow this format: 2023-00098-TG-0.',
+            'studentNum.regex' => 'Student number must follow this format: YYYY-12345-TG-0 or YYYY-12345-TG-1.',
         ];
     }
 
@@ -1587,9 +1594,8 @@ class AuthController extends Controller
     protected function passwordValidationMessages(string $field = 'password', string $confirmField = 'password_confirmation'): array
     {
         return [
-            $field . '.min' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
-            $field . '.max' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
-            $field . '.regex' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            $field . '.min' => 'Password must be at least 8 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            $field . '.regex' => 'Password must be at least 8 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
             $field . '.confirmed' => 'Password confirmation does not match.',
             $confirmField . '.required' => 'Please confirm your password.',
             $confirmField . '.same' => 'Password confirmation does not match.',

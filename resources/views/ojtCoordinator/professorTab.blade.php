@@ -700,6 +700,7 @@
 
         /* Modal form fields */
         .field-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+        .field-group.has-bubble { overflow: visible; }
 
         .field-label {
             font-size: 12px; font-weight: 600; color: #444;
@@ -719,6 +720,88 @@
         .field-input:focus, .field-select:focus {
             border-color: var(--red); background: #fff;
             box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
+        }
+
+        .field-input-wrap { position: relative; }
+
+        .field-input-wrap.has-toggle .field-input {
+            padding-right: 42px;
+        }
+
+        .field-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            z-index: 2;
+            transition: color 0.2s;
+        }
+
+        .field-toggle:hover { color: var(--red); }
+
+        .field-bubble {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: calc(100% + 10px);
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+            background: #fff7f7;
+            color: var(--red-dark);
+            font-size: 11.5px;
+            line-height: 1.45;
+            box-shadow: 0 12px 24px rgba(127,0,0,0.12);
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .field-bubble.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .field-bubble::after {
+            content: '';
+            position: absolute;
+            left: 22px;
+            top: 100%;
+            width: 14px;
+            height: 14px;
+            background: #fff7f7;
+            border-right: 1px solid #fecaca;
+            border-bottom: 1px solid #fecaca;
+            transform: rotate(45deg) translateY(-7px);
+        }
+
+        .modal-alert-errors {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+        }
+
+        .modal-alert-errors ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .modal-alert-errors li {
+            font-size: 12.5px;
+            color: var(--red);
+            line-height: 1.5;
         }
 
         .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -1245,26 +1328,46 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ url('/professorCreate') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ url('/professorCreate') }}" method="post" enctype="multipart/form-data" id="addProfessorForm" data-email-check-url="{{ route('check-email-availability') }}">
                 @csrf
                 <div class="modal-body">
+                    @if ($errors->has('first_name') || $errors->has('last_name') || $errors->has('email') || $errors->has('subject_code') || $errors->has('subject_description') || $errors->has('password') || $errors->has('password_confirmation'))
+                        <div class="modal-alert-errors">
+                            <ul>
+                                @foreach (['first_name', 'last_name', 'email', 'subject_code', 'subject_description', 'password', 'password_confirmation'] as $field)
+                                    @error($field)
+                                        <li>{{ $message }}</li>
+                                    @enderror
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     <div class="modal-section"><i class="fa fa-user"></i> Basic Information</div>
 
                     <div class="field-row">
-                        <div class="field-group">
+                        <div class="field-group has-bubble">
                             <label class="field-label"><i class="fa fa-user"></i> First Name</label>
-                            <input class="field-input" type="text" name="first_name" placeholder="First Name" required>
+                            <div class="field-input-wrap">
+                                <div class="field-bubble" id="profFirstNameBubble"></div>
+                                <input class="field-input" type="text" id="prof_first_name" name="first_name" placeholder="First name" value="{{ old('first_name') }}" required autocapitalize="words" spellcheck="false">
+                            </div>
                         </div>
-                        <div class="field-group">
+                        <div class="field-group has-bubble">
                             <label class="field-label"><i class="fa fa-user"></i> Last Name</label>
-                            <input class="field-input" type="text" name="last_name" placeholder="Last Name" required>
+                            <div class="field-input-wrap">
+                                <div class="field-bubble" id="profLastNameBubble"></div>
+                                <input class="field-input" type="text" id="prof_last_name" name="last_name" placeholder="Last name" value="{{ old('last_name') }}" required autocapitalize="words" spellcheck="false">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="field-group">
+                    <div class="field-group has-bubble">
                         <label class="field-label"><i class="fa fa-envelope"></i> Email Address</label>
-                        <input class="field-input" type="email" name="email" placeholder="Enter email address" required>
+                        <div class="field-input-wrap">
+                            <div class="field-bubble" id="profEmailBubble"></div>
+                            <input class="field-input" type="email" id="prof_email" name="email" placeholder="Enter email address" value="{{ old('email') }}" required>
+                        </div>
                     </div>
 
                     <div class="modal-section"><i class="fa fa-book"></i> Subject Details</div>
@@ -1272,27 +1375,39 @@
                     <div class="field-row">
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-tag"></i> Subject Code</label>
-                            <input class="field-input" type="text" name="subject_code" placeholder="e.g. OJT101" required>
+                            <input class="field-input" type="text" name="subject_code" placeholder="e.g. OJT101" value="{{ old('subject_code') }}" required>
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-align-left"></i> Subject Description</label>
-                            <input class="field-input" type="text" name="subject_description" placeholder="Subject description" required>
+                            <input class="field-input" type="text" name="subject_description" placeholder="Subject description" value="{{ old('subject_description') }}" required>
                         </div>
                     </div>
 
 
                     <div class="modal-section"><i class="fa fa-lock"></i> Set Password</div>
-                    <div class="field-group">
+                    <div class="field-group has-bubble">
                         <label class="field-label"><i class="fa fa-lock"></i> Password</label>
-                        <input class="field-input" type="password" name="password" placeholder="Enter password" required minlength="8">
-                    </div>
-                    <div class="field-group">
+                            <div class="field-input-wrap has-toggle">
+                                <div class="field-bubble" id="profPasswordBubble"></div>
+                                <input class="field-input" type="password" id="prof_password" name="password" placeholder="Enter password" required minlength="8">
+                                <button type="button" class="field-toggle" id="toggleProfPassword" aria-label="Show password">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    <div class="field-group has-bubble">
                         <label class="field-label"><i class="fa fa-check-circle"></i> Confirm Password</label>
-                        <input class="field-input" type="password" name="password_confirmation" placeholder="Re-enter password" required minlength="8">
+                        <div class="field-input-wrap has-toggle">
+                            <div class="field-bubble" id="profConfirmPasswordBubble"></div>
+                            <input class="field-input" type="password" id="prof_password_confirmation" name="password_confirmation" placeholder="Re-enter password" required minlength="8">
+                            <button type="button" class="field-toggle" id="toggleProfPasswordConfirmation" aria-label="Show confirm password">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="field-group">
                         <small style="color:#666;display:block;margin-top:4px;">
-                            The coordinator sets the password. Please share it securely with the professor.
+                            The coordinator sets the password. Please share it securely with the professor. Use at least 8 characters with uppercase, lowercase, a number, and one symbol: ! @ # $ % ^ & *.
                         </small>
                     </div>
 
@@ -1437,10 +1552,35 @@
             startYearSelect.addEventListener('change', updateEndYearOptions);
         }
 
+        function buildTimeOptions() {
+            let options = '';
+
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute = 0; minute < 60; minute += 15) {
+                    const value = String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
+                    options += '<option value="' + value + '"></option>';
+                }
+            }
+
+            return options;
+        }
+
+        function ensureTimeSuggestions() {
+            if (document.getElementById('scheduleTimeSuggestions')) {
+                return;
+            }
+
+            const datalist = document.createElement('datalist');
+            datalist.id = 'scheduleTimeSuggestions';
+            datalist.innerHTML = buildTimeOptions();
+            document.body.appendChild(datalist);
+        }
+
         // Time slots dynamic inputs
         $('#time_slots').change(function () {
             const numSlots = parseInt($(this).val());
             $('#timeInputs').empty();
+            ensureTimeSuggestions();
             if (numSlots > 0) {
                 $('input[name="schedule_day[]"]:checked').each(function () {
                     const day = $(this).val();
@@ -1450,11 +1590,11 @@
                                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                                     <div class="field-group">
                                         <label class="field-label"><i class="fa fa-clock"></i> Start Time ${i} (${day})</label>
-                                        <input class="field-input" type="time" name="${day}_start_time_${i}">
+                                        <input class="field-select schedule-time-input" type="text" name="${day}_start_time_${i}" placeholder="HH:MM" inputmode="numeric" list="scheduleTimeSuggestions" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" title="Enter time in 24-hour format like 08:00 or 13:30" required>
                                     </div>
                                     <div class="field-group">
                                         <label class="field-label"><i class="fa fa-clock"></i> End Time ${i} (${day})</label>
-                                        <input class="field-input" type="time" name="${day}_end_time_${i}">
+                                        <input class="field-select schedule-time-input" type="text" name="${day}_end_time_${i}" placeholder="HH:MM" inputmode="numeric" list="scheduleTimeSuggestions" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" title="Enter time in 24-hour format like 08:00 or 13:30" required>
                                     </div>
                                 </div>
                             </div>
@@ -1462,6 +1602,13 @@
                     }
                 });
             }
+        });
+
+        $(document).on('input change', '.schedule-time-input', function () {
+            const isValid = /^([01]\d|2[0-3]):([0-5]\d)$/.test(this.value.trim());
+            this.setCustomValidity(this.value.trim() === '' || isValid
+                ? ''
+                : 'Use HH:MM in 24-hour format, like 08:00 or 13:30.');
         });
 
         // Edit professor modal populate
@@ -1507,6 +1654,348 @@
                 }
             });
         });
+
+        const addProfessorForm = document.getElementById('addProfessorForm');
+        if (addProfessorForm) {
+            const firstNameInput = document.getElementById('prof_first_name');
+            const lastNameInput = document.getElementById('prof_last_name');
+            const emailInput = document.getElementById('prof_email');
+            const passwordInput = document.getElementById('prof_password');
+            const confirmPasswordInput = document.getElementById('prof_password_confirmation');
+            const togglePasswordButton = document.getElementById('toggleProfPassword');
+            const toggleConfirmPasswordButton = document.getElementById('toggleProfPasswordConfirmation');
+            const emailCheckUrl = addProfessorForm.dataset.emailCheckUrl || '';
+            let emailCheckTimer = null;
+            let emailRequestCounter = 0;
+
+            function setupPasswordToggle(toggle, input) {
+                if (!toggle || !input) return;
+
+                toggle.addEventListener('click', function () {
+                    const isHidden = input.type === 'password';
+                    input.type = isHidden ? 'text' : 'password';
+
+                    const icon = toggle.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('fa-eye');
+                        icon.classList.toggle('fa-eye-slash');
+                    }
+                });
+            }
+
+            function setInputErrorState(input, hasError) {
+                if (!input) return;
+                input.style.borderColor = hasError ? '#dc2626' : '';
+                input.style.boxShadow = hasError ? '0 0 0 3px rgba(220,38,38,0.1)' : '';
+            }
+
+            function showFieldBubble(bubbleId, message) {
+                const bubble = document.getElementById(bubbleId);
+                if (!bubble) return;
+
+                if (!message) {
+                    bubble.innerHTML = '';
+                    bubble.classList.remove('active');
+                    return;
+                }
+
+                const messages = Array.isArray(message) ? message : [message];
+                bubble.innerHTML = messages.map(function (item) {
+                    return '<div>' + item + '</div>';
+                }).join('');
+                bubble.classList.add('active');
+            }
+
+            function sanitizeNameValue(value) {
+                let sanitized = (value || '').replace(/[^\p{L}\s'\-]/gu, '');
+                sanitized = sanitized.replace(/\s+/g, ' ');
+                sanitized = sanitized.replace(/\s*-\s*/g, '-');
+                sanitized = sanitized.replace(/\s*'\s*/g, "'");
+                sanitized = sanitized.replace(/-{2,}/g, '-');
+                sanitized = sanitized.replace(/'{2,}/g, "'");
+                sanitized = sanitized.trim();
+
+                return sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
+                    return separator + character.toUpperCase();
+                });
+            }
+
+            function getNameValidationError(value) {
+                const trimmed = (value || '').trim();
+                if (!trimmed) {
+                    return 'This field is required.';
+                }
+
+                if (!/^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u.test(trimmed)) {
+                    return 'Use letters only. Apostrophes and hyphens are allowed.';
+                }
+
+                if (!/^[\p{Lu}]/u.test(trimmed)) {
+                    return 'Name must start with a capital letter.';
+                }
+
+                return '';
+            }
+
+            function evaluatePasswordRequirements(password) {
+                const unmet = [];
+                if (password.length < 8) {
+                    unmet.push('Use at least 8 characters.');
+                }
+                if (!/[A-Z]/.test(password)) {
+                    unmet.push('Add an uppercase letter.');
+                }
+                if (!/[a-z]/.test(password)) {
+                    unmet.push('Add a lowercase letter.');
+                }
+                if (!/\d/.test(password)) {
+                    unmet.push('Add a number.');
+                }
+                if (!/[!@#$%^&*]/.test(password)) {
+                    unmet.push('Add one symbol: ! @ # $ % ^ & *.');
+                }
+                if (/[^A-Za-z\d!@#$%^&*]/.test(password)) {
+                    unmet.push('Use only these symbols: ! @ # $ % ^ & *.');
+                }
+
+                return {
+                    isValid: unmet.length === 0,
+                    unmet: unmet,
+                };
+            }
+
+            async function checkEmailAvailability(email) {
+                const trimmedEmail = (email || '').trim();
+
+                if (!trimmedEmail) {
+                    return { available: false, message: 'Email is required.' };
+                }
+
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+                    return { available: false, message: 'Please enter a valid email address.' };
+                }
+
+                const requestId = ++emailRequestCounter;
+
+                try {
+                    const response = await fetch(emailCheckUrl + '?email=' + encodeURIComponent(trimmedEmail), {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    const payload = await response.json();
+
+                    if (requestId !== emailRequestCounter) {
+                        return { available: false, message: 'Checking email availability...' };
+                    }
+
+                    return {
+                        available: Boolean(payload.available),
+                        message: payload.message || (payload.available ? 'Email is available.' : 'This email is already in use.')
+                    };
+                } catch (error) {
+                    return { available: false, message: 'Unable to verify email right now. Please try again.' };
+                }
+            }
+
+            [
+                { input: firstNameInput, bubbleId: 'profFirstNameBubble' },
+                { input: lastNameInput, bubbleId: 'profLastNameBubble' }
+            ].forEach(function (field) {
+                if (!field.input) return;
+
+                function syncNameField(showBubble) {
+                    field.input.value = sanitizeNameValue(field.input.value);
+                    const validationError = getNameValidationError(field.input.value);
+                    field.input.setCustomValidity(validationError);
+                    setInputErrorState(field.input, Boolean(validationError));
+                    showFieldBubble(field.bubbleId, showBubble ? validationError : '');
+                }
+
+                field.input.addEventListener('input', function () {
+                    syncNameField(false);
+                });
+
+                field.input.addEventListener('blur', function () {
+                    syncNameField(Boolean(field.input.value.trim()));
+                });
+            });
+
+            if (emailInput) {
+                emailInput.addEventListener('input', function () {
+                    const value = emailInput.value.trim();
+
+                    if (emailCheckTimer) {
+                        clearTimeout(emailCheckTimer);
+                    }
+
+                    if (!value) {
+                        emailInput.setCustomValidity('Email is required.');
+                        setInputErrorState(emailInput, false);
+                        showFieldBubble('profEmailBubble', '');
+                        return;
+                    }
+
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                        emailInput.setCustomValidity('Please enter a valid email address.');
+                        setInputErrorState(emailInput, true);
+                        showFieldBubble('profEmailBubble', 'Please enter a valid email address.');
+                        return;
+                    }
+
+                    emailInput.setCustomValidity('');
+                    setInputErrorState(emailInput, false);
+                    showFieldBubble('profEmailBubble', '');
+
+                    emailCheckTimer = setTimeout(async function () {
+                        const result = await checkEmailAvailability(value);
+                        if (emailInput.value.trim() !== value) {
+                            return;
+                        }
+
+                        if (!result.available) {
+                            emailInput.setCustomValidity(result.message);
+                            setInputErrorState(emailInput, true);
+                            showFieldBubble('profEmailBubble', result.message);
+                        } else {
+                            emailInput.setCustomValidity('');
+                            setInputErrorState(emailInput, false);
+                            showFieldBubble('profEmailBubble', '');
+                        }
+                    }, 350);
+                });
+            }
+
+            function syncPasswordValidationState() {
+                if (!passwordInput || !confirmPasswordInput) {
+                    return;
+                }
+
+                const passwordValidation = evaluatePasswordRequirements(passwordInput.value);
+                const hasPasswordValue = passwordInput.value.length > 0;
+                const hasConfirmValue = confirmPasswordInput.value.length > 0;
+                const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+
+                if (!hasPasswordValue && !hasConfirmValue) {
+                    showFieldBubble('profPasswordBubble', '');
+                    showFieldBubble('profConfirmPasswordBubble', '');
+                    setInputErrorState(passwordInput, false);
+                    setInputErrorState(confirmPasswordInput, false);
+                    return;
+                }
+
+                if (!passwordValidation.isValid) {
+                    showFieldBubble('profPasswordBubble', passwordValidation.unmet);
+                    setInputErrorState(passwordInput, true);
+                } else {
+                    showFieldBubble('profPasswordBubble', '');
+                    setInputErrorState(passwordInput, false);
+                }
+
+                if (hasConfirmValue && !passwordsMatch) {
+                    showFieldBubble('profConfirmPasswordBubble', 'Password confirmation does not match.');
+                    setInputErrorState(confirmPasswordInput, true);
+                } else {
+                    showFieldBubble('profConfirmPasswordBubble', '');
+                    setInputErrorState(confirmPasswordInput, false);
+                }
+            }
+
+            if (passwordInput) {
+                passwordInput.addEventListener('input', syncPasswordValidationState);
+            }
+
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('input', syncPasswordValidationState);
+            }
+
+            setupPasswordToggle(togglePasswordButton, passwordInput);
+            setupPasswordToggle(toggleConfirmPasswordButton, confirmPasswordInput);
+
+            addProfessorForm.addEventListener('submit', async function (event) {
+                if (addProfessorForm.dataset.submitting === 'true') {
+                    return;
+                }
+
+                event.preventDefault();
+                let hasError = false;
+
+                [
+                    { input: firstNameInput, bubbleId: 'profFirstNameBubble' },
+                    { input: lastNameInput, bubbleId: 'profLastNameBubble' }
+                ].forEach(function (field) {
+                    if (!field.input) return;
+                    field.input.value = sanitizeNameValue(field.input.value);
+                    const validationError = getNameValidationError(field.input.value);
+                    field.input.setCustomValidity(validationError);
+                    setInputErrorState(field.input, Boolean(validationError));
+                    showFieldBubble(field.bubbleId, validationError);
+                    if (validationError) {
+                        hasError = true;
+                    }
+                });
+
+                if (emailInput) {
+                    const value = emailInput.value.trim();
+                    if (!value) {
+                        emailInput.setCustomValidity('Email is required.');
+                        setInputErrorState(emailInput, true);
+                        showFieldBubble('profEmailBubble', 'Email is required.');
+                        hasError = true;
+                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                        emailInput.setCustomValidity('Please enter a valid email address.');
+                        setInputErrorState(emailInput, true);
+                        showFieldBubble('profEmailBubble', 'Please enter a valid email address.');
+                        hasError = true;
+                    } else {
+                        const result = await checkEmailAvailability(value);
+                        if (!result.available) {
+                            emailInput.setCustomValidity(result.message);
+                            setInputErrorState(emailInput, true);
+                            showFieldBubble('profEmailBubble', result.message);
+                            hasError = true;
+                        } else {
+                            emailInput.setCustomValidity('');
+                            setInputErrorState(emailInput, false);
+                            showFieldBubble('profEmailBubble', '');
+                        }
+                    }
+                }
+
+                if (passwordInput) {
+                    const passwordValidation = evaluatePasswordRequirements(passwordInput.value.trim());
+                    if (!passwordValidation.isValid) {
+                        setInputErrorState(passwordInput, true);
+                        showFieldBubble('profPasswordBubble', passwordValidation.unmet);
+                        hasError = true;
+                    } else {
+                        setInputErrorState(passwordInput, false);
+                        showFieldBubble('profPasswordBubble', '');
+                    }
+                }
+
+                if (confirmPasswordInput && passwordInput) {
+                    if (passwordInput.value.trim() !== confirmPasswordInput.value.trim()) {
+                        setInputErrorState(confirmPasswordInput, true);
+                        showFieldBubble('profConfirmPasswordBubble', 'Password confirmation does not match.');
+                        hasError = true;
+                    } else {
+                        setInputErrorState(confirmPasswordInput, false);
+                        showFieldBubble('profConfirmPasswordBubble', '');
+                    }
+                }
+
+                if (hasError) {
+                    return;
+                }
+
+                addProfessorForm.dataset.submitting = 'true';
+                addProfessorForm.submit();
+            });
+
+            @if ($errors->has('first_name') || $errors->has('last_name') || $errors->has('email') || $errors->has('subject_code') || $errors->has('subject_description') || $errors->has('password') || $errors->has('password_confirmation'))
+                const addProfessorModal = new bootstrap.Modal(document.getElementById('addProfessorModal'));
+                addProfessorModal.show();
+            @endif
+        }
 
     });
 </script>

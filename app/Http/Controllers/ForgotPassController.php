@@ -51,14 +51,12 @@ class ForgotPassController extends Controller
                 'required',
                 'string',
                 'min:8',
-                'max:12',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/',
             ],
             'confirm_password' => 'required|same:password',
         ], [
-            'password.min' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
-            'password.max' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
-            'password.regex' => 'Password must be 8 to 12 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            'password.min' => 'Password must be at least 8 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
+            'password.regex' => 'Password must be at least 8 characters and include uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.',
             'confirm_password.same' => 'Password confirmation does not match.',
         ]);
         
