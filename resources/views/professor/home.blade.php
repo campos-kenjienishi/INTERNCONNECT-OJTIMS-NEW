@@ -1243,7 +1243,7 @@
                     and get familiar with the evaluation workflow.
                 </p>
                 <div class="welcome-actions">
-                    <a href="https://youtu.be/ikfInULZYJs" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
+                    <a href="https://youtu.be/DMKokFwPbDM" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
                         <i class="fab fa-youtube"></i>
                         Professor Setup Guide
                     </a>
