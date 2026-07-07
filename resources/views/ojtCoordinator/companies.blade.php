@@ -1059,6 +1059,10 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 </footer>
 </div>
 
+@php
+    $selectedCreateStudentNames = collect(old('student_names', []))->filter()->values();
+@endphp
+
 <!-- =============== ADD COMPANY MODAL =============== -->
 <div class="modal fade" id="addCompanyModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1133,22 +1137,21 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
                     <div class="modal-section"><i class="fa fa-users"></i> Assign Students</div>
 
-                    <div class="field-group">
-                        <label class="field-label"><i class="fa fa-user-graduate"></i> Student Names <span style="color:#aaa; font-weight:400;">(Optional, hold Ctrl to select multiple)</span></label>
-                        <input
-                            id="moaStudentSearch"
-                            class="field-input"
-                            type="text"
-                            placeholder="Search student name"
-                            style="margin-bottom:8px;"
-                            disabled
-                        >
-                        <select name="student_names[]" id="moaStudentSelect" class="field-select" multiple style="min-height:100px;" disabled>
-                            @foreach ($stu as $student)
-                                <option value="{{ $student->full_name }}" data-course="{{ strtolower(trim($student->course ?? '')) }}">{{ $student->full_name }}</option>
+                    <div class="field-group" style="margin-top:10px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                            <div>
+                                <label class="field-label" style="margin-bottom:4px;"><i class="fa fa-user-graduate"></i> Assigned Students</label>
+                                <div id="moaAssignedStudentsSummary" style="font-size:12px; color:#666;">{{ $selectedCreateStudentNames->isEmpty() ? 'No students assigned yet.' : $selectedCreateStudentNames->count() . ' students selected.' }}</div>
+                            </div>
+                            <button type="button" class="btn-modal-submit" id="openAssignStudentsModal" style="padding:10px 14px; white-space:nowrap;">
+                                <i class="fa fa-user-plus me-1"></i> Assign
+                            </button>
+                        </div>
+                        <div id="moaAssignedStudentInputs" style="display:none;">
+                            @foreach ($selectedCreateStudentNames as $studentName)
+                                <input type="hidden" name="student_names[]" value="{{ $studentName }}">
                             @endforeach
-                        </select>
-                        <div id="moaStudentHint" style="margin-top:6px; font-size:12px; color:#888;">Select a course first to show matching students.</div>
+                        </div>
                     </div>
 
                     <div class="field-group" style="margin-top:10px;">
@@ -1277,22 +1280,17 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
                     <div class="modal-section"><i class="fa fa-users"></i> Assign Students</div>
 
-                    <div class="field-group">
-                        <label class="field-label"><i class="fa fa-user-graduate"></i> Student Names <span style="color:#aaa; font-weight:400;">(Optional, hold Ctrl to select multiple)</span></label>
-                        <input
-                            id="editMoaStudentSearch"
-                            class="field-input"
-                            type="text"
-                            placeholder="Search student name"
-                            style="margin-bottom:8px;"
-                            disabled
-                        >
-                        <select name="student_names[]" id="editMoaStudentSelect" class="field-select" multiple style="min-height:100px;" disabled>
-                            @foreach ($stu as $student)
-                                <option value="{{ $student->full_name }}" data-course="{{ strtolower(trim($student->course ?? '')) }}">{{ $student->full_name }}</option>
-                            @endforeach
-                        </select>
-                        <div id="editMoaStudentHint" style="margin-top:6px; font-size:12px; color:#888;">Select a course first to show matching students.</div>
+                    <div class="field-group" style="margin-top:10px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                            <div>
+                                <label class="field-label" style="margin-bottom:4px;"><i class="fa fa-user-graduate"></i> Assigned Students</label>
+                                <div id="editMoaAssignedStudentsSummary" style="font-size:12px; color:#666;">No students assigned yet.</div>
+                            </div>
+                            <button type="button" class="btn-modal-submit" id="openEditAssignStudentsModal" style="padding:10px 14px; white-space:nowrap;">
+                                <i class="fa fa-user-plus me-1"></i> Assign
+                            </button>
+                        </div>
+                        <div id="editMoaAssignedStudentInputs" style="display:none;"></div>
                     </div>
 
                     <div class="field-group" style="margin-top:10px;">
@@ -1318,6 +1316,69 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- =============== ASSIGN STUDENTS MODAL =============== -->
+<div class="modal fade" id="assignStudentsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-user-plus"></i> Assign Students</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="background:#fff; max-height:78vh;">
+                <div style="display:grid; grid-template-columns: 1.1fr 1fr; gap:12px; margin-bottom:14px;">
+                    <div class="field-group" style="margin:0;">
+                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                        <select id="assignStudentsCourse" class="field-select">
+                            <option value="">All Courses</option>
+                            @foreach ($course as $courseItem)
+                                <option value="{{ $courseItem->course }}">{{ $courseItem->course }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="field-group" style="margin:0;">
+                        <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year</label>
+                        <select id="assignStudentsSchoolYear" class="field-select">
+                            <option value="">All School Years</option>
+                            @foreach ($studentSchoolYears as $studentSchoolYear)
+                                <option value="{{ $studentSchoolYear }}">{{ $studentSchoolYear }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-group" style="margin:0 0 14px;">
+                    <label class="field-label"><i class="fa fa-search"></i> Search Students</label>
+                    <input id="assignStudentsSearch" class="field-input" type="text" placeholder="Search by name, student number, or section">
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                    <div id="assignStudentsSelectedInfo" style="font-size:12.5px; color:#6b7280;">No students selected yet.</div>
+                    <button type="button" class="btn-modal-close" id="assignStudentsClear" style="padding:9px 14px;">
+                        <i class="fa fa-eraser me-1"></i> Clear Selection
+                    </button>
+                </div>
+
+                <div id="assignStudentsSelectedChips" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;"></div>
+
+                <div id="assignStudentsStatus" style="display:none; padding:14px; border:1px dashed #f3b3b3; border-radius:12px; color:#6b7280; font-size:12.5px; background:#fff7f7; margin-bottom:12px;"></div>
+
+                <div style="max-height: 52vh; overflow-y: auto; padding-right: 4px;">
+                    <div id="assignStudentsList" style="display:grid; gap:10px;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="margin-right:auto; font-size:12px; color:#6b7280;">Choose one or more students, then click Apply.</div>
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i> Cancel
+                </button>
+                <button type="button" class="btn-modal-submit" id="assignStudentsApply">
+                    <i class="fa fa-check me-1"></i> Apply Assignments
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -1476,59 +1537,311 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             $('#send-company-name').text(companyName);
         });
 
-        function setupStudentFilter(courseSelector, searchSelector, selectSelector, hintSelector) {
-            const $course = $(courseSelector);
-            const $search = $(searchSelector);
-            const studentSelect = document.querySelector(selectSelector);
-            const studentHint = document.querySelector(hintSelector);
+        const assignStudentsUrl = @json(route('moa.assignableStudents'));
+        const assignableStudentState = {
+            mode: null,
+            selectedNames: new Set(),
+            students: [],
+            loading: false,
+            searchTimer: null
+        };
 
-            function runFilter() {
-                if (!studentSelect) {
-                    return;
-                }
-
-                const selectedCourse = (($course.val() || '').trim()).toLowerCase();
-                const searchQuery = (($search.val() || '').trim()).toLowerCase();
-                const hasSelectedCourse = selectedCourse.length > 0;
-
-                studentSelect.disabled = !hasSelectedCourse;
-                if ($search.length) {
-                    $search.prop('disabled', !hasSelectedCourse);
-                }
-
-                if (studentHint) {
-                    studentHint.textContent = hasSelectedCourse
-                        ? 'Only students from the selected course are shown.'
-                        : 'Select a course first to show matching students.';
-                }
-
-                Array.from(studentSelect.options).forEach(function (option) {
-                    const studentCourse = (option.getAttribute('data-course') || '').trim().toLowerCase();
-                    const matchesCourse = !selectedCourse || studentCourse === selectedCourse;
-                    const matchesSearch = !searchQuery || option.value.toLowerCase().includes(searchQuery);
-                    const isMatch = matchesCourse && matchesSearch;
-
-                    option.hidden = !isMatch;
-                    option.disabled = !isMatch;
-
-                    if (!isMatch) {
-                        option.selected = false;
-                    }
-                });
+        const assignTargets = {
+            add: {
+                courseField: '#moaCourseSelect',
+                schoolYearStartField: '#schoolYearStart',
+                schoolYearEndField: '#schoolYearEnd',
+                summaryField: '#moaAssignedStudentsSummary',
+                inputsField: '#moaAssignedStudentInputs'
+            },
+            edit: {
+                courseField: '#editMoaCourseSelect',
+                schoolYearStartField: '#editSchoolYearStart',
+                schoolYearEndField: '#editSchoolYearEnd',
+                summaryField: '#editMoaAssignedStudentsSummary',
+                inputsField: '#editMoaAssignedStudentInputs'
             }
+        };
 
-            $course.on('change', function () {
-                $search.val('');
-                runFilter();
-            });
-            $search.on('input', runFilter);
-
-            runFilter();
-            return runFilter;
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
-        const filterAddStudents = setupStudentFilter('#moaCourseSelect', '#moaStudentSearch', '#moaStudentSelect', '#moaStudentHint');
-        const filterEditStudents = setupStudentFilter('#editMoaCourseSelect', '#editMoaStudentSearch', '#editMoaStudentSelect', '#editMoaStudentHint');
+        function getTargetConfig(mode) {
+            return assignTargets[mode] || null;
+        }
+
+        function getTargetValues(mode) {
+            const target = getTargetConfig(mode);
+            if (!target) {
+                return { course: '', schoolYear: '' };
+            }
+
+            const course = ($(target.courseField).val() || '').trim();
+            const startYear = ($(target.schoolYearStartField).val() || '').trim();
+            const endYear = ($(target.schoolYearEndField).val() || '').trim();
+
+            return {
+                course: course,
+                schoolYear: startYear && endYear ? startYear + '-' + endYear : ''
+            };
+        }
+
+        function syncTargetFields(mode, course, schoolYear) {
+            const target = getTargetConfig(mode);
+            if (!target) return;
+
+            if ($(target.courseField).length) {
+                $(target.courseField).val(course || '');
+            }
+
+            if ($(target.schoolYearStartField).length && $(target.schoolYearEndField).length) {
+                const parts = String(schoolYear || '').split('-');
+                $(target.schoolYearStartField).val(parts[0] || '');
+                $(target.schoolYearEndField).val(parts[1] || '');
+            }
+        }
+
+        function renderAssignedSummary(mode, selectedNames) {
+            const target = getTargetConfig(mode);
+            if (!target) return;
+
+            const summary = document.querySelector(target.summaryField);
+            const inputs = document.querySelector(target.inputsField);
+            const names = Array.from(selectedNames || []).filter(Boolean);
+
+            if (summary) {
+                summary.textContent = names.length
+                    ? names.length + ' student' + (names.length === 1 ? '' : 's') + ' selected.'
+                    : 'No students assigned yet.';
+            }
+
+            if (inputs) {
+                inputs.innerHTML = names.map(function (name) {
+                    return '<input type="hidden" name="student_names[]" value="' + escapeHtml(name) + '">';
+                }).join('');
+            }
+        }
+
+        function renderAssignableSelectedChips() {
+            const chips = document.getElementById('assignStudentsSelectedChips');
+            const info = document.getElementById('assignStudentsSelectedInfo');
+            if (!chips || !info) return;
+
+            const names = Array.from(assignableStudentState.selectedNames);
+            info.textContent = names.length
+                ? names.length + ' student' + (names.length === 1 ? '' : 's') + ' selected.'
+                : 'No students selected yet.';
+
+            chips.innerHTML = names.length
+                ? names.map(function (name) {
+                    return '<button type="button" class="student-pill" data-selected-name="' + escapeHtml(name) + '" style="border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">'
+                        + '<i class="fa fa-times" style="font-size:10px;"></i>'
+                        + escapeHtml(name)
+                        + '</button>';
+                }).join('')
+                : '<span style="font-size:12px; color:#6b7280;">Selected students will appear here.</span>';
+        }
+
+        function getActiveAssignFilters() {
+            return {
+                course: ($('#assignStudentsCourse').val() || '').trim(),
+                schoolYear: ($('#assignStudentsSchoolYear').val() || '').trim(),
+                search: ($('#assignStudentsSearch').val() || '').trim()
+            };
+        }
+
+        function setAssignStatus(message, isError) {
+            const status = document.getElementById('assignStudentsStatus');
+            if (!status) return;
+
+            if (!message) {
+                status.style.display = 'none';
+                status.textContent = '';
+                return;
+            }
+
+            status.style.display = 'block';
+            status.textContent = message;
+            status.style.borderColor = isError ? '#fca5a5' : '#f3b3b3';
+            status.style.background = isError ? '#fef2f2' : '#fff7f7';
+        }
+
+        function renderAssignableStudentsList() {
+            const list = document.getElementById('assignStudentsList');
+            const { course } = getActiveAssignFilters();
+
+            if (!list) return;
+
+            if (assignableStudentState.loading) {
+                list.innerHTML = '<div style="padding:18px; text-align:center; color:#6b7280; border:1px dashed #f3b3b3; border-radius:12px; background:#fff;">Loading students...</div>';
+                return;
+            }
+
+            if (!course) {
+                list.innerHTML = '<div style="padding:18px; text-align:center; color:#6b7280; border:1px dashed #f3b3b3; border-radius:12px; background:#fff;">Choose a course to load matching students.</div>';
+                setAssignStatus('', false);
+                return;
+            }
+
+            if (!assignableStudentState.students.length) {
+                list.innerHTML = '<div style="padding:18px; text-align:center; color:#6b7280; border:1px dashed #f3b3b3; border-radius:12px; background:#fff;">No students found for the selected filters.</div>';
+                setAssignStatus('No students matched the current filters.', false);
+                return;
+            }
+
+            setAssignStatus('Loaded ' + assignableStudentState.students.length + ' student' + (assignableStudentState.students.length === 1 ? '' : 's') + ' for the current filters.', false);
+
+            list.innerHTML = assignableStudentState.students.map(function (student) {
+                const checked = assignableStudentState.selectedNames.has(student.full_name) ? 'checked' : '';
+                return '<label style="display:flex; align-items:flex-start; gap:12px; padding:14px 15px; border:1px solid #f1d5d5; border-radius:14px; background:#fff; cursor:pointer; transition:all .15s ease;">'
+                    + '<input type="checkbox" class="assign-student-checkbox" data-student-name="' + escapeHtml(student.full_name) + '" ' + checked + ' style="margin-top:4px; width:18px; height:18px;">'
+                    + '<div style="flex:1; min-width:0;">'
+                    + '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">'
+                    + '<span style="font-size:14px; font-weight:700; color:#111827;">' + escapeHtml(student.full_name) + '</span>'
+                    + '<span style="font-size:11px; padding:3px 8px; border-radius:999px; background:#eff6ff; color:#2563eb; font-weight:700;">' + escapeHtml(student.student_num || 'No ID') + '</span>'
+                    + '</div>'
+                    + '<div style="font-size:12px; color:#6b7280; margin-top:4px;">'
+                    + escapeHtml(student.course || 'No course') + ' • '
+                    + escapeHtml(student.year_and_section || 'No section') + ' • '
+                    + escapeHtml(student.school_year || 'No school year')
+                    + '</div>'
+                    + '</div>'
+                    + '</label>';
+            }).join('');
+
+            renderAssignableSelectedChips();
+        }
+
+        function fetchAssignableStudents() {
+            const { course, schoolYear, search } = getActiveAssignFilters();
+
+            assignableStudentState.loading = true;
+            renderAssignableStudentsList();
+
+            $.getJSON(assignStudentsUrl, {
+                course: course,
+                school_year: schoolYear,
+                search: search
+            }).done(function (response) {
+                assignableStudentState.students = Array.isArray(response.students) ? response.students : [];
+            }).fail(function () {
+                assignableStudentState.students = [];
+                setAssignStatus('Unable to load students right now. Please try again.', true);
+            }).always(function () {
+                assignableStudentState.loading = false;
+                renderAssignableStudentsList();
+            });
+        }
+
+        function resetAssignableSelection() {
+            assignableStudentState.selectedNames.clear();
+            renderAssignableSelectedChips();
+            renderAssignableStudentsList();
+        }
+
+        function openAssignStudentsModal(mode) {
+            assignableStudentState.mode = mode;
+
+            const target = getTargetConfig(mode);
+            if (!target) return;
+
+            const values = getTargetValues(mode);
+            $('#assignStudentsCourse').val(values.course);
+            $('#assignStudentsSchoolYear').val(values.schoolYear);
+            $('#assignStudentsSearch').val('');
+
+            const existingNames = Array.from(document.querySelectorAll(target.inputsField + ' input[name="student_names[]"]'))
+                .map(function (input) { return (input.value || '').trim(); })
+                .filter(Boolean);
+            assignableStudentState.selectedNames = new Set(existingNames);
+
+            renderAssignedSummary(mode, assignableStudentState.selectedNames);
+            renderAssignableSelectedChips();
+            setAssignStatus('', false);
+
+            $('#assignStudentsModal').modal('show');
+            fetchAssignableStudents();
+        }
+
+        function applyAssignableStudents() {
+            if (!assignableStudentState.mode) {
+                return;
+            }
+
+            const values = getActiveAssignFilters();
+            syncTargetFields(assignableStudentState.mode, values.course, values.schoolYear);
+            renderAssignedSummary(assignableStudentState.mode, assignableStudentState.selectedNames);
+
+            $('#assignStudentsModal').modal('hide');
+        }
+
+        $(document).on('click', '#openAssignStudentsModal', function () {
+            openAssignStudentsModal('add');
+        });
+
+        $(document).on('click', '#openEditAssignStudentsModal', function () {
+            openAssignStudentsModal('edit');
+        });
+
+        $(document).on('change', '#assignStudentsCourse, #assignStudentsSchoolYear', function () {
+            if (!assignableStudentState.mode) {
+                return;
+            }
+
+            syncTargetFields(assignableStudentState.mode, $('#assignStudentsCourse').val(), $('#assignStudentsSchoolYear').val());
+            resetAssignableSelection();
+            fetchAssignableStudents();
+        });
+
+        $(document).on('input', '#assignStudentsSearch', function () {
+            clearTimeout(assignableStudentState.searchTimer);
+            assignableStudentState.searchTimer = setTimeout(function () {
+                fetchAssignableStudents();
+            }, 250);
+        });
+
+        $(document).on('change', '.assign-student-checkbox', function () {
+            const studentName = ($(this).data('student-name') || '').trim();
+            if (!studentName) {
+                return;
+            }
+
+            if (this.checked) {
+                assignableStudentState.selectedNames.add(studentName);
+            } else {
+                assignableStudentState.selectedNames.delete(studentName);
+            }
+
+            renderAssignableSelectedChips();
+        });
+
+        $(document).on('click', '#assignStudentsApply', function () {
+            applyAssignableStudents();
+        });
+
+        $(document).on('click', '#assignStudentsClear', function () {
+            resetAssignableSelection();
+        });
+
+        $(document).on('click', '#assignStudentsSelectedChips [data-selected-name]', function () {
+            const studentName = ($(this).data('selected-name') || '').trim();
+            if (!studentName) return;
+
+            assignableStudentState.selectedNames.delete(studentName);
+            renderAssignableSelectedChips();
+
+            document.querySelectorAll('.assign-student-checkbox').forEach(function (checkbox) {
+                if ((checkbox.getAttribute('data-student-name') || '').trim() === studentName) {
+                    checkbox.checked = false;
+                }
+            });
+        });
 
         // File validation error
         @if ($errors->has('file'))
@@ -1592,7 +1905,6 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         $('#edit_school_year_start').val(company.school_year_start || '');
         $('#edit_school_year_end').val(company.school_year_end || '');
         $('#editMoaCourseSelect').val(company.course || '');
-        $('#editMoaStudentSearch').val('');
         $('#editManualStudentInput').val(Array.isArray(company.manual_students) ? company.manual_students.join(', ') : '');
 
         const courseSelect = document.getElementById('editMoaCourseSelect');
@@ -1600,12 +1912,26 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             courseSelect.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
-        const selectedSet = new Set(Array.isArray(company.selected_students) ? company.selected_students : []);
-        const studentSelect = document.getElementById('editMoaStudentSelect');
-        if (studentSelect) {
-            Array.from(studentSelect.options).forEach(function (option) {
-                option.selected = selectedSet.has(option.value) && !option.disabled;
+        const selectedStudents = Array.isArray(company.selected_students) ? company.selected_students : [];
+        const selectedSet = new Set(selectedStudents);
+        const editAssignedInputs = document.getElementById('editMoaAssignedStudentInputs');
+        const editAssignedSummary = document.getElementById('editMoaAssignedStudentsSummary');
+
+        if (editAssignedInputs) {
+            editAssignedInputs.innerHTML = '';
+            selectedStudents.forEach(function (studentName) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'student_names[]';
+                input.value = studentName;
+                editAssignedInputs.appendChild(input);
             });
+        }
+
+        if (editAssignedSummary) {
+            editAssignedSummary.textContent = selectedSet.size
+                ? selectedSet.size + ' student' + (selectedSet.size === 1 ? '' : 's') + ' selected.'
+                : 'No students assigned yet.';
         }
     }
 

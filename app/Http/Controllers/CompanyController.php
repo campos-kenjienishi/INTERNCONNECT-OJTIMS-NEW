@@ -148,7 +148,16 @@ private function requireStudentSession()
             })
             ->values();
     
-        $stu = Student::all();
+        $studentSchoolYears = Student::whereNotNull('school_year_start')
+            ->whereNotNull('school_year_end')
+            ->get()
+            ->map(function ($student) {
+                return trim((string) $student->school_year_start . '-' . (string) $student->school_year_end);
+            })
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values();
     
         // Filter companies based on the start year of "school_year"
         $companies = $companies->filter(function ($company) use ($currentYear) {
@@ -187,7 +196,58 @@ private function requireStudentSession()
             $query->whereIn('company_name', $companyNames);
         })->get();
     
-        return view('ojtCoordinator.companies', compact('companies', 'students', 'user', 'stu', 'course', 'selectedCourse', 'schoolYears', 'selectedSchoolYear'));
+    return view('ojtCoordinator.companies', compact('companies', 'students', 'user', 'course', 'selectedCourse', 'schoolYears', 'selectedSchoolYear', 'studentSchoolYears'));
+    }
+
+    public function assignableStudents(Request $request)
+    {
+        $course = trim((string) $request->query('course', ''));
+        $schoolYear = trim((string) $request->query('school_year', ''));
+        $search = trim((string) $request->query('search', ''));
+
+        $query = Student::with('user');
+
+        if ($course !== '') {
+            $query->where('course', $course);
+        }
+
+        if ($schoolYear !== '') {
+            $query->whereRaw(
+                "CONCAT(COALESCE(school_year_start, ''), '-', COALESCE(school_year_end, '')) = ?",
+                [$schoolYear]
+            );
+        }
+
+        if ($search !== '') {
+            $query->where(function ($studentQuery) use ($search) {
+                $studentQuery->where('studentNum', 'like', '%' . $search . '%')
+                    ->orWhere('year_and_section', 'like', '%' . $search . '%')
+                    ->orWhere('course', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('full_name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        $students = $query->orderBy('course')
+            ->orderBy('school_year_start')
+            ->orderBy('year_and_section')
+            ->get()
+            ->map(function (Student $student) {
+                return [
+                    'id' => $student->id,
+                    'full_name' => trim((string) $student->full_name),
+                    'course' => trim((string) $student->course),
+                    'year_and_section' => trim((string) $student->year_and_section),
+                    'school_year' => trim((string) $student->school_year_start . '-' . (string) $student->school_year_end),
+                    'student_num' => trim((string) $student->studentNum),
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'students' => $students,
+        ]);
     }
     
 
