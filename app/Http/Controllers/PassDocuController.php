@@ -79,6 +79,12 @@ class PassDocuController extends Controller
             ->values();
 
         $submittedRequirements = FileRequirement::where('uploadedBy', $user->full_name)->get();
+        $submittedRequirementNames = $submittedRequirements
+            ->pluck('fileName')
+            ->filter()
+            ->map(fn ($name) => mb_strtolower(trim((string) $name)))
+            ->unique()
+            ->values();
         $validSubmittedNames = $submittedRequirements
             ->filter(fn ($requirement) => (int) ($requirement->status ?? 0) !== 2)
             ->pluck('fileName')
@@ -103,6 +109,7 @@ class PassDocuController extends Controller
             'basicCategories' => $basicCategories,
             'otherCategories' => $otherCategories,
             'submittedRequirements' => $submittedRequirements,
+            'submittedRequirementNames' => $submittedRequirementNames,
             'submittedBasicNames' => $submittedBasicNames,
             'missingBasicCategories' => $missingBasicCategories,
             'hasSubmittedNotarizedMoa' => $hasSubmittedNotarizedMoa,
@@ -465,6 +472,14 @@ public function fileReqCreate(Request $request){
 
     if ($categoryPhase === 'other' && !$phaseState['otherRequirementsUnlocked']) {
         return back()->with('fail', 'Submit all basic requirements and your Notarized MOA first before uploading other requirements.');
+    }
+
+    $normalizedCategoryName = mb_strtolower(trim((string) $request->fileName));
+    $alreadySubmitted = $phaseState['submittedRequirementNames']
+        ->contains($normalizedCategoryName);
+
+    if ($alreadySubmitted) {
+        return back()->withInput()->with('fail', 'This requirement is already submitted. Remove the existing submission first before uploading another file for it.');
     }
     
     // Create a new instance of FileRequirement model

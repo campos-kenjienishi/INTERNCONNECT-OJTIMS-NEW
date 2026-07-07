@@ -1170,6 +1170,8 @@
             top: calc(100% + 8px);
             left: 0;
             right: 0;
+            width: 100%;
+            box-sizing: border-box;
             background: #fff;
             border: 1px solid #f1d3d3;
             border-radius: 14px;
@@ -1187,6 +1189,8 @@
         .category-dropdown-menu-scroll {
             max-height: 176px;
             overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 4px;
         }
 
         .category-dropdown-menu-scroll::-webkit-scrollbar {
@@ -1212,7 +1216,8 @@
             position: relative;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            flex-wrap: wrap;
             gap: 12px;
             width: 100%;
             padding: 11px 12px;
@@ -1250,6 +1255,45 @@
             color: #92400e;
         }
 
+        .phase-dropdown-option-tooltip {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            top: calc(100% + 8px);
+            width: auto;
+            max-width: none;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #7f1d1d;
+            color: #fff;
+            font-size: 11.5px;
+            font-weight: 500;
+            line-height: 1.5;
+            box-shadow: 0 16px 30px rgba(127, 29, 29, 0.28);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: all 0.2s ease;
+            pointer-events: none;
+            z-index: 51;
+        }
+
+        .phase-dropdown-option-tooltip::before {
+            content: "";
+            position: absolute;
+            left: 18px;
+            bottom: 100%;
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent #7f1d1d transparent;
+        }
+
+        .phase-dropdown-option.locked:hover .phase-dropdown-option-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
         .phase-dropdown-option-label {
             display: grid;
             gap: 2px;
@@ -1257,6 +1301,7 @@
         }
 
         .phase-dropdown-option-title {
+            display: block;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1270,6 +1315,7 @@
 
         .phase-dropdown-option-status {
             flex-shrink: 0;
+            margin-left: auto;
             font-size: 11px;
             font-weight: 700;
             border-radius: 999px;
@@ -1278,11 +1324,10 @@
             color: #b45309;
         }
 
-        .phase-dropdown-option-tooltip {
-            position: absolute;
-            left: calc(100% + 10px);
-            top: 50%;
-            width: 220px;
+        .category-hover-bubble {
+            position: fixed;
+            z-index: 30001;
+            max-width: min(320px, calc(100vw - 32px));
             padding: 10px 12px;
             border-radius: 12px;
             background: #7f1d1d;
@@ -1293,27 +1338,25 @@
             box-shadow: 0 16px 30px rgba(127, 29, 29, 0.28);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-50%) translateX(-4px);
-            transition: all 0.2s ease;
+            transform: translateY(-4px);
+            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
             pointer-events: none;
-            z-index: 50;
         }
 
-        .phase-dropdown-option-tooltip::before {
-            content: "";
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 6px;
-            border-style: solid;
-            border-color: transparent #7f1d1d transparent transparent;
-        }
-
-        .phase-dropdown-option.locked:hover .phase-dropdown-option-tooltip {
+        .category-hover-bubble.visible {
             opacity: 1;
             visibility: visible;
-            transform: translateY(-50%) translateX(0);
+            transform: translateY(0);
+        }
+
+        .category-hover-bubble::before {
+            content: "";
+            position: absolute;
+            left: 18px;
+            bottom: 100%;
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent #7f1d1d transparent;
         }
 
         .category-dropdown-option.empty {
@@ -2402,6 +2445,61 @@
     const otherRequirementsUnlocked = @json($otherRequirementsUnlocked);
     const missingBasicRequirementNames = @json($missingBasicCategories->pluck('fileName')->values());
     const hasSubmittedNotarizedMoa = @json($hasSubmittedNotarizedMoa);
+    const submittedRequirementNames = new Set(
+        @json($submittedRequirementNames->values()).map(function (name) {
+            return String(name || '').trim().toLowerCase();
+        })
+    );
+    let categoryHoverBubble = null;
+
+    function normalizeRequirementName(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function ensureCategoryHoverBubble() {
+        if (categoryHoverBubble) {
+            return categoryHoverBubble;
+        }
+
+        categoryHoverBubble = document.createElement('div');
+        categoryHoverBubble.className = 'category-hover-bubble';
+        document.body.appendChild(categoryHoverBubble);
+        return categoryHoverBubble;
+    }
+
+    function hideCategoryHoverBubble() {
+        if (!categoryHoverBubble) {
+            return;
+        }
+
+        categoryHoverBubble.classList.remove('visible');
+    }
+
+    function showCategoryHoverBubble(target, message) {
+        const bubble = ensureCategoryHoverBubble();
+        bubble.textContent = message;
+        bubble.classList.add('visible');
+
+        const rect = target.getBoundingClientRect();
+        const bubbleWidth = Math.min(320, window.innerWidth - 32);
+        const bubbleHeight = bubble.offsetHeight || 56;
+
+        let left = rect.left;
+        if (left + bubbleWidth > window.innerWidth - 16) {
+            left = window.innerWidth - bubbleWidth - 16;
+        }
+        left = Math.max(16, left);
+
+        let top = rect.bottom + 10;
+        if (top + bubbleHeight > window.innerHeight - 16) {
+            top = rect.top - bubbleHeight - 10;
+        }
+        top = Math.max(16, top);
+
+        bubble.style.left = left + 'px';
+        bubble.style.top = top + 'px';
+        bubble.style.width = bubbleWidth + 'px';
+    }
 
     function setPhaseDropdownValue(value) {
         if (!requirementPhaseSelect || !phaseDropdownOptions.length) {
@@ -2462,6 +2560,7 @@
 
         categoryDropdown.classList.remove('open');
         categoryDropdownTrigger.setAttribute('aria-expanded', 'false');
+        hideCategoryHoverBubble();
     }
 
     function openCategoryDropdown() {
@@ -2498,15 +2597,35 @@
                 option.type = 'button';
                 option.className = 'phase-dropdown-option category-dropdown-option';
                 option.dataset.value = category.fileName;
+                const isAlreadySubmitted = submittedRequirementNames.has(normalizeRequirementName(category.fileName));
+
                 option.innerHTML = ''
                     + '<span class="phase-dropdown-option-label">'
                     + '  <span class="phase-dropdown-option-title">' + category.fileName + '</span>'
                     + '</span>';
 
-                option.addEventListener('click', function () {
-                    setCategoryDropdownValue(category.fileName, category.fileName);
-                    closeCategoryDropdown();
-                });
+                if (isAlreadySubmitted) {
+                    option.classList.add('locked');
+                    option.setAttribute('aria-disabled', 'true');
+                    option.addEventListener('mouseenter', function () {
+                        showCategoryHoverBubble(
+                            option,
+                            'This requirement is already submitted. Remove the existing submission first before uploading another file for it.'
+                        );
+                    });
+                    option.addEventListener('mouseleave', hideCategoryHoverBubble);
+                    option.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    });
+                    option.innerHTML += ''
+                        + '<span class="phase-dropdown-option-status">Submitted</span>';
+                } else {
+                    option.addEventListener('click', function () {
+                        setCategoryDropdownValue(category.fileName, category.fileName);
+                        closeCategoryDropdown();
+                    });
+                }
 
                 categoryDropdownMenu.appendChild(option);
 
@@ -2581,6 +2700,7 @@
         document.addEventListener('click', function (event) {
             if (!categoryDropdown.contains(event.target)) {
                 closeCategoryDropdown();
+                hideCategoryHoverBubble();
             }
         });
     }
