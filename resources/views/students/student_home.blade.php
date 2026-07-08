@@ -795,7 +795,7 @@
                     and understand the evaluation process.
                 </p>
                 <div class="welcome-actions">
-                    <a href="https://youtu.be/uGlxS0CMiEk" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
+                    <a href="https://youtu.be/H0ek8it4jKc" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
                         <i class="fab fa-youtube"></i>
                         Student Guide
                     </a>
