@@ -769,7 +769,7 @@
         <div class="topbar-right">
             <div class="topbar-badge">
                 <i class="fa fa-graduation-cap"></i>
-                <span class="badge-label">Student Portal</span>
+                Student Portal
             </div>
         </div>
     </div>
