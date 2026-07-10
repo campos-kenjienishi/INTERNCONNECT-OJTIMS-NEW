@@ -28,6 +28,11 @@
             --topbar-h:   64px;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: #f5f5f5;
@@ -182,6 +187,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         .main-content.expanded {
@@ -282,6 +288,7 @@
             width: 100%;
             max-width: none !important;
             margin: 0 !important;
+            min-width: 0;
         }
 
         .page-header {
@@ -311,6 +318,7 @@
             margin-bottom: 22px;
             width: 100%;
             max-width: none !important;
+            min-width: 0;
         }
 
         .table-card-header {
@@ -320,6 +328,7 @@
             padding: 18px 24px;
             border-bottom: 1px solid #f0f0f0;
             background: #fafafa;
+            flex-wrap: wrap;
         }
 
         .table-card-header .header-icon {
@@ -337,7 +346,7 @@
         .table-card-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
         .table-card-header p { font-size: 12.5px; color: #888; margin-top: 2px; }
 
-        .table-card-body { padding: 0; overflow-x: auto; }
+        .table-card-body { padding: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; min-width: 0; }
 
         /* =============== ROOMS TABLE =============== */
         .rooms-table {
@@ -650,9 +659,43 @@
             }
             .sidebar.mobile-open { transform: translateX(0); }
             .sidebar-overlay.active { display: block; }
-            .main-content { margin-left: 0 !important; }
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
             .page-content { padding: 18px; }
+            .topbar { padding: 0 16px; }
             .topbar-title { display: none; }
+
+            .table-card-header { padding: 16px 18px; }
+            .header-sort-control {
+                margin-left: 0 !important;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .header-sort-control select { flex: 1; min-width: 0; }
+
+            .table-card-body .dataTables_wrapper { padding: 12px 14px; }
+
+            /* Keep tables legible: scroll horizontally inside the card
+               instead of letting them crush columns or blow out the page */
+            .rooms-table,
+            .table-card-body table.dataTable { min-width: 560px; }
+
+            /* Prevent iOS Safari from auto-zooming on focus */
+            .dataTables_filter input,
+            .dataTables_length select,
+            #templateDateSort,
+            #announcementDateSort {
+                font-size: 16px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            div[style*="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))"],
+            div[style*="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"] {
+                grid-template-columns: 1fr !important;
+            }
         }
         /* Dashboard Footer */
 .dashboard-footer {
@@ -898,13 +941,14 @@
         <div class="page-header">
             <div>
                 <h1>My <span>Class</span></h1>
-                <div class="breadcrumb">
+                <div class="breadcrumb" style="margin-top: 6px;">
                     <a href="{{ url('/student/home') }}"><i class="fa fa-home"></i> Home</a>
                     <i class="fa fa-chevron-right"></i>
                     <span>Class</span>
                 </div>
             </div>
         </div>
+        
 
         <!-- Rooms Table Card -->
         <div class="table-card">
@@ -1163,7 +1207,7 @@
             <h2>Room Templates</h2>
             <p>Templates uploaded by your professor for your current room</p>
         </div>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div class="header-sort-control" style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <label for="templateDateSort" style="font-size:13px;color:#666;margin-bottom:0;">Date</label>
             <select id="templateDateSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:160px;">
                 <option value="newest" selected>Newest first</option>
@@ -1261,7 +1305,7 @@
                     <h2>Announcements</h2>
                     <p>Latest announcements from your class adviser</p>
                 </div>
-                <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <div class="header-sort-control" style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                     <label for="announcementDateSort" style="font-size:13px;color:#666;margin-bottom:0;">Date</label>
                     <select id="announcementDateSort" class="form-select" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e5e5;font-size:13px;width:160px;">
                         <option value="newest" selected>Newest first</option>

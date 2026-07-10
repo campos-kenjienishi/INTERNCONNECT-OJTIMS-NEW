@@ -565,6 +565,7 @@
             .page-content { padding: 18px; }
             .form-grid { grid-template-columns: 1fr; }
             .form-grid .full-width { grid-column: 1; }
+            .topbar-title { display: none; }
         }
         /* Dashboard Footer */
 .dashboard-footer {
