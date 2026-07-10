@@ -20,6 +20,18 @@ use App\Services\ReportAiInsightService;
 
 class ReportsController extends Controller
 {
+    private function normalizeSchoolYearRange(?string $startYear, ?string $endYear): ?string
+    {
+        $startYear = trim((string) $startYear);
+        $endYear = trim((string) $endYear);
+
+        if ($startYear === '' || $endYear === '') {
+            return null;
+        }
+
+        return $startYear . '-' . $endYear;
+    }
+
     public function reports()
     {
         $user = [];
@@ -284,14 +296,13 @@ public function reportsExpired()
 
     $startYear = $validatedData['school_year_start'];
     $endYear = $validatedData['school_year_end'];
+    $schoolYear = $this->normalizeSchoolYearRange($startYear, $endYear);
 
     $user = User::find(Session::get('loginId'));
     $course = Courses::all();
 
-    $companyy = Company::where(function ($query) use ($startYear, $endYear) {
-        $query->where('school_year', '>=', $startYear)
-            ->where('school_year', '<=', $endYear);
-    })->get();
+    $companyy = Company::whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear])
+        ->get();
 
     $companies = $companyy->filter(function ($company) use ($validatedData) {
         $hasStudentsWithCourse = $company->students()->where('course', $validatedData['course'])->exists();
@@ -313,7 +324,7 @@ public function reportsExpired()
     AuditLogger::log(
         'Reports',
         'Generate',
-        'Generated MOA report for ' . $validatedData['course'] . ' (' . $startYear . '-' . $endYear . ')',
+        'Generated MOA report for ' . $validatedData['course'] . ' (' . $schoolYear . ')',
         Session::get('loginId') ?? null
     );
 
@@ -464,16 +475,14 @@ public function reportsExpiredProf()
     $startYear = $validatedData['school_year_start'];
     $endYear = $validatedData['school_year_end'];
 
-    $schoolYear = $startYear . '-' . $endYear;
+    $schoolYear = $this->normalizeSchoolYearRange($startYear, $endYear);
     $user = User::find(Session::get('loginId'));
     $courseAll = Courses::all();
     $currentYear = now()->year;
 
     // Retrieve the selected company or companies
-    $companyy = Company::where(function ($query) use ($startYear, $endYear) {
-        $query->where('school_year', '>=', $startYear)
-            ->where('school_year', '<=', $endYear);
-    })->get();
+    $companyy = Company::whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear])
+        ->get();
 
     $companies = $companyy->filter(function ($company) use ($currentYear, $validatedData) {
         // Extract the start year from the "school_year" format
@@ -508,7 +517,7 @@ public function reportsExpiredProf()
     AuditLogger::log(
         'Reports',
         'Generate',
-        'Generated professor MOA report for ' . $validatedData['course'] . ' (' . $startYear . '-' . $endYear . ')',
+        'Generated professor MOA report for ' . $validatedData['course'] . ' (' . $schoolYear . ')',
         Session::get('loginId') ?? null
     );
 
