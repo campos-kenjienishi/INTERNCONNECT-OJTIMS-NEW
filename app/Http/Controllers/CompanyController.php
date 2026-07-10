@@ -407,6 +407,7 @@ public function companyCreate(Request $request)
     if ($data->role == 1) {
         $request->validate([
             'course' => 'required|exists:courses,course',
+            'valid_until' => 'required|date',
         ]);
     }
 
@@ -416,9 +417,7 @@ public function companyCreate(Request $request)
         ]);
     }
 
-    $expirationDate = $data->role == 0
-        ? $request->input('valid_until')
-        : now()->addYears(3);
+    $expirationDate = $request->input('valid_until');
 
     // Create or retrieve the company
     $com = new Company();
@@ -583,6 +582,7 @@ public function companyUpdate(Request $request, $id)
         $rules['valid_until'] = 'required|date';
     } else {
         $rules['course'] = 'required|exists:courses,course';
+        $rules['valid_until'] = 'required|date';
     }
 
     $validator = Validator::make($request->all(), $rules);
@@ -621,9 +621,7 @@ public function companyUpdate(Request $request, $id)
     $startYear = $request->input('school_year_start');
     $endYear = $request->input('school_year_end');
     $company->school_year = $startYear . '-' . $endYear;
-    $company->valid_until = $data->role == 0
-        ? $request->input('valid_until')
-        : ($company->valid_until ?: now()->addYears(3));
+    $company->valid_until = $request->input('valid_until');
 
     if ($data->role != 0) {
         $company->course = $request->input('course');

@@ -1115,6 +1115,14 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                     </div>
 
                     <div class="field-group">
+                        <label class="field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+                            <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
+                            <span style="font-size: 11.5px; color: #777; font-weight: 400;">Select the MOA expiry date.</span>
+                        </label>
+                        <input class="field-input" type="date" name="valid_until" required>
+                    </div>
+
+                    <div class="field-group">
                         <label class="field-label"><i class="fa fa-graduation-cap"></i> Course <span style="color:var(--red);">*</span></label>
                         <select name="course" id="moaCourseSelect" class="field-select" required>
                             <option value="" disabled selected>Select course</option>
@@ -1198,6 +1206,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                 'company_email' => $companyItem->company_email,
                 'school_year_start' => trim((string) $schoolYearStart),
                 'school_year_end' => trim((string) $schoolYearEnd),
+                'valid_until' => $companyItem->valid_until ? \Carbon\Carbon::parse($companyItem->valid_until)->format('Y-m-d') : '',
                 'course' => $companyItem->course,
                 'selected_students' => $linkedStudentNames->all(),
                 'manual_students' => $manualStudentNames->all(),
@@ -1256,6 +1265,14 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                             <span>–</span>
                             <input id="edit_school_year_end" class="field-input" type="text" name="school_year_end" placeholder="End Year" required>
                         </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+                            <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
+                            <span style="font-size: 11.5px; color: #777; font-weight: 400;">Select the MOA expiry date.</span>
+                        </label>
+                        <input id="editValidUntil" class="field-input" type="date" name="valid_until" required>
                     </div>
 
                     <div class="field-group">
@@ -1904,6 +1921,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         $('#edit_company_email').val(company.company_email || '');
         $('#edit_school_year_start').val(company.school_year_start || '');
         $('#edit_school_year_end').val(company.school_year_end || '');
+        $('#editValidUntil').val(company.valid_until || '');
         $('#editMoaCourseSelect').val(company.course || '');
         $('#editManualStudentInput').val(Array.isArray(company.manual_students) ? company.manual_students.join(', ') : '');
 
