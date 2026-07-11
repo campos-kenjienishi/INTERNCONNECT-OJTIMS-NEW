@@ -1340,11 +1340,49 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 </div>
 
 @php
-    $companyEditPayload = $companies->mapWithKeys(function ($companyItem) {
+    $normalizeSchoolYearParts = function ($schoolYearValue) {
+        $parts = array_values(array_filter(array_map('trim', explode('-', (string) $schoolYearValue)), function ($part) {
+            return $part !== '';
+        }));
+
+        if (count($parts) < 2) {
+            return ['', ''];
+        }
+
+        $startYear = (int) $parts[0];
+        $endYear = (int) $parts[1];
+
+        if ($startYear && $endYear && $endYear < $startYear) {
+            [$startYear, $endYear] = [$endYear, $startYear];
+        }
+
+        return [
+            $startYear ? (string) $startYear : '',
+            $endYear ? (string) $endYear : '',
+        ];
+    };
+
+    $normalizeCourseList = function ($courseValue) {
+        return array_values(array_filter(array_map('trim', explode(',', (string) $courseValue)), function ($course) {
+            return $course !== '';
+        }));
+    };
+
+    $companyEditPayload = $companies->mapWithKeys(function ($companyItem) use ($normalizeSchoolYearParts, $normalizeCourseList) {
         $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($companyItem->student_names_display ?? '')))));
         $linkedStudentNames = $companyItem->students->pluck('full_name')->filter()->values();
         $manualStudentNames = $displayStudents->diff($linkedStudentNames)->values();
-        [$schoolYearStart, $schoolYearEnd] = array_pad(explode('-', (string) ($companyItem->school_year ?? '')), 2, '');
+        [$schoolYearStart, $schoolYearEnd] = $normalizeSchoolYearParts($companyItem->school_year ?? '');
+        $courseValues = $normalizeCourseList($companyItem->course ?? '');
+
+        $validUntil = '';
+        if (!empty($companyItem->valid_until)) {
+            try {
+                $validUntil = \Carbon\Carbon::parse($companyItem->valid_until)->format('Y-m-d');
+            } catch (\Throwable $e) {
+                $validUntil = '';
+            }
+        }
 
         return [
             $companyItem->id => [
@@ -1356,8 +1394,12 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                 'company_email' => $companyItem->company_email,
                 'school_year_start' => trim((string) $schoolYearStart),
                 'school_year_end' => trim((string) $schoolYearEnd),
-                'valid_until' => $companyItem->valid_until ? \Carbon\Carbon::parse($companyItem->valid_until)->format('Y-m-d') : '',
+                'school_year' => trim((string) $schoolYearStart) && trim((string) $schoolYearEnd)
+                    ? trim((string) $schoolYearStart) . '-' . trim((string) $schoolYearEnd)
+                    : trim((string) ($companyItem->school_year ?? '')),
+                'valid_until' => $validUntil,
                 'course' => $companyItem->course,
+                'course_values' => $courseValues,
                 'selected_students' => $linkedStudentNames->all(),
                 'manual_students' => $manualStudentNames->all(),
             ],
@@ -1747,8 +1789,8 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             },
             edit: {
                 courseField: '#editMoaCourseSelect',
-                schoolYearStartField: '#editSchoolYearStart',
-                schoolYearEndField: '#editSchoolYearEnd',
+                schoolYearStartField: '#edit_school_year_start',
+                schoolYearEndField: '#edit_school_year_end',
                 summaryField: '#editMoaAssignedStudentsSummary',
                 inputsField: '#editMoaAssignedStudentInputs'
             }
@@ -2169,17 +2211,30 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         $('#edit_company_rep').val(company.company_rep || '');
         $('#edit_company_no').val(company.company_no || '');
         $('#edit_company_email').val(company.company_email || '');
-        $('#edit_school_year_start').val(company.school_year_start || '');
-        syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end', company.school_year_end || '');
-        $('#editValidUntil').val(company.valid_until || '');
-        const selectedCourses = String(company.course || '')
-            .split(',')
-            .map(function (course) {
-                return course.trim();
+        const schoolYearParts = String(company.school_year || '')
+            .split('-')
+            .map(function (part) {
+                return part.trim();
             })
-            .filter(function (course) {
-                return course.length > 0;
+            .filter(function (part) {
+                return part.length > 0;
             });
+        const schoolYearStart = company.school_year_start || schoolYearParts[0] || '';
+        const schoolYearEnd = company.school_year_end || schoolYearParts[1] || '';
+
+        $('#edit_school_year_start').val(schoolYearStart);
+        syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end', schoolYearEnd);
+        $('#editValidUntil').val(company.valid_until || '');
+        const selectedCourses = Array.isArray(company.course_values)
+            ? company.course_values
+            : String(company.course || '')
+                .split(',')
+                .map(function (course) {
+                    return course.trim();
+                })
+                .filter(function (course) {
+                    return course.length > 0;
+                });
 
         setCheckedCourseValues('#editMoaCourseSelect', selectedCourses);
         $('#editManualStudentInput').val(Array.isArray(company.manual_students) ? company.manual_students.join(', ') : '');

@@ -709,10 +709,11 @@ public function companyUpdate(Request $request, $id)
     $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
     $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
     $selectedCourses = $data->role == 0 ? $this->normalizeCourseSelection($company->course) : $this->normalizeCourseSelection($request->input('course'));
+    $effectiveCourses = !empty($selectedCourses) ? $selectedCourses : $this->normalizeCourseSelection($company->course);
 
     if ($data->role != 0 && !empty($studentNames)) {
-        $mismatchedStudents = $existingStudents->filter(function ($student) use ($selectedCourses) {
-            return !in_array($student->course, $selectedCourses, true);
+        $mismatchedStudents = $existingStudents->filter(function ($student) use ($effectiveCourses) {
+            return !in_array($student->course, $effectiveCourses, true);
         });
 
         if ($mismatchedStudents->isNotEmpty()) {
@@ -727,7 +728,7 @@ public function companyUpdate(Request $request, $id)
     }
 
     if ($company->save()) {
-        if ($data->role != 0) {
+        if ($data->role != 0 && !empty($studentNames)) {
             $company->students()->sync($existingStudents->pluck('id')->all());
         }
 
