@@ -441,7 +441,11 @@ public function studentRemove($id)
     $this->reconcileStudentNotarizedRequirements($user);
 
     if ($company->students->isEmpty()) {
-        $this->deleteCompanyAssets($company);
+        $owner = User::where('full_name', $company->uploader_name)->first();
+
+        if (!$owner || (int) $owner->role === 0) {
+            $this->deleteCompanyAssets($company);
+        }
     } elseif ($isOwner) {
         $newOwnerName = $this->transferCompanyOwnership($company, $ownerRequirement);
         if ($newOwnerName) {

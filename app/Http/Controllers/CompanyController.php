@@ -617,7 +617,7 @@ public function companyUpdate(Request $request, $id)
     if ($data->role == 0) {
         $rules['valid_until'] = 'required|date';
     } else {
-        $rules['course'] = 'required|array|min:1';
+        $rules['course'] = 'nullable|array';
         $rules['course.*'] = 'required|exists:courses,course';
         $rules['valid_until'] = 'required|date';
     }
@@ -661,7 +661,13 @@ public function companyUpdate(Request $request, $id)
     $company->valid_until = $request->input('valid_until');
 
     if ($data->role != 0) {
-        $company->course = implode(', ', $this->normalizeCourseSelection($request->input('course')));
+        $selectedCourses = $this->normalizeCourseSelection($request->input('course'));
+
+        if (empty($selectedCourses)) {
+            $selectedCourses = $this->normalizeCourseSelection($company->course);
+        }
+
+        $company->course = implode(', ', $selectedCourses);
     }
 
     $oldFileName = $company->file;
