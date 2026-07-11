@@ -305,6 +305,96 @@
             margin: 2px 2px 0 0;
         }
 
+        .course-pill {
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #eef2ff; color: #4338ca;
+            border-radius: 999px; padding: 2px 9px;
+            font-size: 10.5px; font-weight: 800;
+            letter-spacing: 0.6px; margin: 2px 4px 0 0;
+            white-space: nowrap;
+        }
+
+        .course-picker-shell {
+            border: 1.5px solid #e8e8e8;
+            border-radius: 14px;
+            background: #fafafa;
+            padding: 12px;
+        }
+
+        .course-picker-search {
+            width: 100%;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            margin-bottom: 10px;
+            outline: none;
+            background: #fff;
+        }
+
+        .course-picker-search:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+        }
+
+        .course-picker-scroll {
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .course-picker-scroll::-webkit-scrollbar { width: 5px; }
+        .course-picker-scroll::-webkit-scrollbar-thumb { background: rgba(220,38,38,0.25); border-radius: 999px; }
+
+        .course-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 11px;
+            border: 1px solid #ececec;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .course-option:hover {
+            border-color: #fecaca;
+            box-shadow: 0 4px 14px rgba(220,38,38,0.06);
+        }
+
+        .course-option input {
+            margin-top: 3px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--red);
+            flex-shrink: 0;
+        }
+
+        .course-option-content {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .course-option-acronym {
+            font-size: 12px;
+            font-weight: 800;
+            color: #1f2937;
+            letter-spacing: 0.4px;
+        }
+
+        .course-option-name {
+            font-size: 11.5px;
+            color: #6b7280;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
         /* Status badge */
         .status-active {
             display: inline-flex; align-items: center; gap: 5px;
@@ -936,7 +1026,30 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
                             <!-- Course -->
                             <td>
-                                <span style="font-size:13px; color:#555;">{{ $company->course ?: '—' }}</span>
+                                @php
+                                    $companyCourses = collect(preg_split('/\s*,\s*/', trim((string) $company->course), -1, PREG_SPLIT_NO_EMPTY));
+                                    $courseAcronymLookup = collect($course)->mapWithKeys(function ($courseItem) {
+                                        return [trim((string) $courseItem->course) => trim((string) ($courseItem->acronym ?? ''))];
+                                    });
+                                @endphp
+
+                                @if ($companyCourses->isNotEmpty())
+                                    <div style="display:flex; flex-wrap:wrap; gap:4px; max-width:180px;" title="{{ $companyCourses->implode(', ') }}">
+                                        @foreach ($companyCourses as $companyCourse)
+                                            @php
+                                                $courseAcronym = trim((string) ($courseAcronymLookup[$companyCourse] ?? ''));
+                                                if ($courseAcronym === '') {
+                                                    $courseAcronym = collect(preg_split('/\s+/', trim($companyCourse), -1, PREG_SPLIT_NO_EMPTY))
+                                                        ->map(fn ($word) => strtoupper(substr($word, 0, 1)))
+                                                        ->implode('');
+                                                }
+                                            @endphp
+                                            <span class="course-pill" title="{{ $companyCourse }}">{{ $courseAcronym ?: $companyCourse }}</span>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span style="font-size:13px; color:#555;">—</span>
+                                @endif
                             </td>
 
                             <!-- Students -->
@@ -1061,6 +1174,10 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
 @php
     $selectedCreateStudentNames = collect(old('student_names', []))->filter()->values();
+    $schoolYearBase = now()->year;
+    $schoolYearOptions = range($schoolYearBase - 5, $schoolYearBase + 5);
+    $selectedCreateStartYear = old('school_year_start', $schoolYearBase);
+    $selectedCreateEndYear = old('school_year_end', $selectedCreateStartYear + 1);
 @endphp
 
 <!-- =============== ADD COMPANY MODAL =============== -->
@@ -1108,9 +1225,15 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year <span style="color:var(--red);">*</span></label>
                         <div class="year-row">
-                            <input class="field-input" type="text" name="school_year_start" placeholder="Start Year" required>
+                            <select class="field-input" name="school_year_start" id="schoolYearStart" required>
+                                @foreach ($schoolYearOptions as $year)
+                                    <option value="{{ $year }}" {{ (string) $selectedCreateStartYear === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
                             <span>–</span>
-                            <input class="field-input" type="text" name="school_year_end" placeholder="End Year" required>
+                            <select class="field-input" name="school_year_end" id="schoolYearEnd" required>
+                                <option value="{{ $selectedCreateEndYear }}" selected>{{ $selectedCreateEndYear }}</option>
+                            </select>
                         </div>
                     </div>
 
@@ -1122,14 +1245,41 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                         <input class="field-input" type="date" name="valid_until" required>
                     </div>
 
-                    <div class="field-group">
-                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Course <span style="color:var(--red);">*</span></label>
-                        <select name="course" id="moaCourseSelect" class="field-select" required>
-                            <option value="" disabled selected>Select course</option>
-                            @foreach ($course as $courseItem)
-                                <option value="{{ $courseItem->course }}">{{ $courseItem->course }}</option>
-                            @endforeach
-                        </select>
+                   <div class="field-group">
+                        <label class="field-label">
+                            <i class="fa fa-graduation-cap"></i> Course
+                            <span style="color:var(--red);">*</span>
+                        </label>
+
+                        <div class="course-picker-shell">
+                            <input
+                                type="text"
+                                id="moaCourseSearch"
+                                class="course-picker-search"
+                                placeholder="Search course acronym or name..."
+                            >
+
+                            <div id="moaCourseSelect" class="course-picker-scroll course-checkbox-group">
+                                @foreach ($course as $courseItem)
+                                    <label class="course-option" data-course-name="{{ strtolower($courseItem->course) }}" data-course-acronym="{{ strtolower($courseItem->acronym ?? '') }}">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="course[]"
+                                            id="course{{ $courseItem->id }}"
+                                            value="{{ $courseItem->course }}">
+                                        <span class="course-option-content">
+                                            <span class="course-option-acronym">{{ $courseItem->acronym ?: $courseItem->course }}</span>
+                                            <span class="course-option-name">{{ $courseItem->course }}</span>
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div style="font-size:11.5px; color:#777;">
+                            Select one or more courses.
+                        </div>
                     </div>
 
                     <div class="modal-section"><i class="fa fa-paperclip"></i> MOA Document</div>
@@ -1261,9 +1411,13 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year <span style="color:var(--red);">*</span></label>
                         <div class="year-row">
-                            <input id="edit_school_year_start" class="field-input" type="text" name="school_year_start" placeholder="Start Year" required>
+                            <select id="edit_school_year_start" class="field-input" name="school_year_start" required>
+                                @foreach ($schoolYearOptions as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
+                            </select>
                             <span>–</span>
-                            <input id="edit_school_year_end" class="field-input" type="text" name="school_year_end" placeholder="End Year" required>
+                            <select id="edit_school_year_end" class="field-input" name="school_year_end" required></select>
                         </div>
                     </div>
 
@@ -1277,12 +1431,32 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-graduation-cap"></i> Course <span style="color:var(--red);">*</span></label>
-                        <select name="course" id="editMoaCourseSelect" class="field-select" required>
-                            <option value="" disabled>Select course</option>
-                            @foreach ($course as $courseItem)
-                                <option value="{{ $courseItem->course }}">{{ $courseItem->course }}</option>
-                            @endforeach
-                        </select>
+                        <div class="course-picker-shell">
+                            <input
+                                type="text"
+                                id="editMoaCourseSearch"
+                                class="course-picker-search"
+                                placeholder="Search course acronym or name..."
+                            >
+
+                            <div id="editMoaCourseSelect" class="course-picker-scroll course-checkbox-group">
+                                @foreach ($course as $courseItem)
+                                    <label class="course-option" data-course-name="{{ strtolower($courseItem->course) }}" data-course-acronym="{{ strtolower($courseItem->acronym ?? '') }}">
+                                        <input
+                                            class="form-check-input edit-course-checkbox"
+                                            type="checkbox"
+                                            name="course[]"
+                                            id="editCourse{{ $courseItem->id }}"
+                                            value="{{ $courseItem->course }}">
+                                        <span class="course-option-content">
+                                            <span class="course-option-acronym">{{ $courseItem->acronym ?: $courseItem->course }}</span>
+                                            <span class="course-option-name">{{ $courseItem->course }}</span>
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div style="font-size:11.5px; color:#777;">Select one or more courses.</div>
                     </div>
 
                     <div class="modal-section"><i class="fa fa-paperclip"></i> MOA Document</div>
@@ -1589,6 +1763,67 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                 .replace(/'/g, '&#039;');
         }
 
+        function getCheckedCourseValues(containerSelector) {
+            return Array.from(document.querySelectorAll(containerSelector + ' input[name="course[]"]:checked'))
+                .map(function (input) {
+                    return (input.value || '').trim();
+                })
+                .filter(Boolean);
+        }
+
+        function setCheckedCourseValues(containerSelector, selectedCourses) {
+            const normalizedCourses = new Set((selectedCourses || []).map(function (course) {
+                return String(course || '').trim();
+            }).filter(Boolean));
+
+            document.querySelectorAll(containerSelector + ' input[name="course[]"]').forEach(function (checkbox) {
+                checkbox.checked = normalizedCourses.has((checkbox.value || '').trim());
+            });
+        }
+
+        function filterCourseOptions(searchInputId, containerId) {
+            const searchInput = document.getElementById(searchInputId);
+            const container = document.getElementById(containerId);
+
+            if (!searchInput || !container) {
+                return;
+            }
+
+            const searchTerm = searchInput.value.trim().toLowerCase();
+
+            container.querySelectorAll('.course-option').forEach(function (option) {
+                const courseName = (option.getAttribute('data-course-name') || '').toLowerCase();
+                const courseAcronym = (option.getAttribute('data-course-acronym') || '').toLowerCase();
+                const visible = !searchTerm || courseName.includes(searchTerm) || courseAcronym.includes(searchTerm);
+                option.style.display = visible ? '' : 'none';
+            });
+        }
+
+        function syncSchoolYearEnd(startId, endId, selectedEndYear = null) {
+            const startSelect = document.getElementById(startId);
+            const endSelect = document.getElementById(endId);
+
+            if (!startSelect || !endSelect || !startSelect.value) {
+                return;
+            }
+
+            const startYear = parseInt(startSelect.value, 10);
+
+            if (Number.isNaN(startYear)) {
+                return;
+            }
+
+            const endYear = selectedEndYear ? parseInt(selectedEndYear, 10) : startYear + 1;
+            endSelect.innerHTML = '';
+
+            const option = document.createElement('option');
+            option.value = String(endYear);
+            option.textContent = String(endYear);
+            option.selected = true;
+            endSelect.appendChild(option);
+            endSelect.value = String(endYear);
+        }
+
         function getTargetConfig(mode) {
             return assignTargets[mode] || null;
         }
@@ -1599,12 +1834,12 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                 return { course: '', schoolYear: '' };
             }
 
-            const course = ($(target.courseField).val() || '').trim();
+            const courseValues = getCheckedCourseValues(target.courseField);
             const startYear = ($(target.schoolYearStartField).val() || '').trim();
             const endYear = ($(target.schoolYearEndField).val() || '').trim();
 
             return {
-                course: course,
+                course: courseValues[0] || '',
                 schoolYear: startYear && endYear ? startYear + '-' + endYear : ''
             };
         }
@@ -1612,10 +1847,6 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         function syncTargetFields(mode, course, schoolYear) {
             const target = getTargetConfig(mode);
             if (!target) return;
-
-            if ($(target.courseField).length) {
-                $(target.courseField).val(course || '');
-            }
 
             if ($(target.schoolYearStartField).length && $(target.schoolYearEndField).length) {
                 const parts = String(schoolYear || '').split('-');
@@ -1842,6 +2073,25 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             applyAssignableStudents();
         });
 
+        $(document).on('input', '#moaCourseSearch', function () {
+            filterCourseOptions('moaCourseSearch', 'moaCourseSelect');
+        });
+
+        $(document).on('input', '#editMoaCourseSearch', function () {
+            filterCourseOptions('editMoaCourseSearch', 'editMoaCourseSelect');
+        });
+
+        syncSchoolYearEnd('schoolYearStart', 'schoolYearEnd', @json($selectedCreateEndYear));
+        syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end');
+
+        $('#schoolYearStart').on('change', function () {
+            syncSchoolYearEnd('schoolYearStart', 'schoolYearEnd');
+        });
+
+        $('#edit_school_year_start').on('change', function () {
+            syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end');
+        });
+
         $(document).on('click', '#assignStudentsClear', function () {
             resetAssignableSelection();
         });
@@ -1920,15 +2170,26 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         $('#edit_company_no').val(company.company_no || '');
         $('#edit_company_email').val(company.company_email || '');
         $('#edit_school_year_start').val(company.school_year_start || '');
-        $('#edit_school_year_end').val(company.school_year_end || '');
+        syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end', company.school_year_end || '');
         $('#editValidUntil').val(company.valid_until || '');
-        $('#editMoaCourseSelect').val(company.course || '');
+        const selectedCourses = String(company.course || '')
+            .split(',')
+            .map(function (course) {
+                return course.trim();
+            })
+            .filter(function (course) {
+                return course.length > 0;
+            });
+
+        setCheckedCourseValues('#editMoaCourseSelect', selectedCourses);
         $('#editManualStudentInput').val(Array.isArray(company.manual_students) ? company.manual_students.join(', ') : '');
 
-        const courseSelect = document.getElementById('editMoaCourseSelect');
-        if (courseSelect) {
-            courseSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        const courseSearch = document.getElementById('editMoaCourseSearch');
+        if (courseSearch) {
+            courseSearch.value = '';
         }
+
+        filterCourseOptions('editMoaCourseSearch', 'editMoaCourseSelect');
 
         const selectedStudents = Array.isArray(company.selected_students) ? company.selected_students : [];
         const selectedSet = new Set(selectedStudents);

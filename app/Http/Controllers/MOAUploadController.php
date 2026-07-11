@@ -214,14 +214,16 @@ class MOAUploadController extends Controller
             return;
         }
 
-        $company->loadMissing('students.user');
+        $linkedStudentIds = DB::table('company_student')
+            ->where('company_id', $company->id)
+            ->pluck('student_id');
 
-        $linkedNames = $company->students
-            ->map(function ($student) {
-                $user = $this->resolveUserFromStudent($student);
-
-                return trim((string) ($user->full_name ?? $student->full_name ?? ''));
-            })
+        $linkedNames = DB::table('company_student')
+            ->where('company_student.company_id', $company->id)
+            ->join('students', 'students.id', '=', 'company_student.student_id')
+            ->leftJoin('users', 'users.id', '=', 'students.user_id')
+            ->selectRaw("TRIM(COALESCE(users.full_name, '')) AS linked_name")
+            ->pluck('linked_name')
             ->push(trim((string) $company->uploader_name))
             ->filter()
             ->unique()

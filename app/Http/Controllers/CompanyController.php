@@ -24,6 +24,33 @@ use App\Helpers\AuditLogger;
 
 class CompanyController extends Controller
 {
+private function normalizeCourseSelection($courseInput): array
+{
+    if (is_array($courseInput)) {
+        $values = $courseInput;
+    } else {
+        $values = preg_split('/[\r\n,]+/', (string) $courseInput);
+    }
+
+    return collect($values)
+        ->map(fn ($course) => trim((string) $course))
+        ->filter()
+        ->unique()
+        ->values()
+        ->all();
+}
+
+private function companyMatchesCourse(?Company $company, ?string $course): bool
+{
+    $course = trim((string) $course);
+
+    if ($course === '') {
+        return true;
+    }
+
+    return in_array($course, $this->normalizeCourseSelection($company->course ?? null), true);
+}
+
 private function studentProfileForUser(User $user): ?Student
 {
     return Student::where('user_id', $user->id)->first();
@@ -173,7 +200,9 @@ private function requireStudentSession()
         });
 
         if (!empty($selectedCourse)) {
-            $companies = $companies->where('course', $selectedCourse);
+            $companies = $companies->filter(function ($company) use ($selectedCourse) {
+                return $this->companyMatchesCourse($company, $selectedCourse);
+            });
         }
 
         if (!empty($selectedSchoolYear)) {
@@ -300,13 +329,18 @@ public function companiesup(Request $request)
 
     $availableLinkableCompanies = Company::with('students')
         ->whereNotIn('id', $linkedCompanyIds)
-        ->when(!empty($studentProfile?->course), function ($query) use ($studentProfile) {
-            $query->where('course', $studentProfile->course);
-        })
         ->orderBy('company_name')
         ->get()
-        ->filter(function ($company) {
-            return !empty($company->file);
+        ->filter(function ($company) use ($studentProfile) {
+            if (empty($company->file)) {
+                return false;
+            }
+
+            if (empty($studentProfile?->course)) {
+                return true;
+            }
+
+            return $this->companyMatchesCourse($company, $studentProfile->course);
         })
         ->values();
     $stu= Student::all();
@@ -347,7 +381,7 @@ public function linkExistingMoa(Request $request)
         return back()->with('fail', 'Selected MOA is unavailable.');
     }
 
-    if (!empty($company->course) && !empty($studentProfile->course) && $company->course !== $studentProfile->course) {
+    if (!empty($company->course) && !empty($studentProfile->course) && !$this->companyMatchesCourse($company, $studentProfile->course)) {
         return back()->with('fail', 'The selected MOA does not match your course.');
     }
 
@@ -406,7 +440,8 @@ public function companyCreate(Request $request)
 
     if ($data->role == 1) {
         $request->validate([
-            'course' => 'required|exists:courses,course',
+            'course' => 'required|array|min:1',
+            'course.*' => 'required|exists:courses,course',
             'valid_until' => 'required|date',
         ]);
     }
@@ -441,7 +476,7 @@ public function companyCreate(Request $request)
 
         $com->course = $studentCourse;
     } else {
-        $com->course = $request->input('course');
+        $com->course = implode(', ', $this->normalizeCourseSelection($request->input('course')));
     }
 
         $file = $request->file;
@@ -496,10 +531,11 @@ $res = $fileup->save();
     // Resolve selected student names via users table and map to student profiles via user_id.
     $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
     $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
+    $selectedCourses = $data->role == 1 ? $this->normalizeCourseSelection($request->input('course')) : $this->normalizeCourseSelection($com->course);
 
     if ($data->role == 1 && !empty($studentNames)) {
-        $mismatchedStudents = $existingStudents->filter(function ($student) use ($com) {
-            return $student->course !== $com->course;
+        $mismatchedStudents = $existingStudents->filter(function ($student) use ($selectedCourses) {
+            return !in_array($student->course, $selectedCourses, true);
         });
 
         if ($mismatchedStudents->isNotEmpty()) {
@@ -581,7 +617,8 @@ public function companyUpdate(Request $request, $id)
     if ($data->role == 0) {
         $rules['valid_until'] = 'required|date';
     } else {
-        $rules['course'] = 'required|exists:courses,course';
+        $rules['course'] = 'required|array|min:1';
+        $rules['course.*'] = 'required|exists:courses,course';
         $rules['valid_until'] = 'required|date';
     }
 
@@ -624,7 +661,7 @@ public function companyUpdate(Request $request, $id)
     $company->valid_until = $request->input('valid_until');
 
     if ($data->role != 0) {
-        $company->course = $request->input('course');
+        $company->course = implode(', ', $this->normalizeCourseSelection($request->input('course')));
     }
 
     $oldFileName = $company->file;
@@ -665,10 +702,11 @@ public function companyUpdate(Request $request, $id)
 
     $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
     $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
+    $selectedCourses = $data->role == 0 ? $this->normalizeCourseSelection($company->course) : $this->normalizeCourseSelection($request->input('course'));
 
     if ($data->role != 0 && !empty($studentNames)) {
-        $mismatchedStudents = $existingStudents->filter(function ($student) use ($company) {
-            return $student->course !== $company->course;
+        $mismatchedStudents = $existingStudents->filter(function ($student) use ($selectedCourses) {
+            return !in_array($student->course, $selectedCourses, true);
         });
 
         if ($mismatchedStudents->isNotEmpty()) {
