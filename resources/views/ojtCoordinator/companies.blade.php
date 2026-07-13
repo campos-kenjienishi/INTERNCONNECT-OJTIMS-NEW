@@ -403,6 +403,13 @@
             font-size: 11.5px; font-weight: 600;
         }
 
+        .status-expired {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #fee2e2; color: #dc2626;
+            border-radius: 20px; padding: 4px 10px;
+            font-size: 11.5px; font-weight: 600;
+        }
+
         /* Action buttons */
         .actions-wrap {
             display: grid;
@@ -662,6 +669,7 @@ body.dark-mode .student-pill { background: rgba(22,163,74,0.15); color: #6ee7b7;
 
 /* Status badge */
 body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7; }
+body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5; }
 
         /* Cards */
         body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
@@ -891,7 +899,18 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
         </div>
 
         <!-- Stats Row -->
-        @php $totalCompanies = count($companies); @endphp
+        @php
+            $totalCompanies = count($companies);
+            $activeMoaCount = collect($companies)->filter(function ($company) {
+                try {
+                    $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
+                } catch (\Throwable $e) {
+                    $validUntil = null;
+                }
+
+                return $validUntil && now()->lte($validUntil);
+            })->count();
+        @endphp
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-building"></i></div>
@@ -903,7 +922,7 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
             <div class="stat-card">
                 <div class="stat-icon green"><i class="fa fa-check-circle"></i></div>
                 <div>
-                    <div class="stat-num">{{ $totalCompanies }}</div>
+                    <div class="stat-num">{{ $activeMoaCount }}</div>
                     <div class="stat-name">Active MOAs</div>
                 </div>
             </div>
@@ -989,6 +1008,14 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
                             $linkedStudentNames = $company->students->pluck('full_name')->filter()->values();
                             $manualStudentNames = $displayStudents->diff($linkedStudentNames)->values();
                             [$schoolYearStart, $schoolYearEnd] = array_pad(explode('-', (string) ($company->school_year ?? '')), 2, '');
+
+                            try {
+                                $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
+                            } catch (\Throwable $e) {
+                                $validUntil = null;
+                            }
+
+                            $isActive = $validUntil && now()->lte($validUntil);
                         @endphp
                         <tr>
                             <td style="display:none;">{{ $company->id }}</td>
@@ -1069,9 +1096,15 @@ body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7
 
                             <!-- Status -->
                             <td>
-                                <span class="status-active">
-                                    <i class="fa fa-circle" style="font-size:7px;"></i> Active
-                                </span>
+                                @if ($isActive)
+                                    <span class="status-active">
+                                        <i class="fa fa-circle" style="font-size:7px;"></i> Active
+                                    </span>
+                                @else
+                                    <span class="status-expired">
+                                        <i class="fa fa-times-circle" style="font-size:11px;"></i> Expired
+                                    </span>
+                                @endif
                             </td>
 
                             <!-- Actions -->
