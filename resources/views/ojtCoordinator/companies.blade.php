@@ -1154,6 +1154,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                         data-course-values='@json($companyEditPayload[$company->id]["course_values"] ?? $companyCourses->values())'
                                         data-selected-students='@json($companyEditPayload[$company->id]["selected_students"] ?? $company->students->pluck("full_name")->filter()->values())'
                                         data-manual-students='@json($companyEditPayload[$company->id]["manual_students"] ?? [])'
+                                        data-company-payload='@json($companyEditPayload[$company->id] ?? [])'
                                         onclick="openEditCompanyModal(this)">
                                         <i class="fa fa-pen"></i>
                                     </button>
@@ -2297,11 +2298,15 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
         }
 
         try {
-            const parsed = JSON.parse(value);
-            return Array.isArray(parsed) ? parsed : fallback;
+            return JSON.parse(value);
         } catch (error) {
             return fallback;
         }
+    }
+
+    function getDatasetPayload(dataset) {
+        const rawPayload = parseJsonDataset(dataset.companyPayload, null);
+        return rawPayload && typeof rawPayload === 'object' && !Array.isArray(rawPayload) ? rawPayload : {};
     }
 
     function normalizeCourseList(value) {
@@ -2348,6 +2353,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
         const currentFile = dataset.fileName || '';
         const companyId = dataset.companyId || '';
         const company = companyId ? (companyEditData[String(companyId)] || companyEditData[companyId]) : null;
+        const payload = getDatasetPayload(dataset);
 
         if (!form) {
             return;
@@ -2360,25 +2366,28 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
         $('#edit_company_no').val(dataset.companyNo || '');
         $('#edit_company_email').val(dataset.companyEmail || '');
 
-        const payloadSchoolYear = company ? (company.school_year || '') : '';
         const schoolYearParts = parseSchoolYearParts(
-            dataset.schoolYearNormalized
+            payload.school_year
+                || dataset.schoolYearNormalized
                 || dataset.schoolYear
-                || payloadSchoolYear
                 || ''
         );
-        const schoolYearStart = dataset.schoolYearStart || (company && company.school_year_start) || schoolYearParts[0] || '';
-        const schoolYearEnd = dataset.schoolYearEnd || (company && company.school_year_end) || schoolYearParts[1] || '';
+        const schoolYearStart = payload.school_year_start || dataset.schoolYearStart || schoolYearParts[0] || '';
+        const schoolYearEnd = payload.school_year_end || dataset.schoolYearEnd || schoolYearParts[1] || '';
 
         $('#edit_school_year_start').val(schoolYearStart);
         syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end', schoolYearEnd);
-        $('#editValidUntil').val(normalizeDateInput(dataset.validUntil || (company && (company.valid_until || company.valid_until_raw)) || ''));
+        $('#editValidUntil').val(normalizeDateInput(payload.valid_until || dataset.validUntil || ''));
 
-        const selectedCourses = parseJsonDataset(dataset.courseValues, []).length
-            ? parseJsonDataset(dataset.courseValues, [])
-            : (company && Array.isArray(company.course_values) ? company.course_values : normalizeCourseList(company ? company.course_display || company.course || '' : ''));
+        const selectedCourses = Array.isArray(payload.course_values) && payload.course_values.length
+            ? payload.course_values
+            : (parseJsonDataset(dataset.courseValues, []).length
+                ? parseJsonDataset(dataset.courseValues, [])
+                : normalizeCourseList(payload.course_display || payload.course || ''));
         setCheckedCourseValues('#editMoaCourseSelect', selectedCourses);
-        $('#editManualStudentInput').val((parseJsonDataset(dataset.manualStudents, company && Array.isArray(company.manual_students) ? company.manual_students : []) || []).join(', '));
+        $('#editManualStudentInput').val((Array.isArray(payload.manual_students) && payload.manual_students.length
+            ? payload.manual_students
+            : (parseJsonDataset(dataset.manualStudents, []) || [])).join(', '));
 
         const courseSearch = document.getElementById('editMoaCourseSearch');
         if (courseSearch) {
@@ -2387,7 +2396,9 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
         filterCourseOptions('editMoaCourseSearch', 'editMoaCourseSelect');
 
-        const selectedStudents = parseJsonDataset(dataset.selectedStudents, company && Array.isArray(company.selected_students) ? company.selected_students : []);
+        const selectedStudents = Array.isArray(payload.selected_students) && payload.selected_students.length
+            ? payload.selected_students
+            : parseJsonDataset(dataset.selectedStudents, []);
         const selectedSet = new Set(selectedStudents);
         const editAssignedInputs = document.getElementById('editMoaAssignedStudentInputs');
         const editAssignedSummary = document.getElementById('editMoaAssignedStudentsSummary');
