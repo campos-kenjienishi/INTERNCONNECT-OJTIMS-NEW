@@ -1008,6 +1008,15 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                             $linkedStudentNames = $company->students->pluck('full_name')->filter()->values();
                             $manualStudentNames = $displayStudents->diff($linkedStudentNames)->values();
                             [$schoolYearStart, $schoolYearEnd] = array_pad(explode('-', (string) ($company->school_year ?? '')), 2, '');
+                            $schoolYearStart = trim((string) $schoolYearStart);
+                            $schoolYearEnd = trim((string) $schoolYearEnd);
+                            if ($schoolYearStart !== '' && $schoolYearEnd !== '' && (int) $schoolYearEnd < (int) $schoolYearStart) {
+                                [$schoolYearStart, $schoolYearEnd] = [$schoolYearEnd, $schoolYearStart];
+                            }
+                            $companyCourses = collect(preg_split('/[\r\n,;|\/]+/', trim((string) $company->course), -1, PREG_SPLIT_NO_EMPTY))
+                                ->map(fn ($course) => trim((string) $course))
+                                ->filter()
+                                ->values();
 
                             try {
                                 $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
@@ -1048,13 +1057,18 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
                             <!-- School Year -->
                             <td>
-                                <span style="font-size:13px; color:#555;">{{ $company->school_year }}</span>
+                                <span style="font-size:13px; color:#555;">
+                                    {{ trim((string) $schoolYearStart) && trim((string) $schoolYearEnd) ? $schoolYearStart . '-' . $schoolYearEnd : ($company->school_year ?? '—') }}
+                                </span>
                             </td>
 
                             <!-- Course -->
                             <td>
                                 @php
-                                    $companyCourses = collect(preg_split('/\s*,\s*/', trim((string) $company->course), -1, PREG_SPLIT_NO_EMPTY));
+                                    $companyCourses = collect(preg_split('/[\r\n,;|\/]+/', trim((string) $company->course), -1, PREG_SPLIT_NO_EMPTY))
+                                        ->map(fn ($course) => trim((string) $course))
+                                        ->filter()
+                                        ->values();
                                     $courseAcronymLookup = collect($course)->mapWithKeys(function ($courseItem) {
                                         return [trim((string) $courseItem->course) => trim((string) ($courseItem->acronym ?? ''))];
                                     });
@@ -1126,7 +1140,21 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                         aria-label="Edit MOA"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editCompanyModal"
-                                        onclick="openEditCompanyModal({{ $company->id }})">
+                                        data-company-id="{{ $company->id }}"
+                                        data-company-name="{{ $company->company_name }}"
+                                        data-company-address="{{ $company->company_address }}"
+                                        data-company-rep="{{ $company->company_rep }}"
+                                        data-company-no="{{ $company->companyNo }}"
+                                        data-company-email="{{ $company->company_email }}"
+                                        data-school-year="{{ $companyEditPayload[$company->id]['school_year'] ?? $company->school_year }}"
+                                        data-school-year-start="{{ $companyEditPayload[$company->id]['school_year_start'] ?? $schoolYearStart }}"
+                                        data-school-year-end="{{ $companyEditPayload[$company->id]['school_year_end'] ?? $schoolYearEnd }}"
+                                        data-school-year-normalized="{{ $companyEditPayload[$company->id]['school_year'] ?? ($schoolYearStart . '-' . $schoolYearEnd) }}"
+                                        data-valid-until="{{ $validUntil ? $validUntil->format('Y-m-d') : '' }}"
+                                        data-course-values='@json($companyEditPayload[$company->id]["course_values"] ?? $companyCourses->values())'
+                                        data-selected-students='@json($companyEditPayload[$company->id]["selected_students"] ?? $company->students->pluck("full_name")->filter()->values())'
+                                        data-manual-students='@json($companyEditPayload[$company->id]["manual_students"] ?? [])'
+                                        onclick="openEditCompanyModal(this)">
                                         <i class="fa fa-pen"></i>
                                     </button>
 
@@ -1374,9 +1402,8 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
 @php
     $normalizeSchoolYearParts = function ($schoolYearValue) {
-        $parts = array_values(array_filter(array_map('trim', explode('-', (string) $schoolYearValue)), function ($part) {
-            return $part !== '';
-        }));
+        preg_match_all('/\d{4}/', (string) $schoolYearValue, $matches);
+        $parts = $matches[0] ?? [];
 
         if (count($parts) < 2) {
             return ['', ''];
@@ -1396,7 +1423,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
     };
 
     $normalizeCourseList = function ($courseValue) {
-        return array_values(array_filter(array_map('trim', explode(',', (string) $courseValue)), function ($course) {
+        return array_values(array_filter(array_map('trim', preg_split('/[\r\n,;|\/]+/', (string) $courseValue)), function ($course) {
             return $course !== '';
         }));
     };
@@ -1413,7 +1440,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
             try {
                 $validUntil = \Carbon\Carbon::parse($companyItem->valid_until)->format('Y-m-d');
             } catch (\Throwable $e) {
-                $validUntil = '';
+                $validUntil = trim((string) $companyItem->valid_until);
             }
         }
 
@@ -1431,8 +1458,10 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                     ? trim((string) $schoolYearStart) . '-' . trim((string) $schoolYearEnd)
                     : trim((string) ($companyItem->school_year ?? '')),
                 'valid_until' => $validUntil,
+                'valid_until_raw' => trim((string) ($companyItem->valid_until ?? '')),
                 'course' => $companyItem->course,
                 'course_values' => $courseValues,
+                'course_display' => !empty($courseValues) ? implode(', ', $courseValues) : trim((string) ($companyItem->course ?? '')),
                 'selected_students' => $linkedStudentNames->all(),
                 'manual_students' => $manualStudentNames->all(),
             ],
@@ -1848,11 +1877,20 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
         function setCheckedCourseValues(containerSelector, selectedCourses) {
             const normalizedCourses = new Set((selectedCourses || []).map(function (course) {
-                return String(course || '').trim();
+                return String(course || '').trim().toLowerCase();
             }).filter(Boolean));
 
             document.querySelectorAll(containerSelector + ' input[name="course[]"]').forEach(function (checkbox) {
-                checkbox.checked = normalizedCourses.has((checkbox.value || '').trim());
+                const option = checkbox.closest('.course-option');
+                const checkboxValue = (checkbox.value || '').trim().toLowerCase();
+                const optionName = (option && option.getAttribute('data-course-name') || '').trim().toLowerCase();
+                const optionAcronym = (option && option.getAttribute('data-course-acronym') || '').trim().toLowerCase();
+                const labelText = option ? option.textContent.replace(/\s+/g, ' ').trim().toLowerCase() : '';
+
+                checkbox.checked = normalizedCourses.has(checkboxValue)
+                    || normalizedCourses.has(optionName)
+                    || normalizedCourses.has(optionAcronym)
+                    || (labelText ? normalizedCourses.has(labelText) : false);
             });
         }
 
@@ -2231,46 +2269,116 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
         });
     }
 
-    function openEditCompanyModal(companyId) {
-        const company = companyEditData[String(companyId)] || companyEditData[companyId];
+    function parseSchoolYearParts(value) {
+        const matches = String(value || '').match(/\d{4}/g) || [];
 
-        if (!company) {
+        if (matches.length < 2) {
+            return ['', ''];
+        }
+
+        let startYear = parseInt(matches[0], 10);
+        let endYear = parseInt(matches[1], 10);
+
+        if (!Number.isNaN(startYear) && !Number.isNaN(endYear) && endYear < startYear) {
+            const swap = startYear;
+            startYear = endYear;
+            endYear = swap;
+        }
+
+        return [
+            Number.isNaN(startYear) ? '' : String(startYear),
+            Number.isNaN(endYear) ? '' : String(endYear)
+        ];
+    }
+
+    function parseJsonDataset(value, fallback) {
+        if (!value) {
+            return fallback;
+        }
+
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed : fallback;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function normalizeCourseList(value) {
+        return String(value || '')
+            .split(/[\r\n,;|\/]+/)
+            .map(function (course) {
+                return course.trim();
+            })
+            .filter(function (course) {
+                return course.length > 0;
+            });
+    }
+
+    function normalizeDateInput(value) {
+        if (!value) {
+            return '';
+        }
+
+        const raw = String(value).trim();
+        const isoMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoMatch) {
+            return isoMatch[1] + '-' + isoMatch[2] + '-' + isoMatch[3];
+        }
+
+        const slashMatch = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+        if (slashMatch) {
+            return slashMatch[3] + '-' + slashMatch[2] + '-' + slashMatch[1];
+        }
+
+        const parsed = new Date(raw);
+        if (!Number.isNaN(parsed.getTime())) {
+            const year = String(parsed.getFullYear());
+            const month = String(parsed.getMonth() + 1).padStart(2, '0');
+            const day = String(parsed.getDate()).padStart(2, '0');
+            return year + '-' + month + '-' + day;
+        }
+
+        return '';
+    }
+
+    function openEditCompanyModal(button) {
+        const dataset = button && button.dataset ? button.dataset : {};
+        const form = document.getElementById('editCompanyForm');
+        const currentFile = dataset.fileName || '';
+        const companyId = dataset.companyId || '';
+        const company = companyId ? (companyEditData[String(companyId)] || companyEditData[companyId]) : null;
+
+        if (!form) {
             return;
         }
 
-        $('#editCompanyForm').attr('action', '/company/' + company.id);
-        $('#edit_company_name').val(company.company_name || '');
-        $('#edit_company_address').val(company.company_address || '');
-        $('#edit_company_rep').val(company.company_rep || '');
-        $('#edit_company_no').val(company.company_no || '');
-        $('#edit_company_email').val(company.company_email || '');
-        const schoolYearParts = String(company.school_year || '')
-            .split('-')
-            .map(function (part) {
-                return part.trim();
-            })
-            .filter(function (part) {
-                return part.length > 0;
-            });
-        const schoolYearStart = company.school_year_start || schoolYearParts[0] || '';
-        const schoolYearEnd = company.school_year_end || schoolYearParts[1] || '';
+        form.action = '/company/' + (dataset.companyId || '');
+        $('#edit_company_name').val(dataset.companyName || '');
+        $('#edit_company_address').val(dataset.companyAddress || '');
+        $('#edit_company_rep').val(dataset.companyRep || '');
+        $('#edit_company_no').val(dataset.companyNo || '');
+        $('#edit_company_email').val(dataset.companyEmail || '');
+
+        const payloadSchoolYear = company ? (company.school_year || '') : '';
+        const schoolYearParts = parseSchoolYearParts(
+            dataset.schoolYearNormalized
+                || dataset.schoolYear
+                || payloadSchoolYear
+                || ''
+        );
+        const schoolYearStart = dataset.schoolYearStart || (company && company.school_year_start) || schoolYearParts[0] || '';
+        const schoolYearEnd = dataset.schoolYearEnd || (company && company.school_year_end) || schoolYearParts[1] || '';
 
         $('#edit_school_year_start').val(schoolYearStart);
         syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end', schoolYearEnd);
-        $('#editValidUntil').val(company.valid_until || '');
-        const selectedCourses = Array.isArray(company.course_values)
-            ? company.course_values
-            : String(company.course || '')
-                .split(',')
-                .map(function (course) {
-                    return course.trim();
-                })
-                .filter(function (course) {
-                    return course.length > 0;
-                });
+        $('#editValidUntil').val(normalizeDateInput(dataset.validUntil || (company && (company.valid_until || company.valid_until_raw)) || ''));
 
+        const selectedCourses = parseJsonDataset(dataset.courseValues, []).length
+            ? parseJsonDataset(dataset.courseValues, [])
+            : (company && Array.isArray(company.course_values) ? company.course_values : normalizeCourseList(company ? company.course_display || company.course || '' : ''));
         setCheckedCourseValues('#editMoaCourseSelect', selectedCourses);
-        $('#editManualStudentInput').val(Array.isArray(company.manual_students) ? company.manual_students.join(', ') : '');
+        $('#editManualStudentInput').val((parseJsonDataset(dataset.manualStudents, company && Array.isArray(company.manual_students) ? company.manual_students : []) || []).join(', '));
 
         const courseSearch = document.getElementById('editMoaCourseSearch');
         if (courseSearch) {
@@ -2279,7 +2387,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
         filterCourseOptions('editMoaCourseSearch', 'editMoaCourseSelect');
 
-        const selectedStudents = Array.isArray(company.selected_students) ? company.selected_students : [];
+        const selectedStudents = parseJsonDataset(dataset.selectedStudents, company && Array.isArray(company.selected_students) ? company.selected_students : []);
         const selectedSet = new Set(selectedStudents);
         const editAssignedInputs = document.getElementById('editMoaAssignedStudentInputs');
         const editAssignedSummary = document.getElementById('editMoaAssignedStudentsSummary');
@@ -2299,6 +2407,22 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
             editAssignedSummary.textContent = selectedSet.size
                 ? selectedSet.size + ' student' + (selectedSet.size === 1 ? '' : 's') + ' selected.'
                 : 'No students assigned yet.';
+        }
+
+        const currentFileNode = document.getElementById('editMoaCurrentFile');
+        if (currentFileNode) {
+            currentFileNode.textContent = currentFile
+                ? 'Current file: ' + currentFile + '. Leave the file empty if you only need to update the company details.'
+                : 'Leave the file empty if you only need to update the company details.';
+        }
+
+        const fileInput = document.getElementById('editMoaFileInput');
+        const fileLabel = document.getElementById('editMoaFileLabel');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        if (fileLabel) {
+            fileLabel.textContent = 'Leave empty to keep the current notarized MOA PDF';
         }
     }
 
