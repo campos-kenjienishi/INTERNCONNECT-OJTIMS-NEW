@@ -1024,6 +1024,23 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                 $validUntil = null;
                             }
 
+                            $companyEditPayload = [
+                                'company_name' => $company->company_name,
+                                'company_address' => $company->company_address,
+                                'company_rep' => $company->company_rep,
+                                'company_no' => $company->companyNo,
+                                'company_email' => $company->company_email,
+                                'school_year_start' => $schoolYearStart,
+                                'school_year_end' => $schoolYearEnd,
+                                'school_year' => trim((string) $schoolYearStart) && trim((string) $schoolYearEnd)
+                                    ? $schoolYearStart . '-' . $schoolYearEnd
+                                    : ($company->school_year ?? ''),
+                                'valid_until' => $validUntil ? $validUntil->format('Y-m-d') : '',
+                                'course_values' => $companyCourses->values(),
+                                'selected_students' => $linkedStudentNames->values(),
+                                'manual_students' => $manualStudentNames->values(),
+                            ];
+
                             $isActive = $validUntil && now()->lte($validUntil);
                         @endphp
                         <tr>
@@ -1146,15 +1163,19 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                         data-company-rep="{{ $company->company_rep }}"
                                         data-company-no="{{ $company->companyNo }}"
                                         data-company-email="{{ $company->company_email }}"
-                                        data-school-year="{{ $companyEditPayload[$company->id]['school_year'] ?? $company->school_year }}"
-                                        data-school-year-start="{{ $companyEditPayload[$company->id]['school_year_start'] ?? $schoolYearStart }}"
-                                        data-school-year-end="{{ $companyEditPayload[$company->id]['school_year_end'] ?? $schoolYearEnd }}"
-                                        data-school-year-normalized="{{ $companyEditPayload[$company->id]['school_year'] ?? ($schoolYearStart . '-' . $schoolYearEnd) }}"
+                                        data-school-year="{{ trim((string) $schoolYearStart) && trim((string) $schoolYearEnd) ? $schoolYearStart . '-' . $schoolYearEnd : ($company->school_year ?? '') }}"
+                                        data-school-year-raw="{{ e($company->school_year ?? '') }}"
+                                        data-school-year-start="{{ $schoolYearStart }}"
+                                        data-school-year-end="{{ $schoolYearEnd }}"
+                                        data-school-year-normalized="{{ trim((string) $schoolYearStart) && trim((string) $schoolYearEnd) ? $schoolYearStart . '-' . $schoolYearEnd : ($company->school_year ?? '') }}"
                                         data-valid-until="{{ $validUntil ? $validUntil->format('Y-m-d') : '' }}"
-                                        data-course-values='@json($companyEditPayload[$company->id]["course_values"] ?? $companyCourses->values())'
-                                        data-selected-students='@json($companyEditPayload[$company->id]["selected_students"] ?? $company->students->pluck("full_name")->filter()->values())'
-                                        data-manual-students='@json($companyEditPayload[$company->id]["manual_students"] ?? [])'
-                                        data-company-payload='@json($companyEditPayload[$company->id] ?? [])'
+                                        data-course-raw="{{ e($company->course ?? '') }}"
+                                        data-course-values='@json($companyCourses->values())'
+                                        data-selected-students-raw="{{ e($linkedStudentNames->implode(', ')) }}"
+                                        data-selected-students='@json($linkedStudentNames->values())'
+                                        data-manual-students-raw="{{ e($manualStudentNames->implode(', ')) }}"
+                                        data-manual-students='@json($manualStudentNames->values())'
+                                        data-edit-payload='@json($companyEditPayload)'
                                         onclick="openEditCompanyModal(this)">
                                         <i class="fa fa-pen"></i>
                                     </button>
@@ -1401,75 +1422,6 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
     </div>
 </div>
 
-@php
-    $normalizeSchoolYearParts = function ($schoolYearValue) {
-        preg_match_all('/\d{4}/', (string) $schoolYearValue, $matches);
-        $parts = $matches[0] ?? [];
-
-        if (count($parts) < 2) {
-            return ['', ''];
-        }
-
-        $startYear = (int) $parts[0];
-        $endYear = (int) $parts[1];
-
-        if ($startYear && $endYear && $endYear < $startYear) {
-            [$startYear, $endYear] = [$endYear, $startYear];
-        }
-
-        return [
-            $startYear ? (string) $startYear : '',
-            $endYear ? (string) $endYear : '',
-        ];
-    };
-
-    $normalizeCourseList = function ($courseValue) {
-        return array_values(array_filter(array_map('trim', preg_split('/[\r\n,;|\/]+/', (string) $courseValue)), function ($course) {
-            return $course !== '';
-        }));
-    };
-
-    $companyEditPayload = $companies->mapWithKeys(function ($companyItem) use ($normalizeSchoolYearParts, $normalizeCourseList) {
-        $displayStudents = collect(array_filter(array_map('trim', explode(',', (string) ($companyItem->student_names_display ?? '')))));
-        $linkedStudentNames = $companyItem->students->pluck('full_name')->filter()->values();
-        $manualStudentNames = $displayStudents->diff($linkedStudentNames)->values();
-        [$schoolYearStart, $schoolYearEnd] = $normalizeSchoolYearParts($companyItem->school_year ?? '');
-        $courseValues = $normalizeCourseList($companyItem->course ?? '');
-
-        $validUntil = '';
-        if (!empty($companyItem->valid_until)) {
-            try {
-                $validUntil = \Carbon\Carbon::parse($companyItem->valid_until)->format('Y-m-d');
-            } catch (\Throwable $e) {
-                $validUntil = trim((string) $companyItem->valid_until);
-            }
-        }
-
-        return [
-            $companyItem->id => [
-                'id' => $companyItem->id,
-                'company_name' => $companyItem->company_name,
-                'company_address' => $companyItem->company_address,
-                'company_rep' => $companyItem->company_rep,
-                'company_no' => $companyItem->companyNo,
-                'company_email' => $companyItem->company_email,
-                'school_year_start' => trim((string) $schoolYearStart),
-                'school_year_end' => trim((string) $schoolYearEnd),
-                'school_year' => trim((string) $schoolYearStart) && trim((string) $schoolYearEnd)
-                    ? trim((string) $schoolYearStart) . '-' . trim((string) $schoolYearEnd)
-                    : trim((string) ($companyItem->school_year ?? '')),
-                'valid_until' => $validUntil,
-                'valid_until_raw' => trim((string) ($companyItem->valid_until ?? '')),
-                'course' => $companyItem->course,
-                'course_values' => $courseValues,
-                'course_display' => !empty($courseValues) ? implode(', ', $courseValues) : trim((string) ($companyItem->course ?? '')),
-                'selected_students' => $linkedStudentNames->all(),
-                'manual_students' => $manualStudentNames->all(),
-            ],
-        ];
-    });
-@endphp
-
 <!-- =============== EDIT COMPANY MODAL =============== -->
 <div class="modal fade" id="editCompanyModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1503,11 +1455,11 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                     <div class="field-row">
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-phone"></i> Contact Number <span style="color:#aaa; font-weight:400;">(Optional)</span></label>
-                            <input id="edit_company_no" class="field-input" type="text" name="companyNo">
+                            <input id="edit_company_no" class="field-input" type="text" name="companyNo" placeholder="Leave blank if none">
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-envelope"></i> Email Address <span style="color:#aaa; font-weight:400;">(Optional)</span></label>
-                            <input id="edit_company_email" class="field-input" type="email" name="company_email">
+                            <input id="edit_company_email" class="field-input" type="email" name="company_email" placeholder="Leave blank if none">
                         </div>
                     </div>
 
@@ -1753,8 +1705,6 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    const companyEditData = @json($companyEditPayload);
-
     // Sidebar toggle
     const sidebar     = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
@@ -1812,6 +1762,76 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
             closeMobileSidebar();
         }
     });
+
+    function setCheckedCourseValues(containerSelector, selectedCourses) {
+        const normalizedCourses = new Set((selectedCourses || []).map(function (course) {
+            return String(course || '').trim().toLowerCase();
+        }).filter(Boolean));
+
+        document.querySelectorAll(containerSelector + ' input[name="course[]"]').forEach(function (checkbox) {
+            const option = checkbox.closest('.course-option');
+            const checkboxValue = (checkbox.value || '').trim().toLowerCase();
+            const optionName = (option && option.getAttribute('data-course-name') || '').trim().toLowerCase();
+            const optionAcronym = (option && option.getAttribute('data-course-acronym') || '').trim().toLowerCase();
+            const labelText = option ? option.textContent.replace(/\s+/g, ' ').trim().toLowerCase() : '';
+
+            checkbox.checked = normalizedCourses.has(checkboxValue)
+                || normalizedCourses.has(optionName)
+                || normalizedCourses.has(optionAcronym)
+                || (labelText ? normalizedCourses.has(labelText) : false);
+        });
+    }
+
+    function filterCourseOptions(searchInputId, containerId) {
+        const searchInput = document.getElementById(searchInputId);
+        const container = document.getElementById(containerId);
+
+        if (!searchInput || !container) {
+            return;
+        }
+
+        const searchTerm = searchInput.value.trim().toLowerCase();
+
+        container.querySelectorAll('.course-option').forEach(function (option) {
+            const courseName = (option.getAttribute('data-course-name') || '').toLowerCase();
+            const courseAcronym = (option.getAttribute('data-course-acronym') || '').toLowerCase();
+            const visible = !searchTerm || courseName.includes(searchTerm) || courseAcronym.includes(searchTerm);
+            option.style.display = visible ? '' : 'none';
+        });
+    }
+
+    function setEditSchoolYearFields(startYear, endYear) {
+        const startSelect = document.getElementById('edit_school_year_start');
+        const endSelect = document.getElementById('edit_school_year_end');
+
+        if (!startSelect || !endSelect) {
+            return;
+        }
+
+        if (startYear) {
+            startSelect.value = String(startYear);
+        }
+
+        const resolvedStartYear = parseInt(startSelect.value, 10);
+        let resolvedEndYear = parseInt(endYear, 10);
+
+        if (Number.isNaN(resolvedStartYear)) {
+            return;
+        }
+
+        if (Number.isNaN(resolvedEndYear) || resolvedEndYear <= resolvedStartYear) {
+            resolvedEndYear = resolvedStartYear + 1;
+        }
+
+        endSelect.innerHTML = '';
+
+        const option = document.createElement('option');
+        option.value = String(resolvedEndYear);
+        option.textContent = String(resolvedEndYear);
+        option.selected = true;
+        endSelect.appendChild(option);
+        endSelect.value = String(resolvedEndYear);
+    }
 
     $(document).ready(function () {
 
@@ -1913,9 +1933,9 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
             });
         }
 
-        function syncSchoolYearEnd(startId, endId, selectedEndYear = null) {
-            const startSelect = document.getElementById(startId);
-            const endSelect = document.getElementById(endId);
+    function syncSchoolYearEnd(startId, endId, selectedEndYear = null) {
+        const startSelect = document.getElementById(startId);
+        const endSelect = document.getElementById(endId);
 
             if (!startSelect || !endSelect || !startSelect.value) {
                 return;
@@ -1927,7 +1947,10 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                 return;
             }
 
-            const endYear = selectedEndYear ? parseInt(selectedEndYear, 10) : startYear + 1;
+            const parsedEndYear = selectedEndYear ? parseInt(selectedEndYear, 10) : NaN;
+            const endYear = Number.isNaN(parsedEndYear) || parsedEndYear <= startYear
+                ? startYear + 1
+                : parsedEndYear;
             endSelect.innerHTML = '';
 
             const option = document.createElement('option');
@@ -1936,6 +1959,39 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
             option.selected = true;
             endSelect.appendChild(option);
             endSelect.value = String(endYear);
+        }
+
+        function setEditSchoolYearFields(startYear, endYear) {
+            const startSelect = document.getElementById('edit_school_year_start');
+            const endSelect = document.getElementById('edit_school_year_end');
+
+            if (!startSelect || !endSelect) {
+                return;
+            }
+
+            if (startYear) {
+                startSelect.value = String(startYear);
+            }
+
+            const resolvedStartYear = parseInt(startSelect.value, 10);
+            let resolvedEndYear = parseInt(endYear, 10);
+
+            if (Number.isNaN(resolvedStartYear)) {
+                return;
+            }
+
+            if (Number.isNaN(resolvedEndYear) || resolvedEndYear <= resolvedStartYear) {
+                resolvedEndYear = resolvedStartYear + 1;
+            }
+
+            endSelect.innerHTML = '';
+
+            const option = document.createElement('option');
+            option.value = String(resolvedEndYear);
+            option.textContent = String(resolvedEndYear);
+            option.selected = true;
+            endSelect.appendChild(option);
+            endSelect.value = String(resolvedEndYear);
         }
 
         function getTargetConfig(mode) {
@@ -2304,9 +2360,14 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
         }
     }
 
-    function getDatasetPayload(dataset) {
-        const rawPayload = parseJsonDataset(dataset.companyPayload, null);
-        return rawPayload && typeof rawPayload === 'object' && !Array.isArray(rawPayload) ? rawPayload : {};
+    function getEditPayload(dataset) {
+        const payload = parseJsonDataset(dataset.editPayload, null);
+
+        if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+            return {};
+        }
+
+        return payload;
     }
 
     function normalizeCourseList(value) {
@@ -2317,6 +2378,17 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
             })
             .filter(function (course) {
                 return course.length > 0;
+            });
+    }
+
+    function normalizeNameList(value) {
+        return String(value || '')
+            .split(/[\r\n,;]+/)
+            .map(function (name) {
+                return name.trim();
+            })
+            .filter(function (name) {
+                return name.length > 0;
             });
     }
 
@@ -2349,45 +2421,61 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
     function openEditCompanyModal(button) {
         const dataset = button && button.dataset ? button.dataset : {};
+        const payload = getEditPayload(dataset);
         const form = document.getElementById('editCompanyForm');
         const currentFile = dataset.fileName || '';
-        const companyId = dataset.companyId || '';
-        const company = companyId ? (companyEditData[String(companyId)] || companyEditData[companyId]) : null;
-        const payload = getDatasetPayload(dataset);
+        const row = button && button.closest ? button.closest('tr') : null;
+        const cells = row ? row.querySelectorAll('td') : [];
+
+        const rowSchoolYearText = cells[4] ? cells[4].textContent.trim() : '';
+        const rowCourseValues = cells[5]
+            ? Array.from(cells[5].querySelectorAll('.course-pill'))
+                .map(function (pill) {
+                    return (pill.textContent || '').trim();
+                })
+                .filter(Boolean)
+            : [];
+        const rowStudentValues = cells[6]
+            ? Array.from(cells[6].querySelectorAll('.student-pill'))
+                .map(function (pill) {
+                    return (pill.textContent || '').trim();
+                })
+                .filter(Boolean)
+            : [];
 
         if (!form) {
             return;
         }
 
         form.action = '/company/' + (dataset.companyId || '');
-        $('#edit_company_name').val(dataset.companyName || '');
-        $('#edit_company_address').val(dataset.companyAddress || '');
-        $('#edit_company_rep').val(dataset.companyRep || '');
-        $('#edit_company_no').val(dataset.companyNo || '');
-        $('#edit_company_email').val(dataset.companyEmail || '');
+        $('#edit_company_name').val(payload.company_name || dataset.companyName || '');
+        $('#edit_company_address').val(payload.company_address || dataset.companyAddress || '');
+        $('#edit_company_rep').val(payload.company_rep || dataset.companyRep || '');
+        $('#edit_company_no').val(payload.company_no || dataset.companyNo || '');
+        $('#edit_company_email').val(payload.company_email || dataset.companyEmail || '');
 
         const schoolYearParts = parseSchoolYearParts(
             payload.school_year
+                || dataset.schoolYearRaw
                 || dataset.schoolYearNormalized
                 || dataset.schoolYear
+                || rowSchoolYearText
                 || ''
         );
-        const schoolYearStart = payload.school_year_start || dataset.schoolYearStart || schoolYearParts[0] || '';
-        const schoolYearEnd = payload.school_year_end || dataset.schoolYearEnd || schoolYearParts[1] || '';
+        const schoolYearStart = payload.school_year_start || schoolYearParts[0] || dataset.schoolYearStart || '';
+        const schoolYearEnd = payload.school_year_end || schoolYearParts[1] || dataset.schoolYearEnd || '';
 
-        $('#edit_school_year_start').val(schoolYearStart);
-        syncSchoolYearEnd('edit_school_year_start', 'edit_school_year_end', schoolYearEnd);
+        setEditSchoolYearFields(schoolYearStart, schoolYearEnd);
         $('#editValidUntil').val(normalizeDateInput(payload.valid_until || dataset.validUntil || ''));
 
-        const selectedCourses = Array.isArray(payload.course_values) && payload.course_values.length
-            ? payload.course_values
-            : (parseJsonDataset(dataset.courseValues, []).length
-                ? parseJsonDataset(dataset.courseValues, [])
-                : normalizeCourseList(payload.course_display || payload.course || ''));
-        setCheckedCourseValues('#editMoaCourseSelect', selectedCourses);
-        $('#editManualStudentInput').val((Array.isArray(payload.manual_students) && payload.manual_students.length
-            ? payload.manual_students
-            : (parseJsonDataset(dataset.manualStudents, []) || [])).join(', '));
+        const selectedCourses = normalizeCourseList(payload.course_values && payload.course_values.length ? payload.course_values.join(', ') : (dataset.courseRaw || ''));
+        const selectedCoursesFallback = rowCourseValues.length
+            ? rowCourseValues
+            : parseJsonDataset(dataset.courseValues, []);
+        setCheckedCourseValues('#editMoaCourseSelect', selectedCourses.length ? selectedCourses : selectedCoursesFallback);
+        const manualStudents = normalizeNameList((payload.manual_students && payload.manual_students.length ? payload.manual_students.join(', ') : (dataset.manualStudentsRaw || '')));
+        const manualStudentsFallback = parseJsonDataset(dataset.manualStudents, []);
+        $('#editManualStudentInput').val((manualStudents.length ? manualStudents : (manualStudentsFallback || [])).join(', '));
 
         const courseSearch = document.getElementById('editMoaCourseSearch');
         if (courseSearch) {
@@ -2396,16 +2484,18 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
         filterCourseOptions('editMoaCourseSearch', 'editMoaCourseSelect');
 
-        const selectedStudents = Array.isArray(payload.selected_students) && payload.selected_students.length
-            ? payload.selected_students
+        const selectedStudents = normalizeNameList((payload.selected_students && payload.selected_students.length ? payload.selected_students.join(', ') : (dataset.selectedStudentsRaw || '')));
+        const selectedStudentsFallback = rowStudentValues.length
+            ? rowStudentValues
             : parseJsonDataset(dataset.selectedStudents, []);
-        const selectedSet = new Set(selectedStudents);
+        const resolvedSelectedStudents = selectedStudents.length ? selectedStudents : (selectedStudentsFallback || []);
+        const selectedSet = new Set(resolvedSelectedStudents);
         const editAssignedInputs = document.getElementById('editMoaAssignedStudentInputs');
         const editAssignedSummary = document.getElementById('editMoaAssignedStudentsSummary');
 
         if (editAssignedInputs) {
             editAssignedInputs.innerHTML = '';
-            selectedStudents.forEach(function (studentName) {
+            resolvedSelectedStudents.forEach(function (studentName) {
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = 'student_names[]';

@@ -608,7 +608,7 @@ public function companyUpdate(Request $request, $id)
         'company_address' => 'required|string|max:255',
         'company_rep' => 'required|string|max:255',
         'companyNo' => 'nullable|string|max:255',
-        'company_email' => 'required|email|max:255',
+        'company_email' => 'nullable|email|max:255',
         'school_year_start' => 'required|integer|digits:4',
         'school_year_end' => 'required|integer|digits:4',
         'file' => 'nullable|mimes:pdf|max:2048',
