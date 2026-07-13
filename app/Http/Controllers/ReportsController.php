@@ -20,6 +20,33 @@ use App\Services\ReportAiInsightService;
 
 class ReportsController extends Controller
 {
+    private function normalizeCourseSelection($courseInput): array
+    {
+        if (is_array($courseInput)) {
+            $values = $courseInput;
+        } else {
+            $values = preg_split('/[\r\n,]+/', (string) $courseInput);
+        }
+
+        return collect($values)
+            ->map(fn ($course) => trim((string) $course))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function companyMatchesCourse(?Company $company, ?string $course): bool
+    {
+        $course = trim((string) $course);
+
+        if ($course === '') {
+            return true;
+        }
+
+        return in_array($course, $this->normalizeCourseSelection($company->course ?? null), true);
+    }
+
     private function normalizeSchoolYearRange(?string $startYear, ?string $endYear): ?string
     {
         $startYear = trim((string) $startYear);
@@ -305,9 +332,11 @@ public function reportsExpired()
         ->get();
 
     $companies = $companyy->filter(function ($company) use ($validatedData) {
-        $hasStudentsWithCourse = $company->students()->where('course', $validatedData['course'])->exists();
+        if ($this->companyMatchesCourse($company, $validatedData['course'])) {
+            return true;
+        }
 
-        return $hasStudentsWithCourse;
+        return $company->students()->where('course', $validatedData['course'])->exists();
     })->sortByDesc(function ($company) {
         return optional($company->created_at)->timestamp ?? $company->id;
     })->values();
@@ -342,7 +371,8 @@ public function sendEmailExpired(Request $request)
 
     if ($course) {
         $companies = $companies->filter(function ($company) use ($course) {
-            return $company->students()->where('course', $course)->exists();
+            return $this->companyMatchesCourse($company, $course)
+                || $company->students()->where('course', $course)->exists();
         });
     }
 
@@ -493,10 +523,12 @@ public function reportsExpiredProf()
         $endYear = (int) $endYear;
 
         
-        // Check if the company has students associated with the specified course
-        $hasStudentsWithCourse = $company->students()->where('course', $validatedData['course'])->exists();
+        if ($this->companyMatchesCourse($company, $validatedData['course'])) {
+            return true;
+        }
 
-        return  $hasStudentsWithCourse;
+        // Backward compatibility for older records that only had student links.
+        return $company->students()->where('course', $validatedData['course'])->exists();
     })->sortByDesc(function ($company) {
         return optional($company->created_at)->timestamp ?? $company->id;
     })->values();
