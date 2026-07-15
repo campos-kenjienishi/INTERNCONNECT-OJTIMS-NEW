@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/student_home-responsive.css') }}">
-    <script src="{{ url('/assets/js/dark-mode.js') }}"></script> 
+    <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,7 +31,8 @@
             --border:       #f0f0f0;
             --border-2:     rgba(0,0,0,0.04);
             --text-primary: #1a1a1a;
-            --text-secondary: #888;
+            /* Was #888 on white (~3.5:1) — failed WCAG AA for normal text. Darkened to meet 4.5:1. */
+            --text-secondary: #5f5f5f;
             --text-muted:   #aaa;
             --topbar-bg:    #fff;
             --input-border: #e5e5e5;
@@ -251,13 +252,15 @@
             border-color: rgba(220,38,38,0.3);
         }
 
-        .date-badge i { font-size: 11px; }
+        .date-badge i.fa-calendar-alt { font-size: 11px; }
         .date-badge .pulse-dot {
             width: 7px; height: 7px; border-radius: 50%;
             background: #16a34a;
             animation: pulse-green 1.8s ease-in-out infinite;
             flex-shrink: 0;
         }
+        /* Small affordance so it's clear the badge is interactive, even without hover/tooltip on mobile */
+        .date-badge .fa-chevron-down { font-size: 9px; color: var(--text-muted); margin-left: 1px; }
 
         @keyframes pulse-green {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -322,8 +325,10 @@
         .welcome-icon    { font-size: 64px; opacity: 0.2; position: relative; z-index: 1; }
 
         /* =============== STATS =============== */
+        /* Was auto-fit(minmax(200px,1fr)), which could produce an uneven last row at
+           in-between widths for 4 cards. Explicit column counts per breakpoint instead. */
         .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: grid; grid-template-columns: repeat(4, 1fr);
             gap: 18px; margin-bottom: 28px;
         }
 
@@ -349,6 +354,7 @@
         body.dark-mode .stat-icon.amber { background: rgba(202,138,4,0.2);  color: #facc15; }
 
         .stat-info .stat-num  { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+        .stat-info .stat-num.stat-num--empty { font-size: 15px; font-weight: 700; color: var(--text-muted); }
         .stat-info .stat-name { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; }
 
         /* =============== DASHBOARD GRID =============== */
@@ -434,53 +440,65 @@
         .qa-arrow { color: var(--text-muted); font-size: 11px; transition: all 0.2s; }
         .qa-item:hover .qa-arrow { color: var(--red); transform: translateX(3px); }
 
-        /* =============== MILESTONE / JOURNEY =============== */
-        .milestone-wrap { padding: 20px; }
+        /* =============== MILESTONE / JOURNEY (graph tracker) =============== */
+        .milestone-wrap { padding: 24px 16px 16px; }
 
-        .milestone-item {
-            display: flex; align-items: flex-start; gap: 14px;
-            margin-bottom: 20px; position: relative;
+        .ojt-track { display: flex; align-items: flex-start; position: relative; }
+
+        .ojt-step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+
+        .ojt-line {
+            position: absolute; top: 23px; left: calc(50% + 26px); right: calc(-50% + 26px);
+            height: 3px; background: var(--border); z-index: 0; transition: background 0.3s;
         }
 
-        .milestone-item:last-child { margin-bottom: 0; }
+        .ojt-line.filled { background: #16a34a; }
 
-        .milestone-dot {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: var(--surface-3); color: var(--text-muted);
+        .ojt-dot {
+            width: 46px; height: 46px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 11px; flex-shrink: 0; border: 2px solid var(--border);
-            transition: all 0.3s; position: relative; z-index: 1;
+            font-size: 16px; position: relative; z-index: 1;
+            border: 2.5px solid var(--border); background: var(--surface);
+            color: var(--text-muted); flex-shrink: 0; transition: all 0.3s;
         }
 
-        .milestone-line {
-            position: absolute; left: 15px; top: 34px;
-            width: 2px; height: calc(100% + 6px);
-            background: var(--border); z-index: 0;
+        .ojt-dot.done { background: #dcfce7; border-color: #16a34a; color: #16a34a; }
+
+        .ojt-dot.active {
+            background: #fee2e2; border-color: var(--red); color: var(--red);
+            width: 54px; height: 54px; font-size: 18px;
+            animation: ojt-pulse 2s ease-in-out infinite;
         }
 
-        .milestone-item.done .milestone-dot {
-            background: #dcfce7; color: #16a34a; border-color: #16a34a;
+        body.dark-mode .ojt-dot.done   { background: rgba(22,163,74,0.2); border-color: #22c55e; color: #22c55e; }
+        body.dark-mode .ojt-dot.active { background: rgba(220,38,38,0.2); border-color: var(--red); color: #ff6b6b; }
+
+        @keyframes ojt-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.35); }
+            50%       { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
         }
 
-        .milestone-item.done .milestone-line { background: #16a34a; }
-
-        .milestone-item.active .milestone-dot {
-            background: #fee2e2; color: var(--red); border-color: var(--red);
-            box-shadow: 0 0 0 4px rgba(220,38,38,0.15);
-            animation: pulse-red 2s ease-in-out infinite;
+        @media (prefers-reduced-motion: reduce) {
+            .ojt-dot.active { animation: none; }
         }
 
-        body.dark-mode .milestone-item.done .milestone-dot  { background: rgba(22,163,74,0.2); color: #22c55e; border-color: #22c55e; }
-        body.dark-mode .milestone-item.active .milestone-dot { background: rgba(220,38,38,0.2); color: #ff6b6b; border-color: var(--red); }
+        .ojt-title { font-size: 13px; font-weight: 600; color: var(--text-primary); text-align: center; margin-top: 12px; }
+        .ojt-sub   { font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: 2px; max-width: 130px; }
 
-        @keyframes pulse-red {
-            0%, 100% { box-shadow: 0 0 0 4px rgba(220,38,38,0.15); }
-            50%       { box-shadow: 0 0 0 8px rgba(220,38,38,0.05); }
+        .ojt-badge { font-size: 11px; font-weight: 600; margin-top: 8px; padding: 3px 10px; border-radius: 10px; display: inline-block; }
+        .ojt-badge.done   { background: #dcfce7; color: #14532d; }
+        .ojt-badge.active { background: #fee2e2; color: #7f1d1d; }
+        body.dark-mode .ojt-badge.done   { background: rgba(22,163,74,0.2);  color: #86efac; }
+        body.dark-mode .ojt-badge.active { background: rgba(220,38,38,0.2); color: #fca5a5; }
+
+        @media (max-width: 520px) {
+            .ojt-track { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .ojt-line { display: none; }
+            .ojt-step { flex-direction: row; align-items: center; gap: 14px; }
+            .ojt-title, .ojt-sub { text-align: left; }
+            .ojt-sub { max-width: none; }
+            .ojt-title { margin-top: 0; }
         }
-
-        .milestone-text { padding-top: 5px; }
-        .milestone-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
-        .milestone-sub   { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
         /* =============== TIPS =============== */
         .tips-wrap { padding: 8px 20px 16px; }
@@ -662,6 +680,7 @@
         @media (max-width: 1100px) {
             .dash-grid { grid-template-columns: 1fr; }
             .dash-right-col { gap: 22px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 900px) {
@@ -671,7 +690,6 @@
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
             .dt-modal { width: 92vw; }
             .welcome-icon { display: none; }
             .welcome-banner { flex-direction: column; gap: 12px; }
@@ -692,7 +710,7 @@
 <!-- =============== SIDEBAR =============== -->
 <div class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
+        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect logo">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
             <span class="sidebar-brand-sub">OJTIMS</span>
@@ -700,7 +718,7 @@
     </a>
 
     <a href="{{ url('/student/accountinfo') }}" class="sidebar-user">
-        <div class="user-avatar"><i class="fa fa-user"></i></div>
+        <div class="user-avatar"><i class="fa fa-user" aria-hidden="true"></i></div>
         <div class="user-info">
             <span class="user-name">{{ $user->first_name }} {{ $user->last_name }}</span>
             <span class="user-role">Student</span>
@@ -709,37 +727,37 @@
 
     <nav class="sidebar-nav">
         <a href="{{ url('/student/home') }}" class="nav-item active">
-            <span class="nav-icon"><i class="fa fa-home"></i></span>
+            <span class="nav-icon"><i class="fa fa-home" aria-hidden="true"></i></span>
             <span class="nav-label">Home</span>
             <span class="tooltip-label">Home</span>
         </a>
         <a href="{{ url('/student/ojtinfo') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-layer-group"></i></span>
+            <span class="nav-icon"><i class="fa fa-layer-group" aria-hidden="true"></i></span>
             <span class="nav-label">OJT Information</span>
             <span class="tooltip-label">OJT Information</span>
         </a>
         <a href="{{ url('/student/class') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-clipboard"></i></span>
+            <span class="nav-icon"><i class="fa fa-clipboard" aria-hidden="true"></i></span>
             <span class="nav-label">Class</span>
             <span class="tooltip-label">Class</span>
         </a>
         <a href="{{ url('/student/files') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-download"></i></span>
+            <span class="nav-icon"><i class="fa fa-download" aria-hidden="true"></i></span>
             <span class="nav-label">Downloadable Files</span>
             <span class="tooltip-label">Downloadable Files</span>
         </a>
         <a href="{{ url('/student/MOA') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-alt"></i></span>
+            <span class="nav-icon"><i class="fa fa-file-alt" aria-hidden="true"></i></span>
             <span class="nav-label">Notarized MOA</span>
             <span class="tooltip-label">Notarized MOA</span>
         </a>
         <a href="{{ url('/student/requirements') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-cloud-upload-alt"></i></span>
+            <span class="nav-icon"><i class="fa fa-cloud-upload-alt" aria-hidden="true"></i></span>
             <span class="nav-label">Requirements</span>
             <span class="tooltip-label">Requirements</span>
         </a>
         <a href="{{ url('/student/evaluation') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
+            <span class="nav-icon"><i class="fa fa-star-half-alt" aria-hidden="true"></i></span>
             <span class="nav-label">Evaluation</span>
             <span class="tooltip-label">Evaluation</span>
         </a>
@@ -747,7 +765,7 @@
 
     <div class="sidebar-footer">
         <a href="{{ url('/logout') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
+            <span class="nav-icon"><i class="fa fa-sign-out-alt" aria-hidden="true"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>
         </a>
@@ -760,15 +778,15 @@
     <!-- Topbar -->
     <div class="topbar">
         <div class="topbar-left">
-            <button class="menu-toggle" id="menuToggle"><i class="fa fa-bars"></i></button>
-            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode">
-                <i class="fa fa-moon"></i>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar"><i class="fa fa-bars" aria-hidden="true"></i></button>
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode" aria-label="Toggle dark mode">
+                <i class="fa fa-moon" aria-hidden="true"></i>
             </button>
             <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
         </div>
         <div class="topbar-right">
             <div class="topbar-badge">
-                <i class="fa fa-graduation-cap"></i>
+                <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                 Student Portal
             </div>
         </div>
@@ -780,10 +798,11 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1>Home <span>Dashboard</span></h1>
-            <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
-                <span class="pulse-dot"></span>
-                <i class="fa fa-calendar-alt"></i>
+            <div class="date-badge" id="dateBadge" title="Click to view calendar & clock" role="button" tabindex="0" aria-label="Open calendar and clock">
+                <span class="pulse-dot" aria-hidden="true"></span>
+                <i class="fa fa-calendar-alt" aria-hidden="true"></i>
                 <span id="currentDate"></span>
+                <i class="fa fa-chevron-down" aria-hidden="true"></i>
             </div>
         </div>
 
@@ -796,51 +815,71 @@
                 </p>
                 <div class="welcome-actions">
                     <a href="https://youtu.be/H0ek8it4jKc" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
-                        <i class="fab fa-youtube"></i>
+                        <i class="fab fa-youtube" aria-hidden="true"></i>
                         Student Guide
                     </a>
                     <a href="https://youtu.be/jhLuCIX6yhw" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
-                        <i class="fab fa-youtube"></i>
+                        <i class="fab fa-youtube" aria-hidden="true"></i>
                         Evaluation Guide
                     </a>
                     <a href="https://www.youtube.com/playlist?list=PLyMOKHLwy4fPzwbJ0RsqgHRhvx2Ok1wH3" target="_blank" rel="noopener noreferrer" class="welcome-video-btn">
-                        <i class="fab fa-youtube"></i>
+                        <i class="fab fa-youtube" aria-hidden="true"></i>
                         How To Videos
                     </a>
                 </div>
             </div>
             <div class="welcome-icon">
-                <i class="fa fa-user-graduate"></i>
+                <i class="fa fa-user-graduate" aria-hidden="true"></i>
             </div>
         </div>
 
-        <!-- Stats Row -->
+        <!--
+            Stats Row — now driven by real status values instead of repeating each
+            card's own label. Controller should pass:
+              $fileCount              (int)
+              $requirementsSubmitted  (int)
+              $requirementsTotal      (int)
+              $ojtInfoComplete        (bool)
+              $evaluationStatus       (string: 'pending' | 'completed' | null)
+        -->
         <div class="stats-grid">
             <a href="{{ url('/student/files') }}" class="stat-card">
-                <div class="stat-icon red"><i class="fa fa-cloud-download-alt"></i></div>
+                <div class="stat-icon red"><i class="fa fa-cloud-download-alt" aria-hidden="true"></i></div>
                 <div class="stat-info">
-                    <div class="stat-num">{{ $fileCount }}</div>
+                    @if($fileCount > 0)
+                        <div class="stat-num">{{ $fileCount }}</div>
+                    @else
+                        <div class="stat-num stat-num--empty">None yet</div>
+                    @endif
                     <div class="stat-name">Downloadable Templates</div>
                 </div>
             </a>
             <a href="{{ url('/student/requirements') }}" class="stat-card">
-                <div class="stat-icon green"><i class="fa fa-tasks"></i></div>
+                <div class="stat-icon green"><i class="fa fa-tasks" aria-hidden="true"></i></div>
                 <div class="stat-info">
-                    <div class="stat-num">OJT</div>
-                    <div class="stat-name">Requirements</div>
+                    <div class="stat-num">{{ $requirementsSubmitted ?? 0 }}/{{ $requirementsTotal ?? 0 }}</div>
+                    <div class="stat-name">Requirements Submitted</div>
                 </div>
             </a>
             <a href="{{ url('/student/ojtinfo') }}" class="stat-card">
-                <div class="stat-icon amber"><i class="fa fa-info-circle"></i></div>
+                <div class="stat-icon amber"><i class="fa fa-info-circle" aria-hidden="true"></i></div>
                 <div class="stat-info">
-                    <div class="stat-num">Information</div>
+                    @if(!empty($ojtInfoComplete))
+                        <div class="stat-num">Complete</div>
+                    @else
+                        <div class="stat-num stat-num--empty">Not set up</div>
+                    @endif
                     <div class="stat-name">OJT Information</div>
                 </div>
             </a>
             <a href="{{ url('/student/evaluation') }}" class="stat-card">
-                <div class="stat-icon red"><i class="fa fa-star-half-alt"></i></div>
+                <div class="stat-icon red"><i class="fa fa-star-half-alt" aria-hidden="true"></i></div>
                 <div class="stat-info">
-                    <div class="stat-num">Evaluation</div>
+                    @if(($evaluationStatus ?? null) === 'completed')
+                        <div class="stat-num">Completed</div>
+                    @else
+                        <div class="stat-num stat-num--empty">Pending</div>
+                    @endif
                     <div class="stat-name">Supervisor Evaluation</div>
                 </div>
             </a>
@@ -855,7 +894,7 @@
                 <!-- Quick Actions -->
                 <div class="panel-card">
                     <div class="panel-card-header">
-                        <div class="panel-header-icon"><i class="fa fa-bolt"></i></div>
+                        <div class="panel-header-icon"><i class="fa fa-bolt" aria-hidden="true"></i></div>
                         <div>
                             <h2>Quick Actions</h2>
                             <p>Jump to the most important sections</p>
@@ -863,44 +902,44 @@
                     </div>
                     <div class="quick-actions-wrap">
                         <a href="{{ url('/student/ojtinfo') }}" class="qa-item">
-                            <div class="qa-icon-wrap red"><i class="fa fa-layer-group"></i></div>
+                            <div class="qa-icon-wrap red"><i class="fa fa-layer-group" aria-hidden="true"></i></div>
                             <div class="qa-text">
                                 <div class="qa-title">OJT Information</div>
                                 <div class="qa-desc">View your OJT details & status</div>
                             </div>
-                            <i class="fa fa-chevron-right qa-arrow"></i>
+                            <i class="fa fa-chevron-right qa-arrow" aria-hidden="true"></i>
                         </a>
                         <a href="{{ url('/student/class') }}" class="qa-item">
-                            <div class="qa-icon-wrap blue"><i class="fa fa-clipboard"></i></div>
+                            <div class="qa-icon-wrap blue"><i class="fa fa-clipboard" aria-hidden="true"></i></div>
                             <div class="qa-text">
                                 <div class="qa-title">My Class</div>
                                 <div class="qa-desc">View your class & professor</div>
                             </div>
-                            <i class="fa fa-chevron-right qa-arrow"></i>
+                            <i class="fa fa-chevron-right qa-arrow" aria-hidden="true"></i>
                         </a>
                         <a href="{{ url('/student/files') }}" class="qa-item">
-                            <div class="qa-icon-wrap green"><i class="fa fa-download"></i></div>
+                            <div class="qa-icon-wrap green"><i class="fa fa-download" aria-hidden="true"></i></div>
                             <div class="qa-text">
                                 <div class="qa-title">Downloadable Files</div>
                                 <div class="qa-desc">Get templates & forms</div>
                             </div>
-                            <i class="fa fa-chevron-right qa-arrow"></i>
+                            <i class="fa fa-chevron-right qa-arrow" aria-hidden="true"></i>
                         </a>
                         <a href="{{ url('/student/MOA') }}" class="qa-item">
-                            <div class="qa-icon-wrap purple"><i class="fa fa-file-alt"></i></div>
+                            <div class="qa-icon-wrap purple"><i class="fa fa-file-alt" aria-hidden="true"></i></div>
                             <div class="qa-text">
                                 <div class="qa-title">MOA</div>
                                 <div class="qa-desc">Memorandum of Agreement</div>
                             </div>
-                            <i class="fa fa-chevron-right qa-arrow"></i>
+                            <i class="fa fa-chevron-right qa-arrow" aria-hidden="true"></i>
                         </a>
                         <a href="{{ url('/student/requirements') }}" class="qa-item" style="border-bottom:none;">
-                            <div class="qa-icon-wrap amber"><i class="fa fa-cloud-upload-alt"></i></div>
+                            <div class="qa-icon-wrap amber"><i class="fa fa-cloud-upload-alt" aria-hidden="true"></i></div>
                             <div class="qa-text">
                                 <div class="qa-title">Requirements</div>
                                 <div class="qa-desc">Submit & track your documents</div>
                             </div>
-                            <i class="fa fa-chevron-right qa-arrow"></i>
+                            <i class="fa fa-chevron-right qa-arrow" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
@@ -908,7 +947,7 @@
                 <!-- Announcements -->
                 <div class="panel-card">
                     <div class="panel-card-header">
-                        <div class="panel-header-icon"><i class="fa fa-bullhorn"></i></div>
+                        <div class="panel-header-icon"><i class="fa fa-bullhorn" aria-hidden="true"></i></div>
                         <div>
                             <h2>Announcements</h2>
                             <p>Latest updates from your coordinator</p>
@@ -917,7 +956,7 @@
                     @if(isset($announcements) && count($announcements) > 0)
                         @foreach($announcements as $ann)
                         <div class="announcement-item">
-                            <div class="ann-dot"></div>
+                            <div class="ann-dot" aria-hidden="true"></div>
                             <div>
                                 <div class="ann-title">{{ $ann->title }}</div>
                                 <div class="ann-date">{{ \Carbon\Carbon::parse($ann->created_at)->format('M d, Y') }}</div>
@@ -927,7 +966,7 @@
                         @endforeach
                     @else
                         <div class="empty-ann">
-                            <i class="fa fa-bell-slash"></i>
+                            <i class="fa fa-bell-slash" aria-hidden="true"></i>
                             No announcements yet. Check back later.
                         </div>
                     @endif
@@ -941,43 +980,56 @@
                 <!-- OJT Journey -->
                 <div class="panel-card">
                     <div class="panel-card-header">
-                        <div class="panel-header-icon"><i class="fa fa-chart-line"></i></div>
+                        <div class="panel-header-icon"><i class="fa fa-chart-line" aria-hidden="true"></i></div>
                         <div>
-                            <h2>OJT Journey</h2>
+                            <h2>OJT Guidelines</h2>
                             <p>Your internship milestones</p>
                         </div>
                     </div>
-                    <div class="milestone-wrap">
-                        <div class="milestone-item done">
-                            <div class="milestone-dot"><i class="fa fa-check"></i></div>
-                            <div class="milestone-line"></div>
-                            <div class="milestone-text">
-                                <div class="milestone-title">Account Created</div>
-                                <div class="milestone-sub">You're registered in the system</div>
-                            </div>
-                        </div>
-                        <div class="milestone-item active">
-                            <div class="milestone-dot"><i class="fa fa-circle"></i></div>
-                            <div class="milestone-line"></div>
-                            <div class="milestone-text">
-                                <div class="milestone-title">Submit Requirements</div>
-                                <div class="milestone-sub">Upload your required documents</div>
-                            </div>
-                        </div>
-                        <div class="milestone-item">
-                            <div class="milestone-dot"><i class="fa fa-file-signature"></i></div>
-                            <div class="milestone-line"></div>
-                            <div class="milestone-text">
-                                <div class="milestone-title">MOA Signing</div>
-                                <div class="milestone-sub">Agreement with your company</div>
-                            </div>
-                        </div>
-                        <div class="milestone-item">
-                            <div class="milestone-dot"><i class="fa fa-flag"></i></div>
-                            <div class="milestone-text">
-                                <div class="milestone-title">OJT Completion</div>
-                                <div class="milestone-sub">Finish your internship hours</div>
-                            </div>
+                    <!--
+                        Graph-style milestone tracker. Drive state from the controller via
+                        $ojtStage — one of: 'account_created', 'requirements', 'moa', 'completed'.
+                        Each stage is considered "done" once the student has passed it, and
+                        "active" if it's their current stage.
+                    -->
+                    @php
+                        $ojtStages = ['account_created', 'requirements', 'moa', 'completed'];
+                        $currentIndex = array_search($ojtStage ?? 'account_created', $ojtStages);
+                        $currentIndex = $currentIndex === false ? 0 : $currentIndex;
+                    @endphp
+                    <div class="milestone-wrap" role="list" aria-label="OJT journey progress">
+                        <div class="ojt-track">
+                            @php
+                                $steps = [
+                                    ['key' => 'account_created', 'icon' => 'fa-check',          'title' => 'Account Created', 'sub' => "You're registered in the system"],
+                                    ['key' => 'requirements',    'icon' => 'fa-circle',          'title' => 'Submit Requirements', 'sub' => 'Upload your required documents'],
+                                    ['key' => 'moa',             'icon' => 'fa-file-signature',  'title' => 'MOA Signing', 'sub' => 'Agreement with your company'],
+                                    ['key' => 'completed',       'icon' => 'fa-flag',            'title' => 'OJT Completion', 'sub' => 'Finish your internship hours'],
+                                ];
+                            @endphp
+                            @foreach($steps as $i => $step)
+                                @php
+                                    $isDone   = $i < $currentIndex;
+                                    $isActive = $i === $currentIndex;
+                                @endphp
+                                <div class="ojt-step" role="listitem">
+                                    @if($i < count($steps) - 1)
+                                        <div class="ojt-line {{ $isDone ? 'filled' : '' }}"></div>
+                                    @endif
+                                    <div class="ojt-dot {{ $isDone ? 'done' : ($isActive ? 'active' : '') }}">
+                                        <i class="fa {{ $isDone ? 'fa-check' : $step['icon'] }}" aria-hidden="true"></i>
+                                    </div>
+                                    <div>
+                                        <div class="ojt-title">{{ $step['title'] }}</div>
+                                        <div class="ojt-sub">{{ $step['sub'] }}</div>
+                                        @if($isDone)
+                                            <span class="ojt-badge done">Done</span>
+                                        @elseif($isActive)
+                                            <span class="ojt-badge active">In progress</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -985,7 +1037,7 @@
                 <!-- Helpful Tips -->
                 <div class="panel-card">
                     <div class="panel-card-header">
-                        <div class="panel-header-icon"><i class="fa fa-lightbulb"></i></div>
+                        <div class="panel-header-icon"><i class="fa fa-lightbulb" aria-hidden="true"></i></div>
                         <div>
                             <h2>Helpful Tips</h2>
                             <p>Make the most of your OJT</p>
@@ -993,19 +1045,19 @@
                     </div>
                     <div class="tips-wrap">
                         <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-clock"></i></div>
+                            <div class="tip-icon"><i class="fa fa-clock" aria-hidden="true"></i></div>
                             <div class="tip-text">Submit your requirements before the deadline to avoid delays in your OJT approval.</div>
                         </div>
                         <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-file-alt"></i></div>
+                            <div class="tip-icon"><i class="fa fa-file-alt" aria-hidden="true"></i></div>
                             <div class="tip-text">Download all necessary templates from the Files section early to stay prepared.</div>
                         </div>
                         <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-user-tie"></i></div>
+                            <div class="tip-icon"><i class="fa fa-user-tie" aria-hidden="true"></i></div>
                             <div class="tip-text">Keep your OJT Information updated with your company details and supervisor.</div>
                         </div>
                         <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-bell"></i></div>
+                            <div class="tip-icon"><i class="fa fa-bell" aria-hidden="true"></i></div>
                             <div class="tip-text">Check the Announcements section regularly for important updates from your coordinator.</div>
                         </div>
                     </div>
@@ -1019,14 +1071,14 @@
     <!-- Footer -->
     <footer class="dashboard-footer">
         <div class="footer-inner">
-            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP logo">
             <span class="footer-copy">
                 © 1998–2026 <span>Polytechnic University of the Philippines</span>
             </span>
         </div>
         <div class="footer-links">
             <a href="https://www.pup.edu.ph/" target="_blank">
-                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;" aria-hidden="true"></i>
                 PUP Website
             </a>
             <span class="divider">|</span>
@@ -1043,8 +1095,8 @@
     <div class="dt-modal" id="dtModal">
         <div class="dt-modal-header">
             <div class="dt-header-top">
-                <span class="dt-header-title"><i class="fa fa-clock" style="margin-right:6px;"></i>Date & Time</span>
-                <button class="dt-close-btn" id="dtCloseBtn"><i class="fa fa-times"></i></button>
+                <span class="dt-header-title"><i class="fa fa-clock" style="margin-right:6px;" aria-hidden="true"></i>Date & Time</span>
+                <button class="dt-close-btn" id="dtCloseBtn" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
             </div>
             <div class="dt-clock-display">
                 <div class="dt-time-big">
@@ -1068,9 +1120,9 @@
         </div>
         <div class="dt-calendar">
             <div class="cal-nav">
-                <button class="cal-nav-btn" id="calPrev"><i class="fa fa-chevron-left"></i></button>
+                <button class="cal-nav-btn" id="calPrev" aria-label="Previous month"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
                 <span class="cal-month-label" id="calMonthLabel"></span>
-                <button class="cal-nav-btn" id="calNext"><i class="fa fa-chevron-right"></i></button>
+                <button class="cal-nav-btn" id="calNext" aria-label="Next month"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
             </div>
             <div class="cal-grid" id="calGrid"></div>
         </div>
@@ -1117,7 +1169,7 @@ menuToggle.addEventListener('click', function () {
 
 overlay.addEventListener('click', closeMobileSidebar);
 
-   
+
 
     /* ── Live date badge ── */
     const dateEl = document.getElementById('currentDate');
@@ -1134,10 +1186,15 @@ overlay.addEventListener('click', closeMobileSidebar);
     const dtCloseBtn = document.getElementById('dtCloseBtn');
     const dateBadge  = document.getElementById('dateBadge');
 
-    dateBadge.addEventListener('click', function () {
+    function openModal() {
         dtOverlay.classList.add('open');
         startClock();
         renderCalendar(calViewYear, calViewMonth);
+    }
+
+    dateBadge.addEventListener('click', openModal);
+    dateBadge.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
     });
 
     function closeModal() {

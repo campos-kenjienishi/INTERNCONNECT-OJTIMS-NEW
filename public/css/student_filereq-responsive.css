@@ -655,3 +655,82 @@ button[id*="mic"],
     align-items: center !important;
     justify-content: center !important;
 }
+/* ─────────────────────────────────────────────
+   Upload Requirement Modal — mobile fix
+───────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .upload-modal-dialog {
+        max-width: calc(100% - 16px) !important;
+        margin: 8px auto !important;
+    }
+
+    .modal-body.upload-modal-body {
+        padding: 16px !important;
+        overflow-x: hidden !important;
+    }
+
+    .upload-modal-layout {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        overflow: hidden !important;
+    }
+
+    .upload-modal-left,
+    .upload-modal-right {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .upload-modal-right .upload-modal-section.file {
+        height: auto !important;
+    }
+
+    .upload-modal-section {
+        padding: 12px !important;
+    }
+
+    .upload-modal-section-title {
+        font-size: 12.5px !important;
+    }
+
+    .upload-modal-section-subtitle {
+        font-size: 11px !important;
+    }
+
+    .file-upload-zone {
+        min-height: 180px !important;
+        padding: 18px 14px !important;
+    }
+
+    .file-upload-zone .upload-icon {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 17px !important;
+    }
+
+    .file-upload-zone p {
+        font-size: 12.5px !important;
+    }
+
+    .file-upload-zone span {
+        font-size: 10.5px !important;
+    }
+
+    .phase-dropdown-trigger,
+    .modal-field-input,
+    .modal-field-select {
+        font-size: 13px !important;
+        padding: 10px 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-modal-dialog {
+        max-width: calc(100% - 12px) !important;
+        margin: 6px auto !important;
+    }
+
+    .file-upload-zone {
+        min-height: 160px !important;
+    }
+}
