@@ -602,15 +602,21 @@
                 <div class="filter-card-body">
                     <div class="filter-group">
                         <label class="filter-label"><i class="fa fa-calendar-alt"></i> School Year</label>
-                        <div class="year-range-wrap">
-                            <select class="filter-select" name="school_year_start" id="school_year_start" required>
+                        <select class="filter-select" name="school_year" id="school_year" style="min-width:220px; margin-bottom:10px;">
+                            <option value="" {{ empty($selectedSchoolYear) ? 'selected' : '' }}>All School Years</option>
+                            @foreach (($schoolYears ?? collect()) as $year)
+                                <option value="{{ $year }}" {{ (string) ($selectedSchoolYear ?? '') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
+                            @endforeach
+                        </select>
+                        <div class="year-range-wrap" style="display:none;">
+                            <select class="filter-select" name="school_year_start" id="school_year_start">
                                 <option value="">Start Year</option>
                                 @for ($year = 2018; $year <= date('Y'); $year++)
                                     <option value="{{ $year }}" {{ (string) request('school_year_start') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
                                 @endfor
                             </select>
                             <span class="year-separator">—</span>
-                            <select class="filter-select" name="school_year_end" id="school_year_end" data-selected="{{ request('school_year_end') }}" required>
+                            <select class="filter-select" name="school_year_end" id="school_year_end" data-selected="{{ request('school_year_end') }}">
                                 <option value="">End Year</option>
                                 @for ($year = 2019; $year <= date('Y'); $year++)
                                     <option value="{{ $year }}" {{ (string) request('school_year_end') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
@@ -623,7 +629,7 @@
                         <label class="filter-label"><i class="fa fa-graduation-cap"></i> Course</label>
                         <select class="filter-select" name="course" id="courseSelect" required style="min-width:220px;">
                             @foreach ($courseAll as $c)
-                                <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
+                                <option value="{{ $c->course }}" {{ (string) ($selectedCourse ?? '') === (string) $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -644,7 +650,7 @@
             $activeMOA  = 0;
             $expiredMOA = 0;
             foreach ($companies as $c) {
-                [$sy, $ey] = explode('-', $c->school_year);
+                [$sy, $ey] = array_pad(explode('-', (string) ($c->school_year ?? '0-0')), 2, '');
                 $diff = now()->year - (int)$sy;
                 if ($diff > 3) $expiredMOA++; else $activeMOA++;
             }
@@ -953,7 +959,8 @@
 
 <form id="sendEmailForm" action="{{ url('/reportsExpired/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
     @csrf
-    <input type="hidden" id="courseHidden" name="course" value="{{ $course ?? '' }}">
+    <input type="hidden" id="courseHidden" name="course" value="{{ $selectedCourse ?? '' }}">
+    <input type="hidden" id="schoolYearHidden" name="school_year" value="{{ $selectedSchoolYear ?? '' }}">
     <input type="hidden" id="emailHidden"  name="email"  value="{{ $user->email ?? '' }}">
 </form>
 
@@ -969,7 +976,8 @@
             total_moa: @json($totalMOA ?? 0),
             active_moa: @json($activeMOA ?? 0),
             expired_moa: @json($expiredMOA ?? 0),
-            course: @json(request('course') ?: (isset($courseAll) && $courseAll->first() ? $courseAll->first()->course : null))
+            course: @json($selectedCourse ?? (isset($courseAll) && $courseAll->first() ? $courseAll->first()->course : null)),
+            school_year: @json($selectedSchoolYear ?? null)
         },
         insight: @json($reportInsights ?? [])
     };
@@ -1119,29 +1127,6 @@
     });
 
     /* ── Dynamic end-year options ── */
-    document.addEventListener('DOMContentLoaded', function () {
-        const startSel = document.getElementById('school_year_start');
-        const endSel   = document.getElementById('school_year_end');
-        const selectedEndYear = endSel.dataset.selected || '';
-
-        function updateEndYears() {
-            const sy = parseInt(startSel.value);
-            endSel.innerHTML = '<option value="">End Year</option>';
-            if (!isNaN(sy)) {
-                for (let y = sy + 1; y <= sy + 10; y++) {
-                    const opt = document.createElement('option');
-                    opt.value = y; opt.textContent = y;
-                    if (String(y) === selectedEndYear) {
-                        opt.selected = true;
-                    }
-                    endSel.appendChild(opt);
-                }
-            }
-        }
-        updateEndYears();
-        startSel.addEventListener('change', updateEndYears);
-    });
-
     /* ══════════════════════════════════════════════
        BUILD PRINT HTML  — branded MOA layout
     ══════════════════════════════════════════════ */
@@ -1157,10 +1142,8 @@
         const pageNum          = pageInfo.page + 1;
         const pageCount        = pageInfo.pages;
 
-        const syStart  = document.getElementById('school_year_start').value || '—';
-        const syEnd    = document.getElementById('school_year_end').value   || '—';
-        const course   = document.getElementById('courseSelect').value      || '—';
-        const syLabel  = (syStart !== '—' && syEnd !== '—') ? syStart + ' – ' + syEnd : '—';
+        const syLabel  = document.getElementById('school_year').value || 'All School Years';
+        const course   = document.getElementById('courseSelect').value || '—';
 
         let rowsHTML = '';
         for (let i = 0; i < currentPageNodes.length; i++) {

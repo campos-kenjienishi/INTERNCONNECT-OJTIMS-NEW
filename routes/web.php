@@ -170,6 +170,8 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::get('/allStudents', [ProfessorController::class,'allStudents']);
     Route::post('/roomCreate', [ProfessorController::class,'roomCreate'])->name('roomCreate');
     Route::put('/roomUpdate/{id}', [ProfessorController::class,'roomUpdate'])->name('roomUpdate');
+    Route::post('/roomArchive/{id}', [ProfessorController::class,'roomArchive'])->name('roomArchive');
+    Route::post('/roomUnarchive/{id}', [ProfessorController::class,'roomUnarchive'])->name('roomUnarchive');
     Route::post('/roomDelete/{id}', [ProfessorController::class,'roomDelete'])->name('roomDelete');
     Route::get('/professor/maintain',[PassDocuController::class,'maintainFileCategory']);
     Route::post('/fileCategory', [PassDocuController::class,'fileCategory']);

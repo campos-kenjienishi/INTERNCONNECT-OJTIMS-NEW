@@ -319,6 +319,10 @@ public function home()
                 $classQuery = Classes::where('adviser_name', $data->adviser_name)
                     ->where('course', $data->course);
 
+                if (Schema::hasColumn('classes', 'archived_at')) {
+                    $classQuery->whereNull('archived_at');
+                }
+
                 if (Schema::hasColumn('classes', 'school_year_start')) {
                     $classQuery->orderByDesc('school_year_start');
                 }
@@ -368,7 +372,7 @@ public function home()
                 }
 
                 if (!empty($data->class_id)) {
-                    $currentClass = $class->firstWhere('id', $data->class_id) ?? Classes::find($data->class_id);
+                    $currentClass = Classes::find($data->class_id) ?? $class->firstWhere('id', $data->class_id);
 
                     if ($currentClass) {
                         if ($hasScheduleClassId) {
@@ -432,7 +436,11 @@ public function home()
 public function join(Request $request, $email, $classId)
     {
         $user = User::where('email', $email)->first();
-        $class = Classes::find($classId);
+        $class = Classes::where('id', $classId);
+        if (Schema::hasColumn('classes', 'archived_at')) {
+            $class->whereNull('archived_at');
+        }
+        $class = $class->first();
 
         if (!$user) {
             return back()->with('error', 'User not found.');
@@ -505,7 +513,11 @@ public function join(Request $request, $email, $classId)
 
                 $user=User::where('id','=', Session::get('loginId'))->first();
                         }
-           $class = Classes::where('adviser_name', $user->adviser_name)->get();
+           $class = Classes::where('adviser_name', $user->adviser_name);
+           if (Schema::hasColumn('classes', 'archived_at')) {
+               $class->whereNull('archived_at');
+           }
+           $class = $class->orderByDesc('created_at')->orderByDesc('id')->get();
             // Student download page shows global templates (not room-specific).
         if (Schema::hasColumn('uploaded_files', 'class_id')) {
             $upload = UploadedFile::where(function ($query) {

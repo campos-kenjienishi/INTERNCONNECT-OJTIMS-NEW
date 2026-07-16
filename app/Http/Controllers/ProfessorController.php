@@ -33,6 +33,16 @@ use App\Services\ReportAiInsightService;
 
 class ProfessorController extends Controller
 {
+private function professorClassQuery(string $professorName, bool $archived = false)
+{
+    $query = Classes::where('adviser_name', $professorName);
+
+    if (Schema::hasColumn('classes', 'archived_at')) {
+        $archived ? $query->whereNotNull('archived_at') : $query->whereNull('archived_at');
+    }
+
+    return $query;
+}
     
 public function class()
 {
@@ -40,6 +50,7 @@ public function class()
     $classrooms = [];
     $courses = Courses::all();
     $announcements = collect();
+    $showArchived = request('view') === 'archived';
 
     if (Session::has('loginId')) {
         $data = User::where('id', Session::get('loginId'))->first();
@@ -48,8 +59,12 @@ public function class()
         $hasClassScheduleDay = Schema::hasColumn('classes', 'schedule_day');
         $hasClassScheduleTime = Schema::hasColumn('classes', 'schedule_time');
 
-        // Get all rooms (classes) where this professor is adviser
-        $classrooms = Classes::where('adviser_name', $data->full_name)->get();
+        $classrooms = $this->professorClassQuery($data->full_name, $showArchived)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+        $activeClassCount = $this->professorClassQuery($data->full_name, false)->count();
+        $archivedClassCount = $this->professorClassQuery($data->full_name, true)->count();
         $announcements = Announcements::query()
             ->when(
                 Schema::hasColumn('announcements', 'announcer_user_id'),
@@ -140,7 +155,10 @@ public function class()
         'data' => $data,
         'course' => $courses,
         'class' => $classrooms,
-        'announcements' => $announcements
+        'announcements' => $announcements,
+        'showArchived' => $showArchived,
+        'activeClassCount' => $activeClassCount ?? 0,
+        'archivedClassCount' => $archivedClassCount ?? 0,
     ]);
 }
  
@@ -369,6 +387,70 @@ public function roomDelete($id)
     return response()->json(['success' => true]);
 }
 
+public function roomArchive($id)
+{
+    $data = null;
+    if (Session::has('loginId')) {
+        $data = User::where('id', Session::get('loginId'))->first();
+    }
+
+    if (!Schema::hasColumn('classes', 'archived_at')) {
+        return response()->json(['error' => 'Archive support is not available yet.'], 422);
+    }
+
+    $room = Classes::where('id', $id)
+        ->where('adviser_name', $data->full_name ?? '')
+        ->first();
+
+    if (!$room) {
+        return response()->json(['error' => 'Room not found'], 404);
+    }
+
+    $room->archived_at = now();
+    $room->save();
+
+    AuditLogger::log(
+        'Class Room',
+        'archive',
+        'Archived room: ' . $room->room . ' from course: ' . $room->course,
+        $data->id ?? null
+    );
+
+    return response()->json(['success' => true]);
+}
+
+public function roomUnarchive($id)
+{
+    $data = null;
+    if (Session::has('loginId')) {
+        $data = User::where('id', Session::get('loginId'))->first();
+    }
+
+    if (!Schema::hasColumn('classes', 'archived_at')) {
+        return response()->json(['error' => 'Archive support is not available yet.'], 422);
+    }
+
+    $room = Classes::where('id', $id)
+        ->where('adviser_name', $data->full_name ?? '')
+        ->first();
+
+    if (!$room) {
+        return response()->json(['error' => 'Room not found'], 404);
+    }
+
+    $room->archived_at = null;
+    $room->save();
+
+    AuditLogger::log(
+        'Class Room',
+        'unarchive',
+        'Unarchived room: ' . $room->room . ' from course: ' . $room->course,
+        $data->id ?? null
+    );
+
+    return response()->json(['success' => true]);
+}
+
 private function syncRoomSchedule($room, array $scheduleData, int $timeSlots): void
 {
     if (!Schema::hasTable('schedules') || !Schema::hasColumn('schedules', 'class_id')) {
@@ -459,9 +541,9 @@ public function requirementStatusClasses()
         ? FileCategory::where('professor_id', $professor->id)->count()
         : 0;
 
-    $allClasses = Classes::where('adviser_name', $data->full_name)
-        ->orderBy('course')
-        ->orderBy('room')
+    $allClasses = $this->professorClassQuery($data->full_name, false)
+        ->orderByDesc('created_at')
+        ->orderByDesc('id')
         ->get();
 
     $classStats = [];

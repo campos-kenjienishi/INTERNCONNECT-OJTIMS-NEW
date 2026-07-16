@@ -26,11 +26,11 @@
             font-size: 13px;
             vertical-align: middle;
         }
-        .btn-action, .btn-edit, .btn-remove, .btn-template, .btn-announce {
+        .btn-action, .btn-edit, .btn-archive, .btn-remove, .btn-template, .btn-announce {
             font-size: 12px !important;
             padding: 7px 14px !important;
         }
-        .btn-action i, .btn-edit i, .btn-remove i, .btn-template i, .btn-announce i {
+        .btn-action i, .btn-edit i, .btn-archive i, .btn-remove i, .btn-template i, .btn-announce i {
             font-size: 13px !important;
         }
         .modal-field-label, .modal-field-input, .modal-field-select, .modal-field-textarea {
@@ -72,6 +72,75 @@
     --btn-remove-dark:   #b91c1c;
     --btn-remove-glow:   rgba(220,38,38,0.25);
 }
+
+        .page-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-view-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(15,23,42,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .btn-view-toggle:hover {
+            transform: translateY(-1px);
+            border-color: #fecaca;
+            color: var(--red);
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(220,38,38,0.12);
+        }
+
+        .btn-view-toggle .count-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: var(--red-dark);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .icon-action-btn {
+            width: 34px;
+            height: 34px;
+            padding: 0 !important;
+            border: none;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        }
+
+        .icon-action-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.02);
+        }
+
+        .icon-action-btn i {
+            font-size: 12px !important;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -502,7 +571,15 @@
         }
 
         /* Actions cell */
-        .actions-cell { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .actions-cell {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            min-width: max-content;
+        }
 
         /* =============== MODAL =============== */
         .modal-content {
@@ -804,7 +881,7 @@
             .main-content { margin-left: 0 !important; }
             .page-content { padding: 18px; }
             .topbar-title { display: none; }
-            .actions-cell { flex-direction: column; align-items: flex-start; }
+            .actions-cell { flex-wrap: nowrap; justify-content: center; }
         }
         /* Dashboard Footer */
 .dashboard-footer {
@@ -903,17 +980,38 @@
 }
 .btn-announce:hover { box-shadow: 0 6px 18px var(--btn-announce-glow); }
 
-.btn-edit {
-    background: linear-gradient(135deg, var(--btn-edit-bg), var(--btn-edit-dark));
-    box-shadow: 0 3px 10px var(--btn-edit-glow);
-}
-.btn-edit:hover { box-shadow: 0 6px 18px var(--btn-edit-glow); }
+    .btn-edit {
+        background: linear-gradient(135deg, var(--btn-edit-bg), var(--btn-edit-dark));
+        box-shadow: 0 3px 10px var(--btn-edit-glow);
+    }
+    .btn-edit:hover { box-shadow: 0 6px 18px var(--btn-edit-glow); }
 
-.btn-remove {
-    background: linear-gradient(135deg, var(--btn-remove-bg), var(--btn-remove-dark));
-    box-shadow: 0 3px 10px var(--btn-remove-glow);
-}
+    .btn-archive {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        box-shadow: 0 3px 10px rgba(245,158,11,0.22);
+    }
+
+    .btn-archive:hover { box-shadow: 0 6px 18px rgba(245,158,11,0.28); }
+
+    .btn-remove {
+        background: linear-gradient(135deg, var(--btn-remove-bg), var(--btn-remove-dark));
+        box-shadow: 0 3px 10px var(--btn-remove-glow);
+    }
 .btn-remove:hover { box-shadow: 0 6px 18px var(--btn-remove-glow); }
+
+        #fileTable th:nth-child(9),
+        #fileTable td:nth-child(9) {
+            width: 118px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #fileTable th:nth-child(10),
+        #fileTable td:nth-child(10) {
+            width: 132px;
+            text-align: center;
+            white-space: nowrap;
+        }
 
         .darkmode-toggle {
             width: 38px; height: 38px;
@@ -1123,9 +1221,16 @@
                     <span>Class</span>
                 </div>
             </div>
-            <button class="btn-add-room" data-bs-toggle="modal" data-bs-target="#addRoomModal">
-                <i class="fa fa-plus"></i> Add New Class
-            </button>
+            <div class="page-header-actions">
+                <a href="{{ $showArchived ? url('/professor/class') : url('/professor/class?view=archived') }}" class="btn-view-toggle">
+                    <i class="fa fa-archive"></i>
+                    <span>{{ $showArchived ? 'Active Classes' : 'Archived Classes' }}</span>
+                    <span class="count-pill">{{ $showArchived ? ($activeClassCount ?? 0) : ($archivedClassCount ?? 0) }}</span>
+                </a>
+                <button class="btn-add-room" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+                    <i class="fa fa-plus"></i> Add New Class
+                </button>
+            </div>
         </div>
 
         <!-- Rooms Table Card -->
@@ -1134,8 +1239,8 @@
                 <div class="table-card-header-left">
                     <div class="header-icon"><i class="fa fa-chalkboard"></i></div>
                     <div>
-                        <h2>Class Rooms</h2>
-                        <p>Manage your rooms, view students, and post announcements</p>
+                        <h2>{{ $showArchived ? 'Archived Class Rooms' : 'Class Rooms' }}</h2>
+                        <p>{{ $showArchived ? 'Review archived rooms, restore them, or remove them permanently' : 'Manage your rooms, view students, and post announcements' }}</p>
                     </div>
                 </div>
                 <div class="room-count-badge">
@@ -1393,12 +1498,25 @@
                                 <!-- End Announcement Modal -->
                             </td>
                             <td>
-                                <button class="btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ $room->id }}">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <button class="btn-action btn-remove btn-remove-room" data-id="{{ $room->id }}">
-                                    <i class="fa fa-trash"></i> Remove
-                                </button>
+                                <div class="actions-cell">
+                                @if(!$showArchived)
+                                    <button class="icon-action-btn btn-edit" title="Edit" aria-label="Edit" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ $room->id }}">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="icon-action-btn btn-archive btn-archive-room" title="Archive" aria-label="Archive" data-id="{{ $room->id }}">
+                                        <i class="fa fa-archive"></i>
+                                    </button>
+                                    <button class="icon-action-btn btn-remove btn-remove-room" title="Delete" aria-label="Delete" data-id="{{ $room->id }}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                @else
+                                    <button class="icon-action-btn btn-archive btn-unarchive-room" title="Unarchive" aria-label="Unarchive" data-id="{{ $room->id }}">
+                                        <i class="fa fa-undo"></i>
+                                    </button>
+                                    <button class="icon-action-btn btn-remove btn-remove-room" title="Delete Permanently" aria-label="Delete Permanently" data-id="{{ $room->id }}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                @endif
 
                                 <div class="modal fade" id="editRoomModal{{ $room->id }}" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
@@ -1479,6 +1597,7 @@
                                             </form>
                                         </div>
                                     </div>
+                                </div>
                                 </div>
                             </td>
                         </tr>
@@ -2011,6 +2130,80 @@
             $('#editAnnouncementForm').attr('action', $(this).data('announcement-action'));
             $('#editAnnouncementTitle').val($(this).data('announcement-title'));
             $('#editAnnouncementContent').val($(this).data('announcement-content'));
+        });
+
+        // Archive Room
+        $('.btn-archive-room').on('click', function () {
+            let roomId = $(this).data('id');
+            Swal.fire({
+                title: 'Archive this room?',
+                text: 'Archived rooms will disappear from professor and student lists, but the data will stay in the system.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d97706',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="fa fa-archive"></i> Yes, archive it',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/roomArchive/' + roomId,
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function () {
+                            Swal.fire({
+                                toast: true, icon: 'success',
+                                title: 'Room archived successfully!',
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            setTimeout(() => location.reload(), 2000);
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            Swal.fire('Oops!', 'Error archiving room.', 'error');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Unarchive Room
+        $('.btn-unarchive-room').on('click', function () {
+            let roomId = $(this).data('id');
+            Swal.fire({
+                title: 'Restore this room?',
+                text: 'This will bring the class back to the active list.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="fa fa-undo"></i> Yes, restore it',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/roomUnarchive/' + roomId,
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function () {
+                            Swal.fire({
+                                toast: true, icon: 'success',
+                                title: 'Room restored successfully!',
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            setTimeout(() => window.location.href = '{{ url('/professor/class') }}', 1200);
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            Swal.fire('Oops!', 'Error restoring room.', 'error');
+                        }
+                    });
+                }
+            });
         });
 
         // Delete Room

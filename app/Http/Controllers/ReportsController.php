@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Courses;
+use App\Models\Classes;
 use App\Models\Student;
 use App\Models\Professor;
 use App\Mail\MOAReportEmail;
@@ -15,6 +16,7 @@ use App\Models\OJTInformation;
 use App\Mail\PrintContentsEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 use App\Services\ReportAiInsightService;
 
@@ -57,6 +59,82 @@ class ReportsController extends Controller
         }
 
         return $startYear . '-' . $endYear;
+    }
+
+    private function normalizeSchoolYearValue(?string $schoolYear): ?string
+    {
+        $schoolYear = preg_replace('/\s+/', '', trim((string) $schoolYear));
+
+        return $schoolYear === '' ? null : $schoolYear;
+    }
+
+    private function getProfessorRecentClass(?string $professorName)
+    {
+        $professorName = trim((string) $professorName);
+
+        if ($professorName === '') {
+            return null;
+        }
+
+        $query = Classes::where('adviser_name', $professorName);
+
+        if (Schema::hasColumn('classes', 'school_year_start')) {
+            $query->orderByDesc('school_year_start');
+        }
+
+        if (Schema::hasColumn('classes', 'school_year_end')) {
+            $query->orderByDesc('school_year_end');
+        }
+
+        if (Schema::hasColumn('classes', 'created_at')) {
+            $query->orderByDesc('created_at');
+        }
+
+        return $query->orderByDesc('id')->first();
+    }
+
+    private function getClassSchoolYearLabel($class): ?string
+    {
+        if (!$class || empty($class->school_year_start) || empty($class->school_year_end)) {
+            return null;
+        }
+
+        return $this->normalizeSchoolYearValue($class->school_year_start . '-' . $class->school_year_end);
+    }
+
+    private function buildProfessorMoaFilters(?User $user): array
+    {
+        $courseAll = Courses::orderBy('course')->get();
+        $schoolYears = Company::whereNotNull('school_year')
+            ->pluck('school_year')
+            ->map(fn ($schoolYear) => $this->normalizeSchoolYearValue($schoolYear))
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values();
+
+        $recentClass = $this->getProfessorRecentClass($user?->full_name);
+        $selectedCourse = trim((string) ($recentClass->course ?? ''));
+        if ($selectedCourse === '') {
+            $selectedCourse = $courseAll->first()?->course ?? '';
+        }
+
+        $selectedSchoolYear = $this->getClassSchoolYearLabel($recentClass);
+        if (!$selectedSchoolYear) {
+            $selectedSchoolYear = $schoolYears->first();
+        }
+
+        if ($selectedSchoolYear && !$schoolYears->contains($selectedSchoolYear)) {
+            $schoolYears = $schoolYears->prepend($selectedSchoolYear)->values();
+        }
+
+        return [
+            'courseAll' => $courseAll,
+            'schoolYears' => $schoolYears,
+            'selectedCourse' => $selectedCourse,
+            'selectedSchoolYear' => $selectedSchoolYear,
+            'recentClass' => $recentClass,
+        ];
     }
 
     public function reports()
@@ -366,8 +444,15 @@ public function sendEmailExpired(Request $request)
 {
     $email = $request->input('email');
     $course = $request->input('course');
+    $schoolYear = $this->normalizeSchoolYearValue($request->input('school_year'));
 
     $companies = Company::all();
+
+    if ($schoolYear) {
+        $companies = $companies->filter(function ($company) use ($schoolYear) {
+            return $this->normalizeSchoolYearValue($company->school_year ?? '') === $schoolYear;
+        });
+    }
 
     if ($course) {
         $companies = $companies->filter(function ($company) use ($course) {
@@ -393,7 +478,7 @@ public function sendEmailExpired(Request $request)
     AuditLogger::log(
         'Reports',
         'Send Email',
-        'Sent MOA report to ' . $email . ($course ? ' for ' . $course : ''),
+        'Sent MOA report to ' . $email . ($course ? ' for ' . $course : '') . ($schoolYear ? ' (' . $schoolYear . ')' : ''),
         Session::get('loginId') ?? null
     );
 
@@ -447,40 +532,42 @@ public function generateAiInsight(Request $request)
 
 public function reportsExpiredProf()
     {
-        $user = [];
+        $user = null;
     
         if (Session::has('loginId')) {
             $user = User::where('id', '=', Session::get('loginId'))->first();
         }
 
-        $courseAll = Courses::all();
-    
-        // Get the current year
-        $currentYear = now()->year;
-    
-        // Retrieve the selected company or companies
-        $companies = Company::all(); // Get all companies
-    
+        $filters = $this->buildProfessorMoaFilters($user);
+        $courseAll = $filters['courseAll'];
+        $schoolYears = $filters['schoolYears'];
+        $selectedCourse = $filters['selectedCourse'];
+        $selectedSchoolYear = $filters['selectedSchoolYear'];
+
         $stu = Student::all();
-    
-        // Filter companies based on the start year of "school_year"
-    $companies = $companies->filter(function ($company) use ($currentYear) {
-        // Extract the start year from the "school_year" format
-        list($startYear, $endYear) = explode('-', $company->school_year);
-    
-            // Convert them to integers
-            $startYear = (int) $startYear;
-            $endYear = (int) $endYear;
-    
-          
-            return ($currentYear - $startYear) ;
-        })->sortByDesc(function ($company) {
+
+        $companies = Company::all();
+
+        if ($selectedSchoolYear) {
+            $companies = $companies->filter(function ($company) use ($selectedSchoolYear) {
+                return $this->normalizeSchoolYearValue($company->school_year ?? '') === $selectedSchoolYear;
+            });
+        }
+
+        if ($selectedCourse !== '') {
+            $companies = $companies->filter(function ($company) use ($selectedCourse) {
+                return $this->companyMatchesCourse($company, $selectedCourse)
+                    || $company->students()->where('course', $selectedCourse)->exists();
+            });
+        }
+
+        $companies = $companies->sortByDesc(function ($company) {
             return optional($company->created_at)->timestamp ?? $company->id;
         })->values();
-    
+
         $companyNames = $companies->pluck('company_name')->toArray();
 
-        $reportInsights = $this->buildMoaReportInsights($companies, $courseAll->first()->course ?? null);
+        $reportInsights = $this->buildMoaReportInsights($companies, $selectedCourse ?: null);
     
         // Retrieve students under the specified companies using where and get
         // $students = Student::whereHas('companies', function ($query) use ($companyNames, $course) {
@@ -490,39 +577,32 @@ public function reportsExpiredProf()
     
         $companies = $this->annotateMoaFileStatus($companies);
 
-        return view('professor.expiredMOAReports', compact('companies', 'user', 'stu','courseAll', 'reportInsights'));
+        return view('professor.expiredMOAReports', compact('companies', 'user', 'stu', 'courseAll', 'schoolYears', 'selectedCourse', 'selectedSchoolYear', 'reportInsights'));
     }
 
 
     public function generateMOAReportProf(Request $request)
 {
     $validatedData = $request->validate([
-        'school_year_start' => 'required',
-        'school_year_end' => 'required',
+        'school_year' => 'nullable|string',
         'course' => 'required',
     ]);
 
-    $startYear = $validatedData['school_year_start'];
-    $endYear = $validatedData['school_year_end'];
-
-    $schoolYear = $this->normalizeSchoolYearRange($startYear, $endYear);
+    $schoolYear = $this->normalizeSchoolYearValue($validatedData['school_year'] ?? null);
     $user = User::find(Session::get('loginId'));
-    $courseAll = Courses::all();
-    $currentYear = now()->year;
+    $filters = $this->buildProfessorMoaFilters($user);
+    $courseAll = $filters['courseAll'];
+    $schoolYears = $filters['schoolYears'];
+    $selectedCourse = trim((string) $validatedData['course']);
+    $selectedSchoolYear = $schoolYear;
 
-    // Retrieve the selected company or companies
-    $companyy = Company::whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear])
-        ->get();
+    $companies = Company::query();
 
-    $companies = $companyy->filter(function ($company) use ($currentYear, $validatedData) {
-        // Extract the start year from the "school_year" format
-        list($startYear, $endYear) = explode('-', $company->school_year);
+    if ($schoolYear) {
+        $companies->whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear]);
+    }
 
-        // Convert them to integers
-        $startYear = (int) $startYear;
-        $endYear = (int) $endYear;
-
-        
+    $companies = $companies->get()->filter(function ($company) use ($validatedData) {
         if ($this->companyMatchesCourse($company, $validatedData['course'])) {
             return true;
         }
@@ -549,11 +629,11 @@ public function reportsExpiredProf()
     AuditLogger::log(
         'Reports',
         'Generate',
-        'Generated professor MOA report for ' . $validatedData['course'] . ' (' . $schoolYear . ')',
+        'Generated professor MOA report for ' . $validatedData['course'] . ' (' . ($schoolYear ?: 'All school years') . ')',
         Session::get('loginId') ?? null
     );
 
-    return view('professor.expiredMOAReports', compact('companies', 'students', 'user','courseAll', 'reportInsights'));
+    return view('professor.expiredMOAReports', compact('companies', 'students', 'user', 'courseAll', 'schoolYears', 'selectedCourse', 'selectedSchoolYear', 'reportInsights'));
 }
 
     protected function buildStudentReportInsights($studentData, ?string $course = null)

@@ -44,6 +44,14 @@
                 <div class="shell-filter-form">
                     <label for="studentStatusSearch" class="muted-text" style="font-size:13px; font-weight:500;">Search:</label>
                     <input type="search" id="studentStatusSearch" class="shell-filter-input" placeholder="Search student, number, email, or status">
+                    <label for="studentStatusFilter" class="muted-text" style="font-size:13px; font-weight:500;">Status</label>
+                    <select id="studentStatusFilter" class="shell-filter-select">
+                        <option value="all" selected>All statuses</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="in_progress">In progress</option>
+                        <option value="other">Other</option>
+                        <option value="not_sent">Not sent</option>
+                    </select>
                 </div>
             </div>
             <div class="table-wrap history-datatable-wrap">
@@ -64,11 +72,18 @@
                             @php
                                 $studentRequests = $requestsByStudent[$student->id] ?? collect();
                                 $latest = $studentRequests->first();
+                                $statusRank = match ($latest->status ?? null) {
+                                    'submitted' => 0,
+                                    'sent', 'opened' => 1,
+                                    'expired', 'cancelled' => 2,
+                                    null => 3,
+                                    default => 2,
+                                };
                             @endphp
                             <tr>
                                 <td>{{ optional($student->studentInfo)->studentNum ?: '-' }}</td>
                                 <td>{{ $student->full_name }}</td>
-                                <td>
+                                <td data-order="{{ $statusRank }}">
                                     @if($latest)
                                         <span class="badge-like {{ $latest->status === 'submitted' ? 'success' : ($latest->status === 'expired' ? 'secondary' : ($latest->status === 'cancelled' ? 'dark' : 'warning')) }}">
                                             {{ strtoupper($latest->status) }}
@@ -113,6 +128,7 @@
 
         const studentStatusTable = $('#studentStatusTable').DataTable({
             dom: 't<"history-bottom"ip>',
+            order: [[2, 'asc']],
             pageLength: 10,
             lengthMenu: [[10, 25, 50], [10, 25, 50]],
             autoWidth: false,
@@ -130,6 +146,23 @@
 
         $('#studentStatusSearch').on('input', function () {
             studentStatusTable.search(this.value).draw();
+        });
+
+        $('#studentStatusFilter').on('change', function () {
+            const value = this.value;
+            let pattern = '';
+
+            if (value === 'submitted') {
+                pattern = '^SUBMITTED$';
+            } else if (value === 'in_progress') {
+                pattern = '^(SENT|OPENED)$';
+            } else if (value === 'other') {
+                pattern = '^(EXPIRED|CANCELLED)$';
+            } else if (value === 'not_sent') {
+                pattern = '^NOT SENT$';
+            }
+
+            studentStatusTable.column(2).search(pattern, true, false).draw();
         });
     })();
 

@@ -84,6 +84,7 @@
             pointer-events: none;
             filter: grayscale(0.12);
         }
+
     </style>
 
     @if(session('success'))
