@@ -598,7 +598,7 @@ class EvaluationController extends Controller
         ];
 
         if ($isReviewStep) {
-            $rules['signature_file'] = 'required|file|mimes:jpg,jpeg,png,pdf|max:4096';
+            $rules['signature_file'] = 'required|file|mimes:jpg,jpeg,png,pdf|max:30720';
         } else {
             $rules['signature_temp_path'] = 'required|string|max:255';
         }

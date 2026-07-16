@@ -89,7 +89,7 @@ class FileController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|mimes:doc,docx,pdf|max:2048',
+            'file' => 'required|mimes:doc,docx,pdf|max:30720',
             'name' => 'required|string|max:255',
         ]);
 

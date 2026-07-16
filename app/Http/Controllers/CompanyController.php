@@ -420,7 +420,7 @@ public function companyCreate(Request $request)
     $validator = Validator::make($request->all(), [
         'school_year_start' => 'required|integer|digits:4',
         'school_year_end' => 'required|integer|digits:4',
-        'file' => 'required|mimes:pdf|max:2048', // max:2048 is the maximum file size in kilobytes (2 MB)
+        'file' => 'required|mimes:pdf|max:30720', // max:30720 is the maximum file size in kilobytes (30 MB)
     ]);
 
     $validator->after(function ($validator) use ($request) {
@@ -611,7 +611,7 @@ public function companyUpdate(Request $request, $id)
         'company_email' => 'nullable|email|max:255',
         'school_year_start' => 'required|integer|digits:4',
         'school_year_end' => 'required|integer|digits:4',
-        'file' => 'nullable|mimes:pdf|max:2048',
+        'file' => 'nullable|mimes:pdf|max:30720',
     ];
 
     if ($data->role == 0) {

@@ -1412,10 +1412,10 @@
                         <i class="fa fa-paperclip"></i> MOA Document
                     </label>
                     <div class="file-upload-zone" id="moaDropZone">
-                        <input type="file" name="file" id="moaFileInput" data-max-size-mb="2" accept=".pdf,application/pdf" required>
+                        <input type="file" name="file" id="moaFileInput" data-max-size-mb="30" accept=".pdf,application/pdf" required>
                         <i class="fa fa-cloud-upload-alt upload-icon"></i>
                         <p id="moaFileLabel">Click or drag your notarized MOA file here</p>
-                        <span>Supported: PDF only | Max file size: 2 MB</span>
+                        <span>Supported: PDF only | Max file size: 30 MB</span>
                         <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                     </div>
 
@@ -1526,10 +1526,10 @@
                         <i class="fa fa-paperclip"></i> Replace MOA Document
                     </label>
                     <div class="file-upload-zone" id="editMoaDropZone">
-                        <input type="file" name="file" id="editMoaFileInput" data-max-size-mb="2" accept=".pdf,application/pdf">
+                        <input type="file" name="file" id="editMoaFileInput" data-max-size-mb="30" accept=".pdf,application/pdf">
                         <i class="fa fa-cloud-upload-alt upload-icon"></i>
                         <p id="editMoaFileLabel">Leave empty to keep the current notarized MOA PDF</p>
-                        <span>Supported: PDF only | Max file size: 2 MB</span>
+                        <span>Supported: PDF only | Max file size: 30 MB</span>
                         <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                     </div>
                 </div>

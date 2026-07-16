@@ -113,7 +113,7 @@ class User extends Authenticatable
     public function uploadPhoto(Request $request, $email)
 {
     $request->validate([
-        'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:30720',
     ]);
 
     // 1. Resolve user then linked student profile

@@ -97,7 +97,7 @@
                     <div class="section-gap form-group">
                         <label class="form-label-shell">Supervisor Signature (image or PDF) *</label>
                         <input type="file" name="signature_file" class="form-control-shell" accept=".jpg,.jpeg,.png,.pdf" required>
-                        <div class="form-hint">Accepted formats: JPG, PNG, PDF. Max file size: 4 MB.</div>
+                        <div class="form-hint">Accepted formats: JPG, PNG, PDF. Max file size: 30 MB.</div>
                     </div>
 
                     <div class="section-gap stacked-actions">

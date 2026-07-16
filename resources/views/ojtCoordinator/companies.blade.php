@@ -1369,9 +1369,9 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-file-pdf"></i> Attach MOA File <span style="color:var(--red);">*</span></label>
-                        <input class="field-input" type="file" name="file" data-max-size-mb="2" required style="padding:8px 13px;">
+                        <input class="field-input" type="file" name="file" data-max-size-mb="30" required style="padding:8px 13px;">
                         <div style="margin-top:6px; font-size:12px; color:#777;">
-                            PDF only | Max file size: 2 MB
+                            PDF only | Max file size: 30 MB
                         </div>
                         <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                     </div>
@@ -1520,9 +1520,9 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
 
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-file-pdf"></i> Replace MOA File <span style="color:#aaa; font-weight:400;">(Optional)</span></label>
-                        <input class="field-input" type="file" name="file" data-max-size-mb="2" accept="application/pdf" style="padding:8px 13px;">
+                        <input class="field-input" type="file" name="file" data-max-size-mb="30" accept="application/pdf" style="padding:8px 13px;">
                         <div style="font-size:12px; color:#888; margin-top:8px;">Leave this blank to keep the current PDF.</div>
-                        <div style="margin-top:6px; font-size:12px; color:#777;">PDF only | Max file size: 2 MB</div>
+                        <div style="margin-top:6px; font-size:12px; color:#777;">PDF only | Max file size: 30 MB</div>
                         <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                     </div>
 

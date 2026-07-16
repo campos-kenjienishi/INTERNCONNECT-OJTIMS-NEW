@@ -1270,9 +1270,9 @@
                                                     <input class="modal-field-input" type="text" name="name" placeholder="Enter template name" required>
 
                                                     <label class="modal-field-label"><i class="fa fa-paperclip"></i> File</label>
-                                                    <input class="modal-field-input" type="file" name="file" data-max-size-mb="2" accept=".doc,.docx,.pdf" required>
+                                                    <input class="modal-field-input" type="file" name="file" data-max-size-mb="30" accept=".doc,.docx,.pdf" required>
                                                     <div style="margin-top:6px; font-size:12px; color:#777;">
-                                                        Accepted: .doc, .docx, .pdf | Max file size: 2 MB
+                                                        Accepted: .doc, .docx, .pdf | Max file size: 30 MB
                                                     </div>
                                                     <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
 

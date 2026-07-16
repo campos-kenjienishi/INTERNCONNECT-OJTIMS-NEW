@@ -444,7 +444,7 @@ public function fileReqCreate(Request $request){
     $request->validate([
         'fileName' => 'required|string',
         'phase' => 'required|in:basic,other',
-        'file' => 'required|file|mimes:pdf|max:2048',
+        'file' => 'required|file|mimes:pdf|max:30720',
         'uploadedBy' => 'required|string',
         'adviser' => 'required|string',
     ], [

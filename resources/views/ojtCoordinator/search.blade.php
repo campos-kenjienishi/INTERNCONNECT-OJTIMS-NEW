@@ -149,9 +149,9 @@
                                     <input type="text" name="name">
                                 </td>
                             <td>
-                                <input type="file" name="file" data-max-size-mb="2">
+                                <input type="file" name="file" data-max-size-mb="30">
                                 <div style="margin-top:6px; font-size:11px; color:#777;">
-                                    Max file size: 2 MB
+                                    Max file size: 30 MB
                                 </div>
                                 <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:11px; font-weight:600;"></div>
 
@@ -293,8 +293,6 @@
 </body>
 
 </html>
-
-
 
 
 
