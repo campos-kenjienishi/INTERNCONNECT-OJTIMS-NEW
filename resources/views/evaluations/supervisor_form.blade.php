@@ -20,7 +20,7 @@
 
     <div class="card-shell section-gap">
         <div class="card-header-shell">
-            <h2><span class="header-icon"><i class="fa fa-file-signature"></i></span> {{ optional($requestRow->template)->title ?: 'OJT Evaluation Form' }}</h2>
+            <h2><span class="header-icon"><i class="fa fa-shield-alt"></i></span> {{ optional($requestRow->template)->title ?: 'OJT Evaluation Form' }}</h2>
         </div>
         <div class="card-body-shell">
             @if($cancelled ?? false)
@@ -40,11 +40,7 @@
                     <div class="form-hint">Student Number: {{ $requestRow->student_num }}</div>
                 </div>
 
-                <div class="flash-alert info" style="margin-top:0;">
-                    Legitimacy check: Please upload a photo/scan of your signature over your printed name as proof that this evaluation was completed by the supervising officer.
-                </div>
-
-                <form method="POST" action="{{ route('evaluation.form.review', ['token' => $requestRow->token]) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('evaluation.form.review', ['token' => $requestRow->token]) }}">
                     @csrf
 
                     <div class="form-grid">
@@ -94,10 +90,13 @@
                         @endforeach
                     </div>
 
-                    <div class="section-gap form-group">
-                        <label class="form-label-shell">Supervisor Signature (image or PDF) *</label>
-                        <input type="file" name="signature_file" class="form-control-shell" accept=".jpg,.jpeg,.png,.pdf" required>
-                        <div class="form-hint">Accepted formats: JPG, PNG, PDF. Max file size: 30 MB.</div>
+                    <div class="section-gap form-group" style="padding:16px; border:1px solid #d9e2f2; border-radius:14px; background:#f8fbff;">
+                        <label style="display:flex; gap:12px; align-items:flex-start; cursor:pointer; line-height:1.55;">
+                            <input type="checkbox" name="supervisor_confirmation" value="1" {{ old('supervisor_confirmation') ? 'checked' : '' }} required style="margin-top:4px; transform:scale(1.1);">
+                            <span style="font-size:14px; color:#24324a;">
+                                By submitting this evaluation form, I confirm that I am the authorized Company supervisor of the above-named student and that I have personally completed this evaluation. I certify that all information provided is accurate and based on my own evaluation.
+                            </span>
+                        </label>
                     </div>
 
                     <div class="section-gap stacked-actions">

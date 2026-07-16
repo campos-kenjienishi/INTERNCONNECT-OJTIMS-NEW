@@ -15,12 +15,15 @@ class OjtEvaluation extends Model
         'supervisor_name',
         'responses_json',
         'comments',
-        'signature_path',
+        'supervisor_confirmation',
         'submitted_at',
+        'released_to_student_at',
     ];
 
     protected $casts = [
+        'supervisor_confirmation' => 'boolean',
         'submitted_at' => 'datetime',
+        'released_to_student_at' => 'datetime',
     ];
 
     public function request()

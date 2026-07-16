@@ -52,14 +52,9 @@
 
             <div class="section-gap">
                 <div class="form-group">
-                    <label class="form-label-shell">Signature Proof</label>
-                    <div class="summary-card">
-                        @if(!empty($signaturePreviewDataUri) && str_starts_with($signaturePreviewMime, 'image/'))
-                            <img src="{{ $signaturePreviewDataUri }}" alt="Supervisor Signature" style="max-width:100%; width:420px; border:1px solid #ddd; border-radius:10px;">
-                        @elseif(!empty($signaturePreviewDataUri))
-                            <iframe src="{{ $signaturePreviewDataUri }}" title="Supervisor Signature" style="width:100%; height:420px; border:1px solid #ddd; border-radius:10px; background:#fff;"></iframe>
-                        @endif
-                        <div class="form-hint" style="margin-top:10px;">{{ $signatureOriginalName }}</div>
+                    <label class="form-label-shell">Supervisor Confirmation</label>
+                    <div class="summary-card" style="white-space: pre-line;">
+                        {{ $validated['supervisor_confirmation'] ? 'Confirmed: the supervisor acknowledged they are authorized and personally completed this evaluation.' : 'No confirmation recorded.' }}
                     </div>
                 </div>
             </div>
@@ -69,7 +64,7 @@
                     @csrf
                     <input type="hidden" name="supervisor_name" value="{{ $validated['supervisor_name'] }}">
                     <input type="hidden" name="comments" value="{{ $validated['comments'] ?? '' }}">
-                    <input type="hidden" name="signature_temp_path" value="{{ $signatureTempPath }}">
+                    <input type="hidden" name="supervisor_confirmation" value="1">
                     @foreach($requestRow->template->items as $item)
                         @if($item->input_type === 'rating')
                             <input type="hidden" name="rating_{{ $item->id }}" value="{{ $validated['rating_' . $item->id] ?? '' }}">

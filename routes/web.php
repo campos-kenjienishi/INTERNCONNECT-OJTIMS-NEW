@@ -190,6 +190,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::get('/professor/evaluation/history/{studentId}', [EvaluationController::class, 'professorStudentHistory'])->name('professor.evaluation.history');
     Route::put('/professor/evaluation/template/{templateId}', [EvaluationController::class, 'updateTemplate'])->name('professor.evaluation.template.update');
     Route::get('/professor/evaluation/{requestId}', [EvaluationController::class, 'professorShowEvaluation'])->name('professor.evaluation.show');
+    Route::post('/professor/evaluation/{requestId}/release', [EvaluationController::class, 'releaseEvaluationToStudent'])->name('professor.evaluation.release');
 });
 
 // ─── SHARED: ALL AUTHENTICATED USERS (roles 0, 1 & 2) ──────────────

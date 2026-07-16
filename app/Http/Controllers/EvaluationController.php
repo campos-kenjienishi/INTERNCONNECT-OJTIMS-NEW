@@ -495,11 +495,6 @@ class EvaluationController extends Controller
 
         $validated = $this->validateSupervisorPayload($request, $requestRow, true);
 
-        $signatureFile = $request->file('signature_file');
-        $signatureTempPath = $signatureFile->store('evaluation-signatures/tmp', 'public');
-        $signatureOriginalName = $signatureFile->getClientOriginalName();
-        $signaturePreview = $this->buildSignaturePreviewDataUri($signatureTempPath);
-
         $responses = [];
         foreach ($requestRow->template->items as $item) {
             if ($item->input_type === 'rating') {
@@ -516,10 +511,6 @@ class EvaluationController extends Controller
             'requestRow' => $requestRow,
             'validated' => $validated,
             'responses' => $responses,
-            'signatureTempPath' => $signatureTempPath,
-            'signaturePreviewDataUri' => $signaturePreview['dataUri'],
-            'signaturePreviewMime' => $signaturePreview['mime'],
-            'signatureOriginalName' => $signatureOriginalName,
         ]);
     }
 
@@ -546,11 +537,6 @@ class EvaluationController extends Controller
 
         $validated = $this->validateSupervisorPayload($request, $requestRow, false);
 
-        $signaturePath = $this->persistSignatureFromTemp($validated['signature_temp_path']);
-        if (!$signaturePath) {
-            return back()->with('error', 'Signature upload was not found. Please go back and upload the signature again.');
-        }
-
         $responses = [];
         foreach ($requestRow->template->items as $item) {
             if ($item->input_type === 'rating') {
@@ -570,8 +556,9 @@ class EvaluationController extends Controller
                 'supervisor_name' => $validated['supervisor_name'],
                 'responses_json' => json_encode($responses),
                 'comments' => $validated['comments'] ?? null,
-                'signature_path' => $signaturePath,
+                'supervisor_confirmation' => (bool) ($validated['supervisor_confirmation'] ?? false),
                 'submitted_at' => now(),
+                'released_to_student_at' => null,
             ]
         );
 
@@ -595,13 +582,8 @@ class EvaluationController extends Controller
         $rules = [
             'supervisor_name' => 'required|string|max:255',
             'comments' => 'nullable|string',
+            'supervisor_confirmation' => 'accepted',
         ];
-
-        if ($isReviewStep) {
-            $rules['signature_file'] = 'required|file|mimes:jpg,jpeg,png,pdf|max:30720';
-        } else {
-            $rules['signature_temp_path'] = 'required|string|max:255';
-        }
 
         foreach ($requestRow->template->items as $item) {
             if ($item->input_type === 'rating') {
@@ -610,45 +592,6 @@ class EvaluationController extends Controller
         }
 
         return $request->validate($rules);
-    }
-
-    protected function persistSignatureFromTemp($tempPath)
-    {
-        $normalizedPath = str_replace('\\', '/', (string) $tempPath);
-        if (!Str::startsWith($normalizedPath, 'evaluation-signatures/tmp/')) {
-            return null;
-        }
-
-        if (!Storage::disk('public')->exists($normalizedPath)) {
-            return null;
-        }
-
-        $extension = pathinfo($normalizedPath, PATHINFO_EXTENSION) ?: 'png';
-        $finalPath = 'evaluation-signatures/' . Str::uuid() . '.' . strtolower($extension);
-        Storage::disk('public')->move($normalizedPath, $finalPath);
-
-        return $finalPath;
-    }
-
-    protected function buildSignaturePreviewDataUri(?string $path): array
-    {
-        if (empty($path)) {
-            return ['dataUri' => null, 'mime' => null];
-        }
-
-        $normalizedPath = str_replace('\\', '/', (string) $path);
-        if (!Storage::disk('public')->exists($normalizedPath)) {
-            return ['dataUri' => null, 'mime' => null];
-        }
-
-        $absolutePath = storage_path('app/public/' . $normalizedPath);
-        $mime = @mime_content_type($absolutePath) ?: 'application/octet-stream';
-        $content = Storage::disk('public')->get($normalizedPath);
-
-        return [
-            'dataUri' => 'data:' . $mime . ';base64,' . base64_encode($content),
-            'mime' => $mime,
-        ];
     }
 
     protected function getExpectedSupervisorEmail($student)
@@ -681,13 +624,13 @@ class EvaluationController extends Controller
             return back()->with('error', 'Evaluation is not submitted yet.');
         }
 
-        $signaturePreview = $this->buildSignaturePreviewDataUri($requestRow->evaluation->signature_path);
+        if (empty($requestRow->evaluation->released_to_student_at)) {
+            abort(403, 'The professor has not released this evaluation to the student yet.');
+        }
 
         return view('evaluations.detail', [
             'requestRow' => $requestRow,
             'evaluation' => $requestRow->evaluation,
-            'signaturePreviewDataUri' => $signaturePreview['dataUri'],
-            'signaturePreviewMime' => $signaturePreview['mime'],
             'isProfessorView' => false,
             'backUrl' => '/student/evaluation',
         ]);
@@ -721,8 +664,6 @@ class EvaluationController extends Controller
             return back()->with('error', 'Evaluation is not submitted yet.');
         }
 
-        $signaturePreview = $this->buildSignaturePreviewDataUri($requestRow->evaluation->signature_path);
-
         AuditLogger::log(
             'Evaluation',
             'view',
@@ -733,11 +674,52 @@ class EvaluationController extends Controller
         return view('evaluations.detail', [
             'requestRow' => $requestRow,
             'evaluation' => $requestRow->evaluation,
-            'signaturePreviewDataUri' => $signaturePreview['dataUri'],
-            'signaturePreviewMime' => $signaturePreview['mime'],
             'isProfessorView' => true,
             'backUrl' => '/professor/evaluation/class/' . $class->id,
         ]);
+    }
+
+    public function releaseEvaluationToStudent($requestId)
+    {
+        $user = User::where('id', Session::get('loginId'))->first();
+        if (!$user) {
+            return redirect('/login');
+        }
+
+        $requestRow = OjtEvaluationRequest::with(['evaluation', 'student.studentInfo'])
+            ->where('id', $requestId)
+            ->firstOrFail();
+
+        $student = $requestRow->student;
+        if (!$student || !$student->studentInfo) {
+            abort(403);
+        }
+
+        $class = Classes::where('id', $student->studentInfo->class_id)
+            ->where('adviser_name', $user->full_name)
+            ->first();
+
+        if (!$class) {
+            abort(403);
+        }
+
+        if (!$requestRow->evaluation) {
+            return back()->with('error', 'Evaluation is not submitted yet.');
+        }
+
+        if (empty($requestRow->evaluation->released_to_student_at)) {
+            $requestRow->evaluation->released_to_student_at = now();
+            $requestRow->evaluation->save();
+        }
+
+        AuditLogger::log(
+            'Evaluation',
+            'update',
+            'Professor released evaluation to student: ' . ($requestRow->student_name ?: optional($student)->full_name),
+            $user->id
+        );
+
+        return back()->with('success', 'Evaluation released to the student.');
     }
 
     public function professorStudentHistory($studentId)

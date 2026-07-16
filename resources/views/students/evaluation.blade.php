@@ -51,6 +51,39 @@
             border-right: 1px solid #fdba74;
             transform: rotate(45deg);
         }
+
+        .permission-bubble-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .permission-bubble-wrap .field-bubble-shell {
+            left: 50%;
+            right: auto;
+            bottom: calc(100% + 10px);
+            width: min(260px, 68vw);
+            transform: translate(-50%, 4px);
+        }
+
+        .permission-bubble-wrap .field-bubble-shell::before {
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+        }
+
+        .permission-bubble-wrap:hover .field-bubble-shell,
+        .permission-bubble-wrap:focus-within .field-bubble-shell {
+            visibility: visible;
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .btn-eval.is-disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(0.12);
+        }
     </style>
 
     @if(session('success'))
@@ -165,9 +198,20 @@
                                 <td>
                                     <div class="stacked-actions">
                                         @if($row->status === 'submitted' && $row->evaluation)
-                                            <a href="{{ route('student.evaluation.show', ['requestId' => $row->id]) }}" class="btn-eval btn-eval-outline">
-                                                <i class="fa fa-eye"></i> View
-                                            </a>
+                                            @if(!empty($row->evaluation->released_to_student_at))
+                                                <a href="{{ route('student.evaluation.show', ['requestId' => $row->id]) }}" class="btn-eval btn-eval-outline">
+                                                    <i class="fa fa-eye"></i> View
+                                                </a>
+                                            @else
+                                                <div class="permission-bubble-wrap" tabindex="0">
+                                                    <span class="btn-eval btn-eval-outline is-disabled" aria-disabled="true">
+                                                        <i class="fa fa-lock"></i> Locked
+                                                    </span>
+                                                    <div class="field-bubble-shell">
+                                                        The professor has not released this evaluation for student viewing yet.
+                                                    </div>
+                                                </div>
+                                            @endif
                                         @else
                                             @if($row->status !== 'cancelled')
                                                 <form action="{{ route('student.evaluation.resend', ['requestId' => $row->id]) }}" method="POST" class="no-print">

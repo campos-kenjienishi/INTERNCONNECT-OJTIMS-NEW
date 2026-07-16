@@ -101,17 +101,54 @@
 
     <div class="card-shell section-gap">
         <div class="card-header-shell">
-            <h2><span class="header-icon"><i class="fa fa-signature"></i></span> Supervisor Signature Proof</h2>
+            <h2><span class="header-icon"><i class="fa fa-shield-alt"></i></span> Supervisor Confirmation</h2>
+            @if($evaluation->released_to_student_at)
+                <span class="badge-like success">Released to student</span>
+            @elseif($isProfessorView)
+                <span class="badge-like warning">Private until released</span>
+            @endif
         </div>
         <div class="card-body-shell">
-            @if(!empty($evaluation->signature_path) && !empty($signaturePreviewDataUri))
-                @if(!empty($signaturePreviewMime) && str_starts_with($signaturePreviewMime, 'image/'))
-                    <img src="{{ $signaturePreviewDataUri }}" alt="Supervisor Signature" style="max-width:100%; width:460px; border:1px solid #ddd; border-radius:10px;">
-                @else
-                    <iframe src="{{ $signaturePreviewDataUri }}" title="Supervisor Signature" style="width:100%; min-height:420px; border:1px solid #ddd; border-radius:10px; background:#fff;"></iframe>
-                @endif
+            @if(!empty($evaluation->supervisor_confirmation))
+                <div class="summary-card" style="display:flex; flex-direction:column; gap:12px; padding:18px 20px;">
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <span class="badge-like success" style="padding:8px 14px; border-radius:999px;">
+                            <i class="fa fa-check-circle"></i> Confirmed
+                        </span>
+                        @if($evaluation->released_to_student_at)
+                            <span class="badge-like secondary" style="padding:8px 14px; border-radius:999px;">
+                                Released {{ optional($evaluation->released_to_student_at)->format('M d, Y') }}
+                            </span>
+                        @endif
+                    </div>
+                    <div class="value" style="font-size:16px; line-height:1.6; max-width: 56ch;">
+                        Supervisor attestation was recorded before submission and is ready for professor review.
+                    </div>
+                    @if($isProfessorView)
+                        <div class="form-hint" style="margin-top:-2px;">
+                            Keep it private until you release it to the student.
+                        </div>
+                    @endif
+                </div>
             @else
-                <p class="muted-text">No signature proof uploaded.</p>
+                <p class="muted-text">No supervisor confirmation recorded.</p>
+            @endif
+
+            @if($isProfessorView)
+                <div class="section-gap no-print">
+                    @if(empty($evaluation->released_to_student_at))
+                        <form method="POST" action="{{ route('professor.evaluation.release', ['requestId' => $requestRow->id]) }}">
+                            @csrf
+                            <button type="submit" class="btn-eval btn-eval-primary">
+                                <i class="fa fa-paper-plane"></i> Release to Student
+                            </button>
+                        </form>
+                    @else
+                        <div class="flash-alert success" style="margin-bottom:0;">
+                            Released to student on {{ optional($evaluation->released_to_student_at)->format('M d, Y h:i A') }}.
+                        </div>
+                    @endif
+                </div>
             @endif
         </div>
     </div>
