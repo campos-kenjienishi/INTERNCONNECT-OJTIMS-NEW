@@ -315,7 +315,7 @@ public function home()
             $class = [];
 
             // Check if $data is not empty before accessing the property
-            if (!empty($data) && isset($data->adviser_name)) {
+            if (!empty($data) && !empty($data->adviser_name) && $data->adviser_name !== 'Not Yet Listed') {
                 $classQuery = Classes::where('adviser_name', $data->adviser_name)
                     ->where('course', $data->course);
 
@@ -426,10 +426,61 @@ public function home()
         );
         
 
+        $professors = Professor::all();
+
     // Pass the $professor and $students variables to the view
-    return view('students.student_class', compact('data', 'course', 'class', 'currentClass', 'announce', 'sched', 'roomTemplates'));
+    return view('students.student_class', compact('data', 'course', 'class', 'currentClass', 'announce', 'sched', 'roomTemplates', 'professors'));
 
 
+}
+
+public function updateProfessor(Request $request)
+{
+    $sessionCheck = $this->requireStudentSession();
+
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
+    }
+
+    $user = $sessionCheck;
+
+    $request->validate([
+        'adviser_name' => ['required', 'string', 'max:255', 'not_in:Not Yet Listed'],
+    ], [
+        'adviser_name.required' => 'Please select a professor.',
+        'adviser_name.not_in' => 'Please select a valid professor.',
+    ]);
+
+    $student = Student::where('user_id', $user->id)->first();
+    if (!$student) {
+        $student = new Student();
+        $student->user_id = $user->id;
+    }
+
+    $student->adviser_name = $request->adviser_name;
+    $student->save();
+
+    if (Schema::hasColumn('students', 'class_id') && !empty($student->adviser_name) && $student->adviser_name !== 'Not Yet Listed') {
+        $matchingClass = Classes::where('adviser_name', $student->adviser_name)
+            ->where('course', $student->course)
+            ->latest('created_at')
+            ->first();
+        if ($matchingClass) {
+            $student->class_id = $matchingClass->id;
+            $student->save();
+            $user->status = 3;
+            $user->save();
+        }
+    }
+
+    AuditLogger::log(
+        'Student Account',
+        'update',
+        'Updated professor to: ' . $student->adviser_name,
+        $user->id
+    );
+
+    return back()->with('success', 'Professor updated successfully!');
 }
 
 

@@ -949,6 +949,18 @@
             </div>
         </div>
         
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius:12px; margin-bottom:20px;">
+                <i class="fa fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if (session('fail') || session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius:12px; margin-bottom:20px;">
+                <i class="fa fa-exclamation-circle me-2"></i> {{ session('fail') ?? session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
         <!-- Rooms Table Card -->
         <div class="table-card">
@@ -1031,6 +1043,29 @@
                                 <i class="fa fa-sign-out-alt"></i> Leave
                             </button>
                         </div>
+                    </div>
+                @elseif (empty($data->adviser_name) || $data->adviser_name === 'Not Yet Listed')
+                    <div class="empty-state" style="padding: 36px 20px;">
+                        <div class="empty-icon-wrap" style="background:#fff3ed; color:#e65100;">
+                            <i class="fa fa-user-clock"></i>
+                        </div>
+                        <h3 style="font-size:18px; font-weight:700; color:#1a1a1a; margin-top:12px;">Choose a Professor First</h3>
+                        <p style="color:#666; max-width:500px; margin:8px auto 20px; line-height:1.5;">
+                            You selected <strong>Not Yet Listed</strong> (or haven't assigned a professor yet). You cannot access or join a class without an assigned professor.
+                        </p>
+                        <form action="{{ route('student.updateProfessor') }}" method="POST" style="max-width:420px; margin:0 auto; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                            @csrf
+                            @method('PUT')
+                            <select name="adviser_name" class="form-select" style="flex:1; min-width:220px; padding:10px 14px; border-radius:10px; border:1px solid #d1d5db;" required>
+                                <option value="">Select your Professor</option>
+                                @foreach($professors as $prof)
+                                    <option value="{{ $prof->full_name }}">{{ $prof->full_name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="btn btn-danger" style="background:var(--red); border:none; padding:10px 24px; border-radius:10px; font-weight:600;">
+                                <i class="fa fa-save"></i> Save Professor
+                            </button>
+                        </form>
                     </div>
                 @elseif ($class->isEmpty())
                     <div class="empty-state">

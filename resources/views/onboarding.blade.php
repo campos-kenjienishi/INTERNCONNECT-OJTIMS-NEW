@@ -307,8 +307,9 @@
                                 <label class="form-label">Professor</label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-chalkboard-teacher i-icon"></i>
-                                    <select name="adviser_name" class="form-control" required>
+                                    <select name="adviser_name" class="form-control">
                                         <option value="">Select Professor</option>
+                                        <option value="Not Yet Listed">Not Yet Listed</option>
                                         @foreach($professors as $prof)
                                             <option value="{{ $prof->full_name }}">{{ $prof->full_name }}</option>
                                         @endforeach
