@@ -815,10 +815,10 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-file-word"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-file-alt"></i></div>
                 <div>
-                    <div class="stat-num">DOCX</div>
-                    <div class="stat-name">Accepted Format</div>
+                    <div class="stat-num" style="font-size: 16px;">DOC, PDF, XLS</div>
+                    <div class="stat-name">Accepted Formats</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -870,7 +870,15 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <td>
                                 <div class="file-cell">
                                     <div class="file-icon-box">
-                                        <i class="fa fa-file-word"></i>
+                                        @php
+                                            $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
+                                            $iconClass = match($ext) {
+                                                'pdf' => 'fa-file-pdf',
+                                                'xls', 'xlsx' => 'fa-file-excel',
+                                                default => 'fa-file-word',
+                                            };
+                                        @endphp
+                                        <i class="fa {{ $iconClass }}"></i>
                                     </div>
                                     <div>
                                         <div class="file-name-text">{{ $file->name }}</div>
@@ -959,16 +967,16 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
                     <div class="field-group">
                         <label class="field-label">
-                            <i class="fa fa-file-word"></i> Choose File
+                            <i class="fa fa-file-alt"></i> Choose File
                         </label>
                         <div class="file-dropzone" id="dropzone">
                             <input type="file" name="file" id="fileInput" data-max-size-mb="30"
-                                   accept=".doc,.docx" required>
+                                   accept=".doc,.docx,.pdf,.xls,.xlsx" required>
                             <div class="file-dropzone-icon">
                                 <i class="fa fa-cloud-upload-alt"></i>
                             </div>
                             <div class="file-dropzone-title">Click or drag to upload</div>
-                            <div class="file-dropzone-sub">Accepted: .doc, .docx files only | Max file size: 30 MB</div>
+                            <div class="file-dropzone-sub">Accepted: .doc, .docx, .pdf, .xls, .xlsx | Max file size: 30 MB</div>
                             <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                             <div class="file-dropzone-name" id="selectedFileName"></div>
                         </div>
