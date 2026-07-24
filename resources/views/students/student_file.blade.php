@@ -537,11 +537,34 @@
             .btn-download:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 18px rgba(37,99,235,0.3);
+            .btn-download:active { transform: translateY(0); }
+
+            .btn-view {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                border: none;
+                border-radius: 8px;
+                color: #fff;
+                font-family: 'Poppins', sans-serif;
+                font-size: 12.5px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                transition: all 0.25s;
+                box-shadow: 0 3px 10px rgba(5,150,105,0.2);
+            }
+
+            .btn-view:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 18px rgba(5,150,105,0.3);
                 color: #fff;
                 text-decoration: none;
             }
 
-            .btn-download:active { transform: translateY(0); }
+            .btn-view:active { transform: translateY(0); }
 
             /* Date badge */
             .date-cell {
@@ -887,9 +910,16 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="{{ url('/download', $file->file) }}" class="btn-download">
-                                        <i class="fa fa-download"></i> Download
-                                    </a>
+                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                        @if(in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                            <a href="{{ url('/view/file', $file->file) }}" target="_blank" rel="noopener noreferrer" class="btn-view">
+                                                <i class="fa fa-eye"></i> View
+                                            </a>
+                                        @endif
+                                        <a href="{{ url('/download', $file->file) }}" class="btn-download">
+                                            <i class="fa fa-download"></i> Download
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach

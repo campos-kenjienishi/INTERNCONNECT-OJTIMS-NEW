@@ -812,6 +812,28 @@
             text-decoration: none;
         }
 
+        .btn-template-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #059669;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-template-view:hover {
+            background: #059669;
+            border-color: #059669;
+            color: #fff;
+            text-decoration: none;
+        }
+
         .btn-remove-template {
             border: none;
             background: #fee2e2;
@@ -1413,6 +1435,14 @@
                                                                                 <span class="template-list-name">{{ $template->name }}</span>
                                                                             </div>
                                                                             <div class="template-list-actions">
+                                                                                 @php
+                                                                                     $templateExt = strtolower(pathinfo($template->file, PATHINFO_EXTENSION));
+                                                                                 @endphp
+                                                                                 @if(in_array($templateExt, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                                                                     <a href="{{ url('/view/file', $template->file) }}" target="_blank" rel="noopener noreferrer" class="btn-template-view">
+                                                                                         <i class="fa fa-eye"></i> View
+                                                                                     </a>
+                                                                                 @endif
                                                                                 <a href="{{ url('/download', $template->file) }}" class="btn-template-download">
                                                                                     <i class="fa fa-download"></i> Download
                                                                                 </a>

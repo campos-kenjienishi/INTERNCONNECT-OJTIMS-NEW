@@ -200,6 +200,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
 
 Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::get('/download/{file}', [FileController::class,'download']);
+    Route::get('/view/file/{file}', [FileController::class, 'viewFile'])->name('template.view');
     Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::post('/change_password/verify-current/{id}', [AccountInfo::class,'verifyCurrentPassword']);
     Route::post('/announcements', [AnnouncementController::class,'announcement']);

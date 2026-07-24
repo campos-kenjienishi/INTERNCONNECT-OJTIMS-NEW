@@ -384,6 +384,23 @@
             color: #fff; text-decoration: none;
         }
 
+        .btn-view {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 8px;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border: none; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 12px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(5,150,105,0.2);
+            text-decoration: none;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+            color: #fff; text-decoration: none;
+        }
+
         .btn-remove {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 14px; border-radius: 8px;
@@ -904,6 +921,14 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <!-- Actions -->
                             <td>
                                 <div class="actions-wrap">
+                                    @if(in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                        <a class="btn-view"
+                                           href="{{ url('/view/file', $file->file) }}"
+                                           target="_blank" rel="noopener noreferrer">
+                                            <i class="fa fa-eye"></i> View
+                                        </a>
+                                    @endif
+
                                     <a class="btn-download btn-dl-item"
                                        href="{{ url('/download', $file->file) }}">
                                         <i class="fa fa-download"></i> Download

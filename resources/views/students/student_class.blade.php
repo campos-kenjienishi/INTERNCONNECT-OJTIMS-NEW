@@ -1320,9 +1320,19 @@
                                 {{ \Carbon\Carbon::parse($template->created_at)->format('M d, Y h:i A') }}
                             </td>
                             <td>
-                                <a href="{{ url('/download', $template->file) }}" class="btn-view-action">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
+                                @php
+                                    $templateExt = strtolower(pathinfo($template->file, PATHINFO_EXTENSION));
+                                @endphp
+                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                    @if(in_array($templateExt, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                        <a href="{{ url('/view/file', $template->file) }}" target="_blank" rel="noopener noreferrer" class="btn-view-action" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                                            <i class="fa fa-eye"></i> View
+                                        </a>
+                                    @endif
+                                    <a href="{{ url('/download', $template->file) }}" class="btn-view-action">
+                                        <i class="fa fa-download"></i> Download
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
