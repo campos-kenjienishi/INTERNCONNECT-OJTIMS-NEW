@@ -834,6 +834,13 @@
             text-decoration: none;
         }
 
+        #filePreviewModal {
+            z-index: 105000 !important;
+        }
+        .modal-backdrop.show {
+            z-index: 104990 !important;
+        }
+
         .btn-remove-template {
             border: none;
             background: #fee2e2;
@@ -2322,6 +2329,9 @@
             $('#filePreviewFrame').attr('src', fileUrl);
 
             var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl && modalEl.parentNode !== document.body) {
+                document.body.appendChild(modalEl);
+            }
             var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.show();
         });

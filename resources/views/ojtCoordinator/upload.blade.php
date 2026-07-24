@@ -401,6 +401,13 @@
             color: #fff; text-decoration: none;
         }
 
+        #filePreviewModal {
+            z-index: 105000 !important;
+        }
+        .modal-backdrop.show {
+            z-index: 104990 !important;
+        }
+
         .btn-remove {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 14px; border-radius: 8px;
@@ -1147,6 +1154,9 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             $('#filePreviewFrame').attr('src', fileUrl);
 
             var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl && modalEl.parentNode !== document.body) {
+                document.body.appendChild(modalEl);
+            }
             var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.show();
         });

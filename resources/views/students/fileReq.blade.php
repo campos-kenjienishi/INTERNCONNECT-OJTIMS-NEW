@@ -974,6 +974,13 @@
             overflow: visible;
         }
 
+        #previewModal, #filePreviewModal {
+            z-index: 105000 !important;
+        }
+        .modal-backdrop.show {
+            z-index: 104990 !important;
+        }
+
         .upload-modal-left {
             display: grid;
             gap: 14px;
@@ -2023,8 +2030,12 @@
                                 $('#previewFallback').show();
                                 $('#previewBadge').addClass('no-preview').html('<i class="fa fa-file-download"></i> No preview available');
                             }
-                            var previewModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('previewModal'));
-                            previewModal.show();
+                             var modalEl = document.getElementById('previewModal');
+                             if (modalEl && modalEl.parentNode !== document.body) {
+                                 document.body.appendChild(modalEl);
+                             }
+                             var previewModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                             previewModal.show();
                         });
 
                         document.getElementById('previewModal').addEventListener('hidden.bs.modal', function () {

@@ -847,6 +847,13 @@
     color: #fff !important;
     text-decoration: none;
 }
+
+#filePreviewModal {
+    z-index: 105000 !important;
+}
+.modal-backdrop.show {
+    z-index: 104990 !important;
+}
  
 .template-file-badge {
     display: inline-flex;
@@ -1636,6 +1643,9 @@
         $('#filePreviewFrame').attr('src', fileUrl);
 
         var modalEl = document.getElementById('filePreviewModal');
+        if (modalEl && modalEl.parentNode !== document.body) {
+            document.body.appendChild(modalEl);
+        }
         var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
     });

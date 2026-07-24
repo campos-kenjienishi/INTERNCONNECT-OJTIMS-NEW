@@ -570,6 +570,13 @@
 
             .btn-view:active { transform: translateY(0); }
 
+            #filePreviewModal {
+                z-index: 105000 !important;
+            }
+            .modal-backdrop.show {
+                z-index: 104990 !important;
+            }
+
             /* Date badge */
             .date-cell {
                 font-size: 13px;
@@ -999,6 +1006,9 @@
             $('#filePreviewFrame').attr('src', fileUrl);
 
             var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl && modalEl.parentNode !== document.body) {
+                document.body.appendChild(modalEl);
+            }
             var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.show();
         });
