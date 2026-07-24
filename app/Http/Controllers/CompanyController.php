@@ -442,12 +442,14 @@ public function companyCreate(Request $request)
         $request->validate([
             'course' => 'required|array|min:1',
             'course.*' => 'required|exists:courses,course',
+            'date_notarized' => 'nullable|date',
             'valid_until' => 'required|date',
         ]);
     }
 
     if ($data->role == 0) {
         $request->validate([
+            'date_notarized' => 'nullable|date',
             'valid_until' => 'required|date',
         ]);
     }
@@ -486,6 +488,7 @@ public function companyCreate(Request $request)
 
     // Set the uploader_name field based on the logged-in user's name
     $com->uploader_name = $data->full_name;
+    $com->date_notarized = $request->input('date_notarized');
     $com->valid_until = $expirationDate;
 
     
@@ -612,6 +615,7 @@ public function companyUpdate(Request $request, $id)
         'school_year_start' => 'required|integer|digits:4',
         'school_year_end' => 'required|integer|digits:4',
         'file' => 'nullable|mimes:pdf|max:30720',
+        'date_notarized' => 'nullable|date',
     ];
 
     if ($data->role == 0) {
@@ -647,6 +651,7 @@ public function companyUpdate(Request $request, $id)
         'company_email' => $company->company_email,
         'school_year' => $company->school_year,
         'course' => $company->course,
+        'date_notarized' => $company->date_notarized,
         'student_names_display' => $company->student_names_display ?? null,
     ];
 
@@ -658,6 +663,7 @@ public function companyUpdate(Request $request, $id)
     $startYear = $request->input('school_year_start');
     $endYear = $request->input('school_year_end');
     $company->school_year = $startYear . '-' . $endYear;
+    $company->date_notarized = $request->input('date_notarized');
     $company->valid_until = $request->input('valid_until');
 
     if ($data->role != 0) {

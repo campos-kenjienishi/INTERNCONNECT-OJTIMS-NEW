@@ -1162,6 +1162,7 @@
                                             data-company-no="{{ e($company->companyNo) }}"
                                             data-company-email="{{ e($company->company_email) }}"
                                             data-school-year="{{ e($company->school_year) }}"
+                                            data-date-notarized="{{ $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('Y-m-d') : '' }}"
                                             data-valid-until="{{ $company->valid_until ? \Carbon\Carbon::parse($company->valid_until)->format('Y-m-d') : '' }}"
                                             data-file-name="{{ e($company->file) }}"
                                             onclick="openEditMoaModal(this)">
@@ -1374,6 +1375,14 @@
                                 </select>
                             </div>
 
+                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                                <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Select the date when the MOA was notarized.
+                                </span>
+                            </label>
+                            <input class="modal-field-input" type="date" name="date_notarized">
+
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
                                 <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
@@ -1493,6 +1502,14 @@
                                 <span class="sep">-</span>
                                 <select name="school_year_end" id="editSchoolYearEnd" class="modal-field-input" required></select>
                             </div>
+
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                                <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Select the date when the MOA was notarized.
+                                </span>
+                            </label>
+                            <input class="modal-field-input" type="date" name="date_notarized" id="editDateNotarized">
 
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
                                 <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
@@ -1725,6 +1742,7 @@
         document.getElementById('editCompanyEmail').value = button.dataset.companyEmail || '';
         document.getElementById('editSchoolYearStart').value = schoolYear[0] || '';
         syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd', schoolYear[1] || '');
+        document.getElementById('editDateNotarized').value = button.dataset.dateNotarized || '';
         document.getElementById('editValidUntil').value = button.dataset.validUntil || '';
         document.getElementById('editMoaFileInput').value = '';
         document.getElementById('editMoaFileLabel').textContent = 'Leave empty to keep the current notarized MOA PDF';

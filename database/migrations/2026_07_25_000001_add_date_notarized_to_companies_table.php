@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        if (Schema::hasTable('companies') && !Schema::hasColumn('companies', 'date_notarized')) {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->string('date_notarized')->nullable()->default(null)->after('valid_until');
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        if (Schema::hasTable('companies') && Schema::hasColumn('companies', 'date_notarized')) {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->dropColumn('date_notarized');
+            });
+        }
+    }
+};
