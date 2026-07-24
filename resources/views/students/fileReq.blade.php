@@ -975,10 +975,7 @@
         }
 
         #previewModal, #filePreviewModal {
-            z-index: 105000 !important;
-        }
-        .modal-backdrop.show {
-            z-index: 104990 !important;
+            z-index: 1070 !important;
         }
 
         .upload-modal-left {
