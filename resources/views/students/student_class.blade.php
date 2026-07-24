@@ -808,7 +808,7 @@
     background: #eff6ff;
     border: 1.5px solid #bfdbfe;
     border-radius: 8px;
-    color: #2563eb;
+    color: #2563eb !important;
     font-family: 'Poppins', sans-serif;
     font-size: 12.5px;
     font-weight: 600;
@@ -816,11 +816,35 @@
     transition: all 0.25s;
     text-decoration: none;
 }
- 
+
 .btn-view-action:hover {
     border-color: #2563eb;
-    color: #fff;
+    color: #fff !important;
     background: #2563eb;
+    text-decoration: none;
+}
+
+.btn-view-green {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #ecfdf5;
+    border: 1.5px solid #a7f3d0;
+    border-radius: 8px;
+    color: #047857 !important;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+}
+
+.btn-view-green:hover {
+    background: #059669;
+    border-color: #059669;
+    color: #fff !important;
     text-decoration: none;
 }
  
@@ -1326,8 +1350,7 @@
                                 <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                                     @if(in_array($templateExt, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
                                         <button type="button"
-                                                class="btn-view-action btn-preview-file"
-                                                style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border:none; cursor:pointer;"
+                                                class="btn-view-green btn-preview-file"
                                                 data-file-url="{{ url('/view/file', $template->file) }}"
                                                 data-file-name="{{ $template->name }}"
                                                 data-download-url="{{ url('/download', $template->file) }}">

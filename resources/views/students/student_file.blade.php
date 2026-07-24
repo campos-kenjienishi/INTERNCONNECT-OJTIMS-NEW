@@ -524,7 +524,7 @@
                 background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                 border: none;
                 border-radius: 8px;
-                color: #fff;
+                color: #ffffff !important;
                 font-family: 'Poppins', sans-serif;
                 font-size: 12.5px;
                 font-weight: 600;
@@ -537,6 +537,10 @@
             .btn-download:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 18px rgba(37,99,235,0.3);
+                color: #ffffff !important;
+                text-decoration: none;
+            }
+
             .btn-download:active { transform: translateY(0); }
 
             .btn-view {
@@ -547,7 +551,7 @@
                 background: linear-gradient(135deg, #059669 0%, #047857 100%);
                 border: none;
                 border-radius: 8px;
-                color: #fff;
+                color: #ffffff !important;
                 font-family: 'Poppins', sans-serif;
                 font-size: 12.5px;
                 font-weight: 600;
@@ -560,7 +564,7 @@
             .btn-view:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 18px rgba(5,150,105,0.3);
-                color: #fff;
+                color: #ffffff !important;
                 text-decoration: none;
             }
 
