@@ -611,7 +611,7 @@ public function StuList()
     foreach ($students as $student) {
         $ojt = OJTInformation::where('studentNum', $student->studentNum)->first();
         $studentProfile = Student::with('companies')->where('user_id', $student->id)->first();
-        $moaRequirement = FileRequirement::where('uploadedBy', $student->full_name)
+        $moaRequirement = FileRequirement::forUser($student)
             ->where('fileName', 'Notarized MOA')
             ->latest('id')
             ->first();

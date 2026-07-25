@@ -106,7 +106,7 @@ private function updateCompanyStudentDisplay(Company $company, ?string $removedN
 
 private function syncLinkedNotarizedRequirement(Company $company, User $user): void
 {
-    $requirement = FileRequirement::where('uploadedBy', $user->full_name)
+    $requirement = FileRequirement::forUser($user)
         ->where('fileName', 'Notarized MOA')
         ->where('file', $company->file)
         ->first();
@@ -123,6 +123,7 @@ private function syncLinkedNotarizedRequirement(Company $company, User $user): v
     $requirement->status = $sourceRequirement->status ?? 0;
     $requirement->adviser = $user->adviser_name;
     $requirement->uploadedBy = $user->full_name;
+    $requirement->uploader_user_id = $user->id;
 
     if (Schema::hasColumn('file_requirements', 'denial_reason')) {
         $requirement->denial_reason = $sourceRequirement->denial_reason ?? null;
@@ -529,6 +530,7 @@ public function companyCreate(Request $request)
     $fileup->status = 0;
     $fileup->adviser = $data->adviser_name;
     $fileup->uploadedBy = $data->full_name;
+    $fileup->uploader_user_id = $data->id;
 
 // Save the model instance
 $res = $fileup->save();
