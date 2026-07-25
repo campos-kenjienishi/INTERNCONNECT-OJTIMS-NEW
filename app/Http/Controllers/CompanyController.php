@@ -51,6 +51,26 @@ private function companyMatchesCourse(?Company $company, ?string $course): bool
     return in_array($course, $this->normalizeCourseSelection($company->course ?? null), true);
 }
 
+private function isMoaActive(?Company $company): bool
+{
+    if (!$company) {
+        return false;
+    }
+
+    if (!empty($company->valid_until)) {
+        try {
+            return !\Carbon\Carbon::parse($company->valid_until)->isPast();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    $parts = explode('-', str_replace(' ', '', (string) ($company->school_year ?? '0-0')));
+    $startYear = (int) ($parts[0] ?? 0);
+
+    return $startYear > 0 && ((now()->year - $startYear) <= 3);
+}
+
 private function studentProfileForUser(User $user): ?Student
 {
     return Student::where('user_id', $user->id)->first();
@@ -336,6 +356,10 @@ public function companiesup(Request $request)
                 return false;
             }
 
+            if (!$this->isMoaActive($company)) {
+                return false;
+            }
+
             if (empty($studentProfile?->course)) {
                 return true;
             }
@@ -377,8 +401,8 @@ public function linkExistingMoa(Request $request)
 
     $company = Company::with('students')->find($validated['company_id']);
 
-    if (!$company || empty($company->file)) {
-        return back()->with('fail', 'Selected MOA is unavailable.');
+    if (!$company || empty($company->file) || !$this->isMoaActive($company)) {
+        return back()->with('fail', 'Selected MOA is unavailable or has expired.');
     }
 
     if (!empty($company->course) && !empty($studentProfile->course) && !$this->companyMatchesCourse($company, $studentProfile->course)) {
