@@ -117,6 +117,7 @@ Route::middleware([
     Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
     Route::put('/student/edit/{email}', [StudentController::class,'edit']);
     Route::get('/student/class', [StudentController::class,'class']);
+    Route::put('/student/update-professor', [StudentController::class, 'updateProfessor'])->name('student.updateProfessor');
     Route::post('/student/join/{email}/{classId}', [StudentController::class,'join']);
     Route::post('/student/leave', [StudentController::class,'leave']);
     Route::get('/student/files', [StudentController::class,'fileSee']);
@@ -197,6 +198,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
 
 Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::get('/download/{file}', [FileController::class,'download']);
+    Route::get('/view/file/{file}', [FileController::class, 'viewFile'])->name('template.view');
     Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::post('/change_password/verify-current/{id}', [AccountInfo::class,'verifyCurrentPassword']);
     Route::post('/announcements', [AnnouncementController::class,'announcement']);

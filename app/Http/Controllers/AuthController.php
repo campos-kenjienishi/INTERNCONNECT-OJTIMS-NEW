@@ -84,7 +84,7 @@ class AuthController extends Controller
             'email'=>'required|email|unique:users,email',
             'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
             'course' => ['required', 'string', 'max:255'],
-            'adviser_name' => ['required', 'string', 'max:255'],
+            'adviser_name' => ['nullable', 'string', 'max:255'],
             'academic_year_start' => ['required', 'integer'],
             'academic_year_end' => ['required', 'integer', 'gt:academic_year_start'],
             'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
@@ -96,7 +96,6 @@ class AuthController extends Controller
             $this->yearAndSectionValidationMessages(),
             [
                 'course.required' => 'Course is required.',
-                'adviser_name.required' => 'Professor is required.',
                 'academic_year_start.required' => 'Start year is required.',
                 'academic_year_start.integer' => 'Start year must be a valid year.',
                 'academic_year_end.required' => 'End year is required.',
@@ -147,7 +146,7 @@ class AuthController extends Controller
 
     protected function autoAssignStudentToMatchingClass(User $user, Student $studentProfile): void
     {
-        if (!Schema::hasColumn('students', 'class_id')) {
+        if (!Schema::hasColumn('students', 'class_id') || empty($studentProfile->adviser_name) || $studentProfile->adviser_name === 'Not Yet Listed') {
             return;
         }
 

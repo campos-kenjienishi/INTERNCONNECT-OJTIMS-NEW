@@ -1300,7 +1300,8 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             bubble.classList.add('active');
         }
 
-        function sanitizeNameValue(value) {
+        function sanitizeNameValue(value, preserveTrailingSeparator = false) {
+            const endsWithSeparator = preserveTrailingSeparator && /[\s'-]$/.test(value || '');
             let sanitized = (value || '').replace(/[^\p{L}\s'\-]/gu, '');
             sanitized = sanitized.replace(/\s+/g, ' ');
             sanitized = sanitized.replace(/\s*-\s*/g, '-');
@@ -1309,9 +1310,18 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             sanitized = sanitized.replace(/'{2,}/g, "'");
             sanitized = sanitized.trim();
 
-            return sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
+            sanitized = sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
                 return separator + character.toUpperCase();
             });
+
+            if (endsWithSeparator && sanitized) {
+                const trailingCharacter = (value || '').slice(-1);
+                if (!/[\s'-]$/.test(sanitized)) {
+                    sanitized += trailingCharacter;
+                }
+            }
+
+            return sanitized;
         }
 
         function getNameValidationError(value, isOptional) {
@@ -1367,8 +1377,8 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             const input = document.getElementById(field.id);
             if (!input) return;
 
-            function syncNameField(showBubble) {
-                input.value = sanitizeNameValue(input.value);
+            function syncNameField(showBubble, isLive = false) {
+                input.value = sanitizeNameValue(input.value, isLive);
                 const validationError = getNameValidationError(input.value, field.optional);
                 input.setCustomValidity(validationError);
                 setInputErrorState(input, Boolean(validationError));
@@ -1376,11 +1386,11 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             }
 
             input.addEventListener('input', function () {
-                syncNameField(false);
+                syncNameField(false, true);
             });
 
             input.addEventListener('blur', function () {
-                syncNameField(Boolean(input.value.trim()));
+                syncNameField(Boolean(input.value.trim()), false);
             });
         });
 

@@ -1019,6 +1019,12 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                 ->values();
 
                             try {
+                                $dateNotarized = $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized) : null;
+                            } catch (\Throwable $e) {
+                                $dateNotarized = null;
+                            }
+
+                            try {
                                 $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
                             } catch (\Throwable $e) {
                                 $validUntil = null;
@@ -1035,6 +1041,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                 'school_year' => trim((string) $schoolYearStart) && trim((string) $schoolYearEnd)
                                     ? $schoolYearStart . '-' . $schoolYearEnd
                                     : ($company->school_year ?? ''),
+                                'date_notarized' => $dateNotarized ? $dateNotarized->format('Y-m-d') : '',
                                 'valid_until' => $validUntil ? $validUntil->format('Y-m-d') : '',
                                 'course_values' => $companyCourses->values(),
                                 'selected_students' => $linkedStudentNames->values(),
@@ -1168,6 +1175,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                         data-school-year-start="{{ $schoolYearStart }}"
                                         data-school-year-end="{{ $schoolYearEnd }}"
                                         data-school-year-normalized="{{ trim((string) $schoolYearStart) && trim((string) $schoolYearEnd) ? $schoolYearStart . '-' . $schoolYearEnd : ($company->school_year ?? '') }}"
+                                        data-date-notarized="{{ $dateNotarized ? $dateNotarized->format('Y-m-d') : '' }}"
                                         data-valid-until="{{ $validUntil ? $validUntil->format('Y-m-d') : '' }}"
                                         data-course-raw="{{ e($company->course ?? '') }}"
                                         data-course-values='@json($companyCourses->values())'
@@ -1318,6 +1326,14 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                                 <option value="{{ $selectedCreateEndYear }}" selected>{{ $selectedCreateEndYear }}</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+                            <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
+                            <span style="font-size: 11.5px; color: #777; font-weight: 400;">Select the date when the MOA was notarized.</span>
+                        </label>
+                        <input class="field-input" type="date" name="date_notarized">
                     </div>
 
                     <div class="field-group">
@@ -1476,6 +1492,14 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                             <span>–</span>
                             <select id="edit_school_year_end" class="field-input" name="school_year_end" required></select>
                         </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+                            <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
+                            <span style="font-size: 11.5px; color: #777; font-weight: 400;">Select the date when the MOA was notarized.</span>
+                        </label>
+                        <input id="editDateNotarized" class="field-input" type="date" name="date_notarized">
                     </div>
 
                     <div class="field-group">
@@ -2466,6 +2490,7 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
         const schoolYearEnd = payload.school_year_end || schoolYearParts[1] || dataset.schoolYearEnd || '';
 
         setEditSchoolYearFields(schoolYearStart, schoolYearEnd);
+        $('#editDateNotarized').val(normalizeDateInput(payload.date_notarized || dataset.dateNotarized || ''));
         $('#editValidUntil').val(normalizeDateInput(payload.valid_until || dataset.validUntil || ''));
 
         const selectedCourses = normalizeCourseList(payload.course_values && payload.course_values.length ? payload.course_values.join(', ') : (dataset.courseRaw || ''));

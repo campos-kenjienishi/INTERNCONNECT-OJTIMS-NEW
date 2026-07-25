@@ -812,6 +812,32 @@
             text-decoration: none;
         }
 
+        .btn-template-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #059669;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-template-view:hover {
+            background: #059669;
+            border-color: #059669;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        #filePreviewModal {
+            z-index: 1070 !important;
+        }
+
         .btn-remove-template {
             border: none;
             background: #fee2e2;
@@ -1413,6 +1439,19 @@
                                                                                 <span class="template-list-name">{{ $template->name }}</span>
                                                                             </div>
                                                                             <div class="template-list-actions">
+                                                                                 @php
+                                                                                     $templateExt = strtolower(pathinfo($template->file, PATHINFO_EXTENSION));
+                                                                                 @endphp
+                                                                                  @if(in_array($templateExt, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                                                                      <button type="button"
+                                                                                              class="btn-template-view btn-preview-file"
+                                                                                              style="cursor:pointer;"
+                                                                                              data-file-url="{{ url('/view/file', $template->file) }}"
+                                                                                              data-file-name="{{ $template->name }}"
+                                                                                              data-download-url="{{ url('/download', $template->file) }}">
+                                                                                          <i class="fa fa-eye"></i> View
+                                                                                      </button>
+                                                                                  @endif
                                                                                 <a href="{{ url('/download', $template->file) }}" class="btn-template-download">
                                                                                     <i class="fa fa-download"></i> Download
                                                                                 </a>
@@ -2274,8 +2313,67 @@
             });
         });
 
+        // File preview modal handler
+        $(document).on('click', '.btn-preview-file', function (e) {
+            e.preventDefault();
+            var fileUrl = $(this).data('file-url');
+            var fileName = $(this).data('file-name');
+            var downloadUrl = $(this).data('download-url');
+
+            $('#filePreviewTitle').text(fileName || 'Document Preview');
+            $('#filePreviewSubTitle').text(fileName || '');
+            $('#filePreviewDownloadBtn').attr('href', downloadUrl);
+            $('#filePreviewFrame').attr('src', fileUrl);
+
+            var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl && modalEl.parentNode !== document.body) {
+                document.body.appendChild(modalEl);
+            }
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl) {
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    var frame = document.getElementById('filePreviewFrame');
+                    if (frame) frame.src = 'about:blank';
+                });
+            }
+        });
+
     });
 </script>
+
+<!-- =============== FILE PREVIEW MODAL =============== -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color:#fff; padding:16px 20px;">
+                <h5 class="modal-title" style="font-size:16px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
+                    <i class="fa fa-file-alt"></i> <span id="filePreviewTitle">Document Preview</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.8;"></button>
+            </div>
+            <div class="modal-body" style="padding:0; background:#f8fafc;">
+                <div style="padding:12px 18px; border-bottom:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                        <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:600; flex-shrink:0;">
+                            <i class="fa fa-eye"></i> Preview
+                        </span>
+                        <span id="filePreviewSubTitle" style="font-size:13px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+                    </div>
+                    <a id="filePreviewDownloadBtn" href="#" class="btn-template-download" style="padding:6px 14px; font-size:12px; text-decoration:none;">
+                        <i class="fa fa-download"></i> Download File
+                    </a>
+                </div>
+                <iframe id="filePreviewFrame" title="File Preview" style="width:100%; height:75vh; min-height:400px; border:0; background:#fff;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 

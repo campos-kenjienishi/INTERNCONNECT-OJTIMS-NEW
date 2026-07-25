@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
         <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
         <link rel="stylesheet" href="{{ asset('css/student_downloadablefile-responsive.css') }}">
 
@@ -524,7 +525,7 @@
                 background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                 border: none;
                 border-radius: 8px;
-                color: #fff;
+                color: #ffffff !important;
                 font-family: 'Poppins', sans-serif;
                 font-size: 12.5px;
                 font-weight: 600;
@@ -537,11 +538,42 @@
             .btn-download:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 18px rgba(37,99,235,0.3);
-                color: #fff;
+                color: #ffffff !important;
                 text-decoration: none;
             }
 
             .btn-download:active { transform: translateY(0); }
+
+            .btn-view {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                border: none;
+                border-radius: 8px;
+                color: #ffffff !important;
+                font-family: 'Poppins', sans-serif;
+                font-size: 12.5px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                transition: all 0.25s;
+                box-shadow: 0 3px 10px rgba(5,150,105,0.2);
+            }
+
+            .btn-view:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 18px rgba(5,150,105,0.3);
+                color: #ffffff !important;
+                text-decoration: none;
+            }
+
+            .btn-view:active { transform: translateY(0); }
+
+            #filePreviewModal {
+                z-index: 1070 !important;
+            }
 
             /* Date badge */
             .date-cell {
@@ -898,16 +930,26 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="{{ url('/download', $file->file) }}" class="btn-download">
-                                        <i class="fa fa-download"></i> Download
-                                    </a>
+                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                        @if(in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                            <button type="button"
+                                                    class="btn-view btn-preview-file"
+                                                    data-file-url="{{ url('/view/file', $file->file) }}"
+                                                    data-file-name="{{ $file->name }}"
+                                                    data-download-url="{{ url('/download', $file->file) }}">
+                                                <i class="fa fa-eye"></i> View
+                                            </button>
+                                        @endif
+                                        <a href="{{ url('/download', $file->file) }}" class="btn-download">
+                                            <i class="fa fa-download"></i> Download
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    </table>
-</div>
+                </div>
 
                 </div>
             </div>
@@ -959,8 +1001,65 @@
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
         });
-        
+
+        $(document).on('click', '.btn-preview-file', function (e) {
+            e.preventDefault();
+            var fileUrl = $(this).data('file-url');
+            var fileName = $(this).data('file-name');
+            var downloadUrl = $(this).data('download-url');
+
+            $('#filePreviewTitle').text(fileName || 'Document Preview');
+            $('#filePreviewSubTitle').text(fileName || '');
+            $('#filePreviewDownloadBtn').attr('href', downloadUrl);
+            $('#filePreviewFrame').attr('src', fileUrl);
+
+            var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl && modalEl.parentNode !== document.body) {
+                document.body.appendChild(modalEl);
+            }
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl) {
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    var frame = document.getElementById('filePreviewFrame');
+                    if (frame) frame.src = 'about:blank';
+                });
+            }
+        });
     </script>
+
+    <!-- =============== FILE PREVIEW MODAL =============== -->
+    <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color:#fff; padding:16px 20px;">
+                    <h5 class="modal-title" style="font-size:16px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
+                        <i class="fa fa-file-alt"></i> <span id="filePreviewTitle">Document Preview</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.8;"></button>
+                </div>
+                <div class="modal-body" style="padding:0; background:#f8fafc;">
+                    <div style="padding:12px 18px; border-bottom:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                            <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:600; flex-shrink:0;">
+                                <i class="fa fa-eye"></i> Preview
+                            </span>
+                            <span id="filePreviewSubTitle" style="font-size:13px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+                        </div>
+                        <a id="filePreviewDownloadBtn" href="#" class="btn-download" style="padding:6px 14px; font-size:12px; text-decoration:none;">
+                            <i class="fa fa-download"></i> Download File
+                        </a>
+                    </div>
+                    <iframe id="filePreviewFrame" title="File Preview" style="width:100%; height:75vh; min-height:400px; border:0; background:#fff;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
     <script src="{{ asset('assets/js/voice-input.js') }}"></script>
     </body>

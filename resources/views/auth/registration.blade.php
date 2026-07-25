@@ -731,10 +731,11 @@
                                 <label class="form-label">Professor</label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-chalkboard-teacher i-icon"></i>
-                                    <select name="adviser_name" id="adviser_name" required>
+                                    <select name="adviser_name" id="adviser_name">
                                         <option value="">Select Professor</option>
+                                        <option value="Not Yet Listed" {{ old('adviser_name') == 'Not Yet Listed' ? 'selected' : '' }}>Not Yet Listed</option>
                                         @foreach($data as $professor)
-                                            <option value="{{ $professor->full_name }}">{{ $professor->full_name }}</option>
+                                            <option value="{{ $professor->full_name }}" {{ old('adviser_name') == $professor->full_name ? 'selected' : '' }}>{{ $professor->full_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -1445,7 +1446,7 @@
                         return;
                     }
 
-                    adviserNameSelect.innerHTML = '<option value="">Select Professor</option>';
+                    adviserNameSelect.innerHTML = '<option value="">Select Professor</option><option value="Not Yet Listed">Not Yet Listed</option>';
                     data.forEach(professor => {
                         const option = document.createElement('option');
                         option.value = professor;

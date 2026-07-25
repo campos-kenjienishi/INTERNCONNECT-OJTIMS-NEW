@@ -981,6 +981,8 @@
 
         .upload-modal-dialog {
             max-width: 980px;
+            width: calc(100% - 24px);
+            margin: 1.75rem auto;
         }
 
         .upload-modal-body {
@@ -991,10 +993,14 @@
 
         .upload-modal-layout {
             display: grid;
-            grid-template-columns: minmax(300px, 0.9fr) minmax(460px, 1.3fr);
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
             gap: 18px;
             align-items: stretch;
             overflow: visible;
+        }
+
+        #previewModal, #filePreviewModal {
+            z-index: 1070 !important;
         }
 
         .upload-modal-left {
@@ -1002,6 +1008,7 @@
             gap: 14px;
             align-content: start;
             overflow: visible;
+            min-width: 0;
         }
 
         .upload-modal-right {
@@ -1010,6 +1017,33 @@
 
         .upload-modal-right .upload-modal-section.file {
             height: 100%;
+        }
+
+        @media (max-width: 860px) {
+            .upload-modal-dialog {
+                max-width: 100%;
+                width: calc(100% - 16px);
+                margin: 8px auto;
+            }
+
+            .upload-modal-body {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .upload-modal-layout {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .upload-modal-right .upload-modal-section.file {
+                height: auto;
+            }
+
+            .file-upload-zone {
+                min-height: 180px;
+                padding: 18px 14px;
+            }
         }
 
         .upload-modal-section {
@@ -2030,8 +2064,12 @@
                                 $('#previewFallback').show();
                                 $('#previewBadge').addClass('no-preview').html('<i class="fa fa-file-download"></i> No preview available');
                             }
-                            var previewModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('previewModal'));
-                            previewModal.show();
+                             var modalEl = document.getElementById('previewModal');
+                             if (modalEl && modalEl.parentNode !== document.body) {
+                                 document.body.appendChild(modalEl);
+                             }
+                             var previewModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                             previewModal.show();
                         });
 
                         document.getElementById('previewModal').addEventListener('hidden.bs.modal', function () {
