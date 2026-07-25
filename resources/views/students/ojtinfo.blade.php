@@ -569,18 +569,15 @@
         }
         /* Dashboard Footer */
 .dashboard-footer {
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    color: #888;
-    text-align: center;
+    background: var(--footer-bg);
+    border-top: 3px solid #FDD700;
+    color: var(--text-secondary);
     padding: 18px 28px;
-    font-size: 12.5px;
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
+    font-size: 12.5px; margin-top: auto;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 6px;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .dashboard-footer .footer-left {
@@ -652,6 +649,21 @@ body.dark-mode .dashboard-footer a { color: #999; }
 body.dark-mode .dashboard-footer a:hover { color: var(--red); }
 body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
 body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
+
+.nav-item:hover {
+    color: #f8c62b;
+    background: rgba(248, 198, 43, 0.1);
+    border-left-color: #f8c62b;
+}
+.nav-item:hover .tooltip-label {
+    color: #f8c62b;
+}
+.nav-item.active,
+.nav-item.active:hover {
+    color: #f8c62b;
+    background: rgba(248, 198, 43, 0.12);
+    border-left-color: #f8c62b;
+}
     </style>
 </head>
 

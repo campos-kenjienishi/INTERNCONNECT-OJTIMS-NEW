@@ -808,6 +808,20 @@ body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
 body.dark-mode .dashboard-footer .footer-copy { color: #999; }
 body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
 body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
+.nav-item:hover {
+    color: #f8c62b;
+    background: rgba(248, 198, 43, 0.1);
+    border-left-color: #f8c62b;
+}
+.nav-item:hover .tooltip-label {
+    color: #f8c62b;
+}
+.nav-item.active,
+.nav-item.active:hover {
+    color: #f8c62b;
+    background: rgba(248, 198, 43, 0.12);
+    border-left-color: #f8c62b;
+}
         
     </style>
 </head>
