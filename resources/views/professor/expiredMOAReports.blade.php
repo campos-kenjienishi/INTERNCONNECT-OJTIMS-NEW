@@ -633,6 +633,14 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="filter-group">
+                        <label class="filter-label"><i class="fa fa-calendar-check"></i> Semester</label>
+                        <select class="filter-select" id="semester" name="semester">
+                            <option value="1st Semester" {{ request('semester') === '1st Semester' ? 'selected' : '' }}>1st Semester</option>
+                            <option value="2nd Semester" {{ request('semester') === '2nd Semester' ? 'selected' : '' }}>2nd Semester</option>
+                            <option value="Summer" {{ request('semester') === 'Summer' ? 'selected' : '' }}>Summer</option>
+                        </select>
+                    </div>
                     <div class="filter-actions">
                         <button type="button" class="btn-print-preview" id="openPreviewBtn">
                             <i class="fa fa-print"></i> Print Preview
@@ -833,7 +841,7 @@
                             $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
                             $status = ($validUntil && now()->lte($validUntil)) ? 'Active' : 'Expired';
                         @endphp
-                        <tr>
+                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $company->date_notarized ?? '' }}">
                             <td>{{ $company->id }}</td>
                             <td class="company-name-cell">
                                 <div class="company-cell">
@@ -1142,94 +1150,56 @@
         const pageNum          = pageInfo.page + 1;
         const pageCount        = pageInfo.pages;
 
-        const syLabel  = document.getElementById('school_year').value || 'All School Years';
-        const course   = document.getElementById('courseSelect').value || '—';
+        const sySelect = document.getElementById('school_year');
+        const syLabel  = sySelect && sySelect.value ? sySelect.value : 'All School Years';
+        const semester = document.getElementById('semester') ? document.getElementById('semester').value : '';
+        const course   = document.getElementById('courseSelect') ? document.getElementById('courseSelect').value : '—';
+
+        const campusName    = @json($campusName ?? config('campus.name', 'PUP Taguig Branch'));
+        const campusCollege = @json($campusCollege ?? config('campus.college', 'College of Engineering and Technology'));
 
         let rowsHTML = '';
         for (let i = 0; i < currentPageNodes.length; i++) {
-            const tds  = currentPageNodes[i].querySelectorAll('td');
+            const tr     = currentPageNodes[i];
+            const tds    = tr.querySelectorAll('td');
+            const rowNum = pageInfo.start + i + 1;
+            const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+
             const getCompany = () => {
                 const cn = Array.from(tds).find(td => td.querySelector('.company-name-text'));
-                return cn ? cn.querySelector('.company-name-text').textContent.trim() : '';
-            };
-            const getAddress = () => {
-                const addr = Array.from(tds).find(td => td.querySelector('[class*="fa-map-marker"]'));
-                if (!addr) return '';
-                let text = '';
-                addr.childNodes.forEach(node => {
-                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
-                    else if (node.nodeName !== 'I') text += node.textContent;
-                });
-                return text.trim();
-            };
-            const getRep = () => {
-                const rep = Array.from(tds).find(td => td.querySelector('[class*="fa-user-tie"]'));
-                if (!rep) return '';
-                let text = '';
-                rep.childNodes.forEach(node => {
-                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
-                    else if (node.nodeName !== 'I') text += node.textContent;
-                });
-                return text.trim();
-            };
-            const getContact = () => {
-                const contact = Array.from(tds).find(td => td.querySelector('[class*="fa-phone"]'));
-                if (!contact) return '';
-                let text = '';
-                contact.childNodes.forEach(node => {
-                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
-                    else if (node.nodeName !== 'I') text += node.textContent;
-                });
-                return text.trim();
-            };
-            const getEmail = () => {
-                const email = Array.from(tds).find(td => td.querySelector('[class*="fa-envelope"]'));
-                if (!email) return '';
-                let text = '';
-                email.childNodes.forEach(node => {
-                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
-                    else if (node.nodeName !== 'I') text += node.textContent;
-                });
-                return text.trim();
+                return cn ? cn.querySelector('.company-name-text').textContent.trim() : (tds[1] ? tds[1].textContent.trim() : '');
             };
             const getSY = () => {
                 const sy = Array.from(tds).find(td => td.querySelector('[class*="fa-calendar"]'));
-                if (!sy) return '';
-                let text = '';
-                sy.childNodes.forEach(node => {
-                    if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
-                    else if (node.nodeName !== 'I') text += node.textContent;
-                });
-                return text.trim();
+                return sy ? sy.textContent.trim() : (tds[6] ? tds[6].textContent.trim() : 'N/A');
             };
-            const getStatus = () => {
-                const status = Array.from(tds).find(td => td.querySelector('.badge-active, .badge-expired'));
-                return status ? status.querySelector('.badge-active, .badge-expired').textContent.trim() : '';
-            };
-            const statusTd = Array.from(tds).find(td => td.querySelector('.badge-active, .badge-expired'));
-            const isActive = statusTd && statusTd.querySelector('.badge-active');
-            const statusBadge = isActive
-                ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Active</span>`
-                : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Expired</span>`;
 
-            const rowNum = pageInfo.start + i + 1;
-            const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+            const companyName     = getCompany();
+            const natureOfBusiness = tr.getAttribute('data-nature-of-bus') || '';
+            const validityOfMoa    = getSY() === 'N/A' ? '' : getSY();
+            const dateNotarized    = tr.getAttribute('data-date-notarized') || '';
+            const parsedValidity   = Date.parse(validityOfMoa);
+            const status           = !Number.isNaN(parsedValidity) && parsedValidity >= now.getTime() ? 'Active' : 'Expired';
+            const statusBadge      = status === 'Active'
+                ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Active</span>`
+                : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expired</span>`;
 
             rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
                 <td style="padding:7px 6px; font-size:9px; font-weight:700; color:#6b7280; text-align:center; vertical-align:top; border-right:1px solid #e5e7eb;">${rowNum}</td>
-                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getCompany()}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getAddress()}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getRep()}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getContact()}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getEmail()}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${getSY()}</td>
-                <td style="padding:7px 6px; vertical-align:top; text-align:center;">${statusBadge}</td>
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${companyName}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${natureOfBusiness}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${validityOfMoa}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${dateNotarized}</td>
+                <td style="padding:7px 6px; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">${statusBadge}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top;"></td>
             </tr>`;
         }
 
         return `
         <div style="font-family:'Poppins',Arial,sans-serif; background:#fff;">
+
+            <!-- HEADER -->
             <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
                 <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
                 <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
@@ -1238,8 +1208,8 @@
                     </div>
                     <div style="flex:1;">
                         <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
-                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">MOA Report — Partner Companies</div>
-                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus &nbsp;|&nbsp; College of Engineering and Technology</div>
+                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">OJT MOA MONITORING FORM</div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">${campusName}</div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
                         <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
@@ -1251,6 +1221,8 @@
                 </div>
                 <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
             </div>
+
+            <!-- META ROW -->
             <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
                 <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
@@ -1263,68 +1235,86 @@
                         <span style="color:#6b7280;">Course:</span>
                         <strong style="color:#111827;">${course}</strong>
                     </div>
+                    ${semester ? `
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Showing:</span>
-                        <strong style="color:#111827;">${total} compan${total !== 1 ? 'ies' : 'y'} (Page ${pageNum})</strong>
+                        <span style="color:#6b7280;">Semester:</span>
+                        <strong style="color:#111827;">${semester}</strong>
+                    </div>` : ''}
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Number of HTEs:</span>
+                        <strong style="color:#111827;">${total} &nbsp;<span style="color:#6b7280; font-weight:normal;">/ HTEs w/ NDA:</span> ______</strong>
                     </div>
                 </div>
-                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr}</div>
+                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
             </div>
+
+            <!-- SECTION LABEL -->
             <div style="padding:9px 22px 3px 22px;">
-                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Partner Company Details — Page ${pageNum}</div>
+                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">MOA Monitoring Details — Page ${pageNum}</div>
             </div>
+
+            <!-- DATA TABLE (Template columns: No., Company Name, Nature of Business, Validity of MOA, Date Notarized, Status, Remarks) -->
             <div style="padding:4px 22px 0 22px;">
                 <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
                     <colgroup>
-                        <col style="width:3%;">
-                        <col style="width:18%;">
-                        <col style="width:18%;">
-                        <col style="width:14%;">
-                        <col style="width:12%;">
-                        <col style="width:18%;">
-                        <col style="width:9%;">
-                        <col style="width:8%;">
+                        <col style="width:4%;">   <!-- No. -->
+                        <col style="width:26%;">  <!-- Company Name -->
+                        <col style="width:22%;">  <!-- Nature of Business -->
+                        <col style="width:14%;">  <!-- Validity of MOA -->
+                        <col style="width:14%;">  <!-- Date Notarized -->
+                        <col style="width:9%;">   <!-- Status -->
+                        <col style="width:11%;">  <!-- Remarks -->
                     </colgroup>
                     <thead>
                         <tr style="background:#7f0000;">
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">#</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Company Name</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Address</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Representative</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Contact No.</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Email</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Validity</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; text-align:center;">Status</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">NO.</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">COMPANY NAME</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">NATURE OF BUSINESS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">VALIDITY OF MOA</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">DATE NOTARIZED</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">STATUS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left;">REMARKS</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${rowsHTML || `<tr><td colspan="8" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
+                        ${rowsHTML || `<tr><td colspan="7" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
                     </tbody>
                 </table>
             </div>
 
-            <div class="keep-together">
-                <div style="padding:18px 22px 12px 22px;">
-                    <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
-                        <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
-                            <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Disclaimer</div>
-                            <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">
-                                This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.
-                            </div>
+            <!-- SUBMITTED BY SECTION -->
+            <div style="padding:22px 22px 10px 22px; font-size:11px;">
+                <div style="width:40%;">
+                    <div style="color:#4b5563; font-weight:600; text-transform:uppercase; font-size:9.5px; letter-spacing:0.5px;">Submitted by:</div>
+                    <div style="font-weight:800; color:#111827; margin-top:8px; font-size:11.5px;">${@json($user->full_name ?? 'OJT Coordinator')}</div>
+                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">OJT Coordinator</div>
+                </div>
+            </div>
+
+            <!-- REPORT DISCLAIMER -->
+            <div style="padding:10px 22px 12px 22px;">
+                <div style="border-top:1px dashed #d1d5db; padding-top:14px;">
+                    <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                        <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Disclaimer</div>
+                        <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">
+                            This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.
                         </div>
                     </div>
                 </div>
-                <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
-                        <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
-                    </div>
-                    <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-RPT-${now.getFullYear()}</span>
-                </div>
             </div>
-        </div>`;
 
+            <!-- DOCUMENT FOOTER -->
+            <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
+                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                </div>
+                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
+            </div>
+
+        </div>`;
     }
 
     /* ── Modal (single instance, no double-trigger) ── */
