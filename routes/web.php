@@ -31,7 +31,9 @@ use App\Models\User;
 
 // ─── PUBLIC ROUTES (no auth required) ────────────────────────────────
 
-Route::view('/', 'landing')->name('landing');
+Route::get('/', function () {
+    return view('auth.login');
+});
 
 
 

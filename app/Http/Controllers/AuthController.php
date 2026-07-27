@@ -896,7 +896,7 @@ class AuthController extends Controller
             Session::pull('loginId');
             Session::forget('termsAccepted');
             Cache::forget('active_session_id:' . $id);
-            return redirect('/');
+            return redirect('login');
         }
     }
 

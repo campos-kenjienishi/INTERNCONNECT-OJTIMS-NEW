@@ -610,17 +610,20 @@
                 .stats-row { grid-template-columns: 1fr 1fr; }
             }
             /* Dashboard Footer */
-   .dashboard-footer {
-    background: var(--footer-bg);
-    border-top: 3px solid #FDD700;
-    color: var(--text-secondary);
-    padding: 18px 28px;
-    font-size: 12.5px; margin-top: auto;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; gap: 6px;
-    transition: background 0.3s, border-color 0.3s;
-}
+    .dashboard-footer {
+        background: #fff;
+        border-top: 1px solid #f0f0f0;
+        color: #888;
+        text-align: center;
+        padding: 18px 28px;
+        font-size: 12.5px;
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
 
     .dashboard-footer .footer-left {
         display: flex;
@@ -697,20 +700,6 @@
 #fileTable th,
 #fileTable td {
     white-space: nowrap;
-}
-.nav-item:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.1);
-    border-left-color: #f8c62b;
-}
-.nav-item:hover .tooltip-label {
-    color: #f8c62b;
-}
-.nav-item.active,
-.nav-item.active:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.12);
-    border-left-color: #f8c62b;
 }
         </style>
     </head>
