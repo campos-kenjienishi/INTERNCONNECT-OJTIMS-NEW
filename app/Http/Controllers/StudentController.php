@@ -725,8 +725,8 @@ public function ojt_edit(Request $request,$studentNum)
         $user->company_name = $request->company_name;
         $user->company_address = $request->company_address;
         $user->nature_of_bus = $request->nature_of_bus;
-        $user->nature_of_link = $request->nature_of_link;
-        $user->level = $request->level;
+        $user->assigned_department = $request->assigned_department;
+        $user->student_role = $request->student_role;
         $user->start_date = $request->start_date;
         $user->finish_date = $request->finish_date;
         $user->contact_name = $request->contact_name;

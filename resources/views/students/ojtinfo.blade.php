@@ -819,17 +819,16 @@ body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
                                 value="{{ old('nature_of_bus', optional($user)->nature_of_bus) }}" placeholder="Enter nature of business">
                         </div>
 
-                        <div class="field-group full-width">
-                            <label class="field-label"><i class="fa fa-network-wired"></i> Nature of Networking or Linkages</label>
-                            <span class="field-hint">Please indicate if: Academic Linkages, Benefactors, Research and Extension Linkage, Educational and Cultural Exchange, Government Agencies Partners, National/Institutional Membership, Non-Government Organizations Partners, OJT/Training Stations, etc.</span>
-                            <input class="field-input" type="text" name="nature_of_link"
-                                value="{{ old('nature_of_link', optional($user)->nature_of_link) }}" placeholder="Enter nature of networking or linkages">
+                        <div class="field-group">
+                            <label class="field-label"><i class="fa fa-sitemap"></i> Assigned Department</label>
+                            <input class="field-input" type="text" name="assigned_department"
+                                value="{{ old('assigned_department', optional($user)->assigned_department) }}" placeholder="e.g. IT Department, QA Division, HR">
                         </div>
 
                         <div class="field-group">
-                            <label class="field-label"><i class="fa fa-globe"></i> Level</label>
-                            <input class="field-input" type="text" name="level"
-                                value="{{ old('level', optional($user)->level) }}" placeholder="e.g. International, National, Regional, Local">
+                            <label class="field-label"><i class="fa fa-user-tag"></i> Internship Role / Position</label>
+                            <input class="field-input" type="text" name="student_role"
+                                value="{{ old('student_role', optional($user)->student_role) }}" placeholder="e.g. Web Developer Intern, Data Analyst Intern">
                         </div>
                     </div>
 
