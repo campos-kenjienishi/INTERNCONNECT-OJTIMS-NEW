@@ -840,8 +840,9 @@
                         @php
                             $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
                             $status = ($validUntil && now()->lte($validUntil)) ? 'Active' : 'Expired';
+                            $dateNotarizedFormatted = $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('M d, Y') : '';
                         @endphp
-                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $company->date_notarized ?? '' }}">
+                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}">
                             <td>{{ $company->id }}</td>
                             <td class="company-name-cell">
                                 <div class="company-cell">
@@ -1174,10 +1175,18 @@
                 return sy ? sy.textContent.trim() : (tds[6] ? tds[6].textContent.trim() : 'N/A');
             };
 
+            const formatDateStr = (rawDate) => {
+                if (!rawDate) return '';
+                const parsed = new Date(rawDate);
+                if (isNaN(parsed.getTime())) return rawDate;
+                return parsed.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+            };
+
             const companyName     = getCompany();
             const natureOfBusiness = tr.getAttribute('data-nature-of-bus') || '';
             const validityOfMoa    = getSY() === 'N/A' ? '' : getSY();
-            const dateNotarized    = tr.getAttribute('data-date-notarized') || '';
+            const dateNotarizedRaw = tr.getAttribute('data-date-notarized') || '';
+            const dateNotarized    = formatDateStr(dateNotarizedRaw);
             const parsedValidity   = Date.parse(validityOfMoa);
             const status           = !Number.isNaN(parsedValidity) && parsedValidity >= now.getTime() ? 'Active' : 'Expired';
             const statusBadge      = status === 'Active'
