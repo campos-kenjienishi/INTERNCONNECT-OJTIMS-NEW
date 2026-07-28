@@ -51,6 +51,26 @@ private function companyMatchesCourse(?Company $company, ?string $course): bool
     return in_array($course, $this->normalizeCourseSelection($company->course ?? null), true);
 }
 
+private function isMoaActive(?Company $company): bool
+{
+    if (!$company) {
+        return false;
+    }
+
+    if (!empty($company->valid_until)) {
+        try {
+            return !\Carbon\Carbon::parse($company->valid_until)->isPast();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    $parts = explode('-', str_replace(' ', '', (string) ($company->school_year ?? '0-0')));
+    $startYear = (int) ($parts[0] ?? 0);
+
+    return $startYear > 0 && ((now()->year - $startYear) <= 3);
+}
+
 private function studentProfileForUser(User $user): ?Student
 {
     return Student::where('user_id', $user->id)->first();
@@ -86,7 +106,7 @@ private function updateCompanyStudentDisplay(Company $company, ?string $removedN
 
 private function syncLinkedNotarizedRequirement(Company $company, User $user): void
 {
-    $requirement = FileRequirement::where('uploadedBy', $user->full_name)
+    $requirement = FileRequirement::forUser($user)
         ->where('fileName', 'Notarized MOA')
         ->where('file', $company->file)
         ->first();
@@ -103,6 +123,7 @@ private function syncLinkedNotarizedRequirement(Company $company, User $user): v
     $requirement->status = $sourceRequirement->status ?? 0;
     $requirement->adviser = $user->adviser_name;
     $requirement->uploadedBy = $user->full_name;
+    $requirement->uploader_user_id = $user->id;
 
     if (Schema::hasColumn('file_requirements', 'denial_reason')) {
         $requirement->denial_reason = $sourceRequirement->denial_reason ?? null;
@@ -336,6 +357,10 @@ public function companiesup(Request $request)
                 return false;
             }
 
+            if (!$this->isMoaActive($company)) {
+                return false;
+            }
+
             if (empty($studentProfile?->course)) {
                 return true;
             }
@@ -377,8 +402,8 @@ public function linkExistingMoa(Request $request)
 
     $company = Company::with('students')->find($validated['company_id']);
 
-    if (!$company || empty($company->file)) {
-        return back()->with('fail', 'Selected MOA is unavailable.');
+    if (!$company || empty($company->file) || !$this->isMoaActive($company)) {
+        return back()->with('fail', 'Selected MOA is unavailable or has expired.');
     }
 
     if (!empty($company->course) && !empty($studentProfile->course) && !$this->companyMatchesCourse($company, $studentProfile->course)) {
@@ -442,12 +467,14 @@ public function companyCreate(Request $request)
         $request->validate([
             'course' => 'required|array|min:1',
             'course.*' => 'required|exists:courses,course',
+            'date_notarized' => 'nullable|date',
             'valid_until' => 'required|date',
         ]);
     }
 
     if ($data->role == 0) {
         $request->validate([
+            'date_notarized' => 'nullable|date',
             'valid_until' => 'required|date',
         ]);
     }
@@ -486,6 +513,7 @@ public function companyCreate(Request $request)
 
     // Set the uploader_name field based on the logged-in user's name
     $com->uploader_name = $data->full_name;
+    $com->date_notarized = $request->input('date_notarized');
     $com->valid_until = $expirationDate;
 
     
@@ -502,6 +530,7 @@ public function companyCreate(Request $request)
     $fileup->status = 0;
     $fileup->adviser = $data->adviser_name;
     $fileup->uploadedBy = $data->full_name;
+    $fileup->uploader_user_id = $data->id;
 
 // Save the model instance
 $res = $fileup->save();
@@ -612,6 +641,7 @@ public function companyUpdate(Request $request, $id)
         'school_year_start' => 'required|integer|digits:4',
         'school_year_end' => 'required|integer|digits:4',
         'file' => 'nullable|mimes:pdf|max:30720',
+        'date_notarized' => 'nullable|date',
     ];
 
     if ($data->role == 0) {
@@ -647,6 +677,7 @@ public function companyUpdate(Request $request, $id)
         'company_email' => $company->company_email,
         'school_year' => $company->school_year,
         'course' => $company->course,
+        'date_notarized' => $company->date_notarized,
         'student_names_display' => $company->student_names_display ?? null,
     ];
 
@@ -658,6 +689,7 @@ public function companyUpdate(Request $request, $id)
     $startYear = $request->input('school_year_start');
     $endYear = $request->input('school_year_end');
     $company->school_year = $startYear . '-' . $endYear;
+    $company->date_notarized = $request->input('date_notarized');
     $company->valid_until = $request->input('valid_until');
 
     if ($data->role != 0) {

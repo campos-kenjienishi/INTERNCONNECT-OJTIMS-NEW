@@ -383,33 +383,59 @@ public function reportsExpired()
 
         $course = Courses::all();
 
+        $schoolYears = Company::whereNotNull('school_year')
+            ->pluck('school_year')
+            ->map(fn ($sy) => $this->normalizeSchoolYearValue($sy))
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values();
+
+        $selectedSchoolYear = $schoolYears->first();
+
         $companies = Company::all();
+        if ($selectedSchoolYear) {
+            $companies = $companies->filter(function ($company) use ($selectedSchoolYear) {
+                return $this->normalizeSchoolYearValue($company->school_year ?? '') === $selectedSchoolYear;
+            });
+        }
+        $companies = $this->annotateNatureOfBusiness($companies);
+
+        $campusName = config('campus.name', 'PUP Taguig Branch');
 
         $reportInsights = $this->buildMoaReportInsights($companies, $course->first()->course ?? null);
 
-        return view('ojtCoordinator.reportsExpired', compact('companies', 'user', 'course', 'reportInsights'));
+        return view('ojtCoordinator.reportsExpired', compact('companies', 'user', 'course', 'schoolYears', 'selectedSchoolYear', 'reportInsights', 'campusName'));
     }
 
 
     public function generateMOAReport(Request $request)
 {
     $validatedData = $request->validate([
-        'school_year_start' => 'required',
-        'school_year_end' => 'required',
+        'school_year' => 'nullable|string',
         'course' => 'required',
     ]);
 
-    $startYear = $validatedData['school_year_start'];
-    $endYear = $validatedData['school_year_end'];
-    $schoolYear = $this->normalizeSchoolYearRange($startYear, $endYear);
+    $schoolYear = $this->normalizeSchoolYearValue($validatedData['school_year'] ?? null);
+    $selectedSchoolYear = $schoolYear;
 
     $user = User::find(Session::get('loginId'));
     $course = Courses::all();
 
-    $companyy = Company::whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear])
-        ->get();
+    $schoolYears = Company::whereNotNull('school_year')
+        ->pluck('school_year')
+        ->map(fn ($sy) => $this->normalizeSchoolYearValue($sy))
+        ->filter()
+        ->unique()
+        ->sortDesc()
+        ->values();
 
-    $companies = $companyy->filter(function ($company) use ($validatedData) {
+    $companies = Company::query();
+    if ($schoolYear) {
+        $companies->whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear]);
+    }
+
+    $companies = $companies->get()->filter(function ($company) use ($validatedData) {
         if ($this->companyMatchesCourse($company, $validatedData['course'])) {
             return true;
         }
@@ -419,7 +445,10 @@ public function reportsExpired()
         return optional($company->created_at)->timestamp ?? $company->id;
     })->values();
     $companies = $this->annotateMoaFileStatus($companies);
+    $companies = $this->annotateNatureOfBusiness($companies);
     $companyNames = $companies->pluck('company_name')->toArray();
+
+    $campusName = config('campus.name', 'PUP Taguig Branch');
 
     // Retrieve students under the specified companies using where and get
     $students = Student::whereHas('companies', function ($query) use ($companyNames) {
@@ -431,13 +460,13 @@ public function reportsExpired()
     AuditLogger::log(
         'Reports',
         'Generate',
-        'Generated MOA report for ' . $validatedData['course'] . ' (' . $schoolYear . ')',
+        'Generated MOA report for ' . $validatedData['course'] . ' (' . ($schoolYear ?: 'All school years') . ')',
         Session::get('loginId') ?? null
     );
 
     $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
 
-    return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user','course', 'reportInsights'));
+    return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user', 'course', 'schoolYears', 'selectedSchoolYear', 'reportInsights', 'campusName'));
 }
 
 public function sendEmailExpired(Request $request)
@@ -576,8 +605,11 @@ public function reportsExpiredProf()
         // })->get();
     
         $companies = $this->annotateMoaFileStatus($companies);
+        $companies = $this->annotateNatureOfBusiness($companies);
 
-        return view('professor.expiredMOAReports', compact('companies', 'user', 'stu', 'courseAll', 'schoolYears', 'selectedCourse', 'selectedSchoolYear', 'reportInsights'));
+        $campusName = config('campus.name', 'PUP Taguig Branch');
+
+        return view('professor.expiredMOAReports', compact('companies', 'user', 'stu', 'courseAll', 'schoolYears', 'selectedCourse', 'selectedSchoolYear', 'reportInsights', 'campusName'));
     }
 
 
@@ -623,6 +655,9 @@ public function reportsExpiredProf()
     ->get();
 
     $companies = $this->annotateMoaFileStatus($companies);
+    $companies = $this->annotateNatureOfBusiness($companies);
+
+    $campusName = config('campus.name', 'PUP Taguig Branch');
 
     $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
 
@@ -633,7 +668,7 @@ public function reportsExpiredProf()
         Session::get('loginId') ?? null
     );
 
-    return view('professor.expiredMOAReports', compact('companies', 'students', 'user', 'courseAll', 'schoolYears', 'selectedCourse', 'selectedSchoolYear', 'reportInsights'));
+    return view('professor.expiredMOAReports', compact('companies', 'students', 'user', 'courseAll', 'schoolYears', 'selectedCourse', 'selectedSchoolYear', 'reportInsights', 'campusName'));
 }
 
     protected function buildStudentReportInsights($studentData, ?string $course = null)
@@ -725,6 +760,29 @@ public function reportsExpiredProf()
 
             $company->moa_file_ready = $fileExists && $fileSize > 0;
             $company->moa_file_empty = !empty($company->file) && (!$fileExists || $fileSize === 0);
+
+            return $company;
+        })->values();
+    }
+
+    /**
+     * Annotate each company with the most common nature_of_bus from linked
+     * student OJT information records. Falls back to empty string if none found.
+     */
+    private function annotateNatureOfBusiness($companies)
+    {
+        return collect($companies)->map(function ($company) {
+            $nature = OJTInformation::where('company_name', $company->company_name)
+                ->whereNotNull('nature_of_bus')
+                ->where('nature_of_bus', '!=', '')
+                ->select('nature_of_bus')
+                ->get()
+                ->groupBy('nature_of_bus')
+                ->sortByDesc(fn ($group) => $group->count())
+                ->keys()
+                ->first();
+
+            $company->nature_of_bus = $nature ?? '';
 
             return $company;
         })->values();

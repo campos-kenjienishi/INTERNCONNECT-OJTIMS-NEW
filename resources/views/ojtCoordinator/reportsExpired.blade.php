@@ -818,18 +818,14 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                     <div class="filter-grid">
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year</label>
-                            <div class="year-row">
-                                <select class="field-select" name="school_year_start" id="school_year_start" required>
-                                    <option value="">Start Year</option>
-                                    @for ($year = (date('Y') - 10); $year <= (date('Y') + 10); $year++)
-                                        <option value="{{ $year }}" {{ (string) request('school_year_start') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
-                                    @endfor
-                                </select>
-                                <span>–</span>
-                                <select class="field-select" name="school_year_end" id="school_year_end" data-selected="{{ request('school_year_end') }}" required>
-                                    <option value="">End Year</option>
-                                </select>
-                            </div>
+                            <select class="field-select" id="school_year" name="school_year">
+                                <option value="">Select School Year</option>
+                                @foreach (($schoolYears ?? collect()) as $sy)
+                                    <option value="{{ $sy }}" {{ ($selectedSchoolYear ?? '') === $sy ? 'selected' : '' }}>
+                                        {{ $sy }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
@@ -837,6 +833,14 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                                 @foreach ($course as $c)
                                 <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label"><i class="fa fa-calendar-check"></i> Semester</label>
+                            <select class="field-select" id="semester" name="semester">
+                                <option value="1st Semester" {{ request('semester') === '1st Semester' ? 'selected' : '' }}>1st Semester</option>
+                                <option value="2nd Semester" {{ request('semester') === '2nd Semester' ? 'selected' : '' }}>2nd Semester</option>
+                                <option value="Summer" {{ request('semester') === 'Summer' ? 'selected' : '' }}>Summer</option>
                             </select>
                         </div>
                         <div class="field-group">
@@ -890,8 +894,9 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                         @php
                             $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
                             $status = ($validUntil && now()->lte($validUntil)) ? 'Active' : 'Expired';
+                            $dateNotarizedFormatted = $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('M d, Y') : '';
                         @endphp
-                        <tr>
+                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}">
                             <td style="display:none;">{{ $company->id }}</td>
                             <td>
                                 <div class="company-cell">
@@ -1228,86 +1233,57 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
         const pageNum          = pageInfo.page + 1;
         const pageCount        = pageInfo.pages;
 
-        const syStart = document.getElementById('school_year_start').value || '—';
-        const syEnd   = document.getElementById('school_year_end').value   || '—';
-        const course  = document.getElementById('course').value            || '—';
-        const syLabel = (syStart !== '—' && syEnd !== '—') ? syStart + ' – ' + syEnd : '—';
+        const sySelect = document.getElementById('school_year');
+        const syLabel  = sySelect && sySelect.value ? sySelect.value : '—';
+        const semester = document.getElementById('semester') ? document.getElementById('semester').value : '';
+        const course   = document.getElementById('course') ? document.getElementById('course').value : '—';
 
-        /* ── Icon-safe text extractor ──
-           Skips <i> Font Awesome nodes so glyphs don't
-           bleed into the printed cell content.         */
-        const getClean = (td) => {
-            if (!td) return '';
-            let text = '';
-            td.childNodes.forEach(node => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    text += node.textContent;
-                } else if (node.nodeName !== 'I') {
-                    node.childNodes.forEach(inner => {
-                        if (inner.nodeType === Node.TEXT_NODE) text += inner.textContent;
-                        else if (inner.nodeName !== 'I') text += inner.textContent;
-                    });
-                }
-            });
-            return text.trim();
-        };
+        const campusName    = @json($campusName ?? config('campus.name', 'PUP Taguig Branch'));
+        const campusCollege = @json($campusCollege ?? config('campus.college', 'College of Engineering and Technology'));
 
-        /* Build rows from current page only using icon-based selectors */
         let rowsHTML = '';
         for (let i = 0; i < currentPageNodes.length; i++) {
-            const tds    = currentPageNodes[i].querySelectorAll('td');
+            const tr     = currentPageNodes[i];
+            const tds    = tr.querySelectorAll('td');
             const rowNum = pageInfo.start + i + 1;
             const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
 
             const getCompany = () => {
                 const cn = Array.from(tds).find(td => td.querySelector('.company-name-text'));
-                return cn ? cn.querySelector('.company-name-text').textContent.trim() : '';
-            };
-            const getAddress = () => {
-                const addr = Array.from(tds).find(td => td.querySelector('[class*="fa-map-marker"]'));
-                return addr ? getClean(addr) : '';
-            };
-            const getRep = () => {
-                const rep = Array.from(tds).find(td => td.querySelector('[class*="fa-user-tie"]'));
-                return rep ? getClean(rep) : '';
-            };
-            const getContact = () => {
-                const contact = Array.from(tds).find(td => td.querySelector('[class*="fa-phone"]'));
-                return contact ? getClean(contact) : '';
-            };
-            const getEmail = () => {
-                const email = Array.from(tds).find(td => td.querySelector('[class*="fa-envelope"]'));
-                return email ? getClean(email) : '';
+                return cn ? cn.querySelector('.company-name-text').textContent.trim() : (tds[1] ? tds[1].textContent.trim() : '');
             };
             const getSY = () => {
                 const sy = Array.from(tds).find(td => td.querySelector('[class*="fa-calendar"]'));
-                return sy ? getClean(sy) : '';
+                return sy ? sy.textContent.trim() : (tds[6] ? tds[6].textContent.trim() : 'N/A');
             };
 
-            const company   = getCompany();
-            const address   = getAddress();
-            const rep       = getRep();
-            const contact   = getContact();
-            const email     = getEmail();
-            const validity  = getSY();
-            const parsedValidity = Date.parse(validity);
-            const status = !Number.isNaN(parsedValidity) && parsedValidity >= now.getTime()
-                ? 'Active'
-                : 'Expired';
-            const statusBadge = status === 'Active'
-                ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Active</span>`
-                : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700;">Expired</span>`;
+            const formatDateStr = (rawDate) => {
+                if (!rawDate) return '';
+                const parsed = new Date(rawDate);
+                if (isNaN(parsed.getTime())) return rawDate;
+                return parsed.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+            };
+
+            const companyName     = getCompany();
+            const natureOfBusiness = tr.getAttribute('data-nature-of-bus') || '';
+            const validityOfMoa    = getSY() === 'N/A' ? '' : getSY();
+            const dateNotarizedRaw = tr.getAttribute('data-date-notarized') || '';
+            const dateNotarized    = formatDateStr(dateNotarizedRaw);
+            const parsedValidity   = Date.parse(validityOfMoa);
+            const status           = !Number.isNaN(parsedValidity) && parsedValidity >= now.getTime() ? 'Active' : 'Expired';
+            const statusBadge      = status === 'Active'
+                ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Active</span>`
+                : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expired</span>`;
 
             rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
                 <td style="padding:7px 6px; font-size:9px; font-weight:700; color:#6b7280; text-align:center; vertical-align:top; border-right:1px solid #e5e7eb;">${rowNum}</td>
-                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${company}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${address}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${rep}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${contact}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${email}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; white-space:nowrap;">${validity}</td>
-                <td style="padding:7px 6px; vertical-align:top; text-align:center;">${statusBadge}</td>
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${companyName}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${natureOfBusiness}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${validityOfMoa}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${dateNotarized}</td>
+                <td style="padding:7px 6px; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">${statusBadge}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top;"></td>
             </tr>`;
         }
 
@@ -1323,8 +1299,8 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                     </div>
                     <div style="flex:1;">
                         <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
-                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">MOA Report — Partner Companies</div>
-                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus &nbsp;|&nbsp; College of Engineering and Technology</div>
+                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">OJT MOA MONITORING FORM</div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">${campusName}</div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
                         <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
@@ -1350,10 +1326,16 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                         <span style="color:#6b7280;">Course:</span>
                         <strong style="color:#111827;">${course}</strong>
                     </div>
+                    ${semester ? `
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Showing:</span>
-                        <strong style="color:#111827;">${total} compan${total !== 1 ? 'ies' : 'y'} (Page ${pageNum})</strong>
+                        <span style="color:#6b7280;">Semester:</span>
+                        <strong style="color:#111827;">${semester}</strong>
+                    </div>` : ''}
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Number of HTEs:</span>
+                        <strong style="color:#111827;">${total} &nbsp;<span style="color:#6b7280; font-weight:normal;">/ HTEs w/ NDA:</span> ______</strong>
                     </div>
                 </div>
                 <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
@@ -1361,43 +1343,50 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
 
             <!-- SECTION LABEL -->
             <div style="padding:9px 22px 3px 22px;">
-                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">MOA Details — Page ${pageNum}</div>
+                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">MOA Monitoring Details — Page ${pageNum}</div>
             </div>
 
-            <!-- DATA TABLE — table-layout:fixed + % widths = no side scroll -->
+            <!-- DATA TABLE (Template columns: No., Company Name, Nature of Business, Validity of MOA, Date Notarized, Status, Remarks) -->
             <div style="padding:4px 22px 0 22px;">
                 <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
                     <colgroup>
-                        <col style="width:3%;">   <!-- # -->
-                        <col style="width:18%;">  <!-- Company -->
-                        <col style="width:18%;">  <!-- Address -->
-                        <col style="width:13%;">  <!-- Rep -->
-                        <col style="width:11%;">  <!-- Contact -->
-                        <col style="width:18%;">  <!-- Email -->
-                        <col style="width:10%;">  <!-- Validity -->
+                        <col style="width:4%;">   <!-- No. -->
+                        <col style="width:26%;">  <!-- Company Name -->
+                        <col style="width:22%;">  <!-- Nature of Business -->
+                        <col style="width:14%;">  <!-- Validity of MOA -->
+                        <col style="width:14%;">  <!-- Date Notarized -->
                         <col style="width:9%;">   <!-- Status -->
+                        <col style="width:11%;">  <!-- Remarks -->
                     </colgroup>
                     <thead>
                         <tr style="background:#7f0000;">
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">#</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Company Name</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Address</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Representative</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Contact No.</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Email</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">Validity</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center;">Status</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">NO.</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">COMPANY NAME</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">NATURE OF BUSINESS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">VALIDITY OF MOA</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">DATE NOTARIZED</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">STATUS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left;">REMARKS</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${rowsHTML || `<tr><td colspan="8" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
+                        ${rowsHTML || `<tr><td colspan="7" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
                     </tbody>
                 </table>
             </div>
 
+            <!-- SUBMITTED BY SECTION -->
+            <div style="padding:22px 22px 10px 22px; font-size:11px;">
+                <div style="width:40%;">
+                    <div style="color:#4b5563; font-weight:600; text-transform:uppercase; font-size:9.5px; letter-spacing:0.5px;">Submitted by:</div>
+                    <div style="font-weight:800; color:#111827; margin-top:8px; font-size:11.5px;">${@json($user->full_name ?? 'OJT Coordinator')}</div>
+                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">OJT Coordinator</div>
+                </div>
+            </div>
+
             <!-- REPORT DISCLAIMER -->
-            <div style="padding:18px 22px 12px 22px;">
-                <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+            <div style="padding:10px 22px 12px 22px;">
+                <div style="border-top:1px dashed #d1d5db; padding-top:14px;">
                     <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
                         <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Disclaimer</div>
                         <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">

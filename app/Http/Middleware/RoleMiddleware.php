@@ -23,7 +23,7 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!Session::has('loginId')) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $user = User::where('id', Session::get('loginId'))->first();
@@ -32,7 +32,7 @@ class RoleMiddleware
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         if (!in_array((string) $user->role, $roles, true)) {

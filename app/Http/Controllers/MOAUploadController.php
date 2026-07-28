@@ -70,7 +70,7 @@ class MOAUploadController extends Controller
 
     private function deleteStudentNotarizedRequirement(User $user, Company $company): void
     {
-        FileRequirement::where('uploadedBy', $user->full_name)
+        FileRequirement::forUser($user)
             ->where('fileName', 'Notarized MOA')
             ->where('file', $company->file)
             ->delete();
@@ -90,7 +90,7 @@ class MOAUploadController extends Controller
             ->latest('id')
             ->first();
 
-        $requirement = FileRequirement::where('uploadedBy', $user->full_name)
+        $requirement = FileRequirement::forUser($user)
             ->where('fileName', 'Notarized MOA')
             ->where('file', $company->file)
             ->first();
@@ -101,6 +101,7 @@ class MOAUploadController extends Controller
         $requirement->status = $sourceRequirement->status ?? 0;
         $requirement->adviser = $user->adviser_name;
         $requirement->uploadedBy = $user->full_name;
+        $requirement->uploader_user_id = $user->id;
 
         if (\Illuminate\Support\Facades\Schema::hasColumn('file_requirements', 'denial_reason')) {
             $requirement->denial_reason = $sourceRequirement->denial_reason ?? null;
@@ -118,7 +119,7 @@ class MOAUploadController extends Controller
         $student = Student::where('user_id', $user->id)->first();
 
         if (!$student) {
-            FileRequirement::where('uploadedBy', $user->full_name)
+            FileRequirement::forUser($user)
                 ->where('fileName', 'Notarized MOA')
                 ->delete();
             return;
@@ -127,7 +128,7 @@ class MOAUploadController extends Controller
         $linkedCompanies = $student->companies()->get()->filter(fn ($company) => !empty($company->file))->values();
         $validFiles = $linkedCompanies->pluck('file')->filter()->unique()->values();
 
-        $query = FileRequirement::where('uploadedBy', $user->full_name)
+        $query = FileRequirement::forUser($user)
             ->where('fileName', 'Notarized MOA');
 
         if ($validFiles->isEmpty()) {

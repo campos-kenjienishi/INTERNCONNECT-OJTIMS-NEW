@@ -384,6 +384,27 @@
             color: #fff; text-decoration: none;
         }
 
+        .btn-view {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 8px;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border: none; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 12px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(5,150,105,0.2);
+            text-decoration: none;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+            color: #fff; text-decoration: none;
+        }
+
+        #filePreviewModal {
+            z-index: 1070 !important;
+        }
+
         .btn-remove {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 14px; border-radius: 8px;
@@ -815,10 +836,10 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-file-word"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-file-alt"></i></div>
                 <div>
-                    <div class="stat-num">DOCX</div>
-                    <div class="stat-name">Accepted Format</div>
+                    <div class="stat-num" style="font-size: 16px;">DOC, PDF, XLS</div>
+                    <div class="stat-name">Accepted Formats</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -870,7 +891,15 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <td>
                                 <div class="file-cell">
                                     <div class="file-icon-box">
-                                        <i class="fa fa-file-word"></i>
+                                        @php
+                                            $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
+                                            $iconClass = match($ext) {
+                                                'pdf' => 'fa-file-pdf',
+                                                'xls', 'xlsx' => 'fa-file-excel',
+                                                default => 'fa-file-word',
+                                            };
+                                        @endphp
+                                        <i class="fa {{ $iconClass }}"></i>
                                     </div>
                                     <div>
                                         <div class="file-name-text">{{ $file->name }}</div>
@@ -896,6 +925,16 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
                             <!-- Actions -->
                             <td>
                                 <div class="actions-wrap">
+                                    @if(in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                        <button type="button"
+                                                class="btn-view btn-preview-file"
+                                                data-file-url="{{ url('/view/file', $file->file) }}"
+                                                data-file-name="{{ $file->name }}"
+                                                data-download-url="{{ url('/download', $file->file) }}">
+                                            <i class="fa fa-eye"></i> View
+                                        </button>
+                                    @endif
+
                                     <a class="btn-download btn-dl-item"
                                        href="{{ url('/download', $file->file) }}">
                                         <i class="fa fa-download"></i> Download
@@ -959,16 +998,16 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 
                     <div class="field-group">
                         <label class="field-label">
-                            <i class="fa fa-file-word"></i> Choose File
+                            <i class="fa fa-file-alt"></i> Choose File
                         </label>
                         <div class="file-dropzone" id="dropzone">
                             <input type="file" name="file" id="fileInput" data-max-size-mb="30"
-                                   accept=".doc,.docx" required>
+                                   accept=".doc,.docx,.pdf,.xls,.xlsx" required>
                             <div class="file-dropzone-icon">
                                 <i class="fa fa-cloud-upload-alt"></i>
                             </div>
                             <div class="file-dropzone-title">Click or drag to upload</div>
-                            <div class="file-dropzone-sub">Accepted: .doc, .docx files only | Max file size: 30 MB</div>
+                            <div class="file-dropzone-sub">Accepted: .doc, .docx, .pdf, .xls, .xlsx | Max file size: 30 MB</div>
                             <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
                             <div class="file-dropzone-name" id="selectedFileName"></div>
                         </div>
@@ -1099,8 +1138,67 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
             });
         @endif
 
+        // File preview modal handler
+        $(document).on('click', '.btn-preview-file', function (e) {
+            e.preventDefault();
+            var fileUrl = $(this).data('file-url');
+            var fileName = $(this).data('file-name');
+            var downloadUrl = $(this).data('download-url');
+
+            $('#filePreviewTitle').text(fileName || 'Document Preview');
+            $('#filePreviewSubTitle').text(fileName || '');
+            $('#filePreviewDownloadBtn').attr('href', downloadUrl);
+            $('#filePreviewFrame').attr('src', fileUrl);
+
+            var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl && modalEl.parentNode !== document.body) {
+                document.body.appendChild(modalEl);
+            }
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var modalEl = document.getElementById('filePreviewModal');
+            if (modalEl) {
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    var frame = document.getElementById('filePreviewFrame');
+                    if (frame) frame.src = 'about:blank';
+                });
+            }
+        });
+
     });
 </script>
+
+<!-- =============== FILE PREVIEW MODAL =============== -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color:#fff; padding:16px 20px;">
+                <h5 class="modal-title" style="font-size:16px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
+                    <i class="fa fa-file-alt"></i> <span id="filePreviewTitle">Document Preview</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.8;"></button>
+            </div>
+            <div class="modal-body" style="padding:0; background:#f8fafc;">
+                <div style="padding:12px 18px; border-bottom:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                        <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:600; flex-shrink:0;">
+                            <i class="fa fa-eye"></i> Preview
+                        </span>
+                        <span id="filePreviewSubTitle" style="font-size:13px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+                    </div>
+                    <a id="filePreviewDownloadBtn" href="#" class="btn-download" style="padding:6px 14px; font-size:12px; text-decoration:none;">
+                        <i class="fa fa-download"></i> Download File
+                    </a>
+                </div>
+                <iframe id="filePreviewFrame" title="File Preview" style="width:100%; height:75vh; min-height:400px; border:0; background:#fff;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 

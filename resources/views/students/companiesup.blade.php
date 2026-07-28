@@ -830,17 +830,19 @@
         }
 
         /* Footer */
-         .dashboard-footer {
-    background: var(--footer-bg);
-    border-top: 3px solid #FDD700;
-    color: var(--text-secondary);
-    padding: 18px 28px;
-    font-size: 12.5px; margin-top: auto;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; gap: 6px;
-    transition: background 0.3s, border-color 0.3s;
-}
+        .dashboard-footer {
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            color: #888;
+            padding: 18px 28px;
+            font-size: 12.5px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
 
         .dashboard-footer .footer-left { display: flex; align-items: center; gap: 8px; }
         .dashboard-footer .footer-logo { width: 22px; height: 22px; object-fit: contain; opacity: 0.6; }
@@ -935,20 +937,6 @@
     .school-year-row .sep {
         display: inline;
     }
-}
-.nav-item:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.1);
-    border-left-color: #f8c62b;
-}
-.nav-item:hover .tooltip-label {
-    color: #f8c62b;
-}
-.nav-item.active,
-.nav-item.active:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.12);
-    border-left-color: #f8c62b;
 }
     </style>
 </head>
@@ -1174,6 +1162,7 @@
                                             data-company-no="{{ e($company->companyNo) }}"
                                             data-company-email="{{ e($company->company_email) }}"
                                             data-school-year="{{ e($company->school_year) }}"
+                                            data-date-notarized="{{ $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('Y-m-d') : '' }}"
                                             data-valid-until="{{ $company->valid_until ? \Carbon\Carbon::parse($company->valid_until)->format('Y-m-d') : '' }}"
                                             data-file-name="{{ e($company->file) }}"
                                             onclick="openEditMoaModal(this)">
@@ -1386,6 +1375,14 @@
                                 </select>
                             </div>
 
+                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                                <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Select the date when the MOA was notarized.
+                                </span>
+                            </label>
+                            <input class="modal-field-input" type="date" name="date_notarized">
+
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
                                 <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
@@ -1505,6 +1502,14 @@
                                 <span class="sep">-</span>
                                 <select name="school_year_end" id="editSchoolYearEnd" class="modal-field-input" required></select>
                             </div>
+
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                                <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
+                                <span style="font-size: 11.5px; color: #777; font-weight: 400;">
+                                    Select the date when the MOA was notarized.
+                                </span>
+                            </label>
+                            <input class="modal-field-input" type="date" name="date_notarized" id="editDateNotarized">
 
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
                                 <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
@@ -1737,6 +1742,7 @@
         document.getElementById('editCompanyEmail').value = button.dataset.companyEmail || '';
         document.getElementById('editSchoolYearStart').value = schoolYear[0] || '';
         syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd', schoolYear[1] || '');
+        document.getElementById('editDateNotarized').value = button.dataset.dateNotarized || '';
         document.getElementById('editValidUntil').value = button.dataset.validUntil || '';
         document.getElementById('editMoaFileInput').value = '';
         document.getElementById('editMoaFileLabel').textContent = 'Leave empty to keep the current notarized MOA PDF';
