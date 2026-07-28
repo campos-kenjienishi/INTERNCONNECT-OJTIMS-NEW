@@ -30,7 +30,7 @@ class EvaluationController extends Controller
         }
 
         if (!$data) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $student = Student::where('user_id', $data->id)->first();
@@ -323,7 +323,7 @@ class EvaluationController extends Controller
     {
         $user = User::where('id', Session::get('loginId'))->first();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $requestRow = OjtEvaluationRequest::where('id', $requestId)
@@ -612,7 +612,7 @@ class EvaluationController extends Controller
     {
         $user = User::where('id', Session::get('loginId'))->first();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $requestRow = OjtEvaluationRequest::with(['evaluation', 'template'])
@@ -640,7 +640,7 @@ class EvaluationController extends Controller
     {
         $user = User::where('id', Session::get('loginId'))->first();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $requestRow = OjtEvaluationRequest::with(['evaluation', 'student.studentInfo', 'template'])
@@ -683,7 +683,7 @@ class EvaluationController extends Controller
     {
         $user = User::where('id', Session::get('loginId'))->first();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $requestRow = OjtEvaluationRequest::with(['evaluation', 'student.studentInfo'])
@@ -726,7 +726,7 @@ class EvaluationController extends Controller
     {
         $user = User::where('id', Session::get('loginId'))->first();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $student = User::with('studentInfo')
@@ -767,7 +767,7 @@ class EvaluationController extends Controller
     {
         $user = User::where('id', Session::get('loginId'))->first();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $classIds = Classes::where('adviser_name', $user->full_name)->pluck('id')->all();
@@ -849,7 +849,7 @@ class EvaluationController extends Controller
     {
         $user = User::where('id', Session::get('loginId'))->first();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $classrooms = Classes::where('adviser_name', $user->full_name)->get();

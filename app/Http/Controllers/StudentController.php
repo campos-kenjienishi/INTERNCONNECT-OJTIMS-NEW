@@ -34,7 +34,7 @@ class StudentController extends Controller
 private function requireStudentSession()
 {
     if (!Session::has('loginId')) {
-        return redirect('/login');
+        return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
     }
 
     $user = User::where('id', Session::get('loginId'))->first();
@@ -43,7 +43,7 @@ private function requireStudentSession()
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
-        return redirect('/login');
+        return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
     }
 
     return $user;
