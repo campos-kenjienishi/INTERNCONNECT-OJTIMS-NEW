@@ -189,60 +189,11 @@
                 font-size: 20px;
             }
         }
-            .auth-brand-copy .brand-name span {
-                color: #f8c62b !important;
-        }   
-        .back-to-landing {
-    position: fixed;
-    top: 24px;
-    left: 24px;
-    z-index: 50;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    min-width: 190px;
-    min-height: 46px;
-    padding: 0 22px;
-    border-radius: 999px;
-    border: 1px solid rgba(248, 198, 43, 0.35);
-    color: #fff7dc;
-    background: linear-gradient(180deg, rgba(248, 198, 43, 0.2) 0%, rgba(255, 255, 255, 0.06) 100%);
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 700;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-    white-space: nowrap;
-}
-
-.back-to-landing:hover {
-    color: #fff7dc;
-    transform: translateY(-2px);
-    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.24);
-    border-color: rgba(248, 198, 43, 0.55);
-    background: linear-gradient(180deg, rgba(248, 198, 43, 0.28) 0%, rgba(255, 255, 255, 0.1) 100%);
-}
-
-@media (max-width: 640px) {
-    .back-to-landing {
-        position: static;
-        margin: 16px auto 0;
-        width: calc(100% - 32px);
-    }
-}
     </style>
 
 </head>
 
-
 <body class="auth-centered-page">
-    <a class="back-to-landing" href="{{ route('landing') }}">
-    <i class="fa fa-arrow-left"></i>
-    Back to Landing Page
-</a>
 <div class="main-wrapper">
     <div class="login-container">
 
@@ -255,7 +206,7 @@
 
             <div class="brand-area">
                 <div class="logo-wrapper">
-                    <img src="/images/" alt="InternConnect Logo" class="logo-img">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
                         <div class="brand-name">Intern<span>Connect</span> - BETA</div>
                         <div class="system-title">On-The-Job Training Information Management System</div>
@@ -288,7 +239,7 @@
         <!-- RIGHT PANEL -->
         <div class="right-panel">
             <div class="auth-brand">
-                <img src="/images/puplogo.png" alt="InternConnect Logo" class="auth-logo">
+                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
                 <div class="auth-brand-copy">
                     <div class="brand-name">Intern<span>Connect</span> - BETA</div>
                     <div class="system-title">On-The-Job Training Information Management System</div>
@@ -353,8 +304,8 @@
                         <div class="terms-text">
                             <span class="terms-line-top">By using this service, you understood and agree to the PUP Online Services</span>
                             <span class="terms-line-bottom">
-                                <a href="https://www.pup.edu.ph/terms/"target="_blank">Terms of Use</a> <span class="terms-line-separator">and</span>
-                                <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy Statement</a>.
+                                <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a> <span class="terms-line-separator">and</span>
+                                <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>.
                             </span>
                         </div>
                     </div>

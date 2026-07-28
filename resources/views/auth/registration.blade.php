@@ -433,43 +433,6 @@
             z-index: 9999 !important;
             pointer-events: all !important;
         }
-        .btn-create-account {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    color: #fff !important;
-    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.3);
-}
-
-.btn-create-account:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(22, 163, 74, 0.4);
-    color: #fff !important;
-}
-.btn-create-account {
-    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-    color: #fff !important;
-    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
-    transition: background 0.5s ease, box-shadow 0.5s ease, transform 0.2s ease;
-}
-
-.btn-create-account.is-ready {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35);
-    animation: readyPulse 1.4s ease-in-out 1;
-}
-
-.btn-create-account:hover {
-    transform: translateY(-2px);
-    color: #fff !important;
-}
-
-@keyframes readyPulse {
-    0%   { box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35); }
-    50%  { box-shadow: 0 4px 26px rgba(22, 163, 74, 0.6); }
-    100% { box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35); }
-}
-.btn-create-account .fa-user-plus {
-    color: #fff !important;
-}
 
     </style>
 </head>
@@ -731,10 +694,11 @@
                                 <label class="form-label">Professor</label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-chalkboard-teacher i-icon"></i>
-                                    <select name="adviser_name" id="adviser_name" required>
+                                    <select name="adviser_name" id="adviser_name">
                                         <option value="">Select Professor</option>
+                                        <option value="Not Yet Listed" {{ old('adviser_name') == 'Not Yet Listed' ? 'selected' : '' }}>Not Yet Listed</option>
                                         @foreach($data as $professor)
-                                            <option value="{{ $professor->full_name }}">{{ $professor->full_name }}</option>
+                                            <option value="{{ $professor->full_name }}" {{ old('adviser_name') == $professor->full_name ? 'selected' : '' }}>{{ $professor->full_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -770,7 +734,7 @@
                                     onclick="goToStep1()">
                                 <i class="fa fa-arrow-left"></i> Back
                             </button>
-                                <button type="submit" class="btn-proceed btn-create-account">
+                            <button type="submit" class="btn-proceed">
                                 <i class="fa fa-user-plus"></i> Create Account
                             </button>
                         </div>
@@ -1133,12 +1097,6 @@
         if (!regForm) {
             return;
         }
-        ['semester', 'academic_year_start', 'academic_year_end', 'adviser_name', 'year_and_section']
-    .forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', checkStep2FormValidity);
-        if (el) el.addEventListener('change', checkStep2FormValidity);
-    });
 
         const emailInput = document.getElementById('reg_email');
         const studentNumInput = document.getElementById('studentNum');
@@ -1445,7 +1403,7 @@
                         return;
                     }
 
-                    adviserNameSelect.innerHTML = '<option value="">Select Professor</option>';
+                    adviserNameSelect.innerHTML = '<option value="">Select Professor</option><option value="Not Yet Listed">Not Yet Listed</option>';
                     data.forEach(professor => {
                         const option = document.createElement('option');
                         option.value = professor;
@@ -1469,26 +1427,6 @@
         });
         fetchProfessors(semesterSelect.value, startYearSelect.value, endYearSelect.value);
     });
-    function checkStep2FormValidity() {
-    const requiredIds = [
-        'semester', 'academic_year_start', 'academic_year_end',
-        'adviser_name', 'year_and_section'
-    ];
-
-    const allFilled = requiredIds.every(id => {
-        const el = document.getElementById(id);
-        return el && el.value.trim() !== '';
-    });
-
-    const yearSectionValid = !getYearAndSectionValidationError(
-        document.getElementById('year_and_section')?.value || ''
-    );
-
-    const createBtn = document.querySelector('.btn-create-account');
-    if (!createBtn) return;
-
-    createBtn.classList.toggle('is-ready', allFilled && yearSectionValid);
-}
 </script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

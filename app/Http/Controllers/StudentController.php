@@ -34,7 +34,7 @@ class StudentController extends Controller
 private function requireStudentSession()
 {
     if (!Session::has('loginId')) {
-        return redirect('/login');
+        return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
     }
 
     $user = User::where('id', Session::get('loginId'))->first();
@@ -43,7 +43,7 @@ private function requireStudentSession()
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
-        return redirect('/login');
+        return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
     }
 
     return $user;
@@ -315,7 +315,7 @@ public function home()
             $class = [];
 
             // Check if $data is not empty before accessing the property
-            if (!empty($data) && isset($data->adviser_name)) {
+            if (!empty($data) && !empty($data->adviser_name) && $data->adviser_name !== 'Not Yet Listed') {
                 $classQuery = Classes::where('adviser_name', $data->adviser_name)
                     ->where('course', $data->course);
 
@@ -426,10 +426,61 @@ public function home()
         );
         
 
+        $professors = Professor::all();
+
     // Pass the $professor and $students variables to the view
-    return view('students.student_class', compact('data', 'course', 'class', 'currentClass', 'announce', 'sched', 'roomTemplates'));
+    return view('students.student_class', compact('data', 'course', 'class', 'currentClass', 'announce', 'sched', 'roomTemplates', 'professors'));
 
 
+}
+
+public function updateProfessor(Request $request)
+{
+    $sessionCheck = $this->requireStudentSession();
+
+    if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+        return $sessionCheck;
+    }
+
+    $user = $sessionCheck;
+
+    $request->validate([
+        'adviser_name' => ['required', 'string', 'max:255', 'not_in:Not Yet Listed'],
+    ], [
+        'adviser_name.required' => 'Please select a professor.',
+        'adviser_name.not_in' => 'Please select a valid professor.',
+    ]);
+
+    $student = Student::where('user_id', $user->id)->first();
+    if (!$student) {
+        $student = new Student();
+        $student->user_id = $user->id;
+    }
+
+    $student->adviser_name = $request->adviser_name;
+    $student->save();
+
+    if (Schema::hasColumn('students', 'class_id') && !empty($student->adviser_name) && $student->adviser_name !== 'Not Yet Listed') {
+        $matchingClass = Classes::where('adviser_name', $student->adviser_name)
+            ->where('course', $student->course)
+            ->latest('created_at')
+            ->first();
+        if ($matchingClass) {
+            $student->class_id = $matchingClass->id;
+            $student->save();
+            $user->status = 3;
+            $user->save();
+        }
+    }
+
+    AuditLogger::log(
+        'Student Account',
+        'update',
+        'Updated professor to: ' . $student->adviser_name,
+        $user->id
+    );
+
+    return back()->with('success', 'Professor updated successfully!');
 }
 
 
@@ -560,7 +611,7 @@ public function StuList()
     foreach ($students as $student) {
         $ojt = OJTInformation::where('studentNum', $student->studentNum)->first();
         $studentProfile = Student::with('companies')->where('user_id', $student->id)->first();
-        $moaRequirement = FileRequirement::where('uploadedBy', $student->full_name)
+        $moaRequirement = FileRequirement::forUser($student)
             ->where('fileName', 'Notarized MOA')
             ->latest('id')
             ->first();
@@ -674,8 +725,8 @@ public function ojt_edit(Request $request,$studentNum)
         $user->company_name = $request->company_name;
         $user->company_address = $request->company_address;
         $user->nature_of_bus = $request->nature_of_bus;
-        $user->nature_of_link = $request->nature_of_link;
-        $user->level = $request->level;
+        $user->assigned_department = $request->assigned_department;
+        $user->student_role = $request->student_role;
         $user->start_date = $request->start_date;
         $user->finish_date = $request->finish_date;
         $user->contact_name = $request->contact_name;

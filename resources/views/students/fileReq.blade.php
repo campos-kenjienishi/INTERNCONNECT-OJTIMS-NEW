@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ asset('css/student_filereq-responsive.css') }}">
     
 
@@ -726,28 +726,8 @@
         }
 
         @media (max-width: 768px) {
-            .upload-modal-dialog {
-                max-width: calc(100vw - 1rem);
-                margin: 0.5rem auto;
-            }
-
             .upload-modal-layout {
                 grid-template-columns: 1fr;
-            }
-
-            .upload-modal-left,
-            .upload-modal-right,
-            .upload-modal-section {
-                min-width: 0;
-            }
-
-            .upload-modal-right .upload-modal-section.file {
-                height: auto;
-            }
-
-            .file-upload-zone {
-                min-height: 0;
-                padding: 18px 14px;
             }
         }
 
@@ -981,6 +961,8 @@
 
         .upload-modal-dialog {
             max-width: 980px;
+            width: calc(100% - 24px);
+            margin: 1.75rem auto;
         }
 
         .upload-modal-body {
@@ -991,10 +973,14 @@
 
         .upload-modal-layout {
             display: grid;
-            grid-template-columns: minmax(300px, 0.9fr) minmax(460px, 1.3fr);
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
             gap: 18px;
             align-items: stretch;
             overflow: visible;
+        }
+
+        #previewModal, #filePreviewModal {
+            z-index: 1070 !important;
         }
 
         .upload-modal-left {
@@ -1002,6 +988,7 @@
             gap: 14px;
             align-content: start;
             overflow: visible;
+            min-width: 0;
         }
 
         .upload-modal-right {
@@ -1010,6 +997,33 @@
 
         .upload-modal-right .upload-modal-section.file {
             height: 100%;
+        }
+
+        @media (max-width: 860px) {
+            .upload-modal-dialog {
+                max-width: 100%;
+                width: calc(100% - 16px);
+                margin: 8px auto;
+            }
+
+            .upload-modal-body {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .upload-modal-layout {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .upload-modal-right .upload-modal-section.file {
+                height: auto;
+            }
+
+            .file-upload-zone {
+                min-height: 180px;
+                padding: 18px 14px;
+            }
         }
 
         .upload-modal-section {
@@ -1615,15 +1629,17 @@
         }
         /* Dashboard Footer */
 .dashboard-footer {
-    background: var(--footer-bg);
-    border-top: 3px solid #FDD700;
-    color: var(--text-secondary);
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    color: #888;
     padding: 18px 28px;
-    font-size: 12.5px; margin-top: auto;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; gap: 6px;
-    transition: background 0.3s, border-color 0.3s;
+    font-size: 12.5px;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .dashboard-footer .footer-left {
@@ -1668,20 +1684,6 @@
 .dashboard-footer .divider {
     color: #e5e5e5;
     margin: 0 2px;
-}
-.nav-item:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.1);
-    border-left-color: #f8c62b;
-}
-.nav-item:hover .tooltip-label {
-    color: #f8c62b;
-}
-.nav-item.active,
-.nav-item.active:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.12);
-    border-left-color: #f8c62b;
 }
 
     </style>
@@ -2030,8 +2032,12 @@
                                 $('#previewFallback').show();
                                 $('#previewBadge').addClass('no-preview').html('<i class="fa fa-file-download"></i> No preview available');
                             }
-                            var previewModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('previewModal'));
-                            previewModal.show();
+                             var modalEl = document.getElementById('previewModal');
+                             if (modalEl && modalEl.parentNode !== document.body) {
+                                 document.body.appendChild(modalEl);
+                             }
+                             var previewModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                             previewModal.show();
                         });
 
                         document.getElementById('previewModal').addEventListener('hidden.bs.modal', function () {

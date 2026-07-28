@@ -699,15 +699,18 @@
         }
         /* Dashboard Footer */
 .dashboard-footer {
-    background: var(--footer-bg);
-    border-top: 3px solid #FDD700;
-    color: var(--text-secondary);
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    color: #888;
+    text-align: center;
     padding: 18px 28px;
-    font-size: 12.5px; margin-top: auto;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; gap: 6px;
-    transition: background 0.3s, border-color 0.3s;
+    font-size: 12.5px;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .dashboard-footer .footer-left {
@@ -805,7 +808,7 @@
     background: #eff6ff;
     border: 1.5px solid #bfdbfe;
     border-radius: 8px;
-    color: #2563eb;
+    color: #2563eb !important;
     font-family: 'Poppins', sans-serif;
     font-size: 12.5px;
     font-weight: 600;
@@ -813,12 +816,40 @@
     transition: all 0.25s;
     text-decoration: none;
 }
- 
+
 .btn-view-action:hover {
     border-color: #2563eb;
-    color: #fff;
+    color: #fff !important;
     background: #2563eb;
     text-decoration: none;
+}
+
+.btn-view-green {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #ecfdf5;
+    border: 1.5px solid #a7f3d0;
+    border-radius: 8px;
+    color: #047857 !important;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+}
+
+.btn-view-green:hover {
+    background: #059669;
+    border-color: #059669;
+    color: #fff !important;
+    text-decoration: none;
+}
+
+#filePreviewModal {
+    z-index: 1070 !important;
 }
  
 .template-file-badge {
@@ -831,20 +862,6 @@
     font-size: 12px;
     color: #555;
     font-weight: 500;
-}
-.nav-item:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.1);
-    border-left-color: #f8c62b;
-}
-.nav-item:hover .tooltip-label {
-    color: #f8c62b;
-}
-.nav-item.active,
-.nav-item.active:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.12);
-    border-left-color: #f8c62b;
 }
 
 
@@ -960,6 +977,18 @@
             </div>
         </div>
         
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius:12px; margin-bottom:20px;">
+                <i class="fa fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if (session('fail') || session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius:12px; margin-bottom:20px;">
+                <i class="fa fa-exclamation-circle me-2"></i> {{ session('fail') ?? session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
         <!-- Rooms Table Card -->
         <div class="table-card">
@@ -1042,6 +1071,29 @@
                                 <i class="fa fa-sign-out-alt"></i> Leave
                             </button>
                         </div>
+                    </div>
+                @elseif (empty($data->adviser_name) || $data->adviser_name === 'Not Yet Listed')
+                    <div class="empty-state" style="padding: 36px 20px;">
+                        <div class="empty-icon-wrap" style="background:#fff3ed; color:#e65100;">
+                            <i class="fa fa-user-clock"></i>
+                        </div>
+                        <h3 style="font-size:18px; font-weight:700; color:#1a1a1a; margin-top:12px;">Choose a Professor First</h3>
+                        <p style="color:#666; max-width:500px; margin:8px auto 20px; line-height:1.5;">
+                            You selected <strong>Not Yet Listed</strong> (or haven't assigned a professor yet). You cannot access or join a class without an assigned professor.
+                        </p>
+                        <form action="{{ route('student.updateProfessor') }}" method="POST" style="max-width:420px; margin:0 auto; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                            @csrf
+                            @method('PUT')
+                            <select name="adviser_name" class="form-select" style="flex:1; min-width:220px; padding:10px 14px; border-radius:10px; border:1px solid #d1d5db;" required>
+                                <option value="">Select your Professor</option>
+                                @foreach($professors as $prof)
+                                    <option value="{{ $prof->full_name }}">{{ $prof->full_name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="btn btn-danger" style="background:var(--red); border:none; padding:10px 24px; border-radius:10px; font-weight:600;">
+                                <i class="fa fa-save"></i> Save Professor
+                            </button>
+                        </form>
                     </div>
                 @elseif ($class->isEmpty())
                     <div class="empty-state">
@@ -1296,9 +1348,23 @@
                                 {{ \Carbon\Carbon::parse($template->created_at)->format('M d, Y h:i A') }}
                             </td>
                             <td>
-                                <a href="{{ url('/download', $template->file) }}" class="btn-view-action">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
+                                @php
+                                    $templateExt = strtolower(pathinfo($template->file, PATHINFO_EXTENSION));
+                                @endphp
+                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                    @if(in_array($templateExt, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
+                                        <button type="button"
+                                                class="btn-view-green btn-preview-file"
+                                                data-file-url="{{ url('/view/file', $template->file) }}"
+                                                data-file-name="{{ $template->name }}"
+                                                data-download-url="{{ url('/download', $template->file) }}">
+                                            <i class="fa fa-eye"></i> View
+                                        </button>
+                                    @endif
+                                    <a href="{{ url('/download', $template->file) }}" class="btn-view-action">
+                                        <i class="fa fa-download"></i> Download
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -1560,7 +1626,66 @@
             }
         });
     }
+
+    // File preview modal handler
+    $(document).on('click', '.btn-preview-file', function (e) {
+        e.preventDefault();
+        var fileUrl = $(this).data('file-url');
+        var fileName = $(this).data('file-name');
+        var downloadUrl = $(this).data('download-url');
+
+        $('#filePreviewTitle').text(fileName || 'Document Preview');
+        $('#filePreviewSubTitle').text(fileName || '');
+        $('#filePreviewDownloadBtn').attr('href', downloadUrl);
+        $('#filePreviewFrame').attr('src', fileUrl);
+
+        var modalEl = document.getElementById('filePreviewModal');
+        if (modalEl && modalEl.parentNode !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var modalEl = document.getElementById('filePreviewModal');
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                var frame = document.getElementById('filePreviewFrame');
+                if (frame) frame.src = 'about:blank';
+            });
+        }
+    });
 </script>
+
+<!-- =============== FILE PREVIEW MODAL =============== -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color:#fff; padding:16px 20px;">
+                <h5 class="modal-title" style="font-size:16px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
+                    <i class="fa fa-file-alt"></i> <span id="filePreviewTitle">Document Preview</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.8;"></button>
+            </div>
+            <div class="modal-body" style="padding:0; background:#f8fafc;">
+                <div style="padding:12px 18px; border-bottom:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                        <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:600; flex-shrink:0;">
+                            <i class="fa fa-eye"></i> Preview
+                        </span>
+                        <span id="filePreviewSubTitle" style="font-size:13px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+                    </div>
+                    <a id="filePreviewDownloadBtn" href="#" class="btn-view-action" style="padding:6px 14px; font-size:12px; text-decoration:none;">
+                        <i class="fa fa-download"></i> Download File
+                    </a>
+                </div>
+                <iframe id="filePreviewFrame" title="File Preview" style="width:100%; height:75vh; min-height:400px; border:0; background:#fff;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

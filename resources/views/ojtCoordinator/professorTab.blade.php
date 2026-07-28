@@ -1706,7 +1706,8 @@
                 bubble.classList.add('active');
             }
 
-            function sanitizeNameValue(value) {
+            function sanitizeNameValue(value, preserveTrailingSeparator = false) {
+                const endsWithSeparator = preserveTrailingSeparator && /[\s'-]$/.test(value || '');
                 let sanitized = (value || '').replace(/[^\p{L}\s'\-]/gu, '');
                 sanitized = sanitized.replace(/\s+/g, ' ');
                 sanitized = sanitized.replace(/\s*-\s*/g, '-');
@@ -1715,9 +1716,18 @@
                 sanitized = sanitized.replace(/'{2,}/g, "'");
                 sanitized = sanitized.trim();
 
-                return sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
+                sanitized = sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
                     return separator + character.toUpperCase();
                 });
+
+                if (endsWithSeparator && sanitized) {
+                    const trailingCharacter = (value || '').slice(-1);
+                    if (!/[\s'-]$/.test(sanitized)) {
+                        sanitized += trailingCharacter;
+                    }
+                }
+
+                return sanitized;
             }
 
             function getNameValidationError(value) {
@@ -1802,8 +1812,8 @@
             ].forEach(function (field) {
                 if (!field.input) return;
 
-                function syncNameField(showBubble) {
-                    field.input.value = sanitizeNameValue(field.input.value);
+                function syncNameField(showBubble, isLive = false) {
+                    field.input.value = sanitizeNameValue(field.input.value, isLive);
                     const validationError = getNameValidationError(field.input.value);
                     field.input.setCustomValidity(validationError);
                     setInputErrorState(field.input, Boolean(validationError));
@@ -1811,11 +1821,11 @@
                 }
 
                 field.input.addEventListener('input', function () {
-                    syncNameField(false);
+                    syncNameField(false, true);
                 });
 
                 field.input.addEventListener('blur', function () {
-                    syncNameField(Boolean(field.input.value.trim()));
+                    syncNameField(Boolean(field.input.value.trim()), false);
                 });
             });
 

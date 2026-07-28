@@ -71,7 +71,7 @@ class FileController extends Controller
         $user = $this->getLoggedInUser();
 
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $data = $this->managedUploadedFilesQuery($user)
@@ -89,7 +89,7 @@ class FileController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|mimes:doc,docx,pdf|max:30720',
+            'file' => 'required|mimes:doc,docx,pdf,xls,xlsx|max:30720',
             'name' => 'required|string|max:255',
         ]);
 
@@ -138,7 +138,7 @@ class FileController extends Controller
     {
         $user = $this->getLoggedInUser();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $data = $this->managedUploadedFilesQuery($user)->find($id);
@@ -155,7 +155,7 @@ class FileController extends Controller
     {
         $user = $this->getLoggedInUser();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $data = $this->managedUploadedFilesQuery($user)->find($id);
@@ -237,7 +237,7 @@ class FileController extends Controller
     public function search(Request $request){
         $user = $this->getLoggedInUser();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         if($request->search){
@@ -305,4 +305,36 @@ class FileController extends Controller
     // File not found, return a response indicating that
     return response()->json(['message' => 'File not found'], 404);
 }
+
+    public function viewFile($file)
+    {
+        $filePath = public_path('assets/' . $file);
+
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'File not found.');
+        }
+
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $viewableExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg'];
+
+        if (!in_array($ext, $viewableExtensions)) {
+            return response()->download($filePath, $file);
+        }
+
+        $mimeTypes = [
+            'pdf'  => 'application/pdf',
+            'png'  => 'image/png',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif'  => 'image/gif',
+            'webp' => 'image/webp',
+            'txt'  => 'text/plain',
+            'svg'  => 'image/svg+xml',
+        ];
+
+        return response()->file($filePath, [
+            'Content-Type'        => $mimeTypes[$ext] ?? 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="' . $file . '"',
+        ]);
+    }
 }

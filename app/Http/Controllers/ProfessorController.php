@@ -532,7 +532,7 @@ public function show_list($roomId)
 public function requirementStatusClasses()
 {
     if (!Session::has('loginId')) {
-        return redirect('/login');
+        return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
     }
 
     $data = User::where('id', Session::get('loginId'))->first();
@@ -640,7 +640,7 @@ public function requirementStatusClasses()
 public function requirementStatus(Request $request, $roomId)
 {
     if (!Session::has('loginId')) {
-        return redirect('/login');
+        return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
     }
 
     $data = User::where('id', Session::get('loginId'))->first();

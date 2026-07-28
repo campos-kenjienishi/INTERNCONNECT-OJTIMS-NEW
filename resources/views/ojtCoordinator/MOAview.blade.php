@@ -964,6 +964,34 @@ body.dark-mode .darkmode-toggle {
                         </div>
                     </div>
 
+                    <div class="info-item">
+                        <div class="info-item-icon"><i class="fa fa-calendar-check"></i></div>
+                        <div>
+                            <div class="info-item-label">Date Notarized</div>
+                            <div class="info-item-value">
+                                @if(!empty($company->date_notarized))
+                                    {{ \Carbon\Carbon::parse($company->date_notarized)->format('M d, Y') }}
+                                @else
+                                    N/A
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-item-icon"><i class="fa fa-hourglass-end"></i></div>
+                        <div>
+                            <div class="info-item-label">Validity Period</div>
+                            <div class="info-item-value">
+                                @if(!empty($company->valid_until))
+                                    {{ \Carbon\Carbon::parse($company->valid_until)->format('M d, Y') }}
+                                @else
+                                    N/A
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

@@ -78,7 +78,7 @@ class PassDocuController extends Controller
             ->filter(fn ($category) => $this->normalizeRequirementPhase($category->phase ?? null) !== 'basic')
             ->values();
 
-        $submittedRequirements = FileRequirement::where('uploadedBy', $user->full_name)->get();
+        $submittedRequirements = FileRequirement::forUser($user)->get();
         $submittedRequirementNames = $submittedRequirements
             ->pluck('fileName')
             ->filter()
@@ -159,7 +159,7 @@ class PassDocuController extends Controller
             ->latest('id')
             ->first();
 
-        $requirement = FileRequirement::where('uploadedBy', $user->full_name)
+        $requirement = FileRequirement::forUser($user)
             ->where('fileName', 'Notarized MOA')
             ->where('file', $company->file)
             ->first();
@@ -170,6 +170,7 @@ class PassDocuController extends Controller
         $requirement->status = $sourceRequirement->status ?? 0;
         $requirement->adviser = $user->adviser_name;
         $requirement->uploadedBy = $user->full_name;
+        $requirement->uploader_user_id = $user->id;
 
         if (Schema::hasColumn('file_requirements', 'denial_reason')) {
             $requirement->denial_reason = $sourceRequirement->denial_reason ?? null;
@@ -187,7 +188,7 @@ class PassDocuController extends Controller
         $student = Student::where('user_id', $user->id)->first();
 
         if (!$student) {
-            FileRequirement::where('uploadedBy', $user->full_name)
+            FileRequirement::forUser($user)
                 ->where('fileName', 'Notarized MOA')
                 ->delete();
             return;
@@ -196,7 +197,7 @@ class PassDocuController extends Controller
         $linkedCompanies = $student->companies()->get()->filter(fn ($company) => !empty($company->file))->values();
         $validFiles = $linkedCompanies->pluck('file')->filter()->unique()->values();
 
-        $query = FileRequirement::where('uploadedBy', $user->full_name)
+        $query = FileRequirement::forUser($user)
             ->where('fileName', 'Notarized MOA');
 
         if ($validFiles->isEmpty()) {
@@ -250,7 +251,7 @@ class PassDocuController extends Controller
     private function requireStudentSession()
     {
         if (!Session::has('loginId')) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $user = User::where('id', Session::get('loginId'))->first();
@@ -259,7 +260,7 @@ class PassDocuController extends Controller
             request()->session()->invalidate();
             request()->session()->regenerateToken();
 
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         return $user;
@@ -491,7 +492,8 @@ public function fileReqCreate(Request $request){
     $fileup->file=$filename;
     $fileup->status = 0;
     $fileup->adviser = $request->adviser;
-    $fileup->uploadedBy = $request->uploadedBy;
+    $fileup->uploadedBy = $user->full_name;
+    $fileup->uploader_user_id = $user->id;
     
     // Save the model instance
     $res = $fileup->save();
@@ -527,7 +529,14 @@ public function removeFile($id)
             return redirect()->back()->with('error', 'File not found.');
         }
 
-        if ($data->uploadedBy !== $sessionCheck->full_name) {
+        $isOwner = false;
+        if (!empty($data->uploader_user_id)) {
+            $isOwner = ((int) $data->uploader_user_id === (int) $sessionCheck->id);
+        } else {
+            $isOwner = ($data->uploadedBy === $sessionCheck->full_name);
+        }
+
+        if (!$isOwner) {
             return redirect()->back()->with('error', 'You do not have permission to remove this file.');
         }
 
@@ -612,7 +621,7 @@ public function removeFile($id)
         $user = $sessionCheck;
 
         $fileRequirement = FileRequirement::where('id', $id)
-            ->where('uploadedBy', $user->full_name)
+            ->forUser($user)
             ->firstOrFail();
 
         $filePath = public_path('assets/' . $fileRequirement->file);
@@ -635,7 +644,7 @@ public function removeFile($id)
         $user = $sessionCheck;
 
         $fileRequirement = FileRequirement::where('id', $id)
-            ->where('uploadedBy', $user->full_name)
+            ->forUser($user)
             ->firstOrFail();
 
         $filePath = public_path('assets/' . $fileRequirement->file);
@@ -668,9 +677,9 @@ public function removeFile($id)
             $data = User::where('id', '=', Session::get('loginId'))->first();
             $userName = $data->full_name;
         }
-        $files=FileRequirement::where('adviser', '=',$data->full_name)
-                                ->where('uploadedBy', '=', $value)
-                                ->get();
+        $files = FileRequirement::where('adviser', '=', $data->full_name)
+            ->forUser($student)
+            ->get();
         
         return view('professor.studentRequire', compact('data','files', 'value','course', 'roomId'));
 

@@ -569,7 +569,7 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
     </nav>
 
     <div class="sidebar-footer">
-        <a href="{{ url('/login') }}" class="nav-item">
+        <a href="{{ url('/logout') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-sign-out-alt"></i></span>
             <span class="nav-label">Log Out</span>
             <span class="tooltip-label">Log Out</span>
@@ -819,49 +819,46 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                     <table id="fileTable" class="display" style="width:100%">
                         <thead>
                             <tr>
-                                <th>Student Name</th>
-                                <th>Company Name</th>
-                                <th>Company Address</th>
-                                <th>Nature of Business</th>
-                                <th>Nature of Linkages</th>
-                                <th>Level</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Reporting Time</th>
-                                <th>Contact Name</th>
-                                <th>Position</th>
-                                <th>Contact No.</th>
+                                <th style="white-space:nowrap; min-width:140px;">Student Name</th>
+                                <th style="white-space:nowrap; min-width:130px;">Course / Major</th>
+                                <th style="white-space:nowrap; min-width:70px;">Section</th>
+                                <th style="white-space:nowrap; min-width:160px;">Company Name</th>
+                                <th style="white-space:nowrap; min-width:120px;">Assigned Dept.</th>
+                                <th style="white-space:nowrap; min-width:110px;">Role</th>
+                                <th style="white-space:nowrap; min-width:100px;">Start Date</th>
+                                <th style="white-space:nowrap; min-width:100px;">End Date</th>
+                                <th style="white-space:nowrap; min-width:150px;">Reporting Time</th>
+                                <th style="white-space:nowrap; min-width:120px;">Contact Name</th>
+                                <th style="white-space:nowrap; min-width:110px;">Contact No.</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($studentData as $data)
                                 @if(isset($data['ojt']) && $data['ojt'])
-                                <tr>
+                                <tr data-course="{{ $data['student']->course ?? '' }}"
+                                    data-section="{{ $data['student']->year_and_section ?? '' }}"
+                                    data-department="{{ $data['ojt']->assigned_department ?? '' }}"
+                                    data-role="{{ $data['ojt']->student_role ?? '' }}">
                                     <td>
                                         <div class="name-cell">
                                             <div class="name-avatar">{{ strtoupper(substr($data['student']->full_name, 0, 1)) }}</div>
                                             <span class="name-text">{{ $data['student']->full_name }}</span>
                                         </div>
                                     </td>
+                                    <td>{{ $data['student']->course ?? '—' }}</td>
+                                    <td>{{ $data['student']->year_and_section ?? '—' }}</td>
                                     <td>
                                         <div style="display:flex; align-items:center; gap:5px;">
                                             <i class="fa fa-building" style="color:var(--red); font-size:11px;"></i>
                                             {{ $data['ojt']->company_name }}
                                         </div>
                                     </td>
-                                    <td class="company-address-cell" style="max-width:160px; word-break:break-word; font-size:12.5px;">{{ $data['ojt']->company_address }}</td>
-                                    <td>{{ $data['ojt']->nature_of_bus }}</td>
-                                    <td>{{ $data['ojt']->nature_of_link }}</td>
-                                    <td>
-                                    <span class="level-badge">
-                                    {{ Str::limit($data['ojt']->level, 15) }}
-                                    </span>
-                                    </td>
+                                    <td>{{ $data['ojt']->assigned_department ?? '' }}</td>
+                                    <td>{{ $data['ojt']->student_role ?? '' }}</td>
                                     <td><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date }}</span></td>
                                     <td><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date }}</span></td>
                                     <td class="report-time-cell" style="white-space:nowrap;"><i class="fa fa-clock" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->report_time }}</td>
                                     <td style="font-weight:600;">{{ $data['ojt']->contact_name }}</td>
-                                    <td class="position-cell" style="font-size:12.5px;">{{ $data['ojt']->contact_position }}</td>
                                     <td style="white-space:nowrap;"><i class="fa fa-phone" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->contact_number }}</td>
                                 </tr>
                                 @endif
@@ -1081,7 +1078,6 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
         });
     });
 
-    /* ── Dynamic end year options ── */
     /* ══════════════════════════════════════════════
        BUILD PRINT HTML
     ══════════════════════════════════════════════ */
@@ -1090,69 +1086,61 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
         const dateStr  = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
         const timeStr  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
 
-        const dt = $('#fileTable').DataTable();
-
+        const dt               = $('#fileTable').DataTable();
         const currentPageNodes = dt.rows({ page: 'current' }).nodes();
         const total            = currentPageNodes.length;
         const pageInfo         = dt.page.info();
         const pageNum          = pageInfo.page + 1;
         const pageCount        = pageInfo.pages;
 
-        const schoolYear = document.getElementById('school_year').value || '—';
-        const course     = document.getElementById('course').value || '?';
+        const schoolYear   = document.getElementById('school_year') ? document.getElementById('school_year').value : '—';
+        const courseSelect = document.getElementById('course');
+        const course       = courseSelect && courseSelect.value ? courseSelect.value : '—';
+        const campusName   = @json($campusName ?? config('campus.name', 'PUP Taguig Branch'));
 
         let rowsHTML = '';
         for (let i = 0; i < currentPageNodes.length; i++) {
-            const tds = currentPageNodes[i].querySelectorAll('td');
+            const tr  = currentPageNodes[i];
+            const tds = tr.querySelectorAll('td');
 
-            const getName = (idx) => {
-                if (!tds[idx]) return '';
-                const nt = tds[idx].querySelector('.name-text');
-                return nt ? nt.textContent.trim() : tds[idx].textContent.trim();
+            const getName = () => {
+                if (!tds[0]) return '';
+                const nt = tds[0].querySelector('.name-text');
+                return nt ? nt.textContent.trim() : tds[0].textContent.trim();
             };
-            const get = (idx) => tds[idx] ? tds[idx].textContent.trim() : '';
+            const getCompany = () => {
+                if (!tds[3]) return '';
+                return tds[3].textContent.trim();
+            };
 
-            const rowNum = pageInfo.start + i + 1;
-            const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+            const rowNum             = pageInfo.start + i + 1;
+            const rowBg              = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+            const studentName        = getName();
+            const courseMajor        = tr.getAttribute('data-course') || (tds[1] ? tds[1].textContent.trim() : '');
+            const section            = tr.getAttribute('data-section') || (tds[2] ? tds[2].textContent.trim() : '');
+            const companyName        = getCompany();
+            const startDate          = tds[6] ? tds[6].textContent.trim() : '';
+            const assignedDepartment = tr.getAttribute('data-department') || (tds[4] ? tds[4].textContent.trim() : '');
+            const studentRole        = tr.getAttribute('data-role') || (tds[5] ? tds[5].textContent.trim() : '');
 
             rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
-                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#6b7280; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">${rowNum}</td>
-                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${getName(0)}</td>
-                <td style="padding:7px 6px; font-size:9px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${get(1)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(2)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(3)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(4)}</td>
-                <td style="padding:7px 6px; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">
-                <span style="
-                display:inline-block;
-                background:#dbeafe;
-                color:#1d4ed8;
-                border-radius:4px;
-                padding:2px 4px;
-                font-size:8px;
-                font-weight:700;
-                white-space:normal;
-                word-break:break-word;
-                text-align:center;
-                line-height:1.1;
-                max-width:55px;
-                ">
-                ${get(5)}
-                </span>
-                </td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#059669; font-weight:600; vertical-align:top; white-space:nowrap; border-right:1px solid #e5e7eb;">${get(6)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#059669; font-weight:600; vertical-align:top; white-space:nowrap; border-right:1px solid #e5e7eb;">${get(7)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(8)}</td>
-                <td style="padding:7px 6px; font-size:9px; font-weight:600; color:#111827; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(9)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#6b7280; vertical-align:top; word-break:break-word; border-right:1px solid #e5e7eb;">${get(10)}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; word-break:break-word;">${get(11)}</td>
+                <td style="padding:7px 6px; font-size:9px; font-weight:700; color:#6b7280; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">${rowNum}</td>
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${studentName}</td>
+                <td style="padding:7px 6px; font-size:9px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${courseMajor}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center;">${section}</td>
+                <td style="padding:7px 6px; font-size:9px; font-weight:600; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${companyName}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${startDate}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${assignedDepartment}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${studentRole}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top;"></td>
             </tr>`;
         }
 
         return `
         <div style="font-family:'Poppins',Arial,sans-serif; background:#fff;">
 
+            <!-- HEADER -->
             <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
                 <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
                 <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
@@ -1161,8 +1149,8 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                     </div>
                     <div style="flex:1;">
                         <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
-                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Student OJT Information Report</div>
-                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus &nbsp;|&nbsp; College of Engineering and Technology</div>
+                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">OJT REPORT FORM</div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">${campusName}</div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
                         <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
@@ -1175,6 +1163,7 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                 <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
             </div>
 
+            <!-- META ROW -->
             <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
                 <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
@@ -1189,63 +1178,79 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
                     </div>
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Showing:</span>
-                        <strong style="color:#111827;">${total} student${total !== 1 ? 's' : ''} (Page ${pageNum})</strong>
+                        <span style="color:#6b7280;">Total No. of Students:</span>
+                        <strong style="color:#111827;">${total}</strong>
                     </div>
                 </div>
                 <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
             </div>
 
+            <!-- SECTION LABEL -->
             <div style="padding:9px 22px 3px 22px;">
-                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Student Placement Details — Page ${pageNum}</div>
+                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Student OJT Placement Details — Page ${pageNum}</div>
             </div>
 
+            <!-- DATA TABLE (Template columns: NO., STUDENT NAME, COURSE / MAJOR, SECTION, COMPANY NAME, START DATE OF OJT, ASSIGNED DEPARTMENT, ROLE, REMARKS (RHired)) -->
             <div style="padding:4px 22px 0 22px;">
                 <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
                     <colgroup>
-                        <col style="width:3%;">    <col style="width:10%;">   <col style="width:9%;">    <col style="width:10%;">   <col style="width:8%;">    <col style="width:8%;">    <col style="width:6%;">    <col style="width:6%;">    <col style="width:6%;">    <col style="width:10%;">   <col style="width:9%;">    <col style="width:8%;">    <col style="width:7%;">    </colgroup>
+                        <col style="width:4%;">   <!-- NO. -->
+                        <col style="width:18%;">  <!-- STUDENT NAME -->
+                        <col style="width:12%;">  <!-- COURSE / MAJOR -->
+                        <col style="width:8%;">   <!-- SECTION -->
+                        <col style="width:20%;">  <!-- COMPANY NAME -->
+                        <col style="width:12%;">  <!-- START DATE OF OJT -->
+                        <col style="width:12%;">  <!-- ASSIGNED DEPARTMENT -->
+                        <col style="width:10%;">  <!-- ROLE -->
+                        <col style="width:14%;">  <!-- REMARKS(RHIRED) -->
+                    </colgroup>
                     <thead>
                         <tr style="background:#7f0000;">
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">#</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Student Name</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Company</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Address</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Nat. Business</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Linkages</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Level</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Start</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">End</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Schedule</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Contact Person</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15); overflow:hidden;">Position</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; overflow:hidden;">Contact No.</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">NO.</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">STUDENT NAME</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">COURSE / MAJOR</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">SECTION</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">COMPANY NAME</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">START DATE OF OJT</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">ASSIGNED DEPARTMENT</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">ROLE</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left;">REMARKS (RHIRED)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${rowsHTML || `<tr><td colspan="13" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
+                        ${rowsHTML || `<tr><td colspan="9" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
                     </tbody>
                 </table>
             </div>
 
-            <div style="page-break-inside: avoid !important; break-inside: avoid !important; display: table; width: 100%;">
-                <div style="padding:18px 22px 12px 22px;">
-                    <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
-                        <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
-                            <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Disclaimer</div>
-                            <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">
-                                This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.
-                            </div>
+            <!-- SUBMITTED BY SECTION -->
+            <div style="padding:22px 22px 10px 22px; font-size:11px;">
+                <div style="width:40%;">
+                    <div style="color:#4b5563; font-weight:600; text-transform:uppercase; font-size:9.5px; letter-spacing:0.5px;">Submitted by:</div>
+                    <div style="font-weight:800; color:#111827; margin-top:8px; font-size:11.5px;">${@json($user->full_name ?? 'OJT Coordinator')}</div>
+                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">OJT Coordinator</div>
+                </div>
+            </div>
+
+            <!-- REPORT DISCLAIMER -->
+            <div style="padding:10px 22px 12px 22px;">
+                <div style="border-top:1px dashed #d1d5db; padding-top:14px;">
+                    <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                        <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Disclaimer</div>
+                        <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">
+                            This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
-                        <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
-                    </div>
-                    <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: OJT-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
+            <!-- DOCUMENT FOOTER -->
+            <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
+                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                 </div>
+                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: OJT-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
             </div>
 
         </div>`;

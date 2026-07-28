@@ -23,7 +23,7 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!Session::has('loginId')) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $user = User::where('id', Session::get('loginId'))->first();
@@ -32,14 +32,22 @@ class RoleMiddleware
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         if (!in_array((string) $user->role, $roles, true)) {
             return $this->redirectToDashboard($user);
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        if ($response instanceof Response) {
+            $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
+        }
+
+        return $response;
     }
 
     /**
@@ -48,14 +56,14 @@ class RoleMiddleware
     private function redirectToDashboard(?User $user): Response
     {
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         return match ((string) $user->role) {
             '0' => redirect()->route('student_home'),
             '1' => redirect('/dashboard'),
             '2' => redirect()->route('professor_home'),
-            default => redirect('/login'),
+            default => response()->view('errors.something-went-wrong', ['statusCode' => 401], 401),
         };
     }
 }
