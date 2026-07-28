@@ -71,7 +71,7 @@ class FileController extends Controller
         $user = $this->getLoggedInUser();
 
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $data = $this->managedUploadedFilesQuery($user)
@@ -138,7 +138,7 @@ class FileController extends Controller
     {
         $user = $this->getLoggedInUser();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $data = $this->managedUploadedFilesQuery($user)->find($id);
@@ -155,7 +155,7 @@ class FileController extends Controller
     {
         $user = $this->getLoggedInUser();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         $data = $this->managedUploadedFilesQuery($user)->find($id);
@@ -237,7 +237,7 @@ class FileController extends Controller
     public function search(Request $request){
         $user = $this->getLoggedInUser();
         if (!$user) {
-            return redirect('/login');
+            return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
         if($request->search){
