@@ -1315,7 +1315,7 @@
                         <option value="">All Classes</option>
                         @if(isset($class))
                             @foreach($class as $room)
-                                <option value="{{ $room->room }}">{{ $room->room }}</option>
+                                <option value="{{ $room->room }}" data-course="{{ $room->course }}">{{ $room->room }}</option>
                             @endforeach
                         @endif
                     </select>
@@ -1399,15 +1399,44 @@ $(document).ready(function() {
         }
     });
 
+    function updateFilters() {
+        var courseVal = $('#courseFilter').val();
+        var classVal = $('#classFilter').val();
+
+        $('#classFilter option').each(function() {
+            var optCourse = $(this).data('course');
+            if (!optCourse) return;
+
+            if (!courseVal || optCourse === courseVal) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+
+        if (courseVal && classVal) {
+            var $selectedOpt = $('#classFilter option:selected');
+            if ($selectedOpt.val() && $selectedOpt.data('course') !== courseVal) {
+                $('#classFilter').val('');
+                classVal = '';
+            }
+        }
+
+        table.column(2).search(courseVal ? '^' + $.fn.dataTable.util.escapeRegex(courseVal) + '$' : '', true, false);
+        table.column(3).search(classVal ? '^' + $.fn.dataTable.util.escapeRegex(classVal) + '$' : '', true, false);
+        table.draw();
+    }
+
     $('#courseFilter').on('change', function() {
-        var val = $(this).val();
-        table.column(2).search(val ? '^' + $.fn.dataTable.util.escapeRegex(val) + '$' : '', true, false).draw();
-        $('#classFilter').val('');
+        updateFilters();
     });
+
     $('#classFilter').on('change', function() {
-        var val = $(this).val();
-        table.column(3).search(val ? '^' + $.fn.dataTable.util.escapeRegex(val) + '$' : '', true, false).draw();
-        $('#courseFilter').val('');
+        var selectedCourse = $(this).find('option:selected').data('course');
+        if (selectedCourse && !$('#courseFilter').val()) {
+            $('#courseFilter').val(selectedCourse);
+        }
+        updateFilters();
     });
 });
 </script>
