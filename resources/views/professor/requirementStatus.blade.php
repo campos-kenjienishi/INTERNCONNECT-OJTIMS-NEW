@@ -303,7 +303,7 @@
 @php
     $totalStudents = $allStudentStatuses->count();
     $completeStudents = $allStudentStatuses->where('missingCount', 0)->count();
-    $categoryCount = $categories->count();
+    $categoryCount = isset($categoryNames) ? $categoryNames->count() : ($categories->count() + 1);
     $averageCompletion = $totalStudents > 0 ? round($allStudentStatuses->avg('completion')) : 0;
     $studentsWithMissing = $allStudentStatuses->filter(fn ($status) => $status['missingCount'] > 0)->count();
     $studentsWithPending = $allStudentStatuses->filter(fn ($status) => $status['pendingCount'] > 0)->count();
@@ -585,7 +585,7 @@
             <div class="report-head">
                 <div class="report-head-left">
                     <h2>Student Requirement Matrix</h2>
-                    <p>Submitted and missing requirements are based on the current professor file categories.</p>
+                    <p>Submitted and missing requirements are based on professor file categories and Notarized MOA.</p>
                 </div>
                 <div class="report-head-meta">
                     <p class="report-generated">Generated: {{ now()->format('M d, Y h:i A') }}</p>

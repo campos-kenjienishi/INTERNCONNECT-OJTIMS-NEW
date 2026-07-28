@@ -537,9 +537,14 @@ public function requirementStatusClasses()
 
     $data = User::where('id', Session::get('loginId'))->first();
     $professor = Professor::where('full_name', $data->full_name)->first();
-    $categoryCount = $professor
-        ? FileCategory::where('professor_id', $professor->id)->count()
-        : 0;
+    $monitoredCategoryNames = $professor
+        ? FileCategory::where('professor_id', $professor->id)->pluck('fileName')->values()
+        : collect();
+
+    if (!$monitoredCategoryNames->map(fn ($n) => mb_strtolower(trim((string) $n)))->contains('notarized moa')) {
+        $monitoredCategoryNames->push('Notarized MOA');
+    }
+    $categoryCount = $monitoredCategoryNames->count();
 
     $allClasses = $this->professorClassQuery($data->full_name, false)
         ->orderByDesc('created_at')
@@ -571,24 +576,33 @@ public function requirementStatusClasses()
         $studentCount = $studentNames->count();
         $totalStudents += $studentCount;
 
-        $submittedPairs = FileRequirement::where('adviser', $data->full_name)
+        $submittedPairs = FileRequirement::where(function ($query) use ($data) {
+                $query->where('adviser', $data->full_name)
+                    ->orWhereNull('adviser')
+                    ->orWhere('adviser', '');
+            })
             ->whereIn('uploadedBy', $studentNames)
             ->select('uploadedBy', 'fileName')
             ->get()
             ->groupBy('uploadedBy');
 
+        $monitoredLower = $monitoredCategoryNames->map(fn ($n) => mb_strtolower(trim((string) $n)));
+
         $completeCount = 0;
         $submittedCategoryTotal = 0;
         foreach ($studentNames as $studentName) {
-            $submittedCount = $submittedPairs->get($studentName, collect())
+            $studentFiles = $submittedPairs->get($studentName, collect())
                 ->pluck('fileName')
                 ->map(fn ($name) => mb_strtolower(trim((string) $name)))
-                ->unique()
+                ->unique();
+
+            $matchingCount = $monitoredLower
+                ->filter(fn ($catKey) => $studentFiles->contains($catKey))
                 ->count();
 
-            $submittedCategoryTotal += min($submittedCount, $categoryCount);
+            $submittedCategoryTotal += $matchingCount;
 
-            if ($categoryCount > 0 && $submittedCount >= $categoryCount) {
+            if ($categoryCount > 0 && $matchingCount >= $categoryCount) {
                 $completeCount++;
             }
         }
@@ -681,11 +695,19 @@ public function requirementStatus(Request $request, $roomId)
 
     $students = $studentsQuery->get();
     $categoryNames = $categories->pluck('fileName')->values();
+    if (!$categoryNames->map(fn ($n) => mb_strtolower(trim((string) $n)))->contains('notarized moa')) {
+        $categoryNames->push('Notarized MOA');
+    }
+
     $categoryLookup = $categoryNames->mapWithKeys(function ($name) {
         return [mb_strtolower(trim((string) $name)) => $name];
     });
 
-    $requirements = FileRequirement::where('adviser', $data->full_name)
+    $requirements = FileRequirement::where(function ($query) use ($data) {
+            $query->where('adviser', $data->full_name)
+                ->orWhereNull('adviser')
+                ->orWhere('adviser', '');
+        })
         ->whereIn('uploadedBy', $students->pluck('full_name')->filter()->values())
         ->get()
         ->groupBy('uploadedBy');
@@ -773,12 +795,13 @@ public function requirementStatus(Request $request, $roomId)
         ]
     );
 
-    $requirementInsights = $this->buildRequirementStatusInsights($course, $categories, $allStudentStatuses);
+    $requirementInsights = $this->buildRequirementStatusInsights($course, $categoryNames, $allStudentStatuses);
 
     return view('professor.requirementStatus', compact(
         'data',
         'course',
         'categories',
+        'categoryNames',
         'studentStatuses',
         'allStudentStatuses',
         'activeView',
@@ -789,7 +812,7 @@ public function requirementStatus(Request $request, $roomId)
 protected function buildRequirementStatusInsights($course, $categories, $allStudentStatuses): array
 {
     $totalStudents = $allStudentStatuses->count();
-    $categoryCount = $categories->count();
+    $categoryCount = $categories instanceof \Illuminate\Support\Collection ? $categories->count() : (is_array($categories) ? count($categories) : 0);
     $completeStudents = $allStudentStatuses->where('missingCount', 0)->count();
     $studentsWithMissing = $allStudentStatuses->filter(fn ($status) => $status['missingCount'] > 0)->count();
     $studentsWithPending = $allStudentStatuses->filter(fn ($status) => $status['pendingCount'] > 0)->count();
