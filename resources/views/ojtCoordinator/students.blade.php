@@ -1327,15 +1327,8 @@ body.dark-mode .dashboard-footer .footer-copy {
     transition: color 0.2s;
 }
 
-.dashboard-footer a:hover {
-    color: var(--red);
-    text-decoration: none;
-}
-
-.dashboard-footer .divider {
-    color: #e5e5e5;
-    margin: 0 2px;
-}
+            background: #252525; border-color: #444; color: #fff;
+        }
     </style>
 </head>
 
@@ -1363,7 +1356,7 @@ body.dark-mode .dashboard-footer .footer-copy {
             @endif
         </div>
         <div class="user-info">
-            <span class="user-name">{{ $user->full_name }}</span>
+            <span class="user-name">{{ is_object($user) ? ($user->full_name ?? 'OJT Coordinator') : 'OJT Coordinator' }}</span>
             <span class="user-role">OJT Coordinator</span>
         </div>
     </a>
@@ -1409,14 +1402,12 @@ body.dark-mode .dashboard-footer .footer-copy {
             <span class="nav-label">Analytics</span>
             <span class="tooltip-label">Analytics</span>
         </a>
-        <li>
-    <a href="{{ url('/auditlog') }}" class="nav-item">
+        <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-</li>
-</nav>
+    </nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/logout') }}" class="nav-item">
@@ -1454,18 +1445,23 @@ body.dark-mode .dashboard-footer .footer-copy {
 
         <!-- Page Header -->
         <div class="page-header">
-    <div>
-        <h1>Active <span>Students</span></h1>
-        <div class="breadcrumb">
-            <a href="{{ url('/dashboard') }}"><i class="fa fa-home"></i> Dashboard</a>
-            <i class="fa fa-chevron-right"></i>
-            <span>Students</span>
+            <div>
+                <h1>Active <span>Students</span></h1>
+                <div class="breadcrumb">
+                    <a href="{{ url('/dashboard') }}"><i class="fa fa-home"></i> Dashboard</a>
+                    <i class="fa fa-chevron-right"></i>
+                    <span>Students</span>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="{{ route('coordinator.studentRequirements') }}" class="btn" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color: #ffffff !important; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; text-decoration: none !important; box-shadow: 0 4px 14px rgba(127,0,0,0.3); display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa fa-folder-open"></i> Student Requirements Matrix
+                </a>
+                <button class="btn-back" onclick="window.location.href='{{ url('/dashboard') }}'">
+                    <i class="fa fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
         </div>
-    </div>
-    <button class="btn-back" onclick="window.location.href='{{ url('/dashboard') }}'">
-        <i class="fa fa-arrow-left"></i> Back to Dashboard
-    </button>
-</div>
 
         <!-- Stats Row -->
         @php $totalStudents = count($studentData); @endphp

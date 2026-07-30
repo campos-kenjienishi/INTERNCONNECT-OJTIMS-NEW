@@ -22,6 +22,11 @@ class Student extends Model
         return $this->belongsToMany(Company::class, 'company_student', 'student_id', 'company_id');
     }
 
+    public function moaUnlockRequests()
+    {
+        return $this->hasMany(MoaUnlockRequest::class, 'student_id');
+    }
+
     public function professor()
     {
         return $this->belongsTo(Professor::class, 'adviser_name', 'full_name');

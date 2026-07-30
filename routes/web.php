@@ -96,6 +96,12 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::post('/uploadMOA', [MOAUploadController::class,'uploadfile']);
     Route::post('/moa/remove/{id}', [MOAUploadController::class,'remove']);
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');
+    Route::get('/moa/unlock-requests', [MOAUploadController::class, 'unlockRequests'])->name('coordinator.moa.unlockRequests');
+    Route::post('/moa/unlock-requests/{id}/approve', [MOAUploadController::class, 'approveUnlock'])->name('coordinator.moa.approveUnlock');
+    Route::post('/moa/unlock-requests/{id}/deny', [MOAUploadController::class, 'denyUnlock'])->name('coordinator.moa.denyUnlock');
+    Route::get('/coordinator/student-requirements', [PassDocuController::class, 'coordinatorStudentRequirements'])->name('coordinator.studentRequirements');
+    Route::get('/coordinator/requirements/view/{id}', [PassDocuController::class, 'coordinatorViewRequirement'])->name('coordinator.requirements.view');
+    Route::get('/coordinator/requirements/download/{id}', [PassDocuController::class, 'coordinatorDownloadRequirement'])->name('coordinator.requirements.download');
     Route::post('/sendFile', [MOAUploadController::class,'sendFiles']);
     Route::get('/send/download/{file}', [MOAUploadController::class, 'downloadFile'])->name('download.file');
     Route::post('/status/{studentNum}', [StudentController::class,'update']);
@@ -130,6 +136,7 @@ Route::middleware([
     Route::post('/student/MOA/link', [CompanyController::class,'linkExistingMoa'])->name('student.moa.link');
     Route::put('/student/MOA/{id}', [CompanyController::class,'companyUpdate'])->name('student.moa.update');
     Route::post('/student/moa/remove/{id}', [MOAUploadController::class,'studentRemove'])->name('student.moa.remove');
+    Route::post('/student/moa/request-unlock', [MOAUploadController::class, 'requestUnlock'])->name('student.moa.requestUnlock');
     Route::get('/student/pending', [CompanyController::class,'pending']);
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);

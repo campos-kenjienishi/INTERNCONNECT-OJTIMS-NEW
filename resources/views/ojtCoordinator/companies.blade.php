@@ -893,9 +893,14 @@ body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5
                     <span>MOA</span>
                 </div>
             </div>
-            <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
-                <i class="fa fa-plus"></i> Add New Company
-            </button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{{ route('coordinator.moa.unlockRequests') }}" class="btn-add" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); text-decoration: none;">
+                    <i class="fa fa-key"></i> Unlock Requests
+                </a>
+                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
+                    <i class="fa fa-plus"></i> Add New Company
+                </button>
+            </div>
         </div>
 
         <!-- Stats Row -->

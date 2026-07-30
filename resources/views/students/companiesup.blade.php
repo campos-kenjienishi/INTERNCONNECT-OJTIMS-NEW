@@ -706,6 +706,25 @@
             box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
         }
 
+        select.modal-field-input {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        body.dark-mode select.modal-field-input {
+            background-color: #1e1e1e;
+            border-color: #333;
+            color: #f3f4f6;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+
         .school-year-row {
             display: flex;
             flex-direction: column;
@@ -1048,10 +1067,50 @@
                     <span>Notarized MOA</span>
                 </div>
             </div>
-            <button class="btn-add-moa" data-bs-toggle="modal" data-bs-target="#addMoaModal">
-                <i class="fa fa-plus-circle"></i> Add Notarized MOA
-            </button>
+            @if(empty($isLocked))
+                <button class="btn-add-moa" data-bs-toggle="modal" data-bs-target="#addMoaModal">
+                    <i class="fa fa-plus-circle"></i> Add Notarized MOA
+                </button>
+            @else
+                @if(isset($unlockRequest) && $unlockRequest->status === 'pending')
+                    <button class="btn-add-moa" style="background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); cursor: default;" disabled>
+                        <i class="fa fa-clock"></i> Unlock Request Pending
+                    </button>
+                @else
+                    <button class="btn-add-moa" style="background: linear-gradient(135deg, #475569 0%, #1e293b 100%);" data-bs-toggle="modal" data-bs-target="#requestUnlockModal">
+                        <i class="fa fa-key"></i> Request MOA Unlock
+                    </button>
+                @endif
+            @endif
         </div>
+
+        @if(!empty($isLocked))
+            <!-- Lock Alert Banner -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 20px; flex-shrink: 0;">
+                        <i class="fa fa-lock"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 15px; font-weight: 700; color: #f8fafc;">MOA Selection Locked</div>
+                        <div style="font-size: 13px; color: #94a3b8; margin-top: 2px;">
+                            Your account is locked to your selected company MOA. Browsing or linking to other companies is disabled.
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    @if(isset($unlockRequest) && $unlockRequest->status === 'pending')
+                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15; font-size: 13px; font-weight: 600;">
+                            <i class="fa fa-clock"></i> Request Pending Review
+                        </span>
+                    @else
+                        <button type="button" class="btn" style="background: #ef4444; color: #fff; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 10px; border: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;" data-bs-toggle="modal" data-bs-target="#requestUnlockModal">
+                            <i class="fa fa-key"></i> Request MOA Reset / Change
+                        </button>
+                    @endif
+                </div>
+            </div>
+        @endif
 
         <!-- Info Banner -->
         <div class="info-banner">
@@ -1151,7 +1210,8 @@
                                         onclick="openPdfPreview('{{ asset('assets/' . $company->file) }}')">
                                         <i class="fa fa-print"></i> Print PDF
                                     </button>
-                                    @if($isOwner)
+                                     @php $companyHasEditUnlock = is_callable($hasApprovedEditUnlock) ? $hasApprovedEditUnlock($company->id) : !empty($hasApprovedEditUnlock); @endphp
+                                     @if($isOwner && (empty($isLocked) || $companyHasEditUnlock))
                                         <button type="button"
                                             class="btn-action"
                                             style="background:#eff6ff; border-color:#bfdbfe; color:#2563eb;"
@@ -1169,13 +1229,43 @@
                                             <i class="fa fa-edit"></i> Edit
                                         </button>
                                     @endif
-                                    <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
-                                        onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}', {{ $isOwner ? 'true' : 'false' }})">
-                                        <i class="fa fa-trash"></i> {{ $isOwner ? 'Remove' : 'Unlink' }}
-                                    </button>
-                                    <form id="student-remove-form-{{ $company->id }}" action="{{ route('student.moa.remove', $company->id) }}" method="POST" style="display:none;">
-                                        @csrf
-                                    </form>
+                                    @if(!empty($isLocked))
+                                        @if(!empty($unlockRequest) && $unlockRequest->status === 'pending')
+                                            <button type="button" class="btn-action" disabled style="border:1.5px solid #fcd34d; color:#b45309; background:#fffbeb; cursor:not-allowed; opacity:0.9;" title="Your unlock request is pending coordinator approval.">
+                                                <i class="fa fa-clock me-1"></i> Unlock Request Pending
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
+                                                onclick="openUnlockRequestModal('{{ $isOwner ? 'edit' : 'unlink' }}', {{ $isOwner ? 'true' : 'false' }})">
+                                                <i class="fa fa-key me-1"></i> {{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}
+                                            </button>
+                                            <script>
+                                                function openUnlockRequestModal(type, isOwner) {
+                                                    const select = document.getElementById('modalRequestType');
+                                                    if (select) {
+                                                        const editOpt = select.querySelector('option[value="edit"]');
+                                                        if (isOwner === false) {
+                                                            if (editOpt) editOpt.style.display = 'none';
+                                                            select.value = 'unlink';
+                                                        } else {
+                                                            if (editOpt) editOpt.style.display = 'block';
+                                                            select.value = type || 'edit';
+                                                        }
+                                                    }
+                                                    const modal = new bootstrap.Modal(document.getElementById('requestUnlockModal'));
+                                                    modal.show();
+                                                }
+                                            </script>
+                                        @endif
+                                    @else
+                                        <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
+                                            onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}', {{ $isOwner ? 'true' : 'false' }})">
+                                            <i class="fa fa-trash"></i> {{ $isOwner ? 'Remove' : 'Unlink' }}
+                                        </button>
+                                        <form id="student-remove-form-{{ $company->id }}" action="{{ route('student.moa.remove', $company->id) }}" method="POST" style="display:none;">
+                                            @csrf
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -1406,7 +1496,7 @@
                                 <div style="font-size: 11.5px; color: #777; line-height: 1.6;">
                                     Ensure your MOA is properly <strong>notarized</strong> before submitting.
                                     Accepted format: <strong>PDF only</strong>.
-                                    Max file size: <strong>2 MB</strong>.
+                                    Max file size: <strong>30 MB</strong>.
                                 </div>
                             </div>
                         </div>
@@ -1858,22 +1948,76 @@
             });
         }
 
+        let pendingFormType = null;
+        let pendingCompanyId = null;
+
         document.querySelectorAll('.existing-moa-link-btn').forEach(function (button) {
             button.addEventListener('click', function () {
                 const companyIdInput = document.getElementById('linkExistingMoaCompanyId');
                 const linkForm = document.getElementById('linkExistingMoaForm');
+                if (!companyIdInput || !linkForm) return;
 
-                if (!companyIdInput || !linkForm) {
-                    return;
+                pendingCompanyId = this.dataset.companyId || '';
+                companyIdInput.value = pendingCompanyId;
+
+                const item = this.closest('.existing-moa-item');
+                const companyName = item ? (item.querySelector('[style*="font-weight:800"]')?.innerText || 'this company') : 'this company';
+
+                document.getElementById('confirmCompanyNameText').innerText = companyName;
+                pendingFormType = 'link';
+
+                // Close addMoaModal if open
+                const addModalEl = document.getElementById('addMoaModal');
+                if (addModalEl) {
+                    const addModalInst = bootstrap.Modal.getInstance(addModalEl);
+                    if (addModalInst) addModalInst.hide();
                 }
 
-                companyIdInput.value = this.dataset.companyId || '';
-                this.disabled = true;
-                this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Linking...';
-                linkForm.submit();
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmMoaLockModal'));
+                confirmModal.show();
             });
         });
+
+        const studentMoaForm = document.getElementById('studentMoaForm');
+        if (studentMoaForm) {
+            studentMoaForm.addEventListener('submit', function (e) {
+                if (window.moaLockConfirmed) return;
+
+                e.preventDefault();
+                const companyNameInput = this.querySelector('input[name="company_name"]');
+                const compName = companyNameInput ? companyNameInput.value.trim() : 'this company';
+
+                document.getElementById('confirmCompanyNameText').innerText = compName || 'this company';
+                pendingFormType = 'create';
+
+                const addModalEl = document.getElementById('addMoaModal');
+                if (addModalEl) {
+                    const addModalInst = bootstrap.Modal.getInstance(addModalEl);
+                    if (addModalInst) addModalInst.hide();
+                }
+
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmMoaLockModal'));
+                confirmModal.show();
+            });
+        }
+
+        const btnConfirmLockSubmit = document.getElementById('btnConfirmLockSubmit');
+        if (btnConfirmLockSubmit) {
+            btnConfirmLockSubmit.addEventListener('click', function () {
+                this.disabled = true;
+                this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Processing...';
+
+                if (pendingFormType === 'link') {
+                    const linkForm = document.getElementById('linkExistingMoaForm');
+                    if (linkForm) linkForm.submit();
+                } else if (pendingFormType === 'create') {
+                    window.moaLockConfirmed = true;
+                    if (studentMoaForm) studentMoaForm.submit();
+                }
+            });
+        }
     });
+
     document.addEventListener('click', function(e) {
     const btn = e.target.closest('.view-btn');
     if (btn) {
@@ -1888,6 +2032,85 @@
     });
 @endif
 </script>
+
+<!-- =============== CONFIRM MOA LOCK MODAL =============== -->
+<div class="modal fade" id="confirmMoaLockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: #fff5f5; border-bottom: 1px solid #fee2e2;">
+                <h5 class="modal-title" style="color: var(--red); font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                    <i class="fa fa-exclamation-triangle"></i> Confirm MOA Lock
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <p style="font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 14px;">
+                    Are you sure you want to proceed with <strong id="confirmCompanyNameText" style="color:#111827;">this company</strong>?
+                </p>
+                <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 14px; font-size: 13px; color: #9f1239; line-height: 1.5;">
+                    <i class="fa fa-lock me-1"></i> <strong>Important:</strong> Once confirmed, your selection will be <strong>locked</strong>. You will not be able to browse or select other company MOAs without prior approval from your Internship Coordinator.
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #fafafa;">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-modal-submit" id="btnConfirmLockSubmit">
+                    <i class="fa fa-lock me-1"></i> Yes, Confirm & Lock Selection
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== REQUEST UNLOCK MODAL =============== -->
+<div class="modal fade" id="requestUnlockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.18);">
+            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 18px 24px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                        <i class="fa fa-key"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title" style="color: #0f172a; font-weight: 700; font-size: 16px; margin: 0;">
+                            Request MOA Unlock
+                        </h5>
+                        <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Coordinator approval required</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('student.moa.requestUnlock') }}" method="POST">
+                @csrf
+                <div class="modal-body" style="padding: 24px;">
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 18px; line-height: 1.5; background:#f8fafc; padding:10px 14px; border-radius:8px; border:1px solid #f1f5f9;">
+                        <i class="fa fa-info-circle me-1" style="color:#2563eb;"></i> Select your purpose and provide a clear explanation for your OJT Coordinator.
+                    </p>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-tasks"></i> Request Purpose <span style="color:#ef4444;">*</span>
+                    </label>
+                    <select name="request_type" id="modalRequestType" class="modal-field-input" required>
+                        <option value="edit">Edit MOA Details / Replace File</option>
+                        <option value="unlink">Remove / Unlink MOA</option>
+                    </select>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-comment-alt"></i> Reason for Request <span style="color:#ef4444;">*</span>
+                    </label>
+                    <textarea name="reason" rows="4" class="modal-field-input" style="width:100%; font-family: inherit; resize: vertical;" placeholder="e.g. Need to update company address / replacement PDF file..." required minlength="5"></textarea>
+                </div>
+                <div class="modal-footer" style="background: #fafafa; padding: 14px 24px;">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modal-submit" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+                        <i class="fa fa-paper-plane me-1"></i> Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
