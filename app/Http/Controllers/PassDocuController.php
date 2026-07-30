@@ -62,9 +62,9 @@ class PassDocuController extends Controller
             }, SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
     }
-    private function ensureDefaultBasicCategoriesForProfessor(?Professor $professor): void
+    private function ensureDefaultBasicCategoriesForProfessor(Professor $professor): void
     {
-        if (!$professor) {
+        if (FileCategory::where('professor_id', $professor->id)->exists()) {
             return;
         }
 
@@ -77,21 +77,13 @@ class PassDocuController extends Controller
             'Acceptance Letter'
         ];
 
-        $existingNames = FileCategory::where('professor_id', $professor->id)
-            ->pluck('fileName')
-            ->filter()
-            ->map(fn($n) => mb_strtolower(trim((string)$n)))
-            ->toArray();
-
         foreach ($defaultNames as $name) {
-            if (!in_array(mb_strtolower($name), $existingNames, true)) {
-                FileCategory::create([
-                    'fileName' => $name,
-                    'phase' => 'basic',
-                    'uploadedBy' => $professor->full_name ?? 'System',
-                    'professor_id' => $professor->id,
-                ]);
-            }
+            FileCategory::create([
+                'fileName' => $name,
+                'phase' => 'basic',
+                'uploadedBy' => $professor->full_name ?? 'System',
+                'professor_id' => $professor->id,
+            ]);
         }
     }
 
@@ -107,16 +99,16 @@ class PassDocuController extends Controller
             )
             : collect();
 
-        $defaultBasicNames = [
-            'Resume',
-            'Medical Clearance',
-            'Good Moral',
-            'Consent Form',
-            'Endorsement Letter',
-            'Acceptance Letter'
-        ];
+        if ($fileCategories->isEmpty() && !$professor) {
+            $defaultBasicNames = [
+                'Resume',
+                'Medical Clearance',
+                'Good Moral',
+                'Consent Form',
+                'Endorsement Letter',
+                'Acceptance Letter'
+            ];
 
-        if ($fileCategories->isEmpty()) {
             $fileCategories = collect($defaultBasicNames)->map(function ($name) {
                 $fc = new FileCategory();
                 $fc->id = 0;
@@ -125,25 +117,6 @@ class PassDocuController extends Controller
                 $fc->uploadedBy = 'System';
                 return $fc;
             });
-        } else {
-            $existingBasicNames = $fileCategories
-                ->filter(fn ($c) => $this->normalizeRequirementPhase($c->phase ?? null) === 'basic')
-                ->pluck('fileName')
-                ->map(fn ($n) => mb_strtolower(trim((string)$n)))
-                ->toArray();
-
-            foreach ($defaultBasicNames as $defaultName) {
-                if (!in_array(mb_strtolower($defaultName), $existingBasicNames, true)) {
-                    $fc = new FileCategory();
-                    $fc->id = 0;
-                    $fc->fileName = $defaultName;
-                    $fc->phase = 'basic';
-                    $fc->uploadedBy = 'System';
-                    $fileCategories->push($fc);
-                }
-            }
-
-            $fileCategories = $this->sortCategoriesByPhaseAndName($fileCategories);
         }
 
         $basicCategories = $fileCategories
