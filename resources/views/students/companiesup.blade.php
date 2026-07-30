@@ -1057,6 +1057,11 @@
     <!-- Page Content -->
     <div class="page-content">
 
+        @php
+            $studentProfile = \App\Models\Student::where('user_id', $user->id)->first();
+            $isInhouseOjt = (bool) ($studentProfile?->is_inhouse_ojt ?? false);
+        @endphp
+
         <!-- Page Header -->
         <div class="page-header">
             <div>
@@ -1067,7 +1072,7 @@
                     <span>Notarized MOA</span>
                 </div>
             </div>
-            @if(empty($isLocked))
+            @if(empty($isLocked) && !$isInhouseOjt)
                 <button class="btn-add-moa" data-bs-toggle="modal" data-bs-target="#addMoaModal">
                     <i class="fa fa-plus-circle"></i> Add Notarized MOA
                 </button>
@@ -1077,12 +1082,52 @@
                         <i class="fa fa-clock"></i> Unlock Request Pending
                     </button>
                 @else
-                    <button class="btn-add-moa" style="background: linear-gradient(135deg, #475569 0%, #1e293b 100%);" data-bs-toggle="modal" data-bs-target="#requestUnlockModal">
+                    <button class="btn-add-moa" style="background: linear-gradient(135deg, #475569 0%, #1e293b 100%);" onclick="openUnlockRequestModal('switch_external', true)">
                         <i class="fa fa-key"></i> Request MOA Unlock
                     </button>
                 @endif
             @endif
         </div>
+
+        @if($isInhouseOjt)
+            <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); border-radius: 16px; padding: 22px 26px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(4,120,87,0.2);">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; flex-shrink: 0;">
+                        <i class="fa fa-university"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 16px; font-weight: 700; color: #ffffff;">School In-House OJT Mode Active</div>
+                        <div style="font-size: 13px; color: #d1fae5; margin-top: 2px;">
+                            You are registered for internal campus OJT. External notarized MOA requirement is <strong>waived</strong>, and all requirement submission slots are unlocked!
+                        </div>
+                    </div>
+                </div>
+                @if(!empty($unlockRequest) && $unlockRequest->status === 'pending')
+                    <button type="button" class="btn" disabled style="background: rgba(253, 230, 138, 0.2); color: #fef08a; border: 1px solid rgba(253, 230, 138, 0.4); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: not-allowed;">
+                        <i class="fa fa-clock me-1"></i> Switch Request Pending
+                    </button>
+                @else
+                    <button type="button" class="btn" onclick="openUnlockRequestModal('switch_external', true)" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                        <i class="fa fa-paper-plane me-1"></i> Request Switch to External MOA
+                    </button>
+                @endif
+            </div>
+        @elseif(empty($isLocked) && count($companies) === 0)
+            <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                        <i class="fa fa-university"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 700; color: #0f172a;">Doing OJT inside the School / Campus?</div>
+                        <div style="font-size: 12.5px; color: #64748b;">If your OJT is internal within PUP / School, no external MOA is required.</div>
+                    </div>
+                </div>
+                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#confirmInhouseLockModal" style="background: #0284c7; color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; box-shadow: 0 2px 8px rgba(2,132,199,0.25);">
+                    <i class="fa fa-check-circle me-1"></i> Declare School In-House OJT
+                </button>
+            </div>
+        @endif
 
         @if(!empty($isLocked))
             <!-- Lock Alert Banner -->
@@ -1239,23 +1284,35 @@
                                                 onclick="openUnlockRequestModal('{{ $isOwner ? 'edit' : 'unlink' }}', {{ $isOwner ? 'true' : 'false' }})">
                                                 <i class="fa fa-key me-1"></i> {{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}
                                             </button>
-                                            <script>
-                                                function openUnlockRequestModal(type, isOwner) {
-                                                    const select = document.getElementById('modalRequestType');
-                                                    if (select) {
-                                                        const editOpt = select.querySelector('option[value="edit"]');
-                                                        if (isOwner === false) {
-                                                            if (editOpt) editOpt.style.display = 'none';
-                                                            select.value = 'unlink';
-                                                        } else {
-                                                            if (editOpt) editOpt.style.display = 'block';
-                                                            select.value = type || 'edit';
-                                                        }
-                                                    }
-                                                    const modal = new bootstrap.Modal(document.getElementById('requestUnlockModal'));
-                                                    modal.show();
-                                                }
-                                            </script>
+                                             <script>
+                                                 function openUnlockRequestModal(type, isOwner) {
+                                                     const select = document.getElementById('modalRequestType');
+                                                     if (select) {
+                                                         const editOpt = select.querySelector('option[value="edit"]');
+                                                         const unlinkOpt = select.querySelector('option[value="unlink"]');
+                                                         const switchOpt = select.querySelector('option[value="switch_external"]');
+
+                                                         if (type === 'switch_external') {
+                                                             if (editOpt) editOpt.style.display = 'none';
+                                                             if (unlinkOpt) unlinkOpt.style.display = 'none';
+                                                             if (switchOpt) switchOpt.style.display = 'block';
+                                                             select.value = 'switch_external';
+                                                         } else if (isOwner === false) {
+                                                             if (editOpt) editOpt.style.display = 'none';
+                                                             if (unlinkOpt) unlinkOpt.style.display = 'block';
+                                                             if (switchOpt) switchOpt.style.display = 'none';
+                                                             select.value = 'unlink';
+                                                         } else {
+                                                             if (editOpt) editOpt.style.display = 'block';
+                                                             if (unlinkOpt) unlinkOpt.style.display = 'block';
+                                                             if (switchOpt) switchOpt.style.display = 'none';
+                                                             select.value = type || 'edit';
+                                                         }
+                                                     }
+                                                     const modal = new bootstrap.Modal(document.getElementById('requestUnlockModal'));
+                                                     modal.show();
+                                                 }
+                                             </script>
                                         @endif
                                     @else
                                         <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
@@ -2092,6 +2149,7 @@
                     <select name="request_type" id="modalRequestType" class="modal-field-input" required>
                         <option value="edit">Edit MOA Details / Replace File</option>
                         <option value="unlink">Remove / Unlink MOA</option>
+                        <option value="switch_external">Switch from In-House OJT to External MOA</option>
                     </select>
 
                     <label class="modal-field-label">
@@ -2110,10 +2168,74 @@
     </div>
 </div>
 
+<!-- =============== CONFIRM IN-HOUSE OJT LOCK MODAL =============== -->
+<div class="modal fade" id="confirmInhouseLockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: #e0f2fe; border-bottom: 1px solid #bae6fd;">
+                <h5 class="modal-title" style="color: #0369a1; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                    <i class="fa fa-university"></i> Confirm School In-House OJT
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('student.moa.toggleInhouse') }}" method="POST">
+                @csrf
+                <input type="hidden" name="is_inhouse" value="1">
+                <div class="modal-body" style="padding: 24px;">
+                    <p style="font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 14px;">
+                        Are you sure you want to register for <strong>School In-House OJT</strong>?
+                    </p>
+                    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 14px; font-size: 13px; color: #9f1239; line-height: 1.5;">
+                        <i class="fa fa-lock me-1"></i> <strong>Important Disclaimer:</strong> Once confirmed, your selection will be <strong>locked</strong> to School In-House OJT mode. You will not be able to upload or link to an external company MOA without prior unlock approval from your Internship Coordinator.
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #fafafa;">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modal-submit" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                        <i class="fa fa-lock me-1"></i> Yes, Confirm & Lock Selection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 <script src="{{ url('/js/mobile-utils.js') }}"></script>
+
+<script>
+    function openUnlockRequestModal(type, isOwner) {
+        const select = document.getElementById('modalRequestType');
+        if (select) {
+            const editOpt = select.querySelector('option[value="edit"]');
+            const unlinkOpt = select.querySelector('option[value="unlink"]');
+            const switchOpt = select.querySelector('option[value="switch_external"]');
+
+            if (type === 'switch_external') {
+                if (editOpt) editOpt.style.display = 'none';
+                if (unlinkOpt) unlinkOpt.style.display = 'none';
+                if (switchOpt) switchOpt.style.display = 'block';
+                select.value = 'switch_external';
+            } else if (isOwner === false) {
+                if (editOpt) editOpt.style.display = 'none';
+                if (unlinkOpt) unlinkOpt.style.display = 'block';
+                if (switchOpt) switchOpt.style.display = 'none';
+                select.value = 'unlink';
+            } else {
+                if (editOpt) editOpt.style.display = 'block';
+                if (unlinkOpt) unlinkOpt.style.display = 'block';
+                if (switchOpt) switchOpt.style.display = 'none';
+                select.value = type || 'edit';
+            }
+        }
+        const modalEl = document.getElementById('requestUnlockModal');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
+</script>
 </body>
 </html>

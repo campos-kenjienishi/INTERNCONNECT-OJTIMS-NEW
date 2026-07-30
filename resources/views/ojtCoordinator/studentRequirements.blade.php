@@ -394,9 +394,37 @@
         .btn-action.view-personal {
             display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
             border-radius: 8px; background: #fff; border: 1.5px solid #e0e7ff; color: #4f46e5;
-            font-family: 'Poppins', sans-serif; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            font-family: 'Poppins', sans-serif; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;
         }
         .btn-action.view-personal:hover { background: #e0e7ff; transform: translateY(-1px); }
+
+        .btn-action-view {
+            display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+            border-radius: 8px; background: #eef2ff; border: 1px solid #c7d2fe; color: #4338ca;
+            font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+            white-space: nowrap; transition: all 0.2s ease; text-decoration: none;
+        }
+        .btn-action-view:hover { background: #4338ca; border-color: #4338ca; color: #ffffff; transform: translateY(-1px); }
+
+        .btn-action-inhouse {
+            display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+            border-radius: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
+            font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+            white-space: nowrap; transition: all 0.2s ease; text-decoration: none;
+        }
+        .btn-action-inhouse:hover { background: #15803d; border-color: #15803d; color: #ffffff; transform: translateY(-1px); }
+
+        .btn-action-inhouse.active { background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; }
+        .btn-action-inhouse.active:hover { background: #c2410c; border-color: #c2410c; color: #ffffff; }
+
+        body.dark-mode .btn-action-view { background: rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.3); color: #a5b4fc; }
+        body.dark-mode .btn-action-view:hover { background: #6366f1; color: #fff; }
+
+        body.dark-mode .btn-action-inhouse { background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.3); color: #86efac; }
+        body.dark-mode .btn-action-inhouse:hover { background: #22c55e; color: #fff; }
+
+        body.dark-mode .btn-action-inhouse.active { background: rgba(249, 115, 22, 0.15); border-color: rgba(249, 115, 22, 0.3); color: #ffedd5; }
+        body.dark-mode .btn-action-inhouse.active:hover { background: #f97316; color: #fff; }
 
         body.dark-mode .btn-action.view-personal {
             background: rgba(79,70,229,0.15); border-color: rgba(79,70,229,0.3); color: #93c5fd;
@@ -715,6 +743,11 @@
                                         <div>
                                             <div style="font-weight:700; color:#1a1a1a;">{{ $studentName }}</div>
                                             <div style="font-size:12px; color:#888;">{{ $st->studentNum ?? '' }}</div>
+                                            @if(!empty($st->is_inhouse_ojt))
+                                                <span class="req-badge" style="background:#d1fae5; color:#047857; border:1px solid #a7f3d0; margin-top:3px; display:inline-flex; align-items:center; gap:4px;" title="Student is in School In-House OJT mode. External MOA requirement is waived.">
+                                                    <i class="fa fa-university"></i> In-House OJT
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -762,17 +795,31 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <button type="button"
-                                            class="btn-action view-personal"
-                                            onclick='openStudentFolderModal({
-                                                student_name: "{{ addslashes($studentName) }}",
-                                                student_num: "{{ addslashes($st->studentNum ?? '') }}",
-                                                course: "{{ addslashes($st->course ?? 'N/A') }}",
-                                                adviser: "{{ addslashes($st->adviser_name ?? 'Not Assigned') }}",
-                                                categories: @json($categories)
-                                            })'>
-                                        <i class="fa fa-folder"></i> View Folder
-                                    </button>
+                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:nowrap;">
+                                        <button type="button"
+                                                class="btn-action-view"
+                                                onclick='openStudentFolderModal({
+                                                    student_name: "{{ addslashes($studentName) }}",
+                                                    student_num: "{{ addslashes($st->studentNum ?? '') }}",
+                                                    course: "{{ addslashes($st->course ?? 'N/A') }}",
+                                                    adviser: "{{ addslashes($st->adviser_name ?? 'Not Assigned') }}",
+                                                    categories: @json($categories)
+                                                })'>
+                                            <i class="fa fa-folder-open"></i> View Folder
+                                        </button>
+                                        <form id="inhouse-form-{{ $st->id }}" action="{{ route('coordinator.student.toggleInhouse', $st->id) }}" method="POST" style="display:inline; margin:0;">
+                                            @csrf
+                                            @if(!empty($st->is_inhouse_ojt))
+                                                <button type="button" class="btn-action-inhouse active" title="Revoke School In-House OJT Waiver" onclick="confirmToggleInhouse({{ $st->id }}, '{{ addslashes($studentName) }}', true)">
+                                                    <i class="fa fa-undo"></i> Revoke Waiver
+                                                </button>
+                                            @else
+                                                <button type="button" class="btn-action-inhouse" title="Grant School In-House OJT Waiver" onclick="confirmToggleInhouse({{ $st->id }}, '{{ addslashes($studentName) }}', false)">
+                                                    <i class="fa fa-university"></i> In-House OJT
+                                                </button>
+                                            @endif
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -904,7 +951,10 @@
                 let badgeHtml = '';
                 let actionHtml = '';
 
-                if (info.submitted || info.file_id) {
+                if (info.is_inhouse_waived) {
+                    badgeHtml = '<span class="req-badge req-approved" style="background:#d1fae5; color:#047857; border-color:#a7f3d0;"><i class="fa fa-university me-1"></i> Waived (In-House OJT)</span>';
+                    actionHtml = '<span style="font-size:12px; color:#047857; font-weight:600;"><i class="fa fa-check-circle me-1"></i> School In-House OJT</span>';
+                } else if (info.submitted || info.file_id) {
                     badgeHtml = '<span class="req-badge req-approved"><i class="fa fa-check-circle me-1"></i> Uploaded</span>';
                     actionHtml = `
                         <button type="button" onclick="openPdfPreviewModal('/coordinator/requirements/view/${info.file_id}', '${catName.replace(/'/g, "\\'")}', '/coordinator/requirements/download/${info.file_id}')" class="btn-action view-personal">
@@ -940,6 +990,40 @@
 
         const modal = new bootstrap.Modal(document.getElementById('studentFilesModal'));
         modal.show();
+    }
+
+    function confirmToggleInhouse(studentId, studentName, isRevoke) {
+        if (isRevoke) {
+            Swal.fire({
+                title: 'Revoke In-House OJT Status?',
+                text: 'This will remove the School In-House OJT waiver for ' + studentName + ' and require an external notarized MOA again.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa fa-undo me-1"></i> Yes, Revoke Waiver',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('inhouse-form-' + studentId).submit();
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Grant School In-House OJT Waiver?',
+                text: 'This will waive the external notarized MOA requirement for ' + studentName + ' and unlock all requirement submission slots.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0284c7',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa fa-university me-1"></i> Yes, Grant Waiver',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('inhouse-form-' + studentId).submit();
+                }
+            });
+        }
     }
 
     $(document).ready(function() {

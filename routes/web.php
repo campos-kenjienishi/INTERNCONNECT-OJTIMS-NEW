@@ -137,6 +137,7 @@ Route::middleware([
     Route::put('/student/MOA/{id}', [CompanyController::class,'companyUpdate'])->name('student.moa.update');
     Route::post('/student/moa/remove/{id}', [MOAUploadController::class,'studentRemove'])->name('student.moa.remove');
     Route::post('/student/moa/request-unlock', [MOAUploadController::class, 'requestUnlock'])->name('student.moa.requestUnlock');
+    Route::post('/student/moa/toggle-inhouse', [MOAUploadController::class, 'toggleInhouse'])->name('student.moa.toggleInhouse');
     Route::get('/student/pending', [CompanyController::class,'pending']);
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
@@ -240,6 +241,7 @@ Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
 Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
     Route::post('/uploadfile', [FileController::class,'uploadfile']);
     Route::get('/download/req/{file}', [PassDocuController::class,'download']);
+    Route::post('/coordinator/student/toggle-inhouse/{id}', [PassDocuController::class, 'toggleStudentInhouse'])->name('coordinator.student.toggleInhouse');
 });
 
 Route::middleware(['auth.session.custom', 'role:1'])->group(function () {

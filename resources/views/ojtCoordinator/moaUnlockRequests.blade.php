@@ -400,12 +400,26 @@
                                     <div style="font-size:12px; color:#888;">{{ $req->student->studentNum ?? '' }} • {{ $req->student->course ?? '' }}</div>
                                 </td>
                                 <td>
-                                    <div style="font-weight:600;">{{ $req->company->company_name ?? 'N/A' }}</div>
+                                    @if(!empty($req->company))
+                                        <div style="font-weight:600;">{{ $req->company->company_name }}</div>
+                                    @elseif(($req->request_type ?? '') === 'switch_external')
+                                        <div style="font-weight:600; color:#047857;"><i class="fa fa-university me-1"></i> School In-House OJT</div>
+                                    @else
+                                        <div style="font-weight:600; color:#888;">N/A</div>
+                                    @endif
                                 </td>
                                 <td>
                                     @if(($req->request_type ?? 'unlink') === 'edit')
                                         <span style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; font-weight:700; padding:4px 10px; border-radius:999px; font-size:11.5px;">
                                             <i class="fa fa-edit"></i> Edit Details/File
+                                        </span>
+                                    @elseif(($req->request_type ?? 'unlink') === 'switch_external')
+                                        <span style="display:inline-flex; align-items:center; gap:5px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-weight:700; padding:4px 10px; border-radius:999px; font-size:11.5px;">
+                                            <i class="fa fa-exchange-alt"></i> Switch to External MOA
+                                        </span>
+                                    @elseif(($req->request_type ?? 'unlink') === 'switch_inhouse')
+                                        <span style="display:inline-flex; align-items:center; gap:5px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:700; padding:4px 10px; border-radius:999px; font-size:11.5px;">
+                                            <i class="fa fa-university"></i> Switch to In-House OJT
                                         </span>
                                     @else
                                         <span style="display:inline-flex; align-items:center; gap:5px; background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; font-weight:700; padding:4px 10px; border-radius:999px; font-size:11.5px;">

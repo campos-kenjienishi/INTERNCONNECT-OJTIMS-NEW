@@ -1795,6 +1795,11 @@
                     <i class="fa fa-chevron-right"></i>
                     <span>Requirements</span>
                 </div>
+                @if(!empty($isInhouseOjt))
+                    <div style="display:inline-flex; align-items:center; gap:6px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600; margin-top:8px;">
+                        <i class="fa fa-university"></i> School In-House OJT Mode (External MOA Waived)
+                    </div>
+                @endif
             </div>
             <button class="btn-upload" data-bs-toggle="modal" data-bs-target="#uploadModal">
                 <i class="fa fa-cloud-upload-alt"></i> Upload Document

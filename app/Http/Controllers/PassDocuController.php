@@ -149,7 +149,8 @@ class PassDocuController extends Controller
             ->reject(fn ($category) => $validSubmittedNames->contains(mb_strtolower(trim((string) $category->fileName))))
             ->values();
 
-        $hasSubmittedNotarizedMoa = $validSubmittedNames->contains(mb_strtolower('Notarized MOA'));
+        $isInhouseOjt = (bool) ($student?->is_inhouse_ojt ?? false);
+        $hasSubmittedNotarizedMoa = $isInhouseOjt || $validSubmittedNames->contains(mb_strtolower('Notarized MOA'));
         $otherRequirementsUnlocked = $missingBasicCategories->isEmpty() && $hasSubmittedNotarizedMoa;
 
         return [
@@ -162,6 +163,7 @@ class PassDocuController extends Controller
             'missingBasicCategories' => $missingBasicCategories,
             'hasSubmittedNotarizedMoa' => $hasSubmittedNotarizedMoa,
             'otherRequirementsUnlocked' => $otherRequirementsUnlocked,
+            'isInhouseOjt' => $isInhouseOjt,
         ];
     }
 
@@ -1034,6 +1036,16 @@ public function removeFile($id)
                         'file_name' => $matchingReq->file,
                         'denial_reason' => $matchingReq->denial_reason ?? null,
                     ];
+                } elseif (mb_strtolower(trim((string)$catName)) === 'notarized moa' && (bool)($student->is_inhouse_ojt ?? false)) {
+                    $submittedCount++;
+                    $categoriesState[$catName] = [
+                        'submitted' => true,
+                        'status' => 1,
+                        'file_id' => null,
+                        'file_name' => 'Waived via School In-House OJT',
+                        'denial_reason' => null,
+                        'is_inhouse_waived' => true,
+                    ];
                 } else {
                     $missingCount++;
                     $categoriesState[$catName] = [
@@ -1115,5 +1127,26 @@ public function removeFile($id)
         }
 
         return back()->with('error', 'File not found on server.');
+    }
+
+    public function toggleStudentInhouse(Request $request, $id)
+    {
+        $student = Student::find($id);
+        if (!$student) {
+            return redirect()->back()->with('error', 'Student not found.');
+        }
+
+        $targetStatus = $request->has('is_inhouse') ? (bool) $request->input('is_inhouse') : !$student->is_inhouse_ojt;
+        $student->is_inhouse_ojt = $targetStatus;
+        $student->save();
+
+        AuditLogger::log(
+            'MOA Mode',
+            'Coordinator Toggle In-House OJT',
+            ($targetStatus ? 'Coordinator granted School In-House OJT waiver for student: ' : 'Coordinator revoked In-House OJT status for student: ') . ($student->full_name ?? 'ID ' . $student->id),
+            Session::get('loginId') ?? null
+        );
+
+        return redirect()->back()->with('success', 'Student In-House OJT status updated successfully.');
     }
 }
