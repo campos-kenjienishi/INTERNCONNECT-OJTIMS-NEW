@@ -1806,6 +1806,31 @@
             </button>
         </div>
 
+        @if(session('fail'))
+            <div style="background:#fee2e2; border:1px solid #fecaca; color:#991b1b; padding:12px 16px; border-radius:12px; font-size:13.5px; margin-bottom:18px; font-weight:500;">
+                <i class="fa fa-exclamation-circle me-1"></i> {{ session('fail') }}
+            </div>
+        @endif
+        @if(session('success'))
+            <div style="background:#dcfce7; border:1px solid #bbf7d0; color:#166534; padding:12px 16px; border-radius:12px; font-size:13.5px; margin-bottom:18px; font-weight:500;">
+                <i class="fa fa-check-circle me-1"></i> {{ session('success') }}
+            </div>
+        @endif
+
+        @php
+            $currentAdviser = trim((string)($user->adviser_name ?? ''));
+        @endphp
+        @if(empty($currentAdviser) || $currentAdviser === 'Not Assigned' || $currentAdviser === 'Not Yet Listed')
+            <div style="background:#fffbeb; border:1px solid #fde68a; color:#92400e; padding:14px 18px; border-radius:14px; font-size:13.5px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fa fa-exclamation-triangle" style="font-size:18px; color:#d97706;"></i>
+                    <span>
+                        <strong>No Professor Assigned:</strong> You currently do not have an assigned professor linked to your account. Please go to <a href="{{ url('/student/class') }}" style="color:#b45309; text-decoration:underline; font-weight:600;">Class Settings</a> to select your professor.
+                    </span>
+                </div>
+            </div>
+        @endif
+
         <!-- Stats Row -->
         <div class="stats-row">
             <div class="stat-card">

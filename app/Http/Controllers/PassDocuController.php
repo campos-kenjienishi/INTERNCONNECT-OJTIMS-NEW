@@ -529,6 +529,12 @@ public function fileReqCreate(Request $request){
 
     $user = $sessionCheck;
     $student = Student::where('user_id', $user->id)->first();
+    $adviserName = trim((string) ($student->adviser_name ?? $user->adviser_name ?? ''));
+
+    if (empty($adviserName) || $adviserName === 'Not Assigned') {
+        return back()->with('fail', 'You must select/assign a professor under Class or Account settings before uploading requirements.');
+    }
+
     $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
     $phaseState = $this->buildRequirementPhaseState($user, $student, $professor);
 

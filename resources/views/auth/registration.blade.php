@@ -694,7 +694,7 @@
                                 <label class="form-label">Professor</label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-chalkboard-teacher i-icon"></i>
-                                    <select name="adviser_name" id="adviser_name">
+                                    <select name="adviser_name" id="adviser_name" required>
                                         <option value="">Select Professor</option>
                                         <option value="Not Yet Listed" {{ old('adviser_name') == 'Not Yet Listed' ? 'selected' : '' }}>Not Yet Listed</option>
                                         @foreach($data as $professor)
