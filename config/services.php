@@ -48,5 +48,18 @@ return [
         'auto_insights' => filter_var(env('AI_AUTO_INSIGHTS', false), FILTER_VALIDATE_BOOL),
     ],
 
+    'idp' => [
+        'enabled'       => filter_var(env('IDP_ENABLED', false), FILTER_VALIDATE_BOOL),
+        'base_url'      => env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com'),
+        'authorize_url' => env('IDP_AUTH_URL', env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/auth/authorize'),
+        'token_url'     => env('IDP_TOKEN_URL', env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/auth/token'),
+        'me_url'        => env('IDP_ME_URL', env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/me'),
+        'jwks_url'      => env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/.well-known/jwks.json',
+        'logout_url'    => env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/auth/logout',
+        'client_id'     => env('IDP_CLIENT_ID'),
+        'client_secret' => env('IDP_CLIENT_SECRET'),
+        'callback_url'  => env('IDP_CALLBACK_URL', env('APP_URL', 'http://127.0.0.1:8000') . '/auth/callback'),
+        'verify_tls'    => filter_var(env('IDP_VERIFY_TLS', true), FILTER_VALIDATE_BOOL),
+    ],
 
 ];

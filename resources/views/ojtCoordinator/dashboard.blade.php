@@ -2255,6 +2255,8 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
     <script src="{{ asset('js/ai-insight-controls.js') }}"></script>
     <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
     <script src="{{ asset('assets/js/voice-input.js') }}"></script>
+    @include('partials.password-setup-modal')
+    @include('students.terms_modal')
     <script src="{{ url('/js/mobile-utils.js') }}"></script>
 </body>
     </html>

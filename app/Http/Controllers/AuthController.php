@@ -31,9 +31,256 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Helpers\AuditLogger;
 use App\Services\ReportAiInsightService;
+use App\Services\IdpService;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    protected IdpService $idpService;
+
+    public function __construct(IdpService $idpService)
+    {
+        $this->idpService = $idpService;
+    }
+
+    public function loginGateway()
+    {
+        if (config('services.idp.enabled')) {
+            return view('auth.login-gateway');
+        }
+
+        return view('auth.login');
+    }
+
+    public function showIdpTransition()
+    {
+        if (!$this->idpService->isReachable()) {
+            return view('auth.idp-transition', [
+                'error' => 'Unable to connect to Identity Provider. The service may be offline or unreachable.'
+            ]);
+        }
+
+        return view('auth.idp-transition');
+    }
+
+    public function redirectToIdp()
+    {
+        return redirect()->away($this->idpService->getAuthorizeUrl());
+    }
+
+    public function handleIdpCallback(Request $request)
+    {
+        $code = $request->query('code');
+
+        if (!$code) {
+            return view('auth.idp-transition', [
+                'error' => 'Authorization code was not provided by Identity Provider.'
+            ]);
+        }
+
+        try {
+            // 1. Exchange code for tokens
+            $tokens = $this->idpService->exchangeCode($code);
+            $accessToken = $tokens['access_token'] ?? null;
+
+            if (!$accessToken) {
+                throw new \RuntimeException('No access token received from Identity Provider.');
+            }
+
+            // 2. Validate token structure & signature via JWKS
+            $this->idpService->validateToken($accessToken);
+
+            // 3. Get User Profile from IdP
+            $idpUser = $this->idpService->getUserInfo($accessToken);
+            $idpUserId = $idpUser['id'] ?? null;
+            $email = $idpUser['email'] ?? null;
+
+            if (!$idpUserId || !$email) {
+                throw new \RuntimeException('Incomplete user profile received from Identity Provider.');
+            }
+
+            // Store IdP access token in session for logout
+            Session::put('idp_access_token', $accessToken);
+
+            // 4. Find local user by idp_user_id or email
+            $user = User::findByIdpId($idpUserId);
+
+            if (!$user) {
+                $user = User::where('email', $email)->first();
+            }
+
+            if ($user) {
+                // Link idp_user_id if not linked yet
+                if (!$user->idp_user_id) {
+                    $user->idp_user_id = $idpUserId;
+                    $user->save();
+                }
+
+                // Log in existing user
+                return $this->loginLocalUser($user, $request);
+            }
+
+            // New User: Store IdP details in session and redirect to onboarding
+            Session::put('idp_onboarding_data', [
+                'idp_user_id' => $idpUserId,
+                'email'       => $email,
+                'first_name'  => $idpUser['first_name'] ?? '',
+                'middle_name' => $idpUser['middle_name'] ?? '',
+                'last_name'   => $idpUser['last_name'] ?? '',
+            ]);
+
+            return redirect()->route('onboarding.show');
+
+        } catch (\Exception $e) {
+            Log::error('IdP Callback Error', ['error' => $e->getMessage()]);
+            return view('auth.idp-transition', [
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    protected function loginLocalUser(User $user, Request $request)
+    {
+        $request->session()->put('loginId', $user->id);
+        $request->session()->put('show_terms', true);
+
+        // Prompt for local password setup if they don't have one set up yet
+        if (!$user->has_local_password) {
+            $request->session()->put('show_password_setup', true);
+        }
+
+        Cache::put(
+            'active_session_id:' . $user->id,
+            $request->session()->getId(),
+            now()->addMinutes((int) config('session.lifetime', 120))
+        );
+
+        AuditLogger::log(
+            'Authentication',
+            'login',
+            'User logged in via Identity Provider: ' . $user->email,
+            $user->id
+        );
+
+        if ($user->role == 0) {
+            return redirect()->route('student_home');
+        } else if ($user->role == 2) {
+            return redirect()->route('professor_home');
+        } else if ($user->role == 1) {
+            return redirect('dashboard');
+        }
+
+        return redirect('/login');
+    }
+
+    public function showOnboarding()
+    {
+        $idp = Session::get('idp_onboarding_data');
+
+        if (!$idp) {
+            return redirect('/')->with('fail', 'No active onboarding session found.');
+        }
+
+        $professors = Professor::all();
+        $courses = Courses::all();
+        $schedules = Schedule::with('subject')->get();
+
+        return view('onboarding', compact('idp', 'professors', 'courses', 'schedules'));
+    }
+
+    public function storeOnboarding(Request $request, string $email)
+    {
+        $idp = Session::get('idp_onboarding_data');
+
+        $request->validate([
+            'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
+            'course' => ['required', 'string', 'max:255'],
+            'adviser_name' => ['required', 'string', 'max:255'],
+            'academic_year_start' => ['required', 'integer'],
+            'academic_year_end' => ['required', 'integer', 'gt:academic_year_start'],
+            'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
+        ]);
+
+        $firstName = $idp['first_name'] ?? $request->input('first_name', '');
+        $middleName = $idp['middle_name'] ?? $request->input('middle_name', '');
+        $lastName = $idp['last_name'] ?? $request->input('last_name', '');
+        $idpUserId = $idp['idp_user_id'] ?? null;
+
+        $user = new User();
+        $user->first_name = $firstName;
+        $user->middle_name = $middleName;
+        $user->last_name = $lastName;
+        $user->email = $email;
+        $user->password = Hash::make(Str::random(32)); // Placeholder hash until local password is set
+        $user->has_local_password = false;
+        $user->idp_user_id = $idpUserId;
+        $user->full_name = trim($firstName . ' ' . $lastName);
+        $user->role = 0; // Default role: Student
+        $user->save();
+
+        $student = new OJTInformation();
+        $studentE = new Student();
+
+        $student->studentNum = $request->studentNum;
+        $studentE->studentNum = $request->studentNum;
+        $studentE->course = $request->course;
+        $studentE->year_and_section = $request->year_and_section;
+        $studentE->school_year_start = $request->academic_year_start;
+        $studentE->school_year_end = $request->academic_year_end;
+        $studentE->adviser_name = $request->adviser_name;
+        $studentE->user_id = $user->id;
+
+        $student->save();
+        $studentE->save();
+
+        $this->autoAssignStudentToMatchingClass($user, $studentE);
+
+        Session::forget('idp_onboarding_data');
+
+        AuditLogger::log(
+            'Student Account',
+            'create',
+            'Completed IdP Onboarding for: ' . $user->full_name,
+            $user->id
+        );
+
+        return $this->loginLocalUser($user, $request);
+    }
+
+    public function setLocalPassword(Request $request)
+    {
+        $request->validate([
+            'new_password' => $this->passwordRules(),
+            'new_password_confirmation' => 'required|same:new_password',
+        ], $this->passwordValidationMessages('new_password', 'new_password_confirmation'));
+
+        $user = User::find(Session::get('loginId'));
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User session expired. Please log in again.'
+            ], 401);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->has_local_password = true;
+        $user->save();
+
+        Session::forget('show_password_setup');
+
+        AuditLogger::log(
+            'Account Security',
+            'update',
+            'Set local fallback password for IdP user: ' . $user->email,
+            $user->id
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Local fallback password created successfully!'
+        ]);
+    }
     public function login(){
         return view("auth.login");
     }
@@ -894,11 +1141,21 @@ class AuthController extends Controller
     public function logout(){
         if(Session::has('loginId')){
             $id = Session::get('loginId');
+            
+            // Perform IdP logout if token is present
+            if (Session::has('idp_access_token')) {
+                $token = Session::get('idp_access_token');
+                $this->idpService->logout($token);
+                Session::forget('idp_access_token');
+            }
+
             Session::pull('loginId');
             Session::forget('termsAccepted');
+            Session::forget('show_password_setup');
             Cache::forget('active_session_id:' . $id);
-            return redirect('login');
+            return redirect('/');
         }
+        return redirect('/');
     }
 
     public function professorTab()

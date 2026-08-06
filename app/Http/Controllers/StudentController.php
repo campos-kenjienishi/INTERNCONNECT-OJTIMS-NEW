@@ -837,7 +837,8 @@ public function ojt_edit(Request $request,$studentNum)
     
     public function acceptTerms(Request $request)
     {
-        Session::put('termsAccepted', true); // lasts for this session only
+        Session::put('termsAccepted', true);
+        Session::save();
         return response()->json(['success' => true]);
     }
 

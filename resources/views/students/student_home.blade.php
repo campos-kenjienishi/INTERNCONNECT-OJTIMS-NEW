@@ -1129,9 +1129,7 @@
     </div>
 </div>
 
-@if(!session()->has('termsAccepted'))
-    @include('students.terms_modal')
-@endif
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -1316,6 +1314,8 @@ overlay.addEventListener('click', closeMobileSidebar);
         }
     }
 </script>
+@include('partials.password-setup-modal')
+@include('students.terms_modal')
 <script src="{{ url('/js/mobile-utils.js') }}"></script>
 </body>
 </html>

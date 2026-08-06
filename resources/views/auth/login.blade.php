@@ -83,6 +83,19 @@
             font-size: 14px;
         }
 
+        .local-signin-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fca5a5;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
         .field-group {
             margin-bottom: 16px;
         }
@@ -247,7 +260,8 @@
             </div>
 
             <div class="login-header">
-                <p>Log in to your InternConnect Account</p>
+                <div class="local-signin-badge"><i class="fa fa-key me-1"></i> Local Account Sign In</div>
+                <p>Sign in using your local InternConnect credentials</p>
             </div>
 
             @if(Session::has('success'))
@@ -257,22 +271,7 @@
                 <div class="alert alert-danger">{{ Session::get('fail') }}</div>
             @endif
 
-            {{-- IdP fallback warning removed --}}
-
-            @if(config('services.idp.enabled'))
-                <div class="terms-wrap">
-                    <div class="terms-text">
-                        Authentication is managed by our Identity Provider. Use external sign-in to continue.
-                    </div>
-                </div>
-
-                <div class="btn-wrap">
-                    <a href="{{ route('login.external') }}" class="btn-login text-decoration-none d-inline-flex align-items-center justify-content-center">
-                        <i class="fa fa-sign-in-alt me-2"></i> Sign In With Identity Provider
-                    </a>
-                </div>
-            @else
-                <form action="{{ route('login-user') }}" method="post">
+            <form action="{{ route('login-user') }}" method="post">
                     @csrf
 
                     <div class="field-group">
@@ -317,13 +316,12 @@
                     </div>
 
                 </form>
-            @endif
         </div>
 
     </div>
 
     <div class="signup-outside">
-        <span>Don't have an account? </span><a href="registration">Sign up</a>
+        <a href="{{ url('/') }}"><i class="fa fa-arrow-left me-1"></i> Back to Sign In Options</a>
     </div>
 </div>
 

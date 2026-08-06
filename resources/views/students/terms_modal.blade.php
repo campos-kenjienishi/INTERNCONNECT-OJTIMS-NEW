@@ -1,317 +1,238 @@
-@if(!empty($showTerms) && $showTerms)
+@php
+    $showTerms = !Session::has('termsAccepted');
+@endphp
 
+@if($showTerms)
 <style>
-    #termsModal {
+    #termsModalOverlay {
         position: fixed;
         top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.65);
-        backdrop-filter: blur(4px);
+        width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(3px);
         z-index: 10000;
         display: flex;
         align-items: center;
         justify-content: center;
         font-family: 'Poppins', sans-serif;
-        animation: fadeInOverlay 0.3s ease;
+        padding: 20px;
     }
 
-    @keyframes fadeInOverlay {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
-
-    .terms-modal-box {
-        background: #fff;
+    .terms-card {
+        background: #ffffff;
         width: 520px;
-        max-width: 92%;
-        border-radius: 20px;
-        box-shadow: 0 24px 60px rgba(127,0,0,0.3);
+        max-width: 100%;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
         overflow: hidden;
-        animation: slideUpModal 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: termsPopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    @keyframes slideUpModal {
-        from { opacity: 0; transform: translateY(40px) scale(0.96); }
-        to   { opacity: 1; transform: translateY(0)   scale(1);    }
+    @keyframes termsPopIn {
+        from { opacity: 0; transform: translateY(20px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .terms-modal-header {
-        background: linear-gradient(135deg, #7f0000 0%, #b91c1c 50%, #dc2626 100%);
-        padding: 28px 28px 24px;
+    .terms-card-header {
+        background: linear-gradient(135deg, #800000 0%, #b30000 100%);
+        color: #ffffff;
+        padding: 24px 28px;
         text-align: center;
-        position: relative;
-        overflow: hidden;
     }
 
-    .terms-modal-header::before {
-        content: '';
-        position: absolute;
-        top: -40px; right: -40px;
-        width: 140px; height: 140px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.06);
-        pointer-events: none;
-    }
-
-    .terms-modal-header::after {
-        content: '';
-        position: absolute;
-        bottom: -30px; left: -30px;
-        width: 100px; height: 100px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.04);
-        pointer-events: none;
-    }
-
-    .terms-modal-icon {
-        width: 54px; height: 54px;
-        background: rgba(255,255,255,0.15);
-        border: 2px solid rgba(255,255,255,0.25);
-        border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 14px;
-        position: relative; z-index: 1;
-    }
-
-    .terms-modal-icon i {
-        font-size: 22px;
-        color: #fca5a5;
-    }
-
-    .terms-modal-header h2 {
-        font-size: 18px;
-        font-weight: 800;
-        color: #fff;
-        margin: 0 0 5px;
-        letter-spacing: -0.3px;
-        position: relative; z-index: 1;
-    }
-
-    .terms-modal-header p {
-        font-size: 12px;
-        color: rgba(255,255,255,0.6);
-        margin: 0;
-        position: relative; z-index: 1;
-    }
-
-    .terms-modal-body {
-        padding: 24px 26px;
-    }
-
-    .terms-scroll-box {
-        max-height: 200px;
-        overflow-y: auto;
-        background: #fafafa;
-        border: 1px solid #f0f0f0;
-        border-left: 3px solid #dc2626;
-        border-radius: 12px;
-        padding: 16px 18px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        line-height: 1.8;
-        color: #555;
-        scrollbar-width: thin;
-        scrollbar-color: #dc2626 #f5f5f5;
-    }
-
-    .terms-scroll-box::-webkit-scrollbar {
-        width: 5px;
-    }
-
-    .terms-scroll-box::-webkit-scrollbar-track {
-        background: #f5f5f5;
-        border-radius: 10px;
-    }
-
-    .terms-scroll-box::-webkit-scrollbar-thumb {
-        background: #dc2626;
-        border-radius: 10px;
-    }
-
-    .terms-scroll-box p {
+    .terms-card-header .logo-badge {
+        width: 54px;
+        height: 54px;
+        object-fit: contain;
         margin-bottom: 10px;
-        font-size: 13px;
-        color: #555;
+        filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
     }
 
-    .terms-scroll-box p:last-child { margin-bottom: 0; }
+    .terms-card-header h2 {
+        font-size: 19px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        color: #ffffff;
+    }
 
-    .terms-scroll-box strong { color: #1a1a1a; }
-
-    .terms-highlight {
-        background: #fff5f5;
-        border: 1px solid #fecaca;
-        border-radius: 8px;
-        padding: 10px 13px;
-        margin-bottom: 18px;
+    .terms-card-header p {
         font-size: 12px;
-        color: #991b1b;
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.85);
+        margin: 0;
     }
 
-    .terms-highlight i {
-        color: #dc2626;
-        font-size: 13px;
-        margin-top: 1px;
+    .terms-card-body {
+        padding: 24px 28px;
+        color: #475569;
+        font-size: 13.5px;
+        line-height: 1.65;
+    }
+
+    .terms-card-body p {
+        margin-bottom: 12px;
+    }
+
+    .terms-card-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    .terms-brand-name {
+        color: #800000;
+        font-weight: 700;
+    }
+
+    .terms-scroll-area {
+        max-height: 140px;
+        overflow-y: auto;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-top: 14px;
+        font-size: 12.5px;
+        color: #64748b;
+    }
+
+    .terms-checkbox-box {
+        background: #fff5f5;
+        border: 1.5px solid #fecaca;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        user-select: none;
+        transition: border-color 0.2s;
+    }
+
+    .terms-checkbox-box input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #800000;
+        cursor: pointer;
         flex-shrink: 0;
     }
 
-    .terms-links {
+    .terms-checkbox-box span {
+        font-size: 13.5px;
+        color: #800000;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .terms-alert-notice {
+        display: none;
+        color: #dc2626;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .terms-card-footer {
+        padding: 16px 28px 24px;
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        color: #999;
-        margin-bottom: 18px;
-        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        background: #ffffff;
     }
 
-    .terms-links a {
-        color: #dc2626;
-        text-decoration: none;
+    .btn-terms-decline {
+        background: transparent;
+        color: #64748b;
+        border: 1px solid #cbd5e1;
+        padding: 10px 22px;
+        border-radius: 8px;
         font-weight: 600;
-        transition: color 0.2s;
-    }
-
-    .terms-links a:hover { color: #991b1b; text-decoration: underline; }
-    .terms-links .sep { color: #ddd; }
-
-    .terms-modal-footer {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn-terms-agree {
-        flex: 1;
-        padding: 13px 0;
-        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        font-family: 'Poppins', sans-serif;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex;
+        font-size: 13.5px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        transition: all 0.25s;
-        box-shadow: 0 4px 14px rgba(220,38,38,0.35);
     }
 
-    .btn-terms-agree:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(220,38,38,0.4);
+    .btn-terms-decline:hover {
+        background: #f1f5f9;
+        color: #334155;
     }
 
-    .btn-terms-agree:active {
-        transform: translateY(0);
+    .btn-terms-continue {
+        background: #e2e8f0 !important;
+        color: #94a3b8 !important;
+        border: none !important;
+        padding: 10px 26px !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 13.5px !important;
+        cursor: not-allowed !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        opacity: 0.65 !important;
+        transition: background 0.2s ease, opacity 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
+        user-select: none !important;
+        min-height: unset !important;
+        width: auto !important;
     }
 
-    .btn-terms-view {
-        padding: 13px 16px;
-        background: #fff;
-        color: #dc2626;
-        border: 1.5px solid #fecaca;
-        border-radius: 12px;
-        font-family: 'Poppins', sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        transition: all 0.2s;
-        white-space: nowrap;
-        text-decoration: none;
+    .btn-terms-continue.tc-unlocked {
+        background: linear-gradient(135deg, #800000, #b30000) !important;
+        color: #ffffff !important;
+        cursor: pointer !important;
+        opacity: 1 !important;
+        box-shadow: 0 4px 14px rgba(128, 0, 0, 0.35) !important;
     }
 
-    .btn-terms-view:hover {
-        background: #fee2e2;
-        border-color: #dc2626;
-        color: #dc2626;
-    }
-
-    .terms-modal-divider {
-        height: 1px;
-        background: #f5f5f5;
-        margin: 0 26px 20px;
+    .btn-terms-continue.tc-unlocked:hover {
+        background: linear-gradient(135deg, #990000, #cc0000) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(128, 0, 0, 0.45) !important;
     }
 </style>
 
-<div id="termsModal">
-    <div class="terms-modal-box">
-
-        <!-- Header -->
-        <div class="terms-modal-header">
-            <div class="terms-modal-icon">
-                <i class="fa fa-shield-alt"></i>
-            </div>
+<div id="termsModalOverlay">
+    <div class="terms-card">
+        <div class="terms-card-header">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-badge">
             <h2>Terms & Privacy Notice</h2>
-            <p>Please read and accept before continuing</p>
+            <p>InternConnect — OJT Information Management System</p>
         </div>
+        <div class="terms-card-body">
+            <p>
+                Welcome to <span class="terms-brand-name">InternConnect</span>. Before continuing to your dashboard, please review and accept our terms of service and data privacy guidelines.
+            </p>
 
-        <!-- Body -->
-        <div class="terms-modal-body">
-
-            <!-- Scrollable content -->
-            <div class="terms-scroll-box">
-                <p>By clicking <strong>"I Agree"</strong>, you consent to the collection, use, and processing of your personal data for legitimate purposes related to the InternConnect OJT Information Management System.</p>
-                <p>Your information will be handled in accordance with our Privacy Statement and in full compliance with the <strong>Data Privacy Act of 2012 (Republic Act No. 10173)</strong>.</p>
-                <p>Data collected includes your personal details, academic records, OJT-related documents, and system usage logs — used solely for OJT administration and University operations.</p>
-                <p>You have the right to access, correct, and object to the processing of your personal data. For concerns, contact the PUP Data Privacy Officer at <strong>dataprivacy@pup.edu.ph</strong>.</p>
+            <div class="terms-scroll-area">
+                <p><strong>Data Privacy & System Usage:</strong> By using InternConnect, you consent to the processing of your academic, training, and profile information for University OJT management purposes in accordance with the Data Privacy Act of 2012.</p>
+                <p>You may view the full <a href="{{ url('/terms') }}" target="_blank" style="color:#800000; font-weight:600;">Terms of Use</a> and <a href="{{ url('/privacy') }}" target="_blank" style="color:#800000; font-weight:600;">Privacy Policy</a> anytime.</p>
             </div>
 
-            <!-- Highlight notice -->
-            <div class="terms-highlight">
-                <i class="fa fa-exclamation-circle"></i>
-                <span>Continued use of InternConnect constitutes your acceptance of these terms. You may review the full documents anytime via the footer links.</span>
+            <div class="terms-checkbox-box" id="termsCheckboxCard">
+                <input type="checkbox" id="agreeTermsCheck">
+                <span>I accept the Terms of Use &amp; Privacy Policy</span>
             </div>
-
-            <!-- Full document links -->
-            <div class="terms-links">
-                <i class="fa fa-file-alt" style="color:#dc2626; font-size:12px;"></i>
-                Read the full:
-                <a href="{{ url('/terms') }}" target="_blank">Terms of Use</a>
-                <span class="sep">|</span>
-                <a href="{{ url('/privacy') }}" target="_blank">Privacy Statement</a>
+            <div class="terms-alert-notice" id="termsAlertNotice">
+                ⚠ Please check the box above before continuing.
             </div>
-
-            <!-- Buttons -->
-            <div class="terms-modal-footer">
-                <a href="{{ url('/terms') }}" target="_blank" class="btn-terms-view">
-                    <i class="fa fa-eye"></i> View Full
-                </a>
-                <button id="acceptBtn" class="btn-terms-agree">
-                    <i class="fa fa-check-circle"></i> I Agree & Continue
-                </button>
+        </div>
+        <div class="terms-card-footer">
+            <a href="{{ url('/logout') }}" class="btn-terms-decline">Decline & Exit</a>
+            <div
+                id="btnTermsContinue"
+                role="button"
+                tabindex="0"
+                class="btn-terms-continue"
+                data-accept-url="{{ route('student.acceptTerms') }}"
+                data-csrf="{{ csrf_token() }}"
+            >
+                ✓ Accept & Continue
             </div>
-
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const modal    = document.getElementById('termsModal');
-    const acceptBtn = document.getElementById('acceptBtn');
-
-    acceptBtn.addEventListener('click', () => {
-        // Animate out
-        modal.style.transition = 'opacity 0.3s ease';
-        modal.style.opacity = '0';
-        setTimeout(() => { modal.style.display = 'none'; }, 300);
-
-        // Mark as accepted
-        $.post('{{ route("student.acceptTerms") }}', {
-            _token: '{{ csrf_token() }}'
-        });
-    });
-});
-</script>
-
+<script src="{{ asset('js/terms-modal.js') }}"></script>
 @endif

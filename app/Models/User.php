@@ -24,6 +24,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix',
+        'full_name',
+        'role',
+        'idp_user_id',
+        'has_local_password',
     ];
 
     /**
@@ -44,7 +52,24 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'has_local_password' => 'boolean',
     ];
+
+    /**
+     * Find a user by their IDP user ID.
+     */
+    public static function findByIdpId(string $idpUserId): ?self
+    {
+        return static::where('idp_user_id', $idpUserId)->first();
+    }
+
+    /**
+     * Check if the user has set up a local password.
+     */
+    public function hasLocalPassword(): bool
+    {
+        return (bool) $this->has_local_password;
+    }
 
     public function studentInfo()
     {

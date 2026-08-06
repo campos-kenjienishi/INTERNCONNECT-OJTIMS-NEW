@@ -31,11 +31,16 @@ use App\Models\User;
 
 // ─── PUBLIC ROUTES (no auth required) ────────────────────────────────
 
-Route::get('/', function () {
-    return view('auth.login');
-});
+Route::get('/', [AuthController::class, 'loginGateway']);
 
+// IdP Authentication Routes
+Route::get('/auth/login/external', [AuthController::class, 'showIdpTransition'])->name('login.external');
+Route::get('/auth/redirect-to-idp', [AuthController::class, 'redirectToIdp'])->name('idp.redirect');
+Route::get('/auth/callback', [AuthController::class, 'handleIdpCallback'])->name('idp.callback');
 
+// IdP Onboarding
+Route::get('/onboarding', [AuthController::class, 'showOnboarding'])->name('onboarding.show');
+Route::post('/onboarding/{email}', [AuthController::class, 'storeOnboarding'])->name('onboarding.store');
 
 Route::get('/login', [AuthController::class,'login'])->name('login');
 Route::get('/registration', [AuthController::class,'registration']);
@@ -65,6 +70,8 @@ Route::get('/evaluation/submitted', [EvaluationController::class, 'thankYou'])->
 
 Route::middleware(['auth.session.custom'])->group(function () {
     Route::match(['get', 'post'], '/logout',[AuthController::class, 'logout']);
+    Route::post('/auth/set-local-password', [AuthController::class, 'setLocalPassword'])->name('auth.setLocalPassword');
+    Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
 });
 
 // ─── OJT COORDINATOR (role 1) ───────────────────────────────────────
@@ -131,7 +138,6 @@ Route::middleware([
     Route::get('/student/files', [StudentController::class,'fileSee']);
     Route::get('/student/ojtinfo', [StudentController::class,'ojtInformation']);
     Route::put('/student/ojtEdit/{studentNum}', [StudentController::class,'ojt_edit']);
-    Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
     Route::get('/student/MOA', [CompanyController::class,'companiesup']);
     Route::post('/student/MOA/link', [CompanyController::class,'linkExistingMoa'])->name('student.moa.link');
     Route::put('/student/MOA/{id}', [CompanyController::class,'companyUpdate'])->name('student.moa.update');
