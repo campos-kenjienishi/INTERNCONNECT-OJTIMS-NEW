@@ -296,9 +296,17 @@ class AuthController extends Controller
             now()->addMinutes((int) config('session.lifetime', 120))
         );
 
-        $user->last_login_at = now();
-        $user->last_activity_at = now();
-        $user->saveQuietly();
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_login_at')) {
+                $user->last_login_at = now();
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_activity_at')) {
+                $user->last_activity_at = now();
+            }
+            $user->saveQuietly();
+        } catch (\Throwable $e) {
+            // Safe fallback if staging DB has not migrated new columns yet
+        }
 
         AuditLogger::log(
             'Authentication',
@@ -627,9 +635,17 @@ class AuthController extends Controller
                     now()->addMinutes((int) config('session.lifetime', 120))
                 );
 
-                $user->last_login_at = now();
-                $user->last_activity_at = now();
-                $user->saveQuietly();
+                try {
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_login_at')) {
+                        $user->last_login_at = now();
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_activity_at')) {
+                        $user->last_activity_at = now();
+                    }
+                    $user->saveQuietly();
+                } catch (\Throwable $e) {
+                    // Safe fallback if staging DB has not migrated new columns yet
+                }
 
                 if ($user->role == 0) {
                     return redirect()->route('student_home');

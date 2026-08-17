@@ -74,7 +74,12 @@ class User extends Authenticatable
         }
 
         // 2. Activity / Process performed within 90 days
-        if ($this->last_activity_at && $this->last_activity_at->greaterThanOrEqualTo(now()->subDays($inactivityDays))) {
+        if (!empty($this->last_activity_at) && $this->last_activity_at->greaterThanOrEqualTo(now()->subDays($inactivityDays))) {
+            return true;
+        }
+
+        // 3. Fallback to updated_at if last_activity_at column is empty or unmigrated
+        if ($this->updated_at && $this->updated_at->greaterThanOrEqualTo(now()->subDays($inactivityDays))) {
             return true;
         }
 
@@ -82,12 +87,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Touch student activity timestamp.
+     * Touch student activity timestamp safely.
      */
     public function touchActivity(): void
     {
-        $this->last_activity_at = now();
-        $this->saveQuietly();
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_activity_at')) {
+                $this->last_activity_at = now();
+                $this->saveQuietly();
+            }
+        } catch (\Throwable $e) {
+            // Ignore if column missing on unmigrated staging server
+        }
     }
 
     /**
