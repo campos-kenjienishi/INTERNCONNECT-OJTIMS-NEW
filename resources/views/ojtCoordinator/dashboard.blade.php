@@ -1362,10 +1362,16 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                 <h1 style="font-size:26px; font-weight:800; color:#1a1a1a; letter-spacing:-0.5px;">
                     Home <span style="color:var(--red);">Dashboard</span>
                 </h1>
-                <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
-                    <span class="pulse-dot"></span>
-                    <i class="fa fa-calendar-alt"></i>
-                    <span id="currentDate"></span>
+                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <a href="{{ route('professor_home') }}" class="btn-switch-view" style="display:inline-flex; align-items:center; gap:8px; padding:9px 18px; background:#ffffff; border:1.5px solid #fecaca; border-radius:12px; color:#dc2626; font-weight:700; font-size:13px; text-decoration:none; box-shadow:0 3px 12px rgba(220,38,38,0.1); transition:all 0.25s;">
+                        <i class="fa fa-exchange-alt"></i>
+                        Switch to Professor View
+                    </a>
+                    <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
+                        <span class="pulse-dot"></span>
+                        <i class="fa fa-calendar-alt"></i>
+                        <span id="currentDate"></span>
+                    </div>
                 </div>
             </div>
 

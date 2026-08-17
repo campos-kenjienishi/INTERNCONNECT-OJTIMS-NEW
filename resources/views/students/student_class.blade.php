@@ -12,11 +12,46 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ asset('css/student_class-responsive.css') }}">
     
 
     <style>
+        /* Select2 styling for Student Class page */
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #d1d5db !important;
+            border-radius: 10px !important;
+            height: 44px !important;
+            padding: 6px 12px !important;
+            background: #ffffff !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1a1a1a !important;
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 14px !important;
+            line-height: 30px !important;
+            text-align: left !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #d1d5db !important;
+            border-radius: 10px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            z-index: 9999 !important;
+        }
+        .select2-search__field {
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
@@ -1081,16 +1116,18 @@
                         <p style="color:#666; max-width:500px; margin:8px auto 20px; line-height:1.5;">
                             You selected <strong>Not Yet Listed</strong> (or haven't assigned a professor yet). You cannot access or join a class without an assigned professor.
                         </p>
-                        <form action="{{ route('student.updateProfessor') }}" method="POST" style="max-width:420px; margin:0 auto; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                        <form action="{{ route('student.updateProfessor') }}" method="POST" style="max-width:480px; margin:0 auto; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center;">
                             @csrf
                             @method('PUT')
-                            <select name="adviser_name" class="form-select" style="flex:1; min-width:220px; padding:10px 14px; border-radius:10px; border:1px solid #d1d5db;" required>
-                                <option value="">Select your Professor</option>
-                                @foreach($professors as $prof)
-                                    <option value="{{ $prof->full_name }}">{{ $prof->full_name }}</option>
-                                @endforeach
-                            </select>
-                            <button type="submit" class="btn btn-danger" style="background:var(--red); border:none; padding:10px 24px; border-radius:10px; font-weight:600;">
+                            <div style="flex:1; min-width:240px; text-align:left;">
+                                <select name="adviser_name" class="form-select" required>
+                                    <option value="">Select your Professor</option>
+                                    @foreach($professors as $prof)
+                                        <option value="{{ $prof->full_name }}">{{ $prof->full_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-danger" style="background:var(--red); border:none; padding:10px 24px; border-radius:10px; font-weight:600; height:44px;">
                                 <i class="fa fa-save"></i> Save Professor
                             </button>
                         </form>
@@ -1686,6 +1723,18 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        if ($.fn.select2) {
+            $('select[name="adviser_name"]').select2({
+                placeholder: 'Select your Professor',
+                allowClear: true,
+                width: '100%'
+            });
+        }
+    });
+</script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>

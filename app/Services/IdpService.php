@@ -227,4 +227,97 @@ class IdpService
             return false;
         }
     }
+
+    /**
+     * Obtain an access token using the Client Credentials grant type.
+     * This token is used for server-to-server calls (e.g., admin user list)
+     * and does not require a user to log in interactively.
+     *
+     * @return string  The access token.
+     *
+     * @throws \RuntimeException
+     */
+    public function getClientCredentialsToken(): string
+    {
+        // 1. Check if an admin access token is provided in .env or session or cache
+        $storedToken = config('services.idp.admin_access_token')
+            ?: session('idp_access_token')
+            ?: Cache::get('idp_admin_access_token');
+
+        if (!empty($storedToken)) {
+            return $storedToken;
+        }
+
+        // 2. Otherwise request via client_credentials grant
+        $response = Http::withOptions(['verify' => $this->verifyTls])
+            ->acceptJson()
+            ->post($this->tokenUrl, [
+                'client_id'     => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'grant_type'    => 'client_credentials',
+            ]);
+
+        if ($response->failed()) {
+            Log::error('IDP client_credentials token request failed', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+            throw new \RuntimeException('Failed to obtain admin access token from Identity Provider.');
+        }
+
+        $token = $response->json('access_token');
+
+        if (empty($token)) {
+            throw new \RuntimeException('Identity Provider returned empty access token for client_credentials grant.');
+        }
+
+        return $token;
+    }
+
+    /**
+     * Fetch a paginated list of all users from the IDP admin API.
+     *
+     * @param  string  $accessToken  Admin-scoped access token.
+     * @param  int     $page         Page number (1-based).
+     * @param  int     $limit        Number of records per page.
+     * @return array   The parsed JSON response from the IDP.
+     *
+     * @throws \RuntimeException
+     */
+    public function getAdminUserList(string $accessToken, int $page = 1, int $limit = 100): array
+    {
+        $url = $this->baseUrl . '/api/v1/admin/users?' . http_build_query([
+            'page'    => $page,
+            'limit'   => $limit,
+            'sort_by' => 'created_at',
+            'order'   => 'desc',
+        ]);
+
+        $sessionCookie = config('services.idp.session_cookie') ?: Cache::get('idp_session_cookie');
+
+        $request = Http::withOptions(['verify' => $this->verifyTls])
+            ->withToken($accessToken)
+            ->acceptJson()
+            ->timeout(30);
+
+        if (!empty($sessionCookie)) {
+            $request = $request->withHeaders([
+                'Cookie'   => 'session_cookie=' . $sessionCookie . '; access_token=' . $accessToken,
+                'Referer'  => $this->baseUrl . '/user-pool',
+            ]);
+        }
+
+        $response = $request->get($url);
+
+        if ($response->failed()) {
+            Log::error('IDP admin user list request failed', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+                'page'   => $page,
+            ]);
+            throw new \RuntimeException('Failed to fetch user list from Identity Provider admin API (page ' . $page . ').');
+        }
+
+        return $response->json() ?? [];
+    }
 }

@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 use App\Models\Company; // ADD THIS at the top
-use Illuminate\Validation\Rule;
+use App\Services\GuidanceApiService;
 
 class StudentController extends Controller
 {
@@ -594,19 +594,14 @@ public function StuList()
         $user = User::where('id', '=', Session::get('loginId'))->first();
     }
 
-    // Get the current date and subtract 6 months
-    $sixMonthsAgo = Carbon::now()->subMonths(6);
-
-    $students = User::where('role', 0)
-                ->where('status', 1)
-                ->where('created_at', '>=', $sixMonthsAgo) // Add condition for created_at
-                ->get();
+    // Fetch active students (created in last 6 months or active in last 90 days)
+    $allStudents = User::where('role', 0)->get();
+    $students = $allStudents->filter(fn ($s) => $s->isStudentActive(90));
     $studentData = [];
     
     // Initialize subject data array outside the loop
     $subjectData = [];
     $course = Courses::all();
-
 
     foreach ($students as $student) {
         $ojt = OJTInformation::where('studentNum', $student->studentNum)->first();
@@ -670,7 +665,7 @@ public function StuList()
         ];
     }
 
-    return view('ojtCoordinator.students', compact('studentData', 'user', 'subjectData','course'));
+    return view('ojtCoordinator.students', compact('studentData', 'user', 'subjectData', 'course'));
 }
 
 
@@ -840,6 +835,140 @@ public function ojt_edit(Request $request,$studentNum)
         Session::put('termsAccepted', true);
         Session::save();
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Sync logged-in student's profile information from GuiSIS (Guidance API).
+     */
+    public function syncFromGuidance(Request $request, GuidanceApiService $guidanceApi)
+    {
+        $userId = Session::get('loginId') ?? Auth::id();
+        if (!$userId) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated session.'], 401);
+        }
+
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User record not found.'], 44);
+        }
+
+        // Query GuiSIS by student email
+        $guisisData = $guidanceApi->getStudentByEmail($user->email);
+
+        if (!$guisisData) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No matching student record found in Guidance System (GuiSIS).'
+            ]);
+        }
+
+        // Fetch student profile record
+        $student = Student::where('user_id', $user->id)->first();
+        if (!$student) {
+            $student = new Student();
+            $student->user_id = $user->id;
+        }
+
+        // Sync fields from GuiSIS data (supporting nested basicInfo/personalInfo and camelCase)
+        $pInfo = $guisisData['personalInfo'] ?? $guisisData['personal_info'] ?? $guisisData;
+        $bInfo = $guisisData['basicInfo'] ?? $guisisData['basic_info'] ?? $guisisData;
+
+        $studentNum = $pInfo['studentNumber'] ?? $pInfo['student_number'] ?? $pInfo['studentNum'] ?? $guisisData['student_number'] ?? $guisisData['studentNum'] ?? null;
+        $course = (is_array($pInfo['program'] ?? null) ? ($pInfo['program']['name'] ?? $pInfo['program']['program'] ?? '') : ($pInfo['program'] ?? ''))
+            ?: (is_array($pInfo['course'] ?? null) ? ($pInfo['course']['name'] ?? $pInfo['course']['course'] ?? '') : ($pInfo['course'] ?? ''))
+            ?: (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['program'] ?? '') : ($guisisData['program'] ?? ''))
+            ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['course'] ?? $guisisData['course']['name'] ?? '') : ($guisisData['course'] ?? null));
+
+        $yearSection = $pInfo['year_and_section'] ?? $pInfo['year_section'] ?? $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
+        if (!$yearSection && isset($pInfo['yearLevel']) && isset($pInfo['section'])) {
+            $yearSection = $pInfo['yearLevel'] . '-' . $pInfo['section'];
+        }
+
+        $suffixName = $pInfo['suffixName'] ?? $pInfo['suffix_name'] ?? $pInfo['suffix'] ?? null;
+        if ($suffixName && empty($user->suffix)) {
+            $user->suffix = $suffixName;
+            $user->save();
+        }
+
+        if ($studentNum) {
+            $student->studentNum = $studentNum;
+            // Also sync to OJTInformation if exists
+            $ojtInfo = OJTInformation::where('studentNum', $student->studentNum)->first();
+            if ($ojtInfo) {
+                $ojtInfo->studentNum = $studentNum;
+                $ojtInfo->save();
+            }
+        }
+
+        if ($course) {
+            $student->course = $course;
+        }
+
+        if ($yearSection) {
+            $student->year_and_section = $yearSection;
+        }
+
+        // Check if personal info API returned additional details
+        $dob = $pInfo['dateOfBirth'] ?? $pInfo['date_of_birth'] ?? null;
+        $mobile = $pInfo['mobileNumber'] ?? $pInfo['mobile_number'] ?? $pInfo['contactNumber'] ?? $pInfo['contact_number'] ?? null;
+
+        if ($studentNum && (!$dob || !$mobile)) {
+            $personalInfo = $guidanceApi->getPersonalInfo($studentNum);
+            if (!empty($personalInfo)) {
+                $dob = $dob ?: ($personalInfo['dateOfBirth'] ?? $personalInfo['date_of_birth'] ?? null);
+                $mobile = $mobile ?: ($personalInfo['mobileNumber'] ?? $personalInfo['contact_number'] ?? null);
+            }
+        }
+
+        if ($dob) {
+            $student->date_of_birth = $dob;
+        }
+        if ($mobile) {
+            $student->contact_number = $mobile;
+        }
+
+        $addresses = $pInfo['addresses'] ?? $guisisData['addresses'] ?? null;
+        if ($studentNum && empty($addresses)) {
+            $addresses = $guidanceApi->getAddresses($studentNum);
+        }
+
+        if (!empty($addresses) && is_array($addresses)) {
+            $firstAddr = reset($addresses);
+            if (is_array($firstAddr)) {
+                $addrObj = $firstAddr['address'] ?? $firstAddr;
+                $fullAddr = implode(', ', array_filter([
+                    $addrObj['street'] ?? '',
+                    $addrObj['barangay']['name'] ?? $addrObj['barangay'] ?? '',
+                    $addrObj['city']['name'] ?? $addrObj['city'] ?? '',
+                    $addrObj['province']['name'] ?? $addrObj['province'] ?? '',
+                ]));
+                if (!empty($fullAddr)) {
+                    $student->address = $fullAddr;
+                }
+            }
+        }
+
+        $student->save();
+
+        AuditLogger::log(
+            'Student Profile',
+            'update',
+            'Synced profile details from Guidance System (GuiSIS) for: ' . $user->full_name,
+            $user->id
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile details successfully synced from Guidance System (GuiSIS)!',
+            'data' => [
+                'studentNum' => $student->studentNum,
+                'course' => $student->course,
+                'year_and_section' => $student->year_and_section,
+                'contact_number' => $student->contact_number ?? '',
+                'date_of_birth' => $student->date_of_birth ?? '',
+                'address' => $student->address ?? '',
+            ]
+        ]);
     }
 
 }

@@ -1039,11 +1039,7 @@ AuditLogger::log(
 );
 
 
-// Retrieve the associated subjects and update them
-$professor->subjects()->update([
-    'subject_code' => $request->input('subject_code'),
-    'subject_description' => $request->input('subject_description'),
-]);
+
 
 // Find the user with the initial professor email
 $user = User::where('email', $initialProfessorEmail)->first();

@@ -450,7 +450,9 @@ window.addEventListener('click', function(e) {
         }
 
         var host = field.parentElement;
-        if (!host.classList.contains("voice-mic-host")) {
+        if (host && (host.classList.contains("input-wrap") || host.classList.contains("input-group"))) {
+            // Already inside a positioned wrapper, do not insert extra wrapper element
+        } else if (!host.classList.contains("voice-mic-host")) {
             var wrapper = document.createElement("div");
             wrapper.className = "voice-mic-host";
             host.insertBefore(wrapper, field);

@@ -19,15 +19,27 @@
     <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}">
 
     <style>
-        body.auth-centered-page .login-container {
-            max-width: 600px;
-            min-height: auto;
+        body.auth-centered-page {
+            position: relative !important;
+            z-index: 1 !important;
         }
 
         body.auth-centered-page .main-wrapper {
+            position: relative !important;
+            z-index: 5 !important;
+            width: 100% !important;
             flex-direction: column;
             align-items: center;
             gap: 14px;
+        }
+
+        body.auth-centered-page .login-container {
+            max-width: 600px;
+            min-height: auto;
+            position: relative !important;
+            z-index: 999 !important;
+            animation: none !important;
+            transform: none !important;
         }
 
         body.auth-centered-page .left-panel {
@@ -40,6 +52,21 @@
             min-height: 450px;
             padding: 30px 38px;
             justify-content: center;
+            position: relative !important;
+            z-index: 1000 !important;
+            pointer-events: auto !important;
+            animation: none !important;
+            transform: none !important;
+        }
+
+        body.auth-centered-page .right-panel input,
+        body.auth-centered-page .right-panel button:not(.voice-mic-button),
+        body.auth-centered-page .right-panel a,
+        body.auth-centered-page .right-panel .input-wrap {
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 1001 !important;
+            touch-action: manipulation !important;
         }
 
         .auth-brand {
@@ -47,25 +74,11 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            gap: 10px;
-            margin-bottom: 30px;
         }
 
         .auth-logo {
-            width: 72px;
-            height: 72px;
             object-fit: contain;
             filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
-        }
-
-        .auth-brand-copy .brand-name {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .auth-brand-copy .system-title {
-            font-size: 10px;
-            letter-spacing: 2px;
         }
 
         .auth-brand-copy .system-title,
@@ -100,28 +113,120 @@
             margin-bottom: 16px;
         }
 
-        .input-wrap input {
-            background: #f7f4ee;
-            border: 1px solid #ddd7cb;
-            color: #3b0000;
+        .input-wrap {
+            position: relative !important;
+            width: 100% !important;
+        }
+
+        .input-wrap {
+            position: relative !important;
+            width: 100% !important;
+            display: block !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input {
+            width: 100% !important;
+            background: #f7f4ee !important;
+            border: 1px solid #ddd7cb !important;
+            color: #3b0000 !important;
+            padding: 12px 48px 12px 46px !important;
+            height: 48px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            border-radius: 12px !important;
+            position: relative !important;
+            z-index: 2 !important;
+            pointer-events: auto !important;
         }
 
         .input-wrap input::placeholder {
-            color: #9a9080;
+            color: #9a9080 !important;
         }
 
         .input-wrap input:focus {
-            background: #fffdf9;
-            border-color: #cdbfa9;
+            background: #fffdf9 !important;
+            border-color: #cdbfa9 !important;
         }
 
         .input-wrap .i-icon {
+            position: absolute !important;
+            left: 16px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
             color: #ef4444 !important;
-            z-index: 2;
+            font-size: 15px !important;
+            z-index: 10 !important;
+            pointer-events: none !important;
+            display: inline-block !important;
         }
 
-        .footer-wrap {
-            margin-top: 8px;
+        .input-wrap .toggle-pw {
+            position: absolute !important;
+            right: 16px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #ef4444 !important;
+            font-size: 16px !important;
+            z-index: 50 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            display: inline-block !important;
+            line-height: 1 !important;
+        }
+
+        .input-wrap .toggle-pw:hover {
+            color: #fca5a5 !important;
+        }
+
+        /* Clean Voice Input Mic Button */
+        body.auth-centered-page .right-panel .voice-mic-button,
+        .input-wrap .voice-mic-button {
+            position: absolute !important;
+            right: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 50% !important;
+            background: #ffffff !important;
+            border: 1.5px solid #ef4444 !important;
+            color: #ef4444 !important;
+            font-size: 13px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 100 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+            transition: all 0.2s !important;
+        }
+
+        /* On password field with toggle-pw, shift voice-mic-button left */
+        body.auth-centered-page .right-panel .input-wrap #id_password ~ .voice-mic-button,
+        body.auth-centered-page .right-panel .input-wrap input[type="password"] ~ .voice-mic-button {
+            right: 46px !important;
+        }
+
+        .btn-wrap {
+            margin-top: 14px;
+            width: 100%;
+        }
+
+        .btn-login {
+            width: 100% !important;
+            height: 48px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35) !important;
         }
 
         .signup-outside {
@@ -162,21 +267,21 @@
         .terms-line-top {
             display: block;
             margin-bottom: 2px;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.85) !important;
         }
 
         .terms-line-bottom {
             display: block;
-            color: #fff;
+            color: rgba(255, 255, 255, 0.85) !important;
         }
 
         .terms-line-bottom a {
-            color: #fca5a5;
+            color: #fca5a5 !important;
             text-decoration: underline;
         }
 
         .terms-line-separator {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.85) !important;
         }
 
         .btn-wrap {
@@ -251,6 +356,12 @@
 
         <!-- RIGHT PANEL -->
         <div class="right-panel">
+            <div style="width: 100%; margin-bottom: 12px; text-align: left;">
+                <a href="{{ url('/login-gateway') }}" class="back-btn-pill">
+                    <i class="fa fa-arrow-left"></i> Back to Portal Selection
+                </a>
+            </div>
+
             <div class="auth-brand">
                 <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
                 <div class="auth-brand-copy">
@@ -259,20 +370,34 @@
                 </div>
             </div>
 
+            @php
+                $activePortal = request()->query('portal', session('target_login_portal', 'student'));
+            @endphp
+
             <div class="login-header">
-                <div class="local-signin-badge"><i class="fa fa-key me-1"></i> Local Account Sign In</div>
-                <p>Sign in using your local InternConnect credentials</p>
+                @if($activePortal === 'faculty')
+                    <div class="local-signin-badge" style="background: rgba(220, 38, 38, 0.2); border-color: #ef4444; color: #fca5a5;">
+                        <i class="fa fa-user-shield me-1"></i> FACULTY & STAFF PORTAL (Local Sign In)
+                    </div>
+                    <p>Sign in using your Faculty or Coordinator account</p>
+                @else
+                    <div class="local-signin-badge" style="background: rgba(30, 144, 255, 0.2); border-color: #1e90ff; color: #93c5fd;">
+                        <i class="fa fa-graduation-cap me-1"></i> STUDENT PORTAL (Local Sign In)
+                    </div>
+                    <p>Sign in using your Student account</p>
+                @endif
             </div>
 
             @if(Session::has('success'))
-                <div class="alert alert-success">{{ Session::get('success') }}</div>
+                <div class="alert alert-success py-2 px-3 mb-3 text-center" style="font-size: 13px;">{{ Session::get('success') }}</div>
             @endif
             @if(Session::has('fail'))
-                <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                <div class="alert alert-danger py-2 px-3 mb-3 text-center" style="font-size: 13px;">{{ Session::get('fail') }}</div>
             @endif
 
             <form action="{{ route('login-user') }}" method="post">
-                    @csrf
+                @csrf
+                <input type="hidden" name="portal" value="{{ $activePortal }}">
 
                     <div class="field-group">
                         <label class="form-label">E-mail Address</label>
@@ -288,7 +413,7 @@
                         <div class="input-wrap">
                             <i class="fa fa-lock i-icon"></i>
                             <input type="password" placeholder="Enter your password" name="password" autocomplete="current-password" required id="id_password">
-                            <i class="far fa-eye toggle-pw" id="togglePassword"></i>
+                            <i class="fa fa-eye toggle-pw" id="togglePassword" aria-label="Toggle password visibility"></i>
                         </div>
                         <span class="text-danger">@error('password') {{ $message }} @enderror</span>
                     </div>
@@ -319,31 +444,10 @@
         </div>
 
     </div>
-
-    <div class="signup-outside">
-        <a href="{{ url('/') }}"><i class="fa fa-arrow-left me-1"></i> Back to Sign In Options</a>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url('/frontend/js/script.js') }}"></script>
-<script>
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput  = document.getElementById('id_password');
-
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener('click', function () {
-            const isHidden = passwordInput.type === 'password';
-            passwordInput.type = isHidden ? 'text' : 'password';
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-            this.classList.remove('toggled');
-            void this.offsetWidth;
-            this.classList.add('toggled');
-        });
-    }
-</script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
-<script src="{{ url('/js/mobile-utils.js') }}"></script>
 </body>
 </html>

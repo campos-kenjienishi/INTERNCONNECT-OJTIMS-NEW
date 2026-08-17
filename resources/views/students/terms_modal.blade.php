@@ -108,18 +108,26 @@
     }
 
     .terms-checkbox-box input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        accent-color: #800000;
-        cursor: pointer;
-        flex-shrink: 0;
+        width: 20px !important;
+        min-width: 20px !important;
+        max-width: 20px !important;
+        height: 20px !important;
+        accent-color: #800000 !important;
+        cursor: pointer !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
     }
 
     .terms-checkbox-box span {
-        font-size: 13.5px;
-        color: #800000;
-        font-weight: 600;
-        cursor: pointer;
+        font-size: 13.5px !important;
+        color: #800000 !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        flex: 1 1 auto !important;
+        white-space: normal !important;
+        word-break: break-word !important;
     }
 
     .terms-alert-notice {
@@ -190,6 +198,84 @@
         background: linear-gradient(135deg, #990000, #cc0000) !important;
         transform: translateY(-1px);
         box-shadow: 0 6px 18px rgba(128, 0, 0, 0.45) !important;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 576px) {
+        #termsModalOverlay {
+            padding: 10px;
+            align-items: center;
+        }
+
+        .terms-card {
+            width: 100%;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 14px;
+        }
+
+        .terms-card-header {
+            padding: 16px 18px;
+        }
+
+        .terms-card-header .logo-badge {
+            width: 42px;
+            height: 42px;
+            margin-bottom: 6px;
+        }
+
+        .terms-card-header h2 {
+            font-size: 16px;
+        }
+
+        .terms-card-header p {
+            font-size: 11px;
+        }
+
+        .terms-card-body {
+            padding: 16px 18px;
+            font-size: 12.5px;
+            overflow-y: auto;
+        }
+
+        .terms-scroll-area {
+            max-height: 100px;
+            padding: 10px 12px;
+            font-size: 11.5px;
+        }
+
+        .terms-checkbox-box {
+            padding: 10px 12px;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .terms-checkbox-box input[type="checkbox"] {
+            width: 18px !important;
+            min-width: 18px !important;
+            max-width: 18px !important;
+            height: 18px !important;
+        }
+
+        .terms-checkbox-box span {
+            font-size: 12px !important;
+            line-height: 1.35 !important;
+        }
+
+        .terms-card-footer {
+            padding: 12px 18px 16px;
+            gap: 8px;
+            flex-direction: column-reverse;
+        }
+
+        .btn-terms-decline,
+        .btn-terms-continue {
+            width: 100% !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+            text-align: center;
+        }
     }
 </style>
 

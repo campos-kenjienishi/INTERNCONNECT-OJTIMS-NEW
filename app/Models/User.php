@@ -32,6 +32,8 @@ class User extends Authenticatable
         'role',
         'idp_user_id',
         'has_local_password',
+        'last_login_at',
+        'last_activity_at',
     ];
 
     /**
@@ -51,9 +53,42 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'has_local_password' => 'boolean',
+        'last_login_at'     => 'datetime',
+        'last_activity_at'  => 'datetime',
+        'password'          => 'hashed',
+        'has_local_password'=> 'boolean',
     ];
+
+    /**
+     * Check whether student is active based on 6-month enrollment window OR 90-day activity.
+     */
+    public function isStudentActive(int $inactivityDays = 90): bool
+    {
+        if ((int) $this->role !== 0) {
+            return true;
+        }
+
+        // 1. Account created within the last 6 months (current semester)
+        if ($this->created_at && $this->created_at->greaterThanOrEqualTo(now()->subMonths(6))) {
+            return true;
+        }
+
+        // 2. Activity / Process performed within 90 days
+        if ($this->last_activity_at && $this->last_activity_at->greaterThanOrEqualTo(now()->subDays($inactivityDays))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Touch student activity timestamp.
+     */
+    public function touchActivity(): void
+    {
+        $this->last_activity_at = now();
+        $this->saveQuietly();
+    }
 
     /**
      * Find a user by their IDP user ID.

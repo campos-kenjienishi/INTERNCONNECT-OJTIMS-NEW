@@ -12,9 +12,41 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* Select2 inside Transfer Coordinator Modal */
+        #transferCoordinatorModal .select2-container--default .select2-selection--single {
+            border: 1px solid #d1d5db !important;
+            border-radius: 8px !important;
+            height: 44px !important;
+            padding: 6px 10px !important;
+        }
+        #transferCoordinatorModal .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1a1a1a !important;
+            font-size: 13.5px !important;
+            line-height: 28px !important;
+        }
+        #transferCoordinatorModal .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #d1d5db !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            z-index: 99999 !important;
+        }
+        .select2-search__field {
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            font-size: 13px !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #7c3aed !important;
+            color: #ffffff !important;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
@@ -1113,14 +1145,12 @@
             <span class="nav-label">Analytics</span>
             <span class="tooltip-label">Analytics</span>
         </a>
-        <li>
-    <a href="{{ url('/auditlog') }}" class="nav-item">
+        <a href="{{ route('auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-</li>
-</nav>
+    </nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/logout') }}" class="nav-item">
@@ -1166,13 +1196,34 @@
                     <span>Professors</span>
                 </div>
             </div>
-            <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addProfessorModal">
-                <i class="fa fa-plus"></i> Add New Professor
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#transferCoordinatorModal" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
+                    <i class="fa fa-user-shield"></i>
+                    <span>Transfer Coordinator Role</span>
+                </button>
+                <button type="button" id="btnSyncFlss" class="btn-sync-flss" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);">
+                    <i class="fa fa-sync-alt" id="flssSyncIcon"></i>
+                    <span>Sync Faculty from FLSS</span>
+                </button>
+                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addProfessorModal">
+                    <i class="fa fa-plus"></i> Add New Professor
+                </button>
+            </div>
         </div>
 
         <!-- Stats Row -->
-        @php $totalProfs = count($data); @endphp
+        @php 
+            $totalProfs = count($data); 
+            $syncedCount = 0;
+            foreach ($data as $prof) {
+                $uRec = $usersP->where('email', $prof->email)->first();
+                $eLower = strtolower(trim($prof->email ?? ''));
+                $nLower = strtolower(trim($prof->full_name ?? ''));
+                if (($uRec && !empty($uRec->idp_user_id)) || str_ends_with($eLower, '@pup.edu.ph') || in_array($eLower, $flssEmails ?? []) || in_array($nLower, $flssNames ?? [])) {
+                    $syncedCount++;
+                }
+            }
+        @endphp
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-chalkboard-teacher"></i></div>
@@ -1182,19 +1233,17 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fa fa-book"></i></div>
+                <div class="stat-icon purple"><i class="fa fa-sync-alt"></i></div>
                 <div>
-                    <div class="stat-num">
-                        {{ collect($data)->sum(fn($p) => $p->subjects->count()) }}
-                    </div>
-                    <div class="stat-name">Total Subjects</div>
+                    <div class="stat-num">{{ $syncedCount }}</div>
+                    <div class="stat-name">FLSS Synced</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-graduation-cap"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-user-tag"></i></div>
                 <div>
-                    <div class="stat-num">OJT</div>
-                    <div class="stat-name">Active Program</div>
+                    <div class="stat-num">{{ $totalProfs - $syncedCount }}</div>
+                    <div class="stat-name">Manually Added</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -1213,7 +1262,7 @@
                     <div class="header-icon"><i class="fa fa-chalkboard-teacher"></i></div>
                     <div>
                         <h2>Professor List</h2>
-                        <p>Manage all OJT professors and their subject assignments</p>
+                        <p>Manage all OJT professors and faculty accounts</p>
                     </div>
                 </div>
                 <div class="prof-count-badge">
@@ -1228,14 +1277,34 @@
                         <tr>
                             <th>Professor Name</th>
                             <th>Email</th>
-                            <th>Subject Code</th>
-                            <th>Subject Description</th>
+                            <th>Role</th>
+                            <th>Account Source</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($data as $professor)
-                        @php $subject = $professor->subjects->first(); @endphp
+                        @php
+                            $userRec = $usersP->where('email', $professor->email)->first();
+                            $isCoordinator = ($userRec && (int)$userRec->role === 1);
+                            $roleLabel = $isCoordinator ? 'OJT Coordinator' : 'Professor';
+                            $roleStyle = $isCoordinator 
+                                ? 'background: #6b21a8 !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;' 
+                                : 'background: #0284c7 !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;';
+
+                            $emailLower = strtolower(trim($professor->email ?? ''));
+                            $nameLower = strtolower(trim($professor->full_name ?? ''));
+
+                            $isFlssSynced = ($userRec && !empty($userRec->idp_user_id))
+                                || str_ends_with($emailLower, '@pup.edu.ph')
+                                || in_array($emailLower, $flssEmails ?? [])
+                                || in_array($nameLower, $flssNames ?? []);
+
+                            $sourceLabel = $isFlssSynced ? 'FLSS / IdP Synced' : 'Manually Added';
+                            $sourceStyle = $isFlssSynced 
+                                ? 'background: #475569 !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;' 
+                                : 'background: #2563eb !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;';
+                        @endphp
                         <tr>
                             <!-- Name -->
                             <td>
@@ -1255,18 +1324,14 @@
                                 </div>
                             </td>
 
-                            <!-- Subject Code -->
+                            <!-- Role -->
                             <td>
-                                @foreach ($professor->subjects as $s)
-                                    <span class="subject-code-badge">{{ $s->subject_code }}</span>
-                                @endforeach
+                                <span class="badge" style="{{ $roleStyle }}">{{ $roleLabel }}</span>
                             </td>
 
-                            <!-- Subject Description -->
-                            <td style="font-size:13px; color:#555;">
-                                @foreach ($professor->subjects as $s)
-                                    {{ $s->subject_description }}@if(!$loop->last), @endif
-                                @endforeach
+                            <!-- Source -->
+                            <td>
+                                <span class="badge" style="{{ $sourceStyle }}">{{ $sourceLabel }}</span>
                             </td>
 
                             <!-- Actions -->
@@ -1275,10 +1340,8 @@
                                     <button class="btn-edit btnView1"
                                         data-professor-id="{{ $professor->id }}"
                                         data-email="{{ $professor->email }}"
-                                        data-subject-code="{{ $subject->subject_code ?? '' }}"
-                                        data-subject-description="{{ $subject->subject_description ?? '' }}"
-                                        data-first-name="{{ $usersP->where('email', $professor->email)->first()->first_name ?? '' }}"
-                                        data-last-name="{{ $usersP->where('email', $professor->email)->first()->last_name ?? '' }}"
+                                        data-first-name="{{ $userRec->first_name ?? '' }}"
+                                        data-last-name="{{ $userRec->last_name ?? '' }}"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editProfessorModal">
                                         <i class="fa fa-edit"></i> Edit
@@ -1370,20 +1433,6 @@
                         </div>
                     </div>
 
-                    <div class="modal-section"><i class="fa fa-book"></i> Subject Details</div>
-
-                    <div class="field-row">
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-tag"></i> Subject Code</label>
-                            <input class="field-input" type="text" name="subject_code" placeholder="e.g. OJT101" value="{{ old('subject_code') }}" required>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-align-left"></i> Subject Description</label>
-                            <input class="field-input" type="text" name="subject_description" placeholder="Subject description" value="{{ old('subject_description') }}" required>
-                        </div>
-                    </div>
-
-
                     <div class="modal-section"><i class="fa fa-lock"></i> Set Password</div>
                     <div class="field-group has-bubble">
                         <label class="field-label"><i class="fa fa-lock"></i> Password</label>
@@ -1447,19 +1496,6 @@
                     <div class="field-group">
                         <label class="field-label"><i class="fa fa-envelope"></i> Email Address</label>
                         <input class="field-input" type="text" name="email" id="editEmail" placeholder="Enter email address">
-                    </div>
-
-                    <div class="modal-section"><i class="fa fa-book"></i> Subject Details</div>
-
-                    <div class="field-row">
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-tag"></i> Subject Code</label>
-                            <input class="field-input" type="text" name="subject_code" id="editSubjectCode" placeholder="Subject code">
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-align-left"></i> Subject Description</label>
-                            <input class="field-input" type="text" name="subject_description" id="editSubjectDescription" placeholder="Subject description">
-                        </div>
                     </div>
                 </div>
 
@@ -1671,14 +1707,22 @@
             function setupPasswordToggle(toggle, input) {
                 if (!toggle || !input) return;
 
-                toggle.addEventListener('click', function () {
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
                     const isHidden = input.type === 'password';
                     input.type = isHidden ? 'text' : 'password';
 
                     const icon = toggle.querySelector('i');
                     if (icon) {
-                        icon.classList.toggle('fa-eye');
-                        icon.classList.toggle('fa-eye-slash');
+                        if (isHidden) {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
                     }
                 });
             }
@@ -2005,12 +2049,431 @@
                 const addProfessorModal = new bootstrap.Modal(document.getElementById('addProfessorModal'));
                 addProfessorModal.show();
             @endif
+
+            $('#btnSyncFlss').on('click', function() {
+                var $btn = $(this);
+                var $icon = $('#flssSyncIcon');
+
+                Swal.fire({
+                    title: 'Sync Faculty from FLSS?',
+                    text: 'This will fetch faculty records from the Faculty Loading System, update existing accounts, and create new professor accounts.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#16a34a',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, Sync Now'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $btn.prop('disabled', true);
+                        $icon.addClass('fa-spin');
+
+                        // Show Syncing Loading Alert asking user not to navigate away
+                        Swal.fire({
+                            title: 'Syncing Faculty Data...',
+                            html: '<div class="py-3">' +
+                                '<div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">' +
+                                    '<span class="visually-hidden">Syncing...</span>' +
+                                '</div>' +
+                                '<p class="font-weight-bold text-dark mb-2" style="font-size: 15px;">Connecting to FLSS Production API...</p>' +
+                                '<div class="alert alert-warning text-start mx-auto mb-0" style="max-width: 420px; font-size: 13px; border-radius: 10px;">' +
+                                    '<i class="fas fa-exclamation-triangle text-warning me-1"></i> <strong>Please do not refresh, close this window, or navigate to another page while syncing is in progress.</strong>' +
+                                '</div>' +
+                            '</div>',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false
+                        });
+
+                        // Prevent accidental page unload during sync
+                        window.onbeforeunload = function() {
+                            return "Faculty sync is currently in progress. Navigating away may interrupt the sync process.";
+                        };
+
+                        $.ajax({
+                            url: "{{ route('coordinator.syncFaculty') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(res) {
+                                window.onbeforeunload = null;
+                                $btn.prop('disabled', false);
+                                $icon.removeClass('fa-spin');
+
+                                if (res.success) {
+                                    if (res.has_missing && res.missing_accounts && res.missing_accounts.length > 0) {
+                                        Swal.fire({
+                                            title: 'FLSS Sync Updated!',
+                                            text: res.message,
+                                            icon: 'info',
+                                            confirmButtonText: 'Review Missing Accounts'
+                                        }).then(function() {
+                                            openPruneMissingFacultyModal(res.missing_accounts);
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Sync Complete!',
+                                            text: res.message,
+                                            icon: 'success'
+                                        }).then(function() {
+                                            location.reload();
+                                        });
+                                    }
+                                } else {
+                                    Swal.fire('Sync Notice', res.message || 'Unable to sync faculty.', 'warning');
+                                }
+                            },
+                            error: function(err) {
+                                window.onbeforeunload = null;
+                                $btn.prop('disabled', false);
+                                $icon.removeClass('fa-spin');
+                                var errMsg = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : 'Error communicating with FLSS system.';
+                                Swal.fire('Sync Failed', errMsg, 'error');
+                            }
+                        });
+                    }
+                });
+            });
         }
 
     });
 </script>
-<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
+<!-- Transfer Coordinator Designation Modal -->
+<div class="modal fade" id="transferCoordinatorModal" tabindex="-1" aria-labelledby="transferCoordinatorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 14px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 18px 24px;">
+                <h5 class="modal-title font-weight-bold" id="transferCoordinatorModalLabel" style="font-size: 16px;">
+                    <i class="fa fa-user-shield me-2"></i> Transfer OJT Coordinator Designation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <p style="font-size: 13.5px; color: #555; line-height: 1.5; margin-bottom: 18px;">
+                    Select an active professor from the faculty list below to transfer the <strong>OJT Coordinator designation</strong> to them.
+                </p>
+                <div class="alert alert-warning d-flex align-items-center" style="font-size: 12.5px; border-radius: 8px;">
+                    <i class="fa fa-exclamation-triangle me-2" style="font-size: 16px; color: #d97706;"></i>
+                    <div>
+                        <strong>Important:</strong> Upon transfer, your account will revert to a standard Professor account, and the selected faculty member will become the active OJT Coordinator.
+                    </div>
+                </div>
+                <form id="transferCoordinatorForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label font-weight-semibold" style="font-size: 13px;">Select New Coordinator</label>
+                        <select name="target_user_id" id="targetUserId" class="form-select" required style="border-radius: 8px; font-size: 13.5px;">
+                            <option value="">-- Choose Active Faculty Member --</option>
+                            @foreach($usersP as $uProf)
+                                @if($uProf->id !== session('loginId'))
+                                    <option value="{{ $uProf->id }}">{{ $uProf->full_name }} ({{ $uProf->email }})</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 500;">Cancel</button>
+                        <button type="submit" class="btn btn-purple" id="btnConfirmTransfer" style="background: #7c3aed; color: white; border-radius: 8px; font-weight: 600;">
+                            Confirm Transfer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        if ($.fn.select2) {
+            $('#targetUserId').select2({
+                placeholder: '-- Choose Active Faculty Member --',
+                allowClear: true,
+                dropdownParent: $('#transferCoordinatorModal'),
+                width: '100%'
+            });
+        }
+    });
+
+    $('#transferCoordinatorForm').on('submit', function(e) {
+        e.preventDefault();
+        var targetId = $('#targetUserId').val();
+        var targetName = $('#targetUserId option:selected').text();
+
+        if (!targetId) {
+            Swal.fire('Selection Required', 'Please select a faculty member to receive the Coordinator designation.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Confirm Role Transfer?',
+            text: 'Are you sure you want to transfer your Coordinator designation to ' + targetName + '?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#7c3aed',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, Transfer Designation'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#btnConfirmTransfer').prop('disabled', true).text('Transferring...');
+
+                $.ajax({
+                    url: "{{ route('coordinator.transferRole') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        target_user_id: targetId
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Role Transferred!',
+                                text: res.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.href = res.redirect || "{{ route('professor_home') }}";
+                            });
+                        } else {
+                            $('#btnConfirmTransfer').prop('disabled', false).text('Confirm Transfer');
+                            Swal.fire('Transfer Error', res.message || 'Unable to transfer role.', 'error');
+                        }
+                    },
+                    error: function(err) {
+                        $('#btnConfirmTransfer').prop('disabled', false).text('Confirm Transfer');
+                        var errMsg = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : 'Error transferring role.';
+                        Swal.fire('Transfer Failed', errMsg, 'error');
+                    }
+                });
+            }
+        });
+    });
+// Prune Missing Faculty Modal Handlers
+var missingFacultyCache = [];
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+window.openPruneMissingFacultyModal = function(missingAccounts) {
+    missingFacultyCache = missingAccounts || [];
+    var $tbody = $('#pruneFacultyTableBody');
+    $tbody.empty();
+
+    if (!missingAccounts || missingAccounts.length === 0) return;
+
+    missingAccounts.forEach(function(acc) {
+        var badgeClass = acc.is_manually_added ? 'bg-primary' : 'bg-secondary';
+        var roleBadgeClass = acc.role_id == 1 ? 'bg-purple text-white' : 'bg-info text-dark';
+        
+        var warningHtml = '';
+        if (acc.student_count > 0 || acc.class_count > 0) {
+            warningHtml = '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-circle me-1"></i> ' + 
+                acc.student_count + ' students, ' + acc.class_count + ' classes</span>';
+        } else {
+            warningHtml = '<span class="text-muted" style="font-size: 12px;">None</span>';
+        }
+
+        var trHtml = '<tr class="prune-account-row" data-search="' + (acc.full_name + ' ' + acc.email).toLowerCase() + '">' +
+            '<td class="text-center">' +
+                '<input type="checkbox" class="form-check-input prune-acc-checkbox" value="' + acc.id + '" checked style="width: 18px; height: 18px; cursor: pointer;">' +
+            '</td>' +
+            '<td>' +
+                '<div class="font-weight-bold text-dark">' + escapeHtml(acc.full_name) + '</div>' +
+                '<div class="text-muted" style="font-size: 12px;">' + escapeHtml(acc.email) + '</div>' +
+            '</td>' +
+            '<td><span class="badge ' + roleBadgeClass + '" style="font-size: 11px;">' + escapeHtml(acc.role_label) + '</span></td>' +
+            '<td><span class="badge ' + badgeClass + '" style="font-size: 11px;">' + escapeHtml(acc.source_label) + '</span></td>' +
+            '<td>' + warningHtml + '</td>' +
+        '</tr>';
+
+        $tbody.append(trHtml);
+    });
+
+    updatePruneSelectionStats();
+    $('#pruneFacultySearchInput').val('');
+    $('#selectAllPruneAccounts').prop('checked', true);
+    $('#pruneMissingFacultyModal').modal('show');
+};
+
+$('#pruneFacultySearchInput').on('keyup input', function() {
+    var query = $(this).val().toLowerCase().trim();
+    $('#pruneFacultyTableBody tr.prune-account-row').each(function() {
+        var searchData = $(this).attr('data-search') || '';
+        if (!query || searchData.indexOf(query) !== -1) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+});
+
+$(document).on('keyup input', '#pruneFacultySearchInput', function() {
+    var query = $(this).val().toLowerCase().trim();
+    $('#pruneFacultyTableBody tr.prune-account-row').each(function() {
+        var searchData = $(this).attr('data-search') || '';
+        if (!query || searchData.indexOf(query) !== -1) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+});
+
+$(document).on('change', '#selectAllPruneAccounts', function() {
+    var isChecked = $(this).is(':checked');
+    $('#pruneFacultyTableBody tr.prune-account-row:visible .prune-acc-checkbox').prop('checked', isChecked);
+    updatePruneSelectionStats();
+});
+
+$(document).on('change', '.prune-acc-checkbox', function() {
+    updatePruneSelectionStats();
+});
+
+function updatePruneSelectionStats() {
+    var totalVisible = $('#pruneFacultyTableBody .prune-acc-checkbox').length;
+    var checkedCount = $('#pruneFacultyTableBody .prune-acc-checkbox:checked').length;
+
+    $('#pruneSelectionCountText').text('Selected ' + checkedCount + ' of ' + totalVisible + ' account(s) for removal');
+    $('#pruneSelectedCountBadge').text(checkedCount);
+
+    if (checkedCount === 0) {
+        $('#btnConfirmPruneFaculty').prop('disabled', true);
+    } else {
+        $('#btnConfirmPruneFaculty').prop('disabled', false);
+    }
+}
+
+$(document).on('click', '#btnConfirmPruneFaculty', function(e) {
+    e.preventDefault();
+    var selectedIds = [];
+    $('#pruneFacultyTableBody .prune-acc-checkbox:checked').each(function() {
+        selectedIds.push($(this).val());
+    });
+
+    if (selectedIds.length === 0) {
+        Swal.fire('No Accounts Selected', 'Please select at least one account to remove, or click Skip.', 'info');
+        return;
+    }
+
+    Swal.fire({
+        title: 'Remove ' + selectedIds.length + ' Faculty Account(s)?',
+        text: 'This action will remove the selected missing faculty account(s) from InternConnect.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Remove Selected'
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            $('#btnConfirmPruneFaculty').prop('disabled', true).text('Removing...');
+
+            $.ajax({
+                url: "{{ route('coordinator.pruneMissingFaculty') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    selected_user_ids: selectedIds
+                },
+                success: function(res) {
+                    $('#pruneMissingFacultyModal').modal('hide');
+                    if (res.success) {
+                        Swal.fire({
+                            title: 'Faculty Removed!',
+                            text: res.message,
+                            icon: 'success'
+                        }).then(function() {
+                            location.reload();
+                        });
+                    } else {
+                        $('#btnConfirmPruneFaculty').prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Confirm & Remove Selected (' + selectedIds.length + ')');
+                        Swal.fire('Error', res.message || 'Failed to remove faculty accounts.', 'error');
+                    }
+                },
+                error: function(err) {
+                    $('#btnConfirmPruneFaculty').prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Confirm & Remove Selected (' + selectedIds.length + ')');
+                    var errMsg = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : 'Error removing accounts.';
+                    Swal.fire('Error', errMsg, 'error');
+                }
+            });
+        }
+    });
+});
+</script>
+
+<!-- Prune Missing Faculty Confirmation Modal -->
+<div class="modal fade" id="pruneMissingFacultyModal" tabindex="-1" aria-labelledby="pruneMissingFacultyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 18px 24px;">
+                <h5 class="modal-title font-weight-bold" id="pruneMissingFacultyModalLabel" style="font-size: 17px; margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-user-minus"></i> Review Missing Faculty Accounts
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="background: #ffffff;">
+                <div class="alert alert-warning d-flex align-items-start gap-2 mb-3" style="font-size: 13.5px; border-radius: 10px;">
+                    <i class="fas fa-exclamation-triangle mt-1 text-warning" style="font-size: 18px;"></i>
+                    <div>
+                        <strong>Notice:</strong> The following faculty member(s) exist in InternConnect but were <strong>not found in the latest FLSS data</strong>. Select which accounts should be removed or kept.
+                    </div>
+                </div>
+
+                <!-- Search Bar & Controls -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">
+                    <div class="input-group" style="max-width: 380px;">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="pruneFacultySearchInput" class="form-control border-start-0 bg-light" placeholder="Search missing faculty name or email..." style="font-size: 13.5px;">
+                    </div>
+                    <div class="form-check form-switch ps-0 d-flex align-items-center gap-2">
+                        <input class="form-check-input ms-0" type="checkbox" id="selectAllPruneAccounts" checked style="width: 38px; height: 20px; cursor: pointer;">
+                        <label class="form-check-input-label font-weight-bold" for="selectAllPruneAccounts" style="font-size: 13px; cursor: pointer; user-select: none;">
+                            Select / Deselect All
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Missing Accounts Table -->
+                <div class="table-responsive" style="max-height: 340px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px;">
+                    <table class="table table-hover align-middle mb-0" id="pruneFacultyTable">
+                        <thead class="table-light sticky-top" style="z-index: 5;">
+                            <tr style="font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;">
+                                <th style="width: 44px;" class="text-center">Select</th>
+                                <th>Faculty Name & Email</th>
+                                <th>Role</th>
+                                <th>Account Source</th>
+                                <th>Active Assignments</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pruneFacultyTableBody" style="font-size: 13.5px;">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-2 d-flex justify-content-between" style="font-size: 12px;">
+                    <span id="pruneSelectionCountText">Selected 0 of 0 accounts for removal</span>
+                    <span class="text-secondary"><i class="fas fa-info-circle me-1"></i> Unchecked accounts will stay in InternConnect</span>
+                </div>
+            </div>
+            <div class="modal-footer bg-light p-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">
+                    Skip Removal (Keep All)
+                </button>
+                <button type="button" class="btn btn-danger btn-sm px-4 font-weight-bold" id="btnConfirmPruneFaculty">
+                    <i class="fas fa-trash-alt me-1"></i> Confirm & Remove Selected (<span id="pruneSelectedCountBadge">0</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

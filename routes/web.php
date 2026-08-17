@@ -32,6 +32,7 @@ use App\Models\User;
 // ─── PUBLIC ROUTES (no auth required) ────────────────────────────────
 
 Route::get('/', [AuthController::class, 'loginGateway']);
+Route::get('/login-gateway', [AuthController::class, 'loginGateway'])->name('login.gateway');
 
 // IdP Authentication Routes
 Route::get('/auth/login/external', [AuthController::class, 'showIdpTransition'])->name('login.external');
@@ -85,6 +86,11 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/analytics/export/pdf',[AuthController::class,'coordinatorAnalyticsExportPdf'])->name('coordinator.analytics.export.pdf');
     Route::get('/professorTab', [AuthController::class,'professorTab']);
     Route::post('/professorCreate', [AuthController::class,'professorCreate'])->name('professorCreate');
+    Route::post('/coordinator/sync-faculty', [AuthController::class, 'syncFacultyFromFlss'])->name('coordinator.syncFaculty');
+    Route::post('/coordinator/sync-users-idp', [AuthController::class, 'syncUsersFromIdp'])->name('coordinator.syncUsersIdp');
+    Route::post('/coordinator/sync-users-guisis', [AuthController::class, 'syncUsersFromGuisis'])->name('coordinator.syncUsersGuisis');
+    Route::post('/coordinator/prune-missing-faculty', [AuthController::class, 'pruneMissingFaculty'])->name('coordinator.pruneMissingFaculty');
+    Route::post('/coordinator/transfer-role', [AuthController::class, 'transferCoordinatorRole'])->name('coordinator.transferRole');
     Route::put('/updateProfessor', [ProfessorController::class, 'update'])->name('updateProfessor');
     Route::get('/maintenance',[MaintenanceController::class,'maintenance']);
     Route::post('/remove/course/{id}', [MaintenanceController::class,'remove']);
@@ -131,6 +137,7 @@ Route::middleware([
     Route::match(['get', 'post'], 'student/login',[AuthController::class, 'logout']);
     Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
     Route::put('/student/edit/{email}', [StudentController::class,'edit']);
+    Route::post('/student/sync-guidance', [StudentController::class, 'syncFromGuidance'])->name('student.syncGuidance');
     Route::get('/student/class', [StudentController::class,'class']);
     Route::put('/student/update-professor', [StudentController::class, 'updateProfessor'])->name('student.updateProfessor');
     Route::post('/student/join/{email}/{classId}', [StudentController::class,'join']);

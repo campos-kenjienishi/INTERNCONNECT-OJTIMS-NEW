@@ -1,8 +1,65 @@
 <!DOCTYPE html>
 <html lang="en" style="background: #3b0000;">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InternConnect - Student Registration</title>
+    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         html, body { background: #3b0000 !important; }
+
+        /* Select2 Dark Theme styling for registration */
+        .select2-container--default .select2-selection--single {
+            background-color: #3b0000 !important;
+            border: 1px solid #ddd7cb !important;
+            border-radius: 8px !important;
+            height: 44px !important;
+            padding: 6px 10px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #ffffff !important;
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 14px !important;
+            line-height: 28px !important;
+            padding-left: 28px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px !important;
+        }
+        .select2-dropdown {
+            background-color: #2b0000 !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+            z-index: 9999 !important;
+        }
+        .select2-search__field {
+            background-color: #1a0000 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .select2-results__option {
+            color: #ffffff !important;
+            font-size: 13.5px !important;
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+        }
     </style>
 
     <style>
@@ -1426,6 +1483,14 @@
             fetchProfessors(semesterSelect.value, startYearSelect.value, this.value);
         });
         fetchProfessors(semesterSelect.value, startYearSelect.value, endYearSelect.value);
+
+        if (window.jQuery && $.fn.select2) {
+            $('#adviser_name').select2({
+                placeholder: 'Search or Select Professor...',
+                allowClear: true,
+                width: '100%'
+            });
+        }
     });
 </script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>

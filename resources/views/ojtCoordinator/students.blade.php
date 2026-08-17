@@ -1453,7 +1453,15 @@ body.dark-mode .dashboard-footer .footer-copy {
                     <span>Students</span>
                 </div>
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+                <button type="button" id="btnSyncIdp" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(79,70,229,0.3);">
+                    <i class="fa fa-id-badge" id="idpSyncIcon"></i>
+                    <span>Sync IDP UUIDs</span>
+                </button>
+                <button type="button" id="btnSyncGuisis" style="background: linear-gradient(135deg, #0d9488 0%, #059669 100%); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(13,148,136,0.3);">
+                    <i class="fa fa-graduation-cap" id="guisisSyncIcon"></i>
+                    <span>Sync GuiSIS</span>
+                </button>
                 <a href="{{ route('coordinator.studentRequirements') }}" class="btn" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color: #ffffff !important; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; text-decoration: none !important; box-shadow: 0 4px 14px rgba(127,0,0,0.3); display: inline-flex; align-items: center; gap: 8px;">
                     <i class="fa fa-folder-open"></i> Student Requirements Matrix
                 </a>
@@ -1464,13 +1472,16 @@ body.dark-mode .dashboard-footer .footer-copy {
         </div>
 
         <!-- Stats Row -->
-        @php $totalStudents = count($studentData); @endphp
+        @php 
+            $totalStudents = count($studentData); 
+            $idpLinkedTotal = \App\Models\User::whereNotNull('idp_user_id')->where('idp_user_id', '!=', '')->count();
+        @endphp
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-users"></i></div>
                 <div>
                     <div class="stat-num">{{ $totalStudents }}</div>
-                    <div class="stat-name">Total Students</div>
+                    <div class="stat-name">Active Students</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -1492,6 +1503,13 @@ body.dark-mode .dashboard-footer .footer-copy {
                 <div>
                     <div class="stat-num">OJT</div>
                     <div class="stat-name">Active Program</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(79,70,229,0.12); color: #7c3aed;"><i class="fa fa-link"></i></div>
+                <div>
+                    <div class="stat-num">{{ $idpLinkedTotal }}</div>
+                    <div class="stat-name">IDP Linked</div>
                 </div>
             </div>
         </div>
@@ -1519,7 +1537,7 @@ body.dark-mode .dashboard-footer .footer-copy {
                     <div class="header-icon"><i class="fa fa-users"></i></div>
                     <div>
                         <h2>Active Student List</h2>
-                        <p>All currently enrolled OJT students</p>
+                        <p>All currently active enrolled OJT students</p>
                     </div>
                 </div>
                 <div class="table-card-header-right">
@@ -1649,7 +1667,7 @@ body.dark-mode .dashboard-footer .footer-copy {
                                 </div>
                             </td>
 
-                            <td>
+                            <td style="display:none;">
                                 @if(isset($data['subjects']) && count($data['subjects']) > 0)
                                     @foreach($data['subjects'] as $subject)
                                         <span class="subject-badge">{{ $subject['subject_code'] ?? '--' }}</span>
@@ -2092,6 +2110,159 @@ body.dark-mode .dashboard-footer .footer-copy {
                     Toast.fire({
                         icon: 'error',
                         title: message
+                    });
+                }
+            });
+        });
+    });
+
+    // ── Unified Student Sync Button (IDP + GuiSIS) ──
+    $('#btnSyncIdp').on('click', function() {
+        var $btn = $(this);
+        var $icon = $('#idpSyncIcon');
+        var originalHtml = $btn.html();
+
+        // --- 1. Sync IDP UUIDs Handler ---
+        $('#btnSyncIdp').on('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Sync Student UUIDs from IDP?',
+                html: 'This will cross-reference existing students in your database with the Identity Provider:<br><br>' +
+                      '<ul style="text-align:left; font-size:13px; color:#4b5563; padding-left:20px;">' +
+                      '<li>Backfills missing <strong>IDP UUIDs</strong> on student accounts.</li>' +
+                      '<li>Synchronizes official name fields from IDP.</li>' +
+                      '</ul>' +
+                      '<div style="font-size:12.5px; color:#6b7280; margin-top:8px;"><strong>Note:</strong> Only updates existing local accounts.</div>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Sync IDP UUIDs'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Connecting to Identity Provider...',
+                        html:
+                            '<div style="margin: 15px 0;">' +
+                                '<div class="spinner-border text-primary" role="status" style="width: 2.5rem; height: 2.5rem;">' +
+                                    '<span class="visually-hidden">Syncing...</span>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">' +
+                                '<i class="fas fa-lock text-primary me-1"></i> Linking student UUIDs from IDP. Please wait...</strong>' +
+                            '</div>',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false
+                    });
+
+                    window.onbeforeunload = function() {
+                        return "IDP sync is in progress. Navigating away may interrupt the process.";
+                    };
+
+                    $.ajax({
+                        url: "{{ route('coordinator.syncUsersIdp') }}",
+                        type: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        timeout: 120000,
+                        success: function(res) {
+                            window.onbeforeunload = null;
+                            var s = res.summary || {};
+                            Swal.fire({
+                                title: 'IDP UUID Sync Complete!',
+                                html:
+                                    '<div style="text-align:left; margin: 10px 0; font-size: 14px;">' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>👥 Total Students:</span><strong>' + (s.total_students || 0) + '</strong></div>' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>🔗 Newly Linked UUIDs:</span><strong style="color:#10b981;">+' + (s.idp_linked || 0) + '</strong></div>' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>✅ Already Linked:</span><strong>' + (s.already_linked || 0) + '</strong></div>' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0;"><span>⚠️ Not Found in IDP:</span><strong>' + (s.not_in_idp || 0) + '</strong></div>' +
+                                    '</div>',
+                                icon: 'success',
+                                confirmButtonColor: '#4f46e5'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            window.onbeforeunload = null;
+                            var errMsg = (xhr.responseJSON && xhr.responseJSON.message)
+                                ? xhr.responseJSON.message
+                                : 'Failed to sync IDP records. Please try again.';
+                            Swal.fire('IDP Sync Failed', errMsg, 'error');
+                        }
+                    });
+                }
+            });
+        });
+
+        // --- 2. Sync GuiSIS Handler ---
+        $('#btnSyncGuisis').on('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Sync from GuiSIS (Guidance)?',
+                html: 'This will update academic & demographic records for existing students from GuiSIS:<br><br>' +
+                      '<ul style="text-align:left; font-size:13px; color:#4b5563; padding-left:20px;">' +
+                      '<li>Updates Student Number, Program, and Year &amp; Section.</li>' +
+                      '<li>Synchronizes Birthdate, Contact #, and Address.</li>' +
+                      '</ul>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d9488',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Sync GuiSIS'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Connecting to GuiSIS...',
+                        html:
+                            '<div style="margin: 15px 0;">' +
+                                '<div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">' +
+                                    '<span class="visually-hidden">Syncing...</span>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">' +
+                                '<i class="fas fa-graduation-cap text-success me-1"></i> Pulling profiles from GuiSIS. Please wait...</strong>' +
+                            '</div>',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false
+                    });
+
+                    window.onbeforeunload = function() {
+                        return "GuiSIS sync is in progress. Navigating away may interrupt the process.";
+                    };
+
+                    $.ajax({
+                        url: "{{ route('coordinator.syncUsersGuisis') }}",
+                        type: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        timeout: 120000,
+                        success: function(res) {
+                            window.onbeforeunload = null;
+                            var s = res.summary || {};
+                            Swal.fire({
+                                title: 'GuiSIS Sync Complete!',
+                                html:
+                                    '<div style="text-align:left; margin: 10px 0; font-size: 14px;">' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>👥 Total Students:</span><strong>' + (s.total_students || 0) + '</strong></div>' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>🎓 Profiles Synced:</span><strong style="color:#059669;">' + (s.guisis_synced || 0) + '</strong></div>' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0;"><span>⚠️ GuiSIS Not Found:</span><strong>' + (s.guisis_not_found || 0) + '</strong></div>' +
+                                    '</div>',
+                                icon: 'success',
+                                confirmButtonColor: '#0d9488'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            window.onbeforeunload = null;
+                            var errMsg = (xhr.responseJSON && xhr.responseJSON.message)
+                                ? xhr.responseJSON.message
+                                : 'Failed to sync GuiSIS records. Please try again.';
+                            Swal.fire('GuiSIS Sync Failed', errMsg, 'error');
+                        }
                     });
                 }
             });

@@ -912,7 +912,7 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
     <div class="page-content">
 
         <!-- Page Header -->
-        <div class="page-header">
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
             <div>
                 <h1>Account <span>Information</span></h1>
                 <div class="breadcrumb">
@@ -920,6 +920,12 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
                     <i class="fa fa-chevron-right"></i>
                     <span>Account Information</span>
                 </div>
+            </div>
+            <div>
+                <button type="button" id="btnSyncGuidance" class="btn-sync-guidance" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);">
+                    <i class="fa fa-sync-alt" id="syncIcon"></i>
+                    <span>Sync from Guidance System (GuiSIS)</span>
+                </button>
             </div>
         </div>
 
@@ -1823,8 +1829,36 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
 
             profileForm.dataset.submitting = 'true';
             profileForm.submit();
+            $('#btnSyncGuidance').on('click', function() {
+                var $btn = $(this);
+                var $icon = $('#syncIcon');
+                $btn.prop('disabled', true);
+                $icon.addClass('fa-spin');
+
+                $.ajax({
+                    url: "{{ route('student.syncGuidance') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(res) {
+                        $btn.prop('disabled', false);
+                        $icon.removeClass('fa-spin');
+                        if (res.success) {
+                            alert(res.message);
+                            location.reload();
+                        } else {
+                            alert(res.message || 'Unable to sync profile details.');
+                        }
+                    },
+                    error: function(err) {
+                        $btn.prop('disabled', false);
+                        $icon.removeClass('fa-spin');
+                        alert('Error syncing with Guidance System (GuiSIS). Please try again.');
+                    }
+                });
+            });
         });
-    });
     // Dark mode toggle
 // Dark mode is handled globally by dark-mode.js
 </script>

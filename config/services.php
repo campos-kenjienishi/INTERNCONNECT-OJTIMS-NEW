@@ -58,8 +58,22 @@ return [
         'logout_url'    => env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/auth/logout',
         'client_id'     => env('IDP_CLIENT_ID'),
         'client_secret' => env('IDP_CLIENT_SECRET'),
+        'admin_access_token' => env('IDP_ADMIN_ACCESS_TOKEN'),
+        'session_cookie' => env('IDP_SESSION_COOKIE'),
         'callback_url'  => env('IDP_CALLBACK_URL', env('APP_URL', 'http://127.0.0.1:8000') . '/auth/callback'),
         'verify_tls'    => filter_var(env('IDP_VERIFY_TLS', true), FILTER_VALIDATE_BOOL),
+    ],
+
+    'guisis' => [
+        'base_url' => env('GUISIS_BASE_URL', 'https://api-guisis.dllbsit2027.com/api/v1'),
+        'api_key' => env('GUISIS_API_KEY', ''),
+        'client_id' => env('GUISIS_CLIENT_ID', ''),
+        'client_secret' => env('GUISIS_CLIENT_SECRET', ''),
+    ],
+
+    'flss' => [
+        'base_url' => env('FLSS_BASE_URL', 'https://flss.alquatrilixbsit2027.com'),
+        'api_key'  => env('FLSS_API_KEY', ''),
     ],
 
 ];

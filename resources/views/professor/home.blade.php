@@ -1225,13 +1225,20 @@
     <div class="page-content" style="flex:1 0 auto;">
 
         <!-- Page Header -->
-        <div class="page-header">
+        <div class="page-header" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
             <h1>Home <span>Dashboard</span></h1>
-            <!-- Clickable date badge -->
-            <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
-                <span class="pulse-dot"></span>
-                <i class="fa fa-calendar-alt"></i>
-                <span id="currentDate"></span>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                @if(isset($data) && (int) ($data->role ?? 0) === 1)
+                    <a href="{{ url('/dashboard') }}" class="btn-switch-view" style="display:inline-flex; align-items:center; gap:8px; padding:9px 18px; background:#ffffff; border:1.5px solid #fecaca; border-radius:12px; color:#dc2626; font-weight:700; font-size:13px; text-decoration:none; box-shadow:0 3px 12px rgba(220,38,38,0.1); transition:all 0.25s;">
+                        <i class="fa fa-user-shield" style="color:var(--red);"></i>
+                        Switch to Coordinator View
+                    </a>
+                @endif
+                <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
+                    <span class="pulse-dot"></span>
+                    <i class="fa fa-calendar-alt"></i>
+                    <span id="currentDate"></span>
+                </div>
             </div>
         </div>
 

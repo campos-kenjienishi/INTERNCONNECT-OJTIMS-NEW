@@ -580,6 +580,7 @@ public function fileReqCreate(Request $request){
     $res = $fileup->save();
 
     if($res){
+        $user->touchActivity();
         AuditLogger::log(
             'PassDocu',
             'Upload',
