@@ -8,14 +8,43 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
-    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}?v={{ time() }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         html, body { background: #3b0000 !important; }
+
+        /* Back to Portal Pill Button */
+        .back-btn-pill,
+        .btn-switch-portal {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            color: #fca5a5 !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            padding: 6px 16px !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            transition: all 0.25s ease !important;
+            cursor: pointer !important;
+            line-height: 1.2 !important;
+            white-space: nowrap !important;
+        }
+
+        .back-btn-pill:hover,
+        .btn-switch-portal:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.18) !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            transform: translateY(-1px) !important;
+            text-decoration: none !important;
+        }
 
         /* Select2 Dark Theme styling for registration */
         .select2-container--default .select2-selection--single {
