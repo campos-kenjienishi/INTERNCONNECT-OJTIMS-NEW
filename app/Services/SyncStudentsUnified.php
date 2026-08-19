@@ -222,21 +222,45 @@ class SyncStudentsUnified
             $summary['errors'][] = 'IdP User lookup note: ' . $e->getMessage();
         }
 
-        // 3. Pre-flight check on GuiSIS connectivity
+        // 3. Pre-fetch all GuiSIS profiles upfront if reachable
+        $guisisProfiles = [];
         $guisisOnline = false;
         try {
             $guisisOnline = $this->guisis->isReachable();
+            if ($guisisOnline) {
+                $guisisProfiles = $this->guisis->getAllStudentProfiles();
+                Log::info('Unified Student Sync: Loaded ' . count($guisisProfiles) . ' student profiles from GuiSIS.');
+            }
         } catch (\Exception $e) {
             $guisisOnline = false;
+            Log::warning('Unified Student Sync: GuiSIS error: ' . $e->getMessage());
         }
 
-        if (!$guisisOnline) {
-            Log::info('Unified Student Sync: GuiSIS API endpoint is currently initializing or unreachable. Proceeding with IdP sync.');
+        // Build index maps for fast matching
+        $guisisByUuid = [];
+        $guisisByEmail = [];
+        $guisisByNum = [];
+        $guisisByName = [];
+
+        foreach ($guisisProfiles as $p) {
+            if (!empty($p['idpUuid'])) {
+                $guisisByUuid[strtolower(trim($p['idpUuid']))] = $p;
+            }
+            if (!empty($p['email'])) {
+                $guisisByEmail[strtolower(trim($p['email']))] = $p;
+            }
+            if (!empty($p['studentNumber'])) {
+                $guisisByNum[strtolower(trim($p['studentNumber']))] = $p;
+            }
+            $fn = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+            if (!empty($fn)) {
+                $guisisByName[$fn] = $p;
+            }
         }
 
         // 4. Process each existing student
         foreach ($students as $studentUser) {
-            $email = strtolower(trim($studentUser->email));
+            $email = strtolower(trim($studentUser->email ?? ''));
 
             // --- A. IdP UUID & Name Sync ---
             if (isset($idpUsersByEmail[$email])) {
@@ -280,17 +304,40 @@ class SyncStudentsUnified
             }
 
             // --- B. GuiSIS Academic & Demographic Profile Sync ---
-            if (!$guisisOnline) {
+            if (!$guisisOnline || empty($guisisProfiles)) {
                 $summary['guisis_not_found']++;
                 continue;
             }
 
             try {
-                $guisisData = $this->guisis->getStudentByEmail($studentUser->email);
+                $stUuid = strtolower(trim($studentUser->idp_user_id ?? ''));
+                $stEmail = strtolower(trim($studentUser->email ?? ''));
+                $stNum = strtolower(trim($studentUser->studentNum ?? ''));
+                $stName = strtolower(preg_replace('/[^a-z0-9]/', '', ($studentUser->first_name ?? '') . ' ' . ($studentUser->last_name ?? '')));
+
+                $guisisData = null;
+                if ($stUuid && isset($guisisByUuid[$stUuid])) {
+                    $guisisData = $guisisByUuid[$stUuid];
+                } elseif ($stEmail && isset($guisisByEmail[$stEmail])) {
+                    $guisisData = $guisisByEmail[$stEmail];
+                } elseif ($stNum && isset($guisisByNum[$stNum])) {
+                    $guisisData = $guisisByNum[$stNum];
+                } elseif ($stName && isset($guisisByName[$stName])) {
+                    $guisisData = $guisisByName[$stName];
+                }
 
                 if (!$guisisData) {
                     $summary['guisis_not_found']++;
                     continue;
+                }
+
+                // If user doesn't have IDP UUID yet, but GuiSIS profile has it, backfill it if not already taken
+                if (empty($studentUser->idp_user_id) && !empty($guisisData['idpUuid'])) {
+                    $uuidTaken = User::where('idp_user_id', $guisisData['idpUuid'])->where('id', '!=', $studentUser->id)->exists();
+                    if (!$uuidTaken) {
+                        $studentUser->idp_user_id = $guisisData['idpUuid'];
+                        $studentUser->save();
+                    }
                 }
 
                 // Resolve student record
@@ -300,23 +347,19 @@ class SyncStudentsUnified
                     $studentProfile->user_id = $studentUser->id;
                 }
 
-                // Extract fields supporting nested objects (basicInfo, personalInfo) and camelCase/snake_case
-                $pInfo = $guisisData['personalInfo'] ?? $guisisData['personal_info'] ?? $guisisData;
-                $bInfo = $guisisData['basicInfo'] ?? $guisisData['basic_info'] ?? $guisisData;
-
-                $studentNum = $pInfo['studentNumber'] ?? $pInfo['student_number'] ?? $pInfo['studentNum'] ?? $guisisData['student_number'] ?? $guisisData['studentNum'] ?? null;
+                $studentNum = $guisisData['studentNumber'] ?? $guisisData['student_number'] ?? null;
                 
-                $course = (is_array($pInfo['program'] ?? null) ? ($pInfo['program']['name'] ?? $pInfo['program']['program'] ?? '') : ($pInfo['program'] ?? ''))
-                    ?: (is_array($pInfo['course'] ?? null) ? ($pInfo['course']['name'] ?? $pInfo['course']['course'] ?? '') : ($pInfo['course'] ?? ''))
-                    ?: (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['program'] ?? '') : ($guisisData['program'] ?? ''))
-                    ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['course'] ?? $guisisData['course']['name'] ?? '') : ($guisisData['course'] ?? null));
+                $course = (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['code'] ?? '') : ($guisisData['program'] ?? ''))
+                    ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['name'] ?? $guisisData['course']['course'] ?? '') : ($guisisData['course'] ?? ''));
 
-                $yearSection = $pInfo['year_and_section'] ?? $pInfo['year_section'] ?? $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
-                if (!$yearSection && isset($pInfo['yearLevel']) && isset($pInfo['section'])) {
-                    $yearSection = $pInfo['yearLevel'] . '-' . $pInfo['section'];
+                $yearSection = null;
+                if (isset($guisisData['yearLevel']) && isset($guisisData['section'])) {
+                    $yearSection = $guisisData['yearLevel'] . '-' . $guisisData['section'];
+                } else {
+                    $yearSection = $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
                 }
 
-                $suffixName = $pInfo['suffixName'] ?? $pInfo['suffix_name'] ?? $pInfo['suffix'] ?? null;
+                $suffixName = $guisisData['suffixName'] ?? $guisisData['suffix_name'] ?? $guisisData['suffix'] ?? null;
                 if ($suffixName && empty($studentUser->suffix)) {
                     $studentUser->suffix = $suffixName;
                     $studentUser->save();
@@ -346,59 +389,21 @@ class SyncStudentsUnified
                     $profileChanged = true;
                 }
 
-                // Check inline or fetched personal info
-                $dob = $pInfo['dateOfBirth'] ?? $pInfo['date_of_birth'] ?? null;
-                $mobile = $pInfo['mobileNumber'] ?? $pInfo['mobile_number'] ?? $pInfo['contactNumber'] ?? $pInfo['contact_number'] ?? null;
-
-                if ($studentNum && (!$dob || !$mobile)) {
-                    $personalInfo = $this->guisis->getPersonalInfo($studentNum);
-                    if (!empty($personalInfo)) {
-                        $dob = $dob ?: ($personalInfo['dateOfBirth'] ?? $personalInfo['date_of_birth'] ?? null);
-                        $mobile = $mobile ?: ($personalInfo['mobileNumber'] ?? $personalInfo['contact_number'] ?? null);
-                    }
-                }
-
-                if ($dob && $studentProfile->date_of_birth !== $dob) {
-                    $studentProfile->date_of_birth = $dob;
-                    $profileChanged = true;
-                }
-
+                $mobile = $guisisData['mobileNumber'] ?? $guisisData['mobile_number'] ?? $guisisData['contactNumber'] ?? $guisisData['contact_number'] ?? null;
                 if ($mobile && $studentProfile->contact_number !== $mobile) {
                     $studentProfile->contact_number = $mobile;
                     $profileChanged = true;
                 }
 
-                // Addresses (inline or fetched)
-                $addresses = $pInfo['addresses'] ?? $guisisData['addresses'] ?? null;
-                if ($studentNum && empty($addresses)) {
-                    $addresses = $this->guisis->getAddresses($studentNum);
-                }
-
-                if (!empty($addresses) && is_array($addresses)) {
-                    $firstAddr = reset($addresses);
-                    if (is_array($firstAddr)) {
-                        $addrObj = $firstAddr['address'] ?? $firstAddr;
-                        $fullAddr = implode(', ', array_filter([
-                            $addrObj['street'] ?? '',
-                            $addrObj['barangay']['name'] ?? $addrObj['barangay'] ?? '',
-                            $addrObj['city']['name'] ?? $addrObj['city'] ?? '',
-                            $addrObj['province']['name'] ?? $addrObj['province'] ?? '',
-                        ]));
-                        if (!empty($fullAddr) && $studentProfile->address !== $fullAddr) {
-                            $studentProfile->address = $fullAddr;
-                            $profileChanged = true;
-                        }
-                    }
+                $dob = $guisisData['dateOfBirth'] ?? $guisisData['date_of_birth'] ?? null;
+                if ($dob && $studentProfile->date_of_birth !== $dob) {
+                    $studentProfile->date_of_birth = $dob;
+                    $profileChanged = true;
                 }
 
                 $studentProfile->save();
                 $summary['guisis_synced']++;
 
-            } catch (\DomainException $e) {
-                $guisisOnline = false;
-                $summary['errors'][] = $e->getMessage();
-                Log::warning('Unified Student Sync: ' . $e->getMessage() . '. Skipping remainder of GuiSIS lookups.');
-                $summary['guisis_not_found']++;
             } catch (\Exception $e) {
                 $summary['errors'][] = "GuiSIS error for {$studentUser->email}: " . $e->getMessage();
                 Log::error('Unified Student Sync: GuiSIS error', [
@@ -412,6 +417,126 @@ class SyncStudentsUnified
             'Unified Student Sync',
             'sync',
             "Unified Student Sync: {$summary['idp_linked']} IDP UUIDs linked, {$summary['guisis_synced']} GuiSIS profiles updated."
+        );
+
+        return $summary;
+    }
+
+    /**
+     * Dedicated GuiSIS sync for all students.
+     */
+    public function syncGuisisOnly(): array
+    {
+        @set_time_limit(300);
+
+        $summary = [
+            'total_students'   => 0,
+            'guisis_synced'    => 0,
+            'guisis_not_found' => 0,
+            'guisis_total_pool'=> 0,
+            'errors'           => [],
+        ];
+
+        $students = User::where('role', 0)->get();
+        $summary['total_students'] = $students->count();
+
+        $profiles = $this->guisis->getAllStudentProfiles();
+        $summary['guisis_total_pool'] = count($profiles);
+
+        if (empty($profiles)) {
+            $summary['errors'][] = 'Could not load student profiles from GuiSIS API.';
+            return $summary;
+        }
+
+        $guisisByUuid = [];
+        $guisisByEmail = [];
+        $guisisByNum = [];
+        $guisisByName = [];
+
+        foreach ($profiles as $p) {
+            if (!empty($p['idpUuid'])) $guisisByUuid[strtolower(trim($p['idpUuid']))] = $p;
+            if (!empty($p['email'])) $guisisByEmail[strtolower(trim($p['email']))] = $p;
+            if (!empty($p['studentNumber'])) $guisisByNum[strtolower(trim($p['studentNumber']))] = $p;
+            $fn = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+            if (!empty($fn)) $guisisByName[$fn] = $p;
+        }
+
+        foreach ($students as $studentUser) {
+            $stUuid = strtolower(trim($studentUser->idp_user_id ?? ''));
+            $stEmail = strtolower(trim($studentUser->email ?? ''));
+            $stNum = strtolower(trim($studentUser->studentNum ?? ''));
+            $stName = strtolower(preg_replace('/[^a-z0-9]/', '', ($studentUser->first_name ?? '') . ' ' . ($studentUser->last_name ?? '')));
+
+            $guisisData = null;
+            if ($stUuid && isset($guisisByUuid[$stUuid])) {
+                $guisisData = $guisisByUuid[$stUuid];
+            } elseif ($stEmail && isset($guisisByEmail[$stEmail])) {
+                $guisisData = $guisisByEmail[$stEmail];
+            } elseif ($stNum && isset($guisisByNum[$stNum])) {
+                $guisisData = $guisisByNum[$stNum];
+            } elseif ($stName && isset($guisisByName[$stName])) {
+                $guisisData = $guisisByName[$stName];
+            }
+
+            if (!$guisisData) {
+                $summary['guisis_not_found']++;
+                continue;
+            }
+
+            // Backfill IDP UUID if missing on User and not claimed by another user
+            if (empty($studentUser->idp_user_id) && !empty($guisisData['idpUuid'])) {
+                $uuidTaken = User::where('idp_user_id', $guisisData['idpUuid'])->where('id', '!=', $studentUser->id)->exists();
+                if (!$uuidTaken) {
+                    $studentUser->idp_user_id = $guisisData['idpUuid'];
+                    $studentUser->save();
+                }
+            }
+
+            $studentProfile = Student::where('user_id', $studentUser->id)->first();
+            if (!$studentProfile) {
+                $studentProfile = new Student();
+                $studentProfile->user_id = $studentUser->id;
+            }
+
+            $studentNum = $guisisData['studentNumber'] ?? $guisisData['student_number'] ?? null;
+            $course = (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['code'] ?? '') : ($guisisData['program'] ?? ''))
+                ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['name'] ?? $guisisData['course']['course'] ?? '') : ($guisisData['course'] ?? ''));
+
+            $yearSection = null;
+            if (isset($guisisData['yearLevel']) && isset($guisisData['section'])) {
+                $yearSection = $guisisData['yearLevel'] . '-' . $guisisData['section'];
+            } else {
+                $yearSection = $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
+            }
+
+            $suffixName = $guisisData['suffixName'] ?? $guisisData['suffix_name'] ?? $guisisData['suffix'] ?? null;
+            if ($suffixName && empty($studentUser->suffix)) {
+                $studentUser->suffix = $suffixName;
+                $studentUser->save();
+            }
+
+            if ($studentNum) {
+                $studentProfile->studentNum = $studentNum;
+            }
+            if ($course) {
+                $studentProfile->course = $course;
+            }
+            if ($yearSection) {
+                $studentProfile->year_and_section = $yearSection;
+            }
+            $mobile = $guisisData['mobileNumber'] ?? $guisisData['mobile_number'] ?? null;
+            if ($mobile) {
+                $studentProfile->contact_number = $mobile;
+            }
+
+            $studentProfile->save();
+            $summary['guisis_synced']++;
+        }
+
+        AuditLogger::log(
+            'GuiSIS Student Sync',
+            'sync',
+            "GuiSIS Student Sync: {$summary['guisis_synced']} profiles updated from {$summary['guisis_total_pool']} GuiSIS records."
         );
 
         return $summary;

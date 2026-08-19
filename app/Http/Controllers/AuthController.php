@@ -1431,11 +1431,12 @@ class AuthController extends Controller
     public function syncUsersFromGuisis(SyncStudentsUnified $syncer)
     {
         @set_time_limit(300);
-        $summary = $syncer->execute();
+        $summary = $syncer->syncGuisisOnly();
 
+        $pool = $summary['guisis_total_pool'] ?? 0;
         return response()->json([
             'success' => true,
-            'message' => "GuiSIS Sync completed! Profiles updated: {$summary['guisis_synced']}.",
+            'message' => "GuiSIS Demographic Sync completed! Profiles updated: {$summary['guisis_synced']}" . ($pool > 0 ? " from {$pool} GuiSIS records." : "."),
             'summary' => $summary,
         ]);
     }

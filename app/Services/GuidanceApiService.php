@@ -4,170 +4,211 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class GuidanceApiService
 {
     protected string $baseUrl;
-    protected string $apiKey;
     protected string $clientId;
     protected string $clientSecret;
 
     public function __construct()
     {
         $this->baseUrl = rtrim(config('services.guisis.base_url', 'https://api-guisis.dllbsit2027.com/api/v1'), '/');
-        $this->apiKey = config('services.guisis.api_key', '');
-        $this->clientId = config('services.guisis.client_id', '');
-        $this->clientSecret = config('services.guisis.client_secret', '');
+        $this->clientId = config('services.guisis.client_id', env('GUISIS_CLIENT_ID', '40284c44-2d44-42ce-88bc-b4e5cc9e8be7'));
+        $this->clientSecret = config('services.guisis.client_secret', env('GUISIS_CLIENT_SECRET', '6f99e1b82ddb71d40b5f5dc30d7ef8e755455982c2bbb92ba68322278adf05fa'));
     }
 
     /**
-     * Build HTTP headers for GuiSIS requests.
+     * Get or generate a valid M2M access token.
+     */
+    public function getM2MToken(): ?string
+    {
+        return Cache::remember('guisis_m2m_token', 3000, function () {
+            try {
+                $endpoint = $this->baseUrl . '/auth/m2m/token';
+                $response = Http::withOptions(['verify' => false])
+                    ->timeout(6)
+                    ->connectTimeout(3)
+                    ->withHeaders([
+                        'Content-Type' => 'application/json',
+                        'Accept'       => 'application/json',
+                    ])
+                    ->post($endpoint, [
+                        'clientId'     => $this->clientId,
+                        'clientSecret' => $this->clientSecret,
+                    ]);
+
+                if ($response->successful()) {
+                    $json = $response->json();
+                    return $json['data']['accessToken'] ?? $json['accessToken'] ?? null;
+                }
+
+                Log::warning('GuiSIS M2M token request failed', [
+                    'status' => $response->status(),
+                    'body'   => $response->body(),
+                ]);
+                return null;
+            } catch (\Exception $e) {
+                Log::error('GuiSIS M2M token exception: ' . $e->getMessage());
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Build HTTP headers with Bearer token.
      */
     protected function getHeaders(): array
     {
-        $headers = [];
+        $token = $this->getM2MToken();
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+        ];
 
-        if (!empty($this->clientId)) {
-            $headers['X-Client-ID'] = $this->clientId;
-        }
-
-        if (!empty($this->clientSecret)) {
-            $headers['X-Client-Secret'] = $this->clientSecret;
-        }
-
-        if (!empty($this->apiKey)) {
-            $headers['Authorization'] = 'Bearer ' . $this->apiKey;
-            $headers['X-API-Key'] = $this->apiKey;
+        if ($token) {
+            $headers['Authorization'] = 'Bearer ' . $token;
         }
 
         return $headers;
     }
 
     /**
-     * List students with pagination and optional filters.
-     * Endpoint: GET /students/external
+     * Check if GuiSIS API is reachable and healthy.
      */
-    public function listStudents(int $page = 1, int $pageSize = 50, array $filters = []): ?array
+    public function isReachable(): bool
     {
         try {
-            $endpoint = $this->baseUrl . '/students/external';
-            $headers = $this->getHeaders();
-            $request = Http::timeout(5)->connectTimeout(2)->acceptJson();
-
-            if (!empty($headers)) {
-                $request = $request->withHeaders($headers);
+            $token = $this->getM2MToken();
+            if (!empty($token)) {
+                return true;
             }
 
-            $queryParams = array_merge([
-                'page' => $page,
-                'page_size' => $pageSize,
-            ], $filters);
+            $healthRes = Http::withOptions(['verify' => false])
+                ->timeout(3)
+                ->connectTimeout(2)
+                ->get($this->baseUrl . '/health');
 
-            $response = $request->get($endpoint, $queryParams);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                return is_array($data) ? $data : null;
-            }
-
-            return null;
+            return $healthRes->successful();
         } catch (\Exception $e) {
-            Log::error('GuiSIS listStudents exception: ' . $e->getMessage());
-            return null;
+            return false;
         }
     }
 
     /**
-     * Get core student record by email address.
-     * Endpoint: GET /students/external/by-email/{email}
+     * Fetch a paginated page of student profiles.
+     * Endpoint: GET /integrations/students/profiles
      */
-    public function getStudentByEmail(string $email): ?array
+    public function getProfiles(int $page = 1, int $pageSize = 50): ?array
     {
-        if (empty($email)) {
-            return null;
-        }
-
         try {
-            $endpoint = $this->baseUrl . '/students/external/by-email/' . urlencode($email);
-            
+            $endpoint = $this->baseUrl . '/integrations/students/profiles';
             $headers = $this->getHeaders();
-            $request = Http::timeout(4)->connectTimeout(2)->acceptJson();
 
-            if (!empty($headers)) {
-                $request = $request->withHeaders($headers);
-            }
-
-            $response = $request->get($endpoint);
+            $response = Http::withOptions(['verify' => false])
+                ->timeout(8)
+                ->connectTimeout(3)
+                ->withHeaders($headers)
+                ->get($endpoint, [
+                    'page'     => $page,
+                    'pageSize' => $pageSize,
+                ]);
 
             if ($response->successful()) {
-                $data = $response->json();
-                return is_array($data) ? $data : null;
+                return $response->json();
             }
 
-            // If the route doesn't exist on the GuiSIS server yet, throw DomainException for circuit breaking
-            if ($response->status() === 404 && str_contains($response->body(), 'Endpoint not found')) {
-                throw new \DomainException('GuiSIS student lookup endpoint (/students/external/by-email) is not available on GuiSIS API.');
-            }
-
-            Log::warning('GuiSIS API lookup returned non-200 status', [
-                'email' => $email,
+            Log::warning('GuiSIS getProfiles request failed', [
+                'page'   => $page,
                 'status' => $response->status(),
-                'body' => $response->body(),
+                'body'   => $response->body(),
             ]);
-
             return null;
-
-        } catch (\DomainException $e) {
-            throw $e;
         } catch (\Exception $e) {
-            Log::error('GuiSIS API lookup exception', [
-                'email' => $email,
-                'error' => $e->getMessage(),
-            ]);
+            Log::error('GuiSIS getProfiles exception: ' . $e->getMessage());
             return null;
         }
     }
 
     /**
-     * Get student personal/demographic info by student number.
-     * Endpoint: GET /students/external/personal-info/{studentNumber}
+     * Fetch all student profiles across all pages.
      */
-    public function getPersonalInfo(string $studentNumber): ?array
+    public function getAllStudentProfiles(): array
+    {
+        $allProfiles = [];
+        $page = 1;
+        $pageSize = 50;
+
+        do {
+            $res = $this->getProfiles($page, $pageSize);
+            if (!$res) {
+                break;
+            }
+
+            // GuiSIS returns {"status": "success", "data": {"students": [...], "meta": {"totalPages": 28}}}
+            $studentsList = $res['data']['students'] ?? $res['data']['profiles'] ?? $res['data']['data'] ?? $res['data'] ?? [];
+            if (empty($studentsList) || !is_array($studentsList)) {
+                break;
+            }
+
+            foreach ($studentsList as $profile) {
+                if (is_array($profile) && (isset($profile['studentNumber']) || isset($profile['idpUuid']) || isset($profile['email']))) {
+                    $allProfiles[] = $profile;
+                }
+            }
+
+            $meta = $res['data']['meta'] ?? $res['meta'] ?? [];
+            $totalPages = $meta['totalPages'] ?? $meta['total_pages'] ?? null;
+
+            if ($totalPages && $page >= $totalPages) {
+                break;
+            }
+
+            $page++;
+            if ($page > 50) { // Safety limit
+                break;
+            }
+        } while (true);
+
+        return $allProfiles;
+    }
+
+    /**
+     * Fetch single student record by student number.
+     * Endpoint: GET /integrations/students/{studentNumber}
+     */
+    public function getStudentByNumber(string $studentNumber): ?array
     {
         if (empty($studentNumber)) {
             return null;
         }
 
         try {
-            $endpoint = $this->baseUrl . '/students/external/personal-info/' . urlencode($studentNumber);
-
+            $endpoint = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber);
             $headers = $this->getHeaders();
-            $request = Http::timeout(4)->connectTimeout(2)->acceptJson();
 
-            if (!empty($headers)) {
-                $request = $request->withHeaders($headers);
-            }
-
-            $response = $request->get($endpoint);
+            $response = Http::withOptions(['verify' => false])
+                ->timeout(5)
+                ->connectTimeout(2)
+                ->withHeaders($headers)
+                ->get($endpoint);
 
             if ($response->successful()) {
-                $data = $response->json();
-                return is_array($data) ? $data : null;
+                $json = $response->json();
+                return $json['data'] ?? $json;
             }
 
             return null;
         } catch (\Exception $e) {
-            Log::error('GuiSIS API personal info exception', [
-                'studentNumber' => $studentNumber,
-                'error' => $e->getMessage(),
-            ]);
+            Log::error('GuiSIS getStudentByNumber exception: ' . $e->getMessage());
             return null;
         }
     }
 
     /**
-     * Get student address records by student number.
-     * Endpoint: GET /students/external/addresses/{studentNumber}
+     * Fetch student address records by student number.
+     * Endpoint: GET /integrations/students/{studentNumber}/addresses
      */
     public function getAddresses(string $studentNumber): ?array
     {
@@ -176,47 +217,24 @@ class GuidanceApiService
         }
 
         try {
-            $endpoint = $this->baseUrl . '/students/external/addresses/' . urlencode($studentNumber);
-
+            $endpoint = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber) . '/addresses';
             $headers = $this->getHeaders();
-            $request = Http::timeout(4)->connectTimeout(2)->acceptJson();
 
-            if (!empty($headers)) {
-                $request = $request->withHeaders($headers);
-            }
-
-            $response = $request->get($endpoint);
+            $response = Http::withOptions(['verify' => false])
+                ->timeout(5)
+                ->connectTimeout(2)
+                ->withHeaders($headers)
+                ->get($endpoint);
 
             if ($response->successful()) {
-                $data = $response->json();
-                return is_array($data) ? $data : null;
+                $json = $response->json();
+                return $json['data'] ?? $json;
             }
 
             return null;
         } catch (\Exception $e) {
-            Log::error('GuiSIS API addresses exception', [
-                'studentNumber' => $studentNumber,
-                'error' => $e->getMessage(),
-            ]);
+            Log::error('GuiSIS getAddresses exception: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Check if GuiSIS API service is reachable and responsive.
-     */
-    public function isReachable(): bool
-    {
-        try {
-            $headers = $this->getHeaders();
-            $res = Http::timeout(2)->connectTimeout(1)->acceptJson();
-            if (!empty($headers)) {
-                $res = $res->withHeaders($headers);
-            }
-            $response = $res->get($this->baseUrl);
-            return $response->successful() || $response->status() === 200;
-        } catch (\Exception $e) {
-            return false;
         }
     }
 }
