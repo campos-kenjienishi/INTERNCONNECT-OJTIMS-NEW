@@ -359,9 +359,30 @@ class SyncStudentsUnified
                     $yearSection = $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
                 }
 
+                $firstName = $guisisData['firstName'] ?? $guisisData['first_name'] ?? null;
+                $middleName = $guisisData['middleName'] ?? $guisisData['middle_name'] ?? null;
+                $lastName = $guisisData['lastName'] ?? $guisisData['last_name'] ?? null;
                 $suffixName = $guisisData['suffixName'] ?? $guisisData['suffix_name'] ?? $guisisData['suffix'] ?? null;
-                if ($suffixName && empty($studentUser->suffix)) {
+
+                $nameChanged = false;
+                if ($firstName && $studentUser->first_name !== $firstName) {
+                    $studentUser->first_name = $firstName;
+                    $nameChanged = true;
+                }
+                if ($middleName !== null && $studentUser->middle_name !== $middleName) {
+                    $studentUser->middle_name = $middleName;
+                    $nameChanged = true;
+                }
+                if ($lastName && $studentUser->last_name !== $lastName) {
+                    $studentUser->last_name = $lastName;
+                    $nameChanged = true;
+                }
+                if ($suffixName !== null && $studentUser->suffix !== $suffixName) {
                     $studentUser->suffix = $suffixName;
+                    $nameChanged = true;
+                }
+                if ($nameChanged) {
+                    $studentUser->full_name = trim(($studentUser->first_name ?: $firstName) . ' ' . ($studentUser->last_name ?: $lastName));
                     $studentUser->save();
                 }
 
@@ -509,9 +530,30 @@ class SyncStudentsUnified
                 $yearSection = $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
             }
 
+            $firstName = $guisisData['firstName'] ?? $guisisData['first_name'] ?? null;
+            $middleName = $guisisData['middleName'] ?? $guisisData['middle_name'] ?? null;
+            $lastName = $guisisData['lastName'] ?? $guisisData['last_name'] ?? null;
             $suffixName = $guisisData['suffixName'] ?? $guisisData['suffix_name'] ?? $guisisData['suffix'] ?? null;
-            if ($suffixName && empty($studentUser->suffix)) {
+
+            $nameChanged = false;
+            if ($firstName && $studentUser->first_name !== $firstName) {
+                $studentUser->first_name = $firstName;
+                $nameChanged = true;
+            }
+            if ($middleName !== null && $studentUser->middle_name !== $middleName) {
+                $studentUser->middle_name = $middleName;
+                $nameChanged = true;
+            }
+            if ($lastName && $studentUser->last_name !== $lastName) {
+                $studentUser->last_name = $lastName;
+                $nameChanged = true;
+            }
+            if ($suffixName !== null && $studentUser->suffix !== $suffixName) {
                 $studentUser->suffix = $suffixName;
+                $nameChanged = true;
+            }
+            if ($nameChanged) {
+                $studentUser->full_name = trim(($studentUser->first_name ?: $firstName) . ' ' . ($studentUser->last_name ?: $lastName));
                 $studentUser->save();
             }
 

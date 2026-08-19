@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url('/css/dark-mode.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1829,38 +1830,78 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
 
             profileForm.dataset.submitting = 'true';
             profileForm.submit();
-            $('#btnSyncGuidance').on('click', function() {
-                var $btn = $(this);
-                var $icon = $('#syncIcon');
-                $btn.prop('disabled', true);
-                $icon.addClass('fa-spin');
+        });
 
-                $.ajax({
-                    url: "{{ route('student.syncGuidance') }}",
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(res) {
-                        $btn.prop('disabled', false);
-                        $icon.removeClass('fa-spin');
-                        if (res.success) {
-                            alert(res.message);
-                            location.reload();
-                        } else {
-                            alert(res.message || 'Unable to sync profile details.');
+        // Sync from GuiSIS Handler
+        $('#btnSyncGuidance').on('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Sync from Guidance System (GuiSIS)?',
+                html: 'This will automatically fetch your latest academic and demographic details from GuiSIS:<br><br>' +
+                      '<ul style="text-align:left; font-size:13px; color:#4b5563; padding-left:20px;">' +
+                      '<li>Student Number, Course/Program, and Year &amp; Section.</li>' +
+                      '<li>Birthdate, Contact Number, and Home Address.</li>' +
+                      '</ul>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Sync My Details'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Connecting to GuiSIS...',
+                        html:
+                            '<div style="margin: 15px 0;">' +
+                                '<div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">' +
+                                    '<span class="visually-hidden">Syncing...</span>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">' +
+                                '<i class="fas fa-graduation-cap text-success me-1"></i> Pulling your profile from GuiSIS. Please wait...</strong>' +
+                            '</div>',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false
+                    });
+
+                    $.ajax({
+                        url: "{{ route('student.syncGuidance') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    title: 'Sync Complete!',
+                                    text: res.message || 'Your profile details were successfully updated from GuiSIS.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#16a34a'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Sync Notice',
+                                    text: res.message || 'Unable to sync profile details.',
+                                    icon: 'info',
+                                    confirmButtonColor: '#16a34a'
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            var errMsg = (xhr.responseJSON && xhr.responseJSON.message)
+                                ? xhr.responseJSON.message
+                                : 'Error connecting to Guidance System (GuiSIS). Please try again.';
+                            Swal.fire('GuiSIS Sync Failed', errMsg, 'error');
                         }
-                    },
-                    error: function(err) {
-                        $btn.prop('disabled', false);
-                        $icon.removeClass('fa-spin');
-                        alert('Error syncing with Guidance System (GuiSIS). Please try again.');
-                    }
-                });
+                    });
+                }
             });
         });
-    // Dark mode toggle
-// Dark mode is handled globally by dark-mode.js
+    });
 </script>
 <script src="{{ url('/assets/js/dark-mode.js') }}"></script>
 <script src="{{ asset('assets/js/voice-input.js') }}"></script>

@@ -132,46 +132,52 @@ class GuidanceApiService
     }
 
     /**
-     * Fetch all student profiles across all pages.
+     * Fetch all student profiles across all pages (cached for 30 minutes).
      */
-    public function getAllStudentProfiles(): array
+    public function getAllStudentProfiles(bool $forceRefresh = false): array
     {
-        $allProfiles = [];
-        $page = 1;
-        $pageSize = 50;
+        if ($forceRefresh) {
+            Cache::forget('guisis_all_student_profiles');
+        }
 
-        do {
-            $res = $this->getProfiles($page, $pageSize);
-            if (!$res) {
-                break;
-            }
+        return Cache::remember('guisis_all_student_profiles', 1800, function () {
+            $allProfiles = [];
+            $page = 1;
+            $pageSize = 50;
 
-            // GuiSIS returns {"status": "success", "data": {"students": [...], "meta": {"totalPages": 28}}}
-            $studentsList = $res['data']['students'] ?? $res['data']['profiles'] ?? $res['data']['data'] ?? $res['data'] ?? [];
-            if (empty($studentsList) || !is_array($studentsList)) {
-                break;
-            }
-
-            foreach ($studentsList as $profile) {
-                if (is_array($profile) && (isset($profile['studentNumber']) || isset($profile['idpUuid']) || isset($profile['email']))) {
-                    $allProfiles[] = $profile;
+            do {
+                $res = $this->getProfiles($page, $pageSize);
+                if (!$res) {
+                    break;
                 }
-            }
 
-            $meta = $res['data']['meta'] ?? $res['meta'] ?? [];
-            $totalPages = $meta['totalPages'] ?? $meta['total_pages'] ?? null;
+                // GuiSIS returns {"status": "success", "data": {"students": [...], "meta": {"totalPages": 28}}}
+                $studentsList = $res['data']['students'] ?? $res['data']['profiles'] ?? $res['data']['data'] ?? $res['data'] ?? [];
+                if (empty($studentsList) || !is_array($studentsList)) {
+                    break;
+                }
 
-            if ($totalPages && $page >= $totalPages) {
-                break;
-            }
+                foreach ($studentsList as $profile) {
+                    if (is_array($profile) && (isset($profile['studentNumber']) || isset($profile['idpUuid']) || isset($profile['email']))) {
+                        $allProfiles[] = $profile;
+                    }
+                }
 
-            $page++;
-            if ($page > 50) { // Safety limit
-                break;
-            }
-        } while (true);
+                $meta = $res['data']['meta'] ?? $res['meta'] ?? [];
+                $totalPages = $meta['totalPages'] ?? $meta['total_pages'] ?? null;
 
-        return $allProfiles;
+                if ($totalPages && $page >= $totalPages) {
+                    break;
+                }
+
+                $page++;
+                if ($page > 50) { // Safety limit
+                    break;
+                }
+            } while (true);
+
+            return $allProfiles;
+        });
     }
 
     /**
@@ -234,6 +240,38 @@ class GuidanceApiService
             return null;
         } catch (\Exception $e) {
             Log::error('GuiSIS getAddresses exception: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Fetch student personal information (DOB, gender, emergency contacts) by student number.
+     * Endpoint: GET /integrations/students/{studentNumber}/personal-info
+     */
+    public function getPersonalInfo(string $studentNumber): ?array
+    {
+        if (empty($studentNumber)) {
+            return null;
+        }
+
+        try {
+            $endpoint = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber) . '/personal-info';
+            $headers = $this->getHeaders();
+
+            $response = Http::withOptions(['verify' => false])
+                ->timeout(5)
+                ->connectTimeout(2)
+                ->withHeaders($headers)
+                ->get($endpoint);
+
+            if ($response->successful()) {
+                $json = $response->json();
+                return $json['data'] ?? $json;
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error('GuiSIS getPersonalInfo exception: ' . $e->getMessage());
             return null;
         }
     }

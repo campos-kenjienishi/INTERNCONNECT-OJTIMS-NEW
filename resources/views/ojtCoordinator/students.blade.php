@@ -2114,13 +2114,6 @@ body.dark-mode .dashboard-footer .footer-copy {
                 }
             });
         });
-    });
-
-    // ── Unified Student Sync Button (IDP + GuiSIS) ──
-    $('#btnSyncIdp').on('click', function() {
-        var $btn = $(this);
-        var $icon = $('#idpSyncIcon');
-        var originalHtml = $btn.html();
 
         // --- 1. Sync IDP UUIDs Handler ---
         $('#btnSyncIdp').on('click', function(e) {
@@ -2248,7 +2241,8 @@ body.dark-mode .dashboard-footer .footer-copy {
                                     '<div style="text-align:left; margin: 10px 0; font-size: 14px;">' +
                                     '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>👥 Total Students:</span><strong>' + (s.total_students || 0) + '</strong></div>' +
                                     '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>🎓 Profiles Synced:</span><strong style="color:#059669;">' + (s.guisis_synced || 0) + '</strong></div>' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0;"><span>⚠️ GuiSIS Not Found:</span><strong>' + (s.guisis_not_found || 0) + '</strong></div>' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span>🌐 GuiSIS Pool:</span><strong>' + (s.guisis_total_pool || 0) + '</strong></div>' +
+                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0;"><span>⚠️ Not in GuiSIS:</span><strong>' + (s.guisis_not_found || 0) + '</strong></div>' +
                                     '</div>',
                                 icon: 'success',
                                 confirmButtonColor: '#0d9488'

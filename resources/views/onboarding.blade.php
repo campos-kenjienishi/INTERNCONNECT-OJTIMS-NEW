@@ -10,32 +10,60 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
     <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/registration-responsive.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
+        *, *::before, *::after {
+            box-sizing: border-box !important;
+        }
+
+        html, body {
+            height: 100% !important;
+            min-height: 100% !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
         body.auth-centered-page {
             background: #3b0000 url('/images/20 Blur.png') no-repeat center center fixed !important;
             background-size: cover !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 16px;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 100vh !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+
+        body.auth-centered-page .main-wrapper {
+            max-width: 860px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 auto !important;
+            min-height: auto !important;
+            box-sizing: border-box !important;
+            padding: 0 !important;
         }
 
         body.auth-centered-page .login-container {
-            max-width: 840px;
-            width: 100%;
+            max-width: 860px !important;
+            width: 100% !important;
+            min-width: 0 !important;
             min-height: auto;
             background: linear-gradient(135deg, rgba(26, 0, 0, 0.92), rgba(60, 0, 0, 0.92)) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-radius: 24px !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6) !important;
+            backdrop-filter: blur(10px) !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+            display: block !important;
         }
 
         body.auth-centered-page .left-panel {
@@ -43,22 +71,47 @@
         }
 
         body.auth-centered-page .right-panel {
-            width: 100%;
-            flex: 1 1 auto;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            flex: 1 1 100% !important;
             min-height: auto;
-            padding: 34px 38px;
+            padding: 34px 44px !important;
             color: #ffffff !important;
-            justify-content: center;
+            box-sizing: border-box !important;
+            display: block !important;
+            border-radius: 24px !important;
+        }
+
+        .fields-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 16px 24px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .field-group {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .field-group.span-3 {
+            grid-column: span 1 !important;
         }
 
         .auth-brand {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            text-align: left;
-            gap: 14px;
-            margin-bottom: 16px;
-            justify-content: center;
+            display: inline-flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 14px !important;
+            margin: 0 auto 16px auto !important;
+            width: auto !important;
+            max-width: 100% !important;
+            text-align: left !important;
         }
 
         .auth-logo {
@@ -66,6 +119,12 @@
             height: 52px;
             object-fit: contain;
             filter: drop-shadow(0 0 12px rgba(255,255,255,0.25));
+            flex-shrink: 0 !important;
+        }
+
+        .auth-brand-copy {
+            text-align: left !important;
+            flex-shrink: 0 !important;
         }
 
         .auth-brand-copy .brand-name {
@@ -84,6 +143,32 @@
             letter-spacing: 2px;
             color: rgba(255,255,255,0.7) !important;
             text-transform: uppercase;
+        }
+
+        .step-indicator {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 10px auto !important;
+            max-width: 240px !important;
+            width: 100% !important;
+        }
+
+        .step-line {
+            flex: 1 !important;
+            height: 2px !important;
+            background: #e0e0e0 !important;
+            max-width: 80px !important;
+            transition: background 0.35s !important;
+        }
+
+        .step-label-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            margin: 0 auto 24px auto !important;
+            max-width: 320px !important;
+            width: 100% !important;
+            padding: 0 4px !important;
         }
 
         .reg-header h2 {
@@ -115,10 +200,11 @@
             font-weight: 700;
         }
 
-        .step-line { max-width: 240px !important; }
-
         .input-wrap {
             position: relative !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
         }
 
         .input-wrap .i-icon {
@@ -135,13 +221,18 @@
 
         body.auth-centered-page .right-panel .input-wrap input,
         body.auth-centered-page .right-panel .input-wrap select {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            display: block !important;
             background: #f7f4ee !important;
-            border: 1px solid #ddd7cb !important;
+            border: 1.5px solid #ddd7cb !important;
             color: #3b0000 !important;
             border-radius: 12px;
             padding-left: 44px !important;
+            padding-right: 36px !important;
             height: 48px;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
             position: relative;
             z-index: 1;
@@ -194,53 +285,141 @@
             display: none !important;
         }
 
-        /* Select2 Light Theme styling for onboarding */
+        /* Select2 Premium Theme styling for onboarding */
+        .select2-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            display: block !important;
+        }
+
         .select2-container--default .select2-selection--single {
             background-color: #f7f4ee !important;
-            border: 1px solid #ddd7cb !important;
+            border: 1.5px solid #ddd7cb !important;
             border-radius: 12px !important;
             height: 48px !important;
-            padding: 8px 12px !important;
+            padding: 8px 14px !important;
+            transition: all 0.2s ease !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+            background-color: #ffffff !important;
         }
         .select2-container--default .select2-selection--single .select2-selection__rendered {
             color: #3b0000 !important;
             font-family: 'Poppins', sans-serif !important;
-            font-size: 14px !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
             line-height: 28px !important;
             padding-left: 28px !important;
+            padding-right: 28px !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #8c8273 !important;
+            font-weight: 500 !important;
         }
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: 46px !important;
-            right: 12px !important;
+            right: 14px !important;
         }
         .select2-container--default .select2-selection--single .select2-selection__arrow b {
             border-color: #ef4444 transparent transparent transparent !important;
-            border-width: 6px 5px 0 5px !important;
+            border-width: 5px 4.5px 0 4.5px !important;
         }
         .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
             border-color: transparent transparent #ef4444 transparent !important;
-            border-width: 0 5px 6px 5px !important;
+            border-width: 0 4.5px 5px 4.5px !important;
         }
         .select2-dropdown {
             background-color: #ffffff !important;
-            border: 1px solid #ddd7cb !important;
+            border: 1px solid #e2ded5 !important;
             color: #3b0000 !important;
-            border-radius: 10px !important;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35) !important;
+            padding: 6px !important;
+            margin-top: 4px !important;
             z-index: 9999 !important;
+            overflow: hidden !important;
+        }
+        .select2-search--dropdown {
+            position: relative !important;
+            padding: 8px 10px !important;
+        }
+        .select2-search--dropdown::before {
+            content: "\f002";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #dc2626;
+            font-size: 13px;
+            z-index: 10;
+            pointer-events: none;
         }
         .select2-search__field {
             background-color: #f7f4ee !important;
             color: #3b0000 !important;
-            border: 1px solid #ddd7cb !important;
-            border-radius: 6px !important;
-            padding: 8px 12px !important;
+            border: 1.5px solid #ddd7cb !important;
+            border-radius: 10px !important;
+            padding: 10px 14px 10px 38px !important;
             font-family: 'Poppins', sans-serif !important;
+            font-size: 13px !important;
+            outline: none !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            transition: all 0.2s ease !important;
+        }
+        .select2-search__field::placeholder {
+            color: #8c8273 !important;
+            font-weight: 500 !important;
+            font-size: 12.5px !important;
+        }
+        .select2-search__field:focus {
+            border-color: #dc2626 !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+        }
+        .select2-results__options {
+            max-height: 220px !important;
+            padding: 2px !important;
         }
         .select2-results__option {
             color: #3b0000 !important;
             font-size: 13.5px !important;
             font-family: 'Poppins', sans-serif !important;
+            padding: 9px 14px !important;
+            border-radius: 8px !important;
+            margin-bottom: 2px !important;
+            transition: all 0.15s ease !important;
+            font-weight: 500 !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+            color: #ffffff !important;
+        }
+        .select2-results__option[aria-selected="true"] {
+            background-color: #fee2e2 !important;
+            color: #991b1b !important;
+            font-weight: 600 !important;
+        }
+        .select2-container--default.select2-container--disabled .select2-selection--single {
+            background-color: #ede8df !important;
+            border-color: #d6cfc2 !important;
+            opacity: 0.85 !important;
+            cursor: not-allowed !important;
+        }
+        .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__rendered {
+            color: #6b5d52 !important;
         }
         .select2-results__option--highlighted[aria-selected] {
             background-color: #dc2626 !important;
@@ -361,29 +540,275 @@
         }
         .step-label.active { color: #dc2626; }
         .step-label.done   { color: #16a34a; }
-        .form-steps-wrapper { overflow: hidden; position: relative; }
-        .form-step { display: none; animation: stepIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .form-step.active { display: block; }
-        @keyframes stepIn {
-            from { opacity: 0; transform: translateX(40px); }
-            to   { opacity: 1; transform: translateX(0); }
+        .form-steps-wrapper {
+            overflow: hidden !important;
+            position: relative !important;
+            width: 100% !important;
+            max-width: 100% !important;
         }
-        @keyframes stepBack {
-            from { opacity: 0; transform: translateX(-40px); }
-            to   { opacity: 1; transform: translateX(0); }
+        .form-step {
+            display: none;
+            width: 100% !important;
+            max-width: 100% !important;
+            animation: stepFadeIn 0.3s ease-out forwards;
         }
-        .form-step.going-back { animation: stepBack 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .form-step.active {
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        @keyframes stepFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsiveness Improvements */
+        html, body, .main-wrapper, .login-container, .right-panel, .form-steps-wrapper, .form-step, .fields-grid, .field-group, .input-wrap {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .year-row {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .year-row .input-wrap {
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            width: 0 !important;
+            max-width: 50% !important;
+            box-sizing: border-box !important;
+        }
+
+        .year-row .select2-container {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .year-row .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-left: 10px !important;
+            padding-right: 20px !important;
+            font-size: 13px !important;
+        }
+
+        .year-row .select2-container--default .select2-selection--single .select2-selection__arrow {
+            right: 6px !important;
+        }
+
+        .year-row .i-icon {
+            display: none !important;
+        }
+
+        .year-sep {
+            flex-shrink: 0 !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+        }
+
+        @media (max-width: 768px) {
+            html, body {
+                height: auto !important;
+                min-height: 100% !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+
+            body.auth-centered-page {
+                padding: 16px 10px 140px 10px !important;
+                display: block !important;
+                height: auto !important;
+                min-height: 100% !important;
+                overflow-y: auto !important;
+                width: 100% !important;
+            }
+
+            body.auth-centered-page .main-wrapper {
+                max-width: min(94vw, 420px) !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+                display: block !important;
+            }
+
+            body.auth-centered-page .login-container {
+                max-width: 100% !important;
+                width: 100% !important;
+                border-radius: 22px !important;
+                overflow: hidden !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+                margin: 0 auto !important;
+            }
+
+            body.auth-centered-page .right-panel {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 24px 20px !important;
+                box-sizing: border-box !important;
+            }
+
+            .fields-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                width: 100% !important;
+                gap: 12px !important;
+                padding: 0 !important;
+            }
+
+            .field-group {
+                width: 100% !important;
+                max-width: 320px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+            }
+
+            .field-group.span-3 {
+                grid-column: span 1 !important;
+            }
+
+            .input-wrap {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            body.auth-centered-page .right-panel .input-wrap input,
+            body.auth-centered-page .right-panel .input-wrap select,
+            .select2-container--default .select2-selection--single {
+                height: 44px !important;
+                font-size: 13px !important;
+                border-radius: 10px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 28px !important;
+                font-size: 12.5px !important;
+            }
+
+            .auth-brand {
+                gap: 10px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .auth-logo {
+                width: 44px !important;
+                height: 44px !important;
+            }
+
+            .auth-brand-copy .brand-name {
+                font-size: 19px !important;
+            }
+
+            .auth-brand-copy .system-title {
+                font-size: 8.5px !important;
+                letter-spacing: 1.2px !important;
+            }
+
+            .reg-header {
+                max-width: 320px !important;
+                margin: 0 auto 14px auto !important;
+                text-align: left !important;
+            }
+
+            .reg-header h2 {
+                font-size: 17px !important;
+            }
+
+            .reg-header p {
+                font-size: 12px !important;
+            }
+
+            .step-dot {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 12px !important;
+            }
+
+            .step-line {
+                max-width: 50px !important;
+            }
+
+            .step-label {
+                font-size: 10.5px !important;
+            }
+
+            .nav-btn-row {
+                width: 100% !important;
+                max-width: 320px !important;
+                margin: 18px auto 6px auto !important;
+                display: flex !important;
+                flex-direction: column-reverse !important;
+                gap: 10px !important;
+            }
+
+            .btn-back-step,
+            .btn-proceed {
+                width: 100% !important;
+                max-width: 320px !important;
+                padding: 12px 18px !important;
+                font-size: 14px !important;
+                justify-content: center !important;
+            }
+        }
+
+        @media (max-width: 420px) {
+            body.auth-centered-page {
+                padding: 12px 6px 140px 6px !important;
+            }
+
+            body.auth-centered-page .main-wrapper {
+                max-width: min(92vw, 340px) !important;
+            }
+
+            body.auth-centered-page .right-panel {
+                padding: 20px 14px !important;
+            }
+
+            .field-group,
+            .reg-header,
+            .nav-btn-row,
+            .btn-back-step,
+            .btn-proceed {
+                max-width: 290px !important;
+            }
+
+            .form-label {
+                font-size: 12px !important;
+            }
+
+            .year-row {
+                gap: 6px !important;
+            }
+
+            .year-sep {
+                font-size: 13px !important;
+            }
+        }
     </style>
 </head>
 <body class="auth-centered-page">
 <div class="main-wrapper">
     <div class="login-container">
         <div class="right-panel">
-            <div class="auth-brand d-flex flex-row align-items-center justify-content-center mb-3" style="gap: 16px; margin: 0 auto;">
-                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo" style="width: 54px; height: 54px; flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));">
-                <div class="auth-brand-copy" style="text-align: left;">
-                    <div class="brand-name" style="font-size: 22px; font-weight: 800; color: #ffffff !important; line-height: 1.1; margin: 0;">Intern<span style="color: #fca5a5;">Connect</span> <span style="font-size: 10px; font-weight: 700; background: rgba(220,38,38,0.4); color: #fca5a5; padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(220,38,38,0.5); vertical-align: middle; margin-left: 4px;">BETA</span></div>
-                    <div class="system-title" style="font-size: 10px; letter-spacing: 1.8px; color: rgba(255,255,255,0.75) !important; text-transform: uppercase; margin-top: 2px;">OJT Information Management System</div>
+            <div class="d-flex justify-content-center w-100 mb-3">
+                <div class="auth-brand">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
+                    <div class="auth-brand-copy">
+                        <div class="brand-name">Intern<span>Connect</span> <span style="font-size: 10px; font-weight: 700; background: rgba(220,38,38,0.4); color: #fca5a5; padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(220,38,38,0.5); vertical-align: middle; margin-left: 4px;">BETA</span></div>
+                        <div class="system-title">OJT Information Management System</div>
+                    </div>
                 </div>
             </div>
             <!-- Step indicator -->
@@ -463,12 +888,20 @@
                             <h2>Academic Information</h2>
                             <p>Step 2 of 2 — Fill in your academic details</p>
                         </div>
+                        @php
+                            $fetchedStudentNum = $guisisData['studentNumber'] ?? $guisisData['student_number'] ?? $guisisData['studentNum'] ?? '';
+                            $fetchedYearSection = (isset($guisisData['yearLevel']) && isset($guisisData['section'])) 
+                                ? ($guisisData['yearLevel'] . '-' . $guisisData['section']) 
+                                : ($guisisData['year_and_section'] ?? $guisisData['year_section'] ?? '');
+                            $fetchedCourse = (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['program'] ?? '') : ($guisisData['program'] ?? ''))
+                                ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['course'] ?? $guisisData['course']['name'] ?? '') : ($guisisData['course'] ?? ''));
+                        @endphp
                         <div class="fields-grid">
                             <div class="field-group span-3">
                                 <label class="form-label">Student Number</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-id-card i-icon"></i>
-                                    <input type="text" name="studentNum" class="form-control" required placeholder="Enter student number" value="{{ old('studentNum', $guisisData['student_number'] ?? $guisisData['studentNum'] ?? '') }}">
+                                    <input type="text" name="studentNum" class="form-control" required placeholder="Enter student number" value="{{ old('studentNum', $fetchedStudentNum) }}">
                                 </div>
                             </div>
                             <div class="field-group span-3">
@@ -476,23 +909,36 @@
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-calendar i-icon"></i>
                                     <select name="semester" class="form-control" required>
-                                        <option value="1st Sem">1st Sem</option>
-                                        <option value="2nd Sem">2nd Sem</option>
-                                        <option value="Summer">Summer</option>
+                                        <option value="" disabled {{ old('semester') ? '' : 'selected' }}>Select Semester</option>
+                                        <option value="1st Sem" {{ old('semester') === '1st Sem' ? 'selected' : '' }}>1st Sem</option>
+                                        <option value="2nd Sem" {{ old('semester') === '2nd Sem' ? 'selected' : '' }}>2nd Sem</option>
+                                        <option value="Summer" {{ old('semester') === 'Summer' ? 'selected' : '' }}>Summer</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Academic Year</label>
+                                <label class="form-label">Academic Year <small style="color: #fca5a5; font-size: 11px;">(Auto-consecutive)</small></label>
                                 <div class="year-row d-flex gap-2 align-items-center">
-                                    <div class="input-wrap flex-grow-1">
+                                    <div class="input-wrap has-select flex-grow-1">
                                         <i class="fa fa-calendar-alt i-icon"></i>
-                                        <input type="text" name="academic_year_start" class="form-control" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="Start Year" required value="{{ date('Y') }}">
+                                        <select name="academic_year_start" id="academic_year_start" class="form-control" required>
+                                            <option value="" disabled {{ old('academic_year_start') ? '' : 'selected' }}>Start Year</option>
+                                            @php $currY = (int) date('Y'); @endphp
+                                            @for ($year = ($currY + 2); $year >= ($currY - 5); $year--)
+                                                <option value="{{ $year }}" {{ old('academic_year_start') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                            @endfor
+                                        </select>
                                     </div>
-                                    <span class="year-sep" style="color: #666; font-weight: 700;">—</span>
-                                    <div class="input-wrap flex-grow-1">
+                                    <span class="year-sep" style="color: #ffffff; font-weight: 700; font-size: 16px;">—</span>
+                                    <div class="input-wrap has-select flex-grow-1">
                                         <i class="fa fa-calendar-alt i-icon"></i>
-                                        <input type="text" name="academic_year_end" class="form-control" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="End Year" required value="{{ date('Y') + 1 }}">
+                                        <select id="academic_year_end_display" class="form-control" disabled style="opacity: 0.85; cursor: not-allowed;">
+                                            <option value="" disabled {{ old('academic_year_end') ? '' : 'selected' }}>End Year</option>
+                                            @for ($year = ($currY + 3); $year >= ($currY - 4); $year--)
+                                                <option value="{{ $year }}" {{ old('academic_year_end') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                            @endfor
+                                        </select>
+                                        <input type="hidden" name="academic_year_end" id="academic_year_end" value="{{ old('academic_year_end', '') }}">
                                     </div>
                                 </div>
                             </div>
@@ -500,13 +946,9 @@
                                 <label class="form-label">Year and Section</label>
                                 <div class="input-wrap">
                                     <i class="fa fa-users i-icon"></i>
-                                    <input type="text" name="year_and_section" class="form-control" required placeholder="e.g. 4-1" value="{{ old('year_and_section', $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? '') }}">
+                                    <input type="text" name="year_and_section" class="form-control" required placeholder="e.g. 4-1" value="{{ old('year_and_section', $fetchedYearSection) }}">
                                 </div>
                             </div>
-                            @php
-                                $fetchedCourse = (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['program'] ?? '') : ($guisisData['program'] ?? ''))
-                                    ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['course'] ?? $guisisData['course']['name'] ?? '') : ($guisisData['course'] ?? ''));
-                            @endphp
                             <div class="field-group span-3">
                                 <label class="form-label">Course</label>
                                 <div class="input-wrap has-select">
@@ -564,13 +1006,15 @@
         document.getElementById('dot2').classList.add('active');
         document.getElementById('line1').classList.add('done');
         document.getElementById('label1').classList.remove('active');
-        document.getElementById('label1').classList.add('done');
-        document.getElementById('label2').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.body.scrollLeft = 0;
+        document.documentElement.scrollLeft = 0;
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        if ($.fn.select2) {
+            $('select').trigger('change.select2');
+        }
     }
     function goToStep1() {
         const step2 = document.getElementById('step2');
-        step2.classList.add('going-back');
         step2.classList.remove('active');
         document.getElementById('step1').classList.add('active');
         const dot1 = document.getElementById('dot1');
@@ -582,7 +1026,9 @@
         document.getElementById('label1').classList.add('active');
         document.getElementById('label1').classList.remove('done');
         document.getElementById('label2').classList.remove('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.body.scrollLeft = 0;
+        document.documentElement.scrollLeft = 0;
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 
     $(document).ready(function() {
@@ -598,8 +1044,46 @@
             });
             $('select[name="semester"]').select2({
                 placeholder: 'Select Semester...',
+                allowClear: true,
                 minimumResultsForSearch: Infinity,
                 width: '100%'
+            });
+            $('select[name="academic_year_start"]').select2({
+                placeholder: 'Start Year',
+                allowClear: true,
+                minimumResultsForSearch: Infinity,
+                width: '100%'
+            });
+            $('#academic_year_end_display').select2({
+                placeholder: 'End Year',
+                minimumResultsForSearch: Infinity,
+                width: '100%',
+                disabled: true
+            });
+
+            $('#academic_year_start').on('change', function() {
+                var startVal = parseInt($(this).val());
+                if (!isNaN(startVal)) {
+                    var nextYear = startVal + 1;
+                    $('#academic_year_end').val(nextYear);
+                    $('#academic_year_end_display').val(nextYear).trigger('change.select2');
+                }
+            });
+
+            // Set search input placeholder when dropdown opens
+            $(document).on('select2:open', function(e) {
+                var searchField = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchField) {
+                    var selectName = $(e.target).attr('name') || '';
+                    if (selectName.indexOf('course') !== -1) {
+                        searchField.setAttribute('placeholder', 'Search course name...');
+                    } else if (selectName.indexOf('adviser') !== -1) {
+                        searchField.setAttribute('placeholder', 'Search professor name...');
+                    } else {
+                        searchField.setAttribute('placeholder', 'Type to search...');
+                    }
+                    searchField.focus();
+                }
             });
         }
     });

@@ -334,9 +334,29 @@ class AuthController extends Controller
             return redirect('/')->with('fail', 'No active onboarding session found.');
         }
 
-        // Auto-search student in GuiSIS by email
-        $email = $idp['email'] ?? '';
-        $guisisData = $guidanceApi->getStudentByEmail($email);
+        // Auto-search student in GuiSIS by UUID, email, or name
+        $guisisData = null;
+        $idpUuid = strtolower(trim($idp['idp_user_id'] ?? ''));
+        $email = strtolower(trim($idp['email'] ?? ''));
+        $name = strtolower(preg_replace('/[^a-z0-9]/', '', ($idp['first_name'] ?? '') . ' ' . ($idp['last_name'] ?? '')));
+
+        try {
+            $profiles = $guidanceApi->getAllStudentProfiles();
+            foreach ($profiles as $p) {
+                $pUuid = strtolower(trim($p['idpUuid'] ?? ''));
+                $pEmail = strtolower(trim($p['email'] ?? ''));
+                $pName = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+
+                if (($idpUuid && $pUuid === $idpUuid) ||
+                    ($email && $pEmail === $email) ||
+                    ($name && $pName === $name)) {
+                    $guisisData = $p;
+                    break;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Onboarding GuiSIS lookup error: ' . $e->getMessage());
+        }
 
         $professors = Professor::all();
         $courses = Courses::all();
@@ -345,7 +365,7 @@ class AuthController extends Controller
         return view('onboarding', compact('idp', 'guisisData', 'professors', 'courses', 'schedules'));
     }
 
-    public function storeOnboarding(Request $request, string $email)
+    public function storeOnboarding(Request $request, string $email, GuidanceApiService $guidanceApi)
     {
         $idp = Session::get('idp_onboarding_data');
 
@@ -386,6 +406,51 @@ class AuthController extends Controller
         $studentE->school_year_end = $request->academic_year_end;
         $studentE->adviser_name = $request->adviser_name;
         $studentE->user_id = $user->id;
+
+        // Auto-fetch additional demographic details from GuiSIS
+        try {
+            $studentNum = $request->studentNum;
+            $personalInfo = $guidanceApi->getPersonalInfo($studentNum);
+            if ($personalInfo && !empty($personalInfo['dateOfBirth'])) {
+                try {
+                    $studentE->date_of_birth = \Carbon\Carbon::parse($personalInfo['dateOfBirth'])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $studentE->date_of_birth = substr($personalInfo['dateOfBirth'], 0, 10);
+                }
+            }
+
+            $guisisProfile = $guidanceApi->getStudentByNumber($studentNum);
+            if ($guisisProfile) {
+                $mobile = $guisisProfile['mobileNumber'] ?? $guisisProfile['contactNumber'] ?? null;
+                if ($mobile) {
+                    $studentE->contact_number = $mobile;
+                }
+                $suffix = $guisisProfile['suffixName'] ?? null;
+                if ($suffix && empty($user->suffix)) {
+                    $user->suffix = $suffix;
+                    $user->save();
+                }
+            }
+
+            $addresses = $guidanceApi->getAddresses($studentNum);
+            if (!empty($addresses) && is_array($addresses)) {
+                $firstAddr = reset($addresses);
+                if (is_array($firstAddr)) {
+                    $street = $firstAddr['streetDetail'] ?? $firstAddr['street'] ?? '';
+                    $brgy = is_array($firstAddr['barangay'] ?? null) ? ($firstAddr['barangay']['name'] ?? '') : ($firstAddr['barangay'] ?? '');
+                    $city = is_array($firstAddr['city'] ?? null) ? ($firstAddr['city']['name'] ?? '') : ($firstAddr['city'] ?? '');
+                    $prov = is_array($firstAddr['province'] ?? null) ? ($firstAddr['province']['name'] ?? '') : ($firstAddr['province'] ?? '');
+                    $reg = is_array($firstAddr['region'] ?? null) ? ($firstAddr['region']['name'] ?? '') : ($firstAddr['region'] ?? '');
+
+                    $fullAddr = implode(', ', array_filter([$street, $brgy, $city, $prov ?: $reg]));
+                    if (!empty($fullAddr)) {
+                        $studentE->address = $fullAddr;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Onboarding background demographic fetch error: ' . $e->getMessage());
+        }
 
         $student->save();
         $studentE->save();

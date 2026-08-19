@@ -164,6 +164,9 @@ class IdpService
                 throw new \RuntimeException('Could not parse any valid public key from Identity Provider JWKS.');
             }
 
+            // Set 300s leeway for clock skew between local machine and IdP server
+            JWT::$leeway = 300;
+
             // Check if JWT header has a kid or if we can decode directly with single key fallback
             $tks = explode('.', $jwt);
             if (count($tks) === 3) {

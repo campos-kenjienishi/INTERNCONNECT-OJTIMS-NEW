@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 use App\Models\Company; // ADD THIS at the top
 use App\Services\GuidanceApiService;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -849,11 +850,47 @@ public function ojt_edit(Request $request,$studentNum)
 
         $user = User::find($userId);
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'User record not found.'], 44);
+            return response()->json(['success' => false, 'message' => 'User record not found.'], 404);
         }
 
-        // Query GuiSIS by student email
-        $guisisData = $guidanceApi->getStudentByEmail($user->email);
+        // 1. Fetch student profile record
+        $student = Student::where('user_id', $user->id)->first();
+        if (!$student) {
+            $student = new Student();
+            $student->user_id = $user->id;
+        }
+
+        $studentNum = $student->studentNum;
+
+        // Try single lookup by student number if available
+        $guisisData = null;
+        if (!empty($studentNum)) {
+            $guisisData = $guidanceApi->getStudentByNumber($studentNum);
+        }
+
+        // If not found by studentNum, search in all GuiSIS profiles by idpUuid, email, studentNum, or name
+        if (!$guisisData) {
+            $profiles = $guidanceApi->getAllStudentProfiles();
+            $stUuid = strtolower(trim($user->idp_user_id ?? ''));
+            $stEmail = strtolower(trim($user->email ?? ''));
+            $stNum = strtolower(trim($studentNum ?? ''));
+            $stName = strtolower(preg_replace('/[^a-z0-9]/', '', ($user->first_name ?? '') . ' ' . ($user->last_name ?? '')));
+
+            foreach ($profiles as $p) {
+                $pUuid = strtolower(trim($p['idpUuid'] ?? ''));
+                $pEmail = strtolower(trim($p['email'] ?? ''));
+                $pNum = strtolower(trim($p['studentNumber'] ?? ''));
+                $pName = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+
+                if (($stUuid && $pUuid === $stUuid) ||
+                    ($stEmail && $pEmail === $stEmail) ||
+                    ($stNum && $pNum === $stNum) ||
+                    ($stName && $pName === $stName)) {
+                    $guisisData = $p;
+                    break;
+                }
+            }
+        }
 
         if (!$guisisData) {
             return response()->json([
@@ -862,40 +899,53 @@ public function ojt_edit(Request $request,$studentNum)
             ]);
         }
 
-        // Fetch student profile record
-        $student = Student::where('user_id', $user->id)->first();
-        if (!$student) {
-            $student = new Student();
-            $student->user_id = $user->id;
+        // Backfill IDP UUID if missing on User
+        if (empty($user->idp_user_id) && !empty($guisisData['idpUuid'])) {
+            $uuidTaken = User::where('idp_user_id', $guisisData['idpUuid'])->where('id', '!=', $user->id)->exists();
+            if (!$uuidTaken) {
+                $user->idp_user_id = $guisisData['idpUuid'];
+                $user->save();
+            }
         }
 
-        // Sync fields from GuiSIS data (supporting nested basicInfo/personalInfo and camelCase)
-        $pInfo = $guisisData['personalInfo'] ?? $guisisData['personal_info'] ?? $guisisData;
-        $bInfo = $guisisData['basicInfo'] ?? $guisisData['basic_info'] ?? $guisisData;
+        $matchedNum = $guisisData['studentNumber'] ?? $guisisData['student_number'] ?? null;
+        $course = (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['code'] ?? '') : ($guisisData['program'] ?? ''))
+            ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['name'] ?? $guisisData['course']['course'] ?? '') : ($guisisData['course'] ?? ''));
 
-        $studentNum = $pInfo['studentNumber'] ?? $pInfo['student_number'] ?? $pInfo['studentNum'] ?? $guisisData['student_number'] ?? $guisisData['studentNum'] ?? null;
-        $course = (is_array($pInfo['program'] ?? null) ? ($pInfo['program']['name'] ?? $pInfo['program']['program'] ?? '') : ($pInfo['program'] ?? ''))
-            ?: (is_array($pInfo['course'] ?? null) ? ($pInfo['course']['name'] ?? $pInfo['course']['course'] ?? '') : ($pInfo['course'] ?? ''))
-            ?: (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['program'] ?? '') : ($guisisData['program'] ?? ''))
-            ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['course'] ?? $guisisData['course']['name'] ?? '') : ($guisisData['course'] ?? null));
-
-        $yearSection = $pInfo['year_and_section'] ?? $pInfo['year_section'] ?? $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
-        if (!$yearSection && isset($pInfo['yearLevel']) && isset($pInfo['section'])) {
-            $yearSection = $pInfo['yearLevel'] . '-' . $pInfo['section'];
+        $yearSection = null;
+        if (isset($guisisData['yearLevel']) && isset($guisisData['section'])) {
+            $yearSection = $guisisData['yearLevel'] . '-' . $guisisData['section'];
+        } else {
+            $yearSection = $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
         }
 
-        $suffixName = $pInfo['suffixName'] ?? $pInfo['suffix_name'] ?? $pInfo['suffix'] ?? null;
-        if ($suffixName && empty($user->suffix)) {
+        $firstName = $guisisData['firstName'] ?? $guisisData['first_name'] ?? null;
+        $middleName = $guisisData['middleName'] ?? $guisisData['middle_name'] ?? null;
+        $lastName = $guisisData['lastName'] ?? $guisisData['last_name'] ?? null;
+        $suffixName = $guisisData['suffixName'] ?? $guisisData['suffix_name'] ?? $guisisData['suffix'] ?? null;
+
+        if ($firstName) {
+            $user->first_name = $firstName;
+        }
+        if ($middleName !== null) {
+            $user->middle_name = $middleName;
+        }
+        if ($lastName) {
+            $user->last_name = $lastName;
+        }
+        if ($firstName || $lastName) {
+            $user->full_name = trim(($user->first_name ?: $firstName) . ' ' . ($user->last_name ?: $lastName));
+        }
+        if ($suffixName !== null) {
             $user->suffix = $suffixName;
-            $user->save();
         }
+        $user->save();
 
-        if ($studentNum) {
-            $student->studentNum = $studentNum;
-            // Also sync to OJTInformation if exists
+        if ($matchedNum) {
+            $student->studentNum = $matchedNum;
             $ojtInfo = OJTInformation::where('studentNum', $student->studentNum)->first();
             if ($ojtInfo) {
-                $ojtInfo->studentNum = $studentNum;
+                $ojtInfo->studentNum = $matchedNum;
                 $ojtInfo->save();
             }
         }
@@ -908,42 +958,47 @@ public function ojt_edit(Request $request,$studentNum)
             $student->year_and_section = $yearSection;
         }
 
-        // Check if personal info API returned additional details
-        $dob = $pInfo['dateOfBirth'] ?? $pInfo['date_of_birth'] ?? null;
-        $mobile = $pInfo['mobileNumber'] ?? $pInfo['mobile_number'] ?? $pInfo['contactNumber'] ?? $pInfo['contact_number'] ?? null;
-
-        if ($studentNum && (!$dob || !$mobile)) {
-            $personalInfo = $guidanceApi->getPersonalInfo($studentNum);
-            if (!empty($personalInfo)) {
-                $dob = $dob ?: ($personalInfo['dateOfBirth'] ?? $personalInfo['date_of_birth'] ?? null);
-                $mobile = $mobile ?: ($personalInfo['mobileNumber'] ?? $personalInfo['contact_number'] ?? null);
-            }
-        }
-
-        if ($dob) {
-            $student->date_of_birth = $dob;
-        }
+        $mobile = $guisisData['mobileNumber'] ?? $guisisData['mobile_number'] ?? $guisisData['contactNumber'] ?? $guisisData['contact_number'] ?? null;
         if ($mobile) {
             $student->contact_number = $mobile;
         }
 
-        $addresses = $pInfo['addresses'] ?? $guisisData['addresses'] ?? null;
-        if ($studentNum && empty($addresses)) {
-            $addresses = $guidanceApi->getAddresses($studentNum);
+        $effectiveNum = $matchedNum ?: $studentNum;
+
+        // Fetch personal info (DOB)
+        $dob = $guisisData['dateOfBirth'] ?? $guisisData['date_of_birth'] ?? null;
+        if ($effectiveNum) {
+            $personalInfo = $guidanceApi->getPersonalInfo($effectiveNum);
+            if ($personalInfo && !empty($personalInfo['dateOfBirth'])) {
+                $dob = $personalInfo['dateOfBirth'];
+            }
         }
 
-        if (!empty($addresses) && is_array($addresses)) {
-            $firstAddr = reset($addresses);
-            if (is_array($firstAddr)) {
-                $addrObj = $firstAddr['address'] ?? $firstAddr;
-                $fullAddr = implode(', ', array_filter([
-                    $addrObj['street'] ?? '',
-                    $addrObj['barangay']['name'] ?? $addrObj['barangay'] ?? '',
-                    $addrObj['city']['name'] ?? $addrObj['city'] ?? '',
-                    $addrObj['province']['name'] ?? $addrObj['province'] ?? '',
-                ]));
-                if (!empty($fullAddr)) {
-                    $student->address = $fullAddr;
+        if ($dob) {
+            try {
+                $formattedDob = Carbon::parse($dob)->format('Y-m-d');
+                $student->date_of_birth = $formattedDob;
+            } catch (\Exception $e) {
+                $student->date_of_birth = substr($dob, 0, 10);
+            }
+        }
+
+        // Fetch addresses
+        if ($effectiveNum) {
+            $addresses = $guidanceApi->getAddresses($effectiveNum);
+            if (!empty($addresses) && is_array($addresses)) {
+                $firstAddr = reset($addresses);
+                if (is_array($firstAddr)) {
+                    $street = $firstAddr['streetDetail'] ?? $firstAddr['street'] ?? '';
+                    $brgy = is_array($firstAddr['barangay'] ?? null) ? ($firstAddr['barangay']['name'] ?? '') : ($firstAddr['barangay'] ?? '');
+                    $city = is_array($firstAddr['city'] ?? null) ? ($firstAddr['city']['name'] ?? '') : ($firstAddr['city'] ?? '');
+                    $prov = is_array($firstAddr['province'] ?? null) ? ($firstAddr['province']['name'] ?? '') : ($firstAddr['province'] ?? '');
+                    $reg = is_array($firstAddr['region'] ?? null) ? ($firstAddr['region']['name'] ?? '') : ($firstAddr['region'] ?? '');
+
+                    $fullAddr = implode(', ', array_filter([$street, $brgy, $city, $prov ?: $reg]));
+                    if (!empty($fullAddr)) {
+                        $student->address = $fullAddr;
+                    }
                 }
             }
         }
@@ -964,9 +1019,8 @@ public function ojt_edit(Request $request,$studentNum)
                 'studentNum' => $student->studentNum,
                 'course' => $student->course,
                 'year_and_section' => $student->year_and_section,
-                'contact_number' => $student->contact_number ?? '',
-                'date_of_birth' => $student->date_of_birth ?? '',
-                'address' => $student->address ?? '',
+                'contact_number' => $student->contact_number,
+                'address' => $student->address,
             ]
         ]);
     }
