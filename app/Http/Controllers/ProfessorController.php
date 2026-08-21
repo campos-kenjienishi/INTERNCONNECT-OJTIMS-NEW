@@ -1011,53 +1011,73 @@ public function update(Request $request)
     // Validate the form data
     $validatedData = $request->validate([
         'professor_id' => 'required|exists:professors,id',
-        'email' => 'required|email',
-        
+        'first_name' => ['required', 'string', 'max:255'],
+        'middle_name' => ['nullable', 'string', 'max:255'],
+        'last_name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email', 'max:255'],
     ]);
 
     // Find the professor
-$professor = Professor::find($validatedData['professor_id']);
+    $professor = Professor::find($validatedData['professor_id']);
 
-if (!$professor) {
-    return back()->with('error', 'Professor not found.');
-}
+    if (!$professor) {
+        return back()->with('error', 'Professor not found.');
+    }
 
-// Store the initial professor email
-$initialProfessorEmail = $professor->email;
+    $oldFullName = $professor->full_name;
+    $oldEmail = $professor->email;
 
-// Update the professor's email
-$professor->email = $validatedData['email'];
+    $user = User::where('email', $oldEmail)->first();
+    if (!$user) {
+        $user = User::where('full_name', $oldFullName)->first();
+    }
 
-Student::where('adviser_name', $professor->full_name)->update(['adviser_name' => $professor->full_name]);
-// Save the updated professor
-$professor->save();
-AuditLogger::log(
-    'Professor',
-    'update',
-    'Updated professor: ' . $professor->full_name . '. Email changed: ' . $initialProfessorEmail . ' → ' . $professor->email,
-    $user->id ?? null
-);
+    // Check unique email on users table (ignoring current user if found)
+    $existingUserWithEmail = User::where('email', $validatedData['email'])
+        ->when($user, fn($q) => $q->where('id', '!=', $user->id))
+        ->first();
+    if ($existingUserWithEmail) {
+        return back()->with('error', 'The email address is already taken by another account.');
+    }
 
+    $newFirstName = trim($validatedData['first_name']);
+    $newMiddleName = trim($validatedData['middle_name'] ?? '');
+    $newLastName = trim($validatedData['last_name']);
 
+    $newFullName = trim($newFirstName . ($newMiddleName ? ' ' . $newMiddleName : '') . ' ' . $newLastName);
 
+    // Update professor model
+    $professor->full_name = $newFullName;
+    $professor->email = $validatedData['email'];
+    $professor->save();
 
-// Find the user with the initial professor email
-$user = User::where('email', $initialProfessorEmail)->first();
+    // Update user model if exists
+    if ($user) {
+        $user->first_name = $newFirstName;
+        $user->middle_name = $newMiddleName ?: null;
+        $user->last_name = $newLastName;
+        $user->full_name = $newFullName;
+        $user->email = $validatedData['email'];
+        $user->save();
+    }
 
-if ($user) {
-    // Update the user email
-    $user->email = $professor->email;
-    $user->save();
+    // Cascade full_name updates to linked records if name changed
+    if ($oldFullName !== $newFullName) {
+        Student::where('adviser_name', $oldFullName)->update(['adviser_name' => $newFullName]);
+        User::where('role', 0)->where('adviser_name', $oldFullName)->update(['adviser_name' => $newFullName]);
+        Classes::where('adviser_name', $oldFullName)->update(['adviser_name' => $newFullName]);
+        Announcements::where('announcer', $oldFullName)->update(['announcer' => $newFullName]);
+    }
 
-   
-} else {
-    // Handle the case where the user with the initial professor email doesn't exist
-    return back()->with('error', 'User not found.');
-}
+    AuditLogger::log(
+        'Professor',
+        'update',
+        'Updated professor: ' . $oldFullName . ' → ' . $newFullName . ' (' . $oldEmail . ' → ' . $professor->email . ')',
+        $user->id ?? (Session::get('loginId') ?? null)
+    );
 
-// Redirect back with a success message
-return back()->with('success', 'Professor details and associated subjects updated successfully.');
-
+    // Redirect back with a success message
+    return back()->with('success', 'Professor details updated successfully.');
 }
 
 

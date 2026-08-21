@@ -301,11 +301,11 @@
                 <span>I accept the Terms of Use &amp; Privacy Policy</span>
             </div>
             <div class="terms-alert-notice" id="termsAlertNotice">
-                ⚠ Please check the box above before continuing.
+                <i class="fas fa-exclamation-circle me-1"></i> Please check the box above before continuing.
             </div>
         </div>
         <div class="terms-card-footer">
-            <a href="{{ url('/logout') }}" class="btn-terms-decline">Decline & Exit</a>
+            <a href="{{ url('/logout') }}" class="btn-terms-decline"><i class="fas fa-times me-1"></i> Decline & Exit</a>
             <div
                 id="btnTermsContinue"
                 role="button"
@@ -314,11 +314,11 @@
                 data-accept-url="{{ route('student.acceptTerms') }}"
                 data-csrf="{{ csrf_token() }}"
             >
-                ✓ Accept & Continue
+                <i class="fas fa-check me-1"></i> Accept & Continue
             </div>
         </div>
     </div>
 </div>
 
-<script src="{{ asset('js/terms-modal.js') }}"></script>
+<script src="{{ vasset('js/terms-modal.js') }}"></script>
 @endif

@@ -78,11 +78,6 @@ class User extends Authenticatable
             return true;
         }
 
-        // 3. Fallback to updated_at if last_activity_at column is empty or unmigrated
-        if ($this->updated_at && $this->updated_at->greaterThanOrEqualTo(now()->subDays($inactivityDays))) {
-            return true;
-        }
-
         return false;
     }
 

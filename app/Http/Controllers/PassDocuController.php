@@ -597,17 +597,23 @@ public function fileReqCreate(Request $request){
     }
 }
 
-public function removeFile($id)
+    public function removeFile($id)
     {
         $sessionCheck = $this->requireStudentSession();
 
         if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized session.'], 401);
+            }
             return $sessionCheck;
         }
 
         $data = FileRequirement::find($id);
 
         if (!$data) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'File not found.'], 404);
+            }
             return redirect()->back()->with('error', 'File not found.');
         }
 
@@ -619,6 +625,9 @@ public function removeFile($id)
         }
 
         if (!$isOwner) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You do not have permission to remove this file.'], 403);
+            }
             return redirect()->back()->with('error', 'You do not have permission to remove this file.');
         }
 
@@ -689,7 +698,15 @@ public function removeFile($id)
             ['id' => $data->id, 'fileName' => $data->fileName, 'file' => $data->file],
             null
         );
-        return redirect()->back();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Requirement removed successfully.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Requirement removed successfully.');
     }
 
     public function viewFile($id)

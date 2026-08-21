@@ -2,7 +2,12 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+
+if (!function_exists('vasset')) {
+    require_once app_path('Helpers/AssetHelper.php');
+}
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Blade::directive('vasset', function ($expression) {
+            return "<?php echo vasset($expression); ?>";
+        });
     }
 }

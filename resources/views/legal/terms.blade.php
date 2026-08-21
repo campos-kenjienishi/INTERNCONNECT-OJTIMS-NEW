@@ -9,62 +9,8 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        /* Top bar / title */
-        .topbar {
-            background-color: #8B0000;
-            color: #FFD700;
-            padding: 20px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* Content container */
-        .content-container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            overflow-y: auto;
-            line-height: 1.6;
-        }
-
-        h1 {
-            color: #8B0000;
-            margin-bottom: 20px;
-        }
-
-        p, ol, ul {
-            margin-bottom: 15px;
-        }
-
-        ol {
-            padding-left: 20px;
-        }
-
-        li {
-            margin-bottom: 10px;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin: 40px 0;
-            color: #666;
-            font-size: 14px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ vasset('css/pages/legal.css') }}">
+</head>
 </head>
 <body>
 

@@ -636,8 +636,13 @@ public function StuList()
             $schoolYearLabel = trim((string) $linkedMoa->school_year);
         }
     
-        // Find the professor associated with the logged-in user's adviser_name
-        $professor = Professor::where('full_name', $student->adviser_name)->first();
+        $adviserName = !empty($student->adviser_name)
+            ? $student->adviser_name
+            : ($studentProfile && !empty($studentProfile->adviser_name) ? $studentProfile->adviser_name : null);
+        $student->adviser_name = $adviserName;
+
+        // Find the professor associated with the student's adviser_name
+        $professor = !empty($adviserName) ? Professor::where('full_name', $adviserName)->first() : null;
     
         // Clear subject data array for each student
         $subjectData = [];

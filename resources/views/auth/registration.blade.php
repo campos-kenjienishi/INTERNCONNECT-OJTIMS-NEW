@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" style="background: #3b0000;">
 <head>
     <meta charset="UTF-8">
@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/login-responsive.css') }}?v={{ time() }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -207,7 +207,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/registration-responsive.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/registration-responsive.css') }}">
 
     <style>
         body.auth-centered-page .login-container {
@@ -1522,6 +1522,6 @@
         }
     });
 </script>
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

@@ -14,7 +14,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/forgotpassword-responsive.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/forgotpassword-responsive.css') }}">
+
+    <style>
+    <link rel="stylesheet" href="{{ vasset('css/pages/auth-forgot.css') }}">
+</head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InternConnect - Reset Password</title>
+    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/forgotpassword-responsive.css') }}">
 
     <style>
         body.auth-centered-page .login-container {
@@ -224,6 +238,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url('/frontend/js/script.js') }}"></script>
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

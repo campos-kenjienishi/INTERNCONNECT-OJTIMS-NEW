@@ -13,96 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
-    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}">
-
-    <style>
-        body.auth-centered-page .login-container {
-            max-width: 520px;
-            min-height: auto;
-        }
-
-        body.auth-centered-page .right-panel {
-            width: 100%;
-            padding: 40px 32px;
-            text-align: center;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .spinner-wrapper {
-            margin: 30px 0;
-        }
-
-        .custom-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #ef4444;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .status-title {
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .status-desc {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-
-        .error-box {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
-            color: #fca5a5;
-            font-size: 14px;
-        }
-
-        .btn-retry {
-            background: #800000;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            margin-right: 8px;
-            display: inline-block;
-        }
-
-        .btn-retry:hover {
-            background: #a00000;
-            color: white;
-        }
-
-        .btn-fallback {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-block;
-        }
-
-        .btn-fallback:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/pages/auth-idp-transition.css') }}">
 </head>
 
 <body class="auth-centered-page">
@@ -135,13 +47,16 @@
                 <div class="status-desc">Please wait while we redirect you to the central authentication service.</div>
 
                 <script>
-                    setTimeout(function() {
-                        window.location.href = "{{ route('idp.redirect') }}";
-                    }, 800);
+                    window.authIdpConfig = {
+                        redirectUrl: @json(route('idp.redirect'))
+                    };
                 </script>
+                <script src="{{ vasset('js/pages/auth-idp-transition.js') }}"></script>
             @endif
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

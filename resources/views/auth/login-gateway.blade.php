@@ -14,8 +14,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ url('/css/dashboard-global.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('css/login-responsive.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/pages/auth-login-gateway.css') }}">
+</head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InternConnect - Welcome Portal</title>
+    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/login-responsive.css') }}?v={{ time() }}">
 
     <style>
         /* Back to Portal Pill Button */
@@ -462,48 +473,13 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function selectPortal(portal) {
-        document.getElementById('stepPortalSelect').style.display = 'none';
-        document.getElementById('stepMethodSelect').style.display = 'block';
-        var topBack = document.getElementById('topBackBtnWrap');
-        if (topBack) topBack.style.display = 'block';
-
-        var badgeText = document.getElementById('portalBadgeText');
-        var badgeIcon = document.getElementById('portalBadgeIcon');
-        var btnIdp = document.getElementById('btnIdpLogin');
-        var btnLocal = document.getElementById('btnLocalLogin');
-
-        if (portal === 'faculty') {
-            badgeText.textContent = 'FACULTY & STAFF PORTAL';
-            badgeIcon.className = 'fa fa-user-shield';
-            btnIdp.href = "{{ route('login.external') }}?portal=faculty";
-            btnLocal.href = "{{ route('login') }}?portal=faculty";
-        } else {
-            badgeText.textContent = 'STUDENT PORTAL';
-            badgeIcon.className = 'fa fa-graduation-cap';
-            btnIdp.href = "{{ route('login.external') }}?portal=student";
-            btnLocal.href = "{{ route('login') }}?portal=student";
-        }
-    }
-
-    function resetPortalSelection() {
-        document.getElementById('stepMethodSelect').style.display = 'none';
-        document.getElementById('stepPortalSelect').style.display = 'block';
-        var topBack = document.getElementById('topBackBtnWrap');
-        if (topBack) topBack.style.display = 'none';
-    }
-
-    // Auto-open portal if requested via query parameter
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const portalParam = urlParams.get('portal');
-        if (portalParam === 'faculty' || portalParam === 'student') {
-            selectPortal(portalParam);
-        }
-    });
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+        window.authGatewayConfig = {
+            idpLoginUrl: @json(route('login.external')),
+            localLoginUrl: @json(route('login'))
+        };
+    </script>
+    <script src="{{ vasset('js/pages/auth-login-gateway.js') }}"></script>
 </body>
 </html>

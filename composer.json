@@ -27,7 +27,8 @@
     },
     "autoload": {
         "files": [
-            "app/Helpers/VoucherHelper.php"
+            "app/Helpers/VoucherHelper.php",
+            "app/Helpers/AssetHelper.php"
         ],
         "psr-4": {
             "App\\": "app/",
