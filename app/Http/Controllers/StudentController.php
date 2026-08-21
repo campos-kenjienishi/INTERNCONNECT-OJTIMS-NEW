@@ -135,8 +135,17 @@ public function home()
     // GET COMPANIES
     $companies = Company::all();
 
-    // GET FILE COUNT
-    $fileCount = UploadedFile::count();
+    // GET FILE COUNT — mirrors the fileSee() filter so the count matches what the student actually sees
+    if (\Illuminate\Support\Facades\Schema::hasColumn('uploaded_files', 'class_id')) {
+        $fileCount = UploadedFile::where(function ($q) {
+                $q->whereNull('class_id')->orWhere('class_id', 0);
+            })
+            ->where('name', '!=', '')
+            ->whereNotNull('name')
+            ->count();
+    } else {
+        $fileCount = UploadedFile::where('name', '!=', '')->whereNotNull('name')->count();
+    }
 
     $announcements = $this->visibleAnnouncementsForStudent($data)->take(5);
 

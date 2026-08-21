@@ -15,7 +15,6 @@
 
     <link rel="stylesheet" href="{{ vasset('css/student/file.css') }}">
 </head>
-    </head>
 
     <body>
 
@@ -176,12 +175,11 @@
                         $(document).ready(function () {
                         $('#fileTable').DataTable({
                             "order": [[2, 'desc']],
-                            "scrollX": true,
                             "autoWidth": false
                         });
                     });
                     </script>
-                    <div style="overflow: visible;">
+                    <div style="overflow-x: auto; width: 100%;">
                       <table id="fileTable" class="display" style="width:100%">
                         <thead>
                             <tr>

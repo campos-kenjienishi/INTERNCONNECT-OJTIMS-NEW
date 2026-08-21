@@ -3,7 +3,7 @@ $email = $_GET['email'] ?? '';
 ?>
 
 <!DOCTYPE html>
-<html lang="en" style="background: #3b0000;">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,10 +75,12 @@ $email = $_GET['email'] ?? '';
 
         <!-- RIGHT PANEL -->
         <div class="right-panel{{ Session::has('success') ? ' success-state' : '' }}">
-            <!-- Floating shield icon -->
-            <div class="shield-icon-wrap">
-                <div class="shield-circle">
-                    <i class="fa fa-shield-alt"></i>
+            
+            <div class="auth-brand">
+                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
+                <div class="auth-brand-copy">
+                    <div class="brand-name">Intern<span>Connect</span> - BETA</div>
+                    <div class="system-title">On-The-Job Training Information Management System</div>
                 </div>
             </div>
 
@@ -91,7 +93,7 @@ $email = $_GET['email'] ?? '';
 
                     <div class="alert alert-success">{{ Session::get('success') }}</div>
                     <div class="btn-wrap">
-                        <a href="{{ url('/login') }}" class="btn-reset" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                        <a href="{{ url('/login') }}" class="btn-reset">
                             <i class="fa fa-arrow-right me-2"></i> Proceed to Login
                         </a>
                     </div>
@@ -105,21 +107,48 @@ $email = $_GET['email'] ?? '';
                 <form action="{{ url('/reset-password') }}?email={{ $email }}" method="post">
                     @csrf
 
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle me-1"></i>
+                            @foreach($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                    @endif
+
                     @if(Session::has('fail'))
-                        <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle me-1"></i> {{ Session::get('fail') }}
+                        </div>
                     @endif
 
                     <!-- New Password -->
-                    <div class="field-group">
+                    <div class="field-group" style="position: relative;">
                         <label class="form-label">New Password</label>
                         <div class="input-wrap">
                             <i class="fa fa-lock i-icon"></i>
-                            <input type="password" placeholder="Enter new password" name="password" id="new_password">
+                            <input type="password" placeholder="Enter new password" name="password" id="new_password" autocomplete="new-password">
                             <i class="far fa-eye toggle-pw" id="toggleNewPassword"></i>
                         </div>
-                        <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
-                            <strong>Password requirements:</strong> Use at least 8 characters with uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.
+
+                        <!-- Interactive Speech Bubble Warning & Checklist -->
+                        <div class="password-bubble" id="passwordBubble">
+                            <div class="bubble-arrow"></div>
+                            <div class="bubble-header">
+                                <i class="fa fa-shield-alt"></i> Password Requirements
+                            </div>
+                            <div class="bubble-warning" id="bubbleWarning" style="display: none;">
+                                <i class="fa fa-exclamation-circle"></i> Please fulfill all criteria below:
+                            </div>
+                            <ul class="bubble-checklist">
+                                <li id="req-length"><i class="fa fa-circle"></i> At least 8 characters</li>
+                                <li id="req-upper"><i class="fa fa-circle"></i> At least one uppercase letter (A-Z)</li>
+                                <li id="req-lower"><i class="fa fa-circle"></i> At least one lowercase letter (a-z)</li>
+                                <li id="req-num"><i class="fa fa-circle"></i> At least one number (0-9)</li>
+                                <li id="req-sym"><i class="fa fa-circle"></i> One symbol: ! @ # $ % ^ & *</li>
+                            </ul>
                         </div>
+
                         <!-- Strength bar -->
                         <div class="strength-wrap">
                             <div class="strength-bar-bg">
@@ -130,12 +159,16 @@ $email = $_GET['email'] ?? '';
                     </div>
 
                     <!-- Confirm Password -->
-                    <div class="field-group">
+                    <div class="field-group" style="position: relative;">
                         <label class="form-label">Confirm Password</label>
                         <div class="input-wrap">
                             <i class="fa fa-lock i-icon"></i>
-                            <input type="password" placeholder="Confirm new password" name="confirm_password" id="confirm_password">
+                            <input type="password" placeholder="Confirm new password" name="confirm_password" id="confirm_password" autocomplete="new-password">
                             <i class="far fa-eye toggle-pw" id="toggleConfirmPassword"></i>
+                        </div>
+                        <div class="confirm-bubble" id="confirmBubble" style="display: none;">
+                            <div class="bubble-arrow"></div>
+                            <i class="fa fa-exclamation-triangle me-1"></i> Passwords do not match
                         </div>
                         <div class="match-indicator" id="matchIndicator">
                             <i class="fa fa-check-circle"></i>

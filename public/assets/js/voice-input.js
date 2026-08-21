@@ -37,11 +37,11 @@
 <style>
 .voice-guide-btn {
     position: fixed;
-    bottom: 110px;
-    right: 32px;
+    bottom: 20px;
+    right: 88px;
     z-index: 1200;
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: #fff;
     color: #7f0000;
@@ -49,7 +49,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 16px;
     cursor: pointer;
     border: 2px solid #7f0000;
     transition: background 0.2s, color 0.2s;
@@ -63,7 +63,7 @@ body.swal2-shown .voice-mic-button {
     display: none !important;
 }
 @media (max-width: 600px) {
-    .voice-guide-btn { right: 12px; bottom: 90px; }
+    .voice-guide-btn { right: 80px; bottom: 16px; }
 }
 .voice-guide-modal {
     position: fixed;
