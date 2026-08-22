@@ -447,7 +447,7 @@
     <script>
     window.studentAccountConfig = {
         initialEndYear: @json((string) ($data->school_year_end ?? '')),
-        syncGuidanceUrl: @json(route('student.syncGuidance')) ($data->school_year_end ?? ''))
+        syncGuidanceUrl: @json(route('student.syncGuidance'))
     };
 </script>
     <script src="{{ vasset('js/student/account.js') }}"></script>

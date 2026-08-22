@@ -14,9 +14,9 @@ class GuidanceApiService
 
     public function __construct()
     {
-        $this->baseUrl = rtrim(config('services.guisis.base_url', 'https://api-guisis.dllbsit2027.com/api/v1'), '/');
-        $this->clientId = config('services.guisis.client_id', env('GUISIS_CLIENT_ID', '40284c44-2d44-42ce-88bc-b4e5cc9e8be7'));
-        $this->clientSecret = config('services.guisis.client_secret', env('GUISIS_CLIENT_SECRET', '6f99e1b82ddb71d40b5f5dc30d7ef8e755455982c2bbb92ba68322278adf05fa'));
+        $this->baseUrl = rtrim(config('services.guisis.base_url') ?: env('GUISIS_BASE_URL', 'https://api-guisis.dllbsit2027.com/api/v1'), '/');
+        $this->clientId = config('services.guisis.client_id') ?: env('GUISIS_CLIENT_ID', '40284c44-2d44-42ce-88bc-b4e5cc9e8be7');
+        $this->clientSecret = config('services.guisis.client_secret') ?: env('GUISIS_CLIENT_SECRET', '6f99e1b82ddb71d40b5f5dc30d7ef8e755455982c2bbb92ba68322278adf05fa');
     }
 
     /**

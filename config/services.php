@@ -67,8 +67,8 @@ return [
     'guisis' => [
         'base_url' => env('GUISIS_BASE_URL', 'https://api-guisis.dllbsit2027.com/api/v1'),
         'api_key' => env('GUISIS_API_KEY', ''),
-        'client_id' => env('GUISIS_CLIENT_ID', ''),
-        'client_secret' => env('GUISIS_CLIENT_SECRET', ''),
+        'client_id' => env('GUISIS_CLIENT_ID', '40284c44-2d44-42ce-88bc-b4e5cc9e8be7'),
+        'client_secret' => env('GUISIS_CLIENT_SECRET', '6f99e1b82ddb71d40b5f5dc30d7ef8e755455982c2bbb92ba68322278adf05fa'),
     ],
 
     'flss' => [
