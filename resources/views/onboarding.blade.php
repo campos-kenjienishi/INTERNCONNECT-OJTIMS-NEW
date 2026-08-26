@@ -66,28 +66,28 @@
                         </div>
                         <div class="fields-grid">
                             <div class="field-group span-3">
-                                <label class="form-label">First Name</label>
+                                <label class="form-label">First Name <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" class="form-control" value="{{ $idp['first_name'] ?? '' }}" disabled>
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Middle Name</label>
+                                <label class="form-label">Middle Name <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" class="form-control" value="{{ $idp['middle_name'] ?? '' }}" disabled>
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Last Name</label>
+                                <label class="form-label">Last Name <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" class="form-control" value="{{ $idp['last_name'] ?? '' }}" disabled>
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">E-mail Address</label>
+                                <label class="form-label">E-mail Address <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-envelope i-icon"></i>
                                     <input type="email" class="form-control" value="{{ $idp['email'] ?? '' }}" disabled>
@@ -116,14 +116,14 @@
                         @endphp
                         <div class="fields-grid">
                             <div class="field-group span-3">
-                                <label class="form-label">Student Number</label>
+                                <label class="form-label">Student Number <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-id-card i-icon"></i>
                                     <input type="text" name="studentNum" class="form-control" required placeholder="Enter student number" value="{{ old('studentNum', $fetchedStudentNum) }}">
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Semester</label>
+                                <label class="form-label">Semester <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-calendar i-icon"></i>
                                     <select name="semester" class="form-control" required>
@@ -135,7 +135,7 @@
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Academic Year <small style="color: #fca5a5; font-size: 11px;">(Auto-consecutive)</small></label>
+                                <label class="form-label">Academic Year <span style="color:#fca5a5;">*</span> <small style="color: #fca5a5; font-size: 11px;">(Auto-consecutive)</small></label>
                                 <div class="year-row d-flex gap-2 align-items-center">
                                     <div class="input-wrap has-select flex-grow-1">
                                         <i class="fa fa-calendar-alt i-icon"></i>
@@ -161,14 +161,14 @@
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Year and Section</label>
+                                <label class="form-label">Year and Section <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-users i-icon"></i>
                                     <input type="text" name="year_and_section" class="form-control" required placeholder="e.g. 4-1" value="{{ old('year_and_section', $fetchedYearSection) }}">
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Course</label>
+                                <label class="form-label">Course <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-university i-icon"></i>
                                     <select name="course" class="form-control" required>
@@ -179,7 +179,7 @@
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Professor</label>
+                                <label class="form-label">Professor <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-chalkboard-teacher i-icon"></i>
                                     <select name="adviser_name" class="form-control" required>

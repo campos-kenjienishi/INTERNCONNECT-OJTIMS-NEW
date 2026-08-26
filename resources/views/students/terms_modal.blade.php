@@ -305,7 +305,7 @@
             </div>
         </div>
         <div class="terms-card-footer">
-            <a href="{{ url('/logout') }}" class="btn-terms-decline"><i class="fas fa-times me-1"></i> Decline & Exit</a>
+            <a href="{{ url('/logout') }}" class="btn-terms-decline">Decline &amp; Exit</a>
             <div
                 id="btnTermsContinue"
                 role="button"
@@ -314,7 +314,7 @@
                 data-accept-url="{{ route('student.acceptTerms') }}"
                 data-csrf="{{ csrf_token() }}"
             >
-                <i class="fas fa-check me-1"></i> Accept & Continue
+                Accept &amp; Continue
             </div>
         </div>
     </div>
