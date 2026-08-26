@@ -1,0 +1,509 @@
+/* ==========================================================================
+   Auth Registration Page Styles
+   Extracted from auth/registration.blade.php
+   ========================================================================== */
+
+        html {
+            background-color: #3b0000;
+        }
+
+        body {
+            background-color: #3b0000;
+            background-image: url('/images/20 Blur.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Back to Portal Pill Button */
+        .back-btn-pill,
+        .btn-switch-portal {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            color: #fca5a5 !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            padding: 6px 16px !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            transition: all 0.25s ease !important;
+            cursor: pointer !important;
+            line-height: 1.2 !important;
+            white-space: nowrap !important;
+        }
+
+        .back-btn-pill:hover,
+        .btn-switch-portal:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.18) !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            transform: translateY(-1px) !important;
+            text-decoration: none !important;
+        }
+
+        /* Select2 Dark Theme styling for registration */
+        .select2-container--default .select2-selection--single {
+            background-color: #3b0000 !important;
+            border: 1px solid #ddd7cb !important;
+            border-radius: 8px !important;
+            height: 44px !important;
+            padding: 6px 10px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #ffffff !important;
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 14px !important;
+            line-height: 28px !important;
+            padding-left: 28px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px !important;
+        }
+        .select2-dropdown {
+            background-color: #2b0000 !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+            z-index: 9999 !important;
+        }
+        .select2-search__field {
+            background-color: #1a0000 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .select2-results__option {
+            color: #ffffff !important;
+            font-size: 13.5px !important;
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+        }
+    </style>
+
+        /* Compact adjustments only for STEP 2 (Academic Information) */
+        #step2 .fields-grid { gap: 8px 12px; }
+        #step2 .field-group { margin-bottom: 8px; }
+        #step2 .form-label { margin-bottom: 6px; font-size: 13px; }
+        #step2 .input-wrap { margin-bottom: 6px; }
+        #step2 .input-wrap input,
+        #step2 .input-wrap select { padding: 10px 40px; font-size: 14px; }
+        #step2 .nav-btn-row { margin-top: 8px; gap: 8px; }
+
+        #step1 .fields-grid {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 12px 14px;
+            align-items: start;
+        }
+
+        #step1 .field-group.compact .input-wrap input {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        #step1 .field-group.span-2 {
+            grid-column: span 2;
+        }
+
+        #step1 .field-group.span-3 {
+            grid-column: span 3;
+        }
+
+        #step1 .field-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .input-wrap.has-bubble {
+            overflow: visible;
+        }
+
+        .field-bubble {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: calc(100% + 8px);
+            z-index: 30;
+            padding: 8px 11px;
+            border-radius: 12px;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            color: #9a3412;
+            font-size: 11.5px;
+            line-height: 1.35;
+            box-shadow: 0 10px 24px rgba(59, 0, 0, 0.18);
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            pointer-events: none;
+        }
+
+        .field-bubble.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .field-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 22px;
+            width: 12px;
+            height: 12px;
+            background: #fff7ed;
+            border-bottom: 1px solid #fdba74;
+            border-right: 1px solid #fdba74;
+            transform: rotate(45deg);
+        }
+
+        @media (max-width: 1023px) {
+            #step1 .fields-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            #step1 .field-group.compact,
+            #step1 .field-group.span-2,
+            #step1 .field-group.span-3,
+            #step1 .field-group.full-width {
+                grid-column: auto;
+            }
+
+            #step1 .field-group.full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #step1 .fields-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #step1 .field-group.compact,
+            #step1 .field-group.span-2,
+            #step1 .field-group.span-3,
+            #step1 .field-group.full-width {
+                grid-column: 1;
+            }
+        }
+    </style>
+
+        body.auth-centered-page .login-container {
+            max-width: 940px;
+            min-height: auto;
+        }
+
+        body.auth-centered-page .login-container.success-state {
+            max-width: 640px;
+        }
+
+        body.auth-centered-page .left-panel {
+            display: none !important;
+        }
+
+        body.auth-centered-page .right-panel {
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 620px;
+            padding: 48px 42px;
+            justify-content: center;
+        }
+
+        body.auth-centered-page .right-panel.success-state {
+            min-height: auto;
+            padding: 36px 42px;
+            justify-content: center;
+        }
+
+        .success-compact {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .success-compact .reg-header {
+            margin-bottom: 0 !important;
+        }
+
+        .success-compact .reg-header h2 {
+            margin-bottom: 6px;
+        }
+
+        .success-compact .reg-header p {
+            margin-bottom: 0;
+        }
+
+        .success-compact .alert {
+            margin-bottom: 0;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .success-compact .nav-btn-row {
+            margin-top: 0 !important;
+        }
+
+        .auth-brand {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
+            gap: 14px;
+            margin-bottom: 22px;
+            justify-content: flex-start;
+        }
+
+        .auth-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
+        }
+
+        .auth-brand-copy .brand-name {
+            font-size: 24px;
+            margin-bottom: 2px;
+            text-align: left;
+        }
+
+        .auth-brand-copy .system-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Make step connector line wider between step 1 and 2 */
+        .step-line { max-width: 260px !important; }
+
+        /* Ensure registration form doesn't force a scroll — restore original spacing */
+        body.auth-centered-page .right-panel {
+            /* keep the original padding/min-height defined above */
+            overflow-y: visible !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input,
+        body.auth-centered-page .right-panel .input-wrap select {
+            background: #f7f4ee !important;
+            border: 1px solid #ddd7cb !important;
+            color: #3b0000 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input::placeholder {
+            color: #9a9080 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap input:focus,
+        body.auth-centered-page .right-panel .input-wrap select:focus {
+            background: #fffdf9 !important;
+            border-color: #cdbfa9 !important;
+        }
+
+        body.auth-centered-page .right-panel .input-wrap .i-icon {
+            color: #ef4444 !important;
+            z-index: 2;
+        }
+
+        @media (max-width: 767px) {
+            .auth-brand { flex-direction: column; align-items: center; text-align: center; }
+            body.auth-centered-page .right-panel {
+                min-height: auto;
+                padding: 40px 24px;
+            }
+
+            body.auth-centered-page .right-panel.success-state {
+                padding: 28px 20px;
+            }
+
+            .auth-logo {
+                width: 58px;
+                height: 58px;
+            }
+
+            .auth-brand-copy .brand-name {
+                font-size: 20px;
+            }
+        }
+    </style>
+
+        /* ── Step indicator ── */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 12px;
+        }
+
+        .step-dot {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #aaa;
+            transition: all 0.35s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-dot.active {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border-color: #dc2626;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(220,38,38,0.35);
+        }
+
+        .step-dot.done {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #16a34a;
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: #e0e0e0;
+            max-width: 80px;
+            transition: background 0.35s;
+        }
+
+        .step-line.done { background: #16a34a; }
+
+        .step-label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
+
+        .step-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #bbb;
+            text-align: center;
+            flex: 1;
+            transition: color 0.35s;
+        }
+
+        .step-label.active { color: #dc2626; }
+        .step-label.done   { color: #16a34a; }
+
+        /* ── Slide panels ── */
+        .form-steps-wrapper { overflow: hidden; position: relative; }
+
+        .form-step { display: none; animation: stepIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .form-step.active { display: block; }
+
+        @keyframes stepIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes stepBack {
+            from { opacity: 0; transform: translateX(-40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-step.going-back { animation: stepBack 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* ── Proceed button ── */
+        .btn-proceed {
+            flex: 1;
+            padding: 13px 0;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff !important;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer !important;
+            transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(220,38,38,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            z-index: 10;
+            pointer-events: all !important;
+            width: 100%;
+        }
+
+        .btn-proceed:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(220,38,38,0.4);
+            color: #fff !important;
+        }
+
+        /* ── Back step button ── */
+        .btn-back-step {
+            padding: 13px 20px;
+            background: #f5f5f5;
+            border: 1.5px solid #e5e5e5;
+            border-radius: 12px;
+            color: #555;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 10;
+            pointer-events: all !important;
+        }
+
+        .btn-back-step:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        /* ── Nav button row ── */
+        .nav-btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ── Fix overlay blocking clicks ── */
+        body::before,
+        body::after {
+            pointer-events: none !important;
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 2 !important;
+        }
+
+        #btnProceed,
+        .btn-proceed,
+        .btn-back-step {
+            position: relative !important;
+            z-index: 9999 !important;
+            pointer-events: all !important;
+        }
+
+    </style>

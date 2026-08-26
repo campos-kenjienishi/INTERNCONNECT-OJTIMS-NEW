@@ -1,0 +1,414 @@
+/* Professor Expired MOA Reports Scripts */
+
+    const cfg = window.professorMoaConfig || {};
+    window.aiReportContext = {
+        report_type: 'moa_report',
+        metrics: cfg.payload || {},
+        insight: cfg.insight || []
+    };
+
+    const aiReportContext = window.aiReportContext;
+
+    function renderAiAnswer(data) {
+        const answerBox = document.getElementById('aiAnswerBox');
+        const answerText = document.getElementById('aiAnswerText');
+        const answerSteps = document.getElementById('aiAnswerSteps');
+        const answerSource = document.getElementById('aiAnswerSource');
+
+        if (!answerBox || !answerText || !answerSteps || !answerSource) return;
+
+        answerText.textContent = data.answer || 'No answer was generated.';
+        answerSource.textContent = data.source === 'gemini' ? 'Gemini AI' : (data.source === 'openai' ? 'OpenAI' : 'Internal Insight');
+        answerSteps.innerHTML = '';
+        (data.next_steps || []).forEach(function (step) {
+            const li = document.createElement('li');
+            li.textContent = step;
+            answerSteps.appendChild(li);
+        });
+        answerBox.style.display = 'block';
+    }
+
+    function askReportAi(question) {
+        const status = document.getElementById('aiAskStatus');
+        const button = document.getElementById('askAiBtn');
+
+        if (!question.trim()) {
+            if (status) {
+                status.textContent = 'Type a question first.';
+                status.style.display = 'block';
+            }
+            return;
+        }
+
+        if (button) button.disabled = true;
+        if (status) {
+            status.textContent = 'Asking AI...';
+            status.style.display = 'block';
+        }
+
+        fetch((window.professorMoaConfig?.aiAskUrl || '/reports/ai/ask'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': (window.professorMoaConfig?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '')
+            },
+            body: JSON.stringify({
+                question: question,
+                report_type: aiReportContext.report_type,
+                metrics: aiReportContext.metrics,
+                insight: aiReportContext.insight
+            })
+        })
+            .then(function (response) {
+                if (!response.ok) throw new Error('AI request failed.');
+                return response.json();
+            })
+            .then(function (data) {
+                renderAiAnswer(data);
+                if (status) {
+                    status.textContent = data.source === 'fallback'
+                        ? ((data.availability && data.availability.message) ? data.availability.message + ' Internal answer shown.' : 'Gemini is unavailable or rate-limited. Internal answer shown; try again in a few minutes, or later if daily quota was reached.')
+                        : 'Answer generated.';
+                }
+            })
+            .catch(function () {
+                if (status) {
+                    status.textContent = 'AI could not answer right now. Please try again later.';
+                    status.style.display = 'block';
+                }
+            })
+            .finally(function () {
+                if (button) button.disabled = false;
+            });
+    }
+
+    document.querySelectorAll('.ai-quick-question').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const input = document.getElementById('aiQuestionInput');
+            const question = btn.getAttribute('data-question') || '';
+            if (input) input.value = question;
+            askReportAi(question);
+        });
+    });
+
+    const askAiBtn = document.getElementById('askAiBtn');
+    if (askAiBtn) {
+        askAiBtn.addEventListener('click', function () {
+            const input = document.getElementById('aiQuestionInput');
+            askReportAi(input ? input.value : '');
+        });
+    }
+
+    /* ── Sidebar toggle ── */
+    const sidebar     = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const menuToggle  = document.getElementById('menuToggle');
+    const overlay     = document.getElementById('sidebarOverlay');
+
+    menuToggle.addEventListener('click', function () {
+        const isMobile = window.innerWidth <= 900;
+        if (isMobile) {
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+    });
+    overlay.addEventListener('click', function () {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    });
+
+    /* ── DataTable ── */
+    $(document).ready(function () {
+        var table = $('#companyTable').DataTable({
+            // Default to newest records first
+            order: [[0, 'desc']], 
+            scrollX: true,
+            autoWidth: false,
+            columnDefs: [
+                { targets: 0, visible: false }, // Hide ID column
+                // Disable the sorting dropdown arrows on all visible columns
+                { targets: [1, 2, 3, 4, 5, 6, 7, 8], orderable: false } 
+            ]
+        });
+
+        // Add the custom Status Filter right next to "Show entries"
+        $('.dataTables_length').append(
+            '<label style="margin-left: 20px; font-weight: 500;">Filter Status: ' +
+            '<select id="statusFilter" class="custom-status-filter">' +
+            '<option value="">All MOAs</option>' +
+            '<option value="Active">Active</option>' +
+            '<option value="Expired">Expired</option>' +
+            '</select></label>'
+        );
+
+        // When the user picks "Active" or "Expired", filter the table
+        $('#statusFilter').on('change', function() {
+            table.column(7).search(this.value).draw();
+        });
+    });
+
+    /* ── Dynamic end-year options ── */
+    /* ══════════════════════════════════════════════
+       BUILD PRINT HTML  — branded MOA layout
+    ══════════════════════════════════════════════ */
+    function buildPrintHTML() {
+        const now      = new Date();
+        const dateStr  = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+        const timeStr  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+        const dt               = $('#companyTable').DataTable();
+        const currentPageNodes = dt.rows({ page: 'current' }).nodes();
+        const total            = currentPageNodes.length;
+        const pageInfo         = dt.page.info();
+        const pageNum          = pageInfo.page + 1;
+        const pageCount        = pageInfo.pages;
+
+        const sySelect = document.getElementById('school_year');
+        const syLabel  = sySelect && sySelect.value ? sySelect.value : 'All School Years';
+        const semester = document.getElementById('semester') ? document.getElementById('semester').value : '';
+        const course   = document.getElementById('courseSelect') ? document.getElementById('courseSelect').value : '—';
+
+        const campusName    = window.professorMoaConfig?.campusName || 'PUP Taguig Branch';
+        const campusCollege = window.professorMoaConfig?.campusCollege || 'College of Engineering and Technology';
+
+        let rowsHTML = '';
+        for (let i = 0; i < currentPageNodes.length; i++) {
+            const tr     = currentPageNodes[i];
+            const tds    = tr.querySelectorAll('td');
+            const rowNum = pageInfo.start + i + 1;
+            const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+
+            const getCompany = () => {
+                const cn = Array.from(tds).find(td => td.querySelector('.company-name-text'));
+                return cn ? cn.querySelector('.company-name-text').textContent.trim() : (tds[1] ? tds[1].textContent.trim() : '');
+            };
+            const getSY = () => {
+                const sy = Array.from(tds).find(td => td.querySelector('[class*="fa-calendar"]'));
+                return sy ? sy.textContent.trim() : (tds[6] ? tds[6].textContent.trim() : 'N/A');
+            };
+
+            const formatDateStr = (rawDate) => {
+                if (!rawDate) return '';
+                const parsed = new Date(rawDate);
+                if (isNaN(parsed.getTime())) return rawDate;
+                return parsed.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+            };
+
+            const companyName     = getCompany();
+            const natureOfBusiness = tr.getAttribute('data-nature-of-bus') || '';
+            const validityOfMoa    = getSY() === 'N/A' ? '' : getSY();
+            const dateNotarizedRaw = tr.getAttribute('data-date-notarized') || '';
+            const dateNotarized    = formatDateStr(dateNotarizedRaw);
+            const parsedValidity   = Date.parse(validityOfMoa);
+            const status           = !Number.isNaN(parsedValidity) && parsedValidity >= now.getTime() ? 'Active' : 'Expired';
+            const statusBadge      = status === 'Active'
+                ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Active</span>`
+                : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expired</span>`;
+
+            rowsHTML += `
+            <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
+                <td style="padding:7px 6px; font-size:9px; font-weight:700; color:#6b7280; text-align:center; vertical-align:top; border-right:1px solid #e5e7eb;">${rowNum}</td>
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${companyName}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${natureOfBusiness}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${validityOfMoa}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${dateNotarized}</td>
+                <td style="padding:7px 6px; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">${statusBadge}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top;"></td>
+            </tr>`;
+        }
+
+        return `
+        <div style="font-family:'Poppins',Arial,sans-serif; background:#fff;">
+
+            <!-- HEADER -->
+            <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
+                <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
+                <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
+                    <div style="width:50px; height:50px; background:rgba(255,255,255,0.18); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.25);">
+                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);">
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
+                        <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">OJT MOA MONITORING FORM</div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">${campusName}</div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
+                            <div style="font-size:18px; font-weight:800; color:#fff; line-height:1;">${total}</div>
+                            <div style="font-size:7.5px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; margin-top:1px;">Page Records</div>
+                        </div>
+                        <div style="font-size:8.5px; color:rgba(255,255,255,0.55); margin-top:4px; text-align:center;">Page ${pageNum} of ${pageCount}</div>
+                    </div>
+                </div>
+                <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
+            </div>
+
+            <!-- META ROW -->
+            <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">School Year:</span>
+                        <strong style="color:#111827;">${syLabel}</strong>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Course:</span>
+                        <strong style="color:#111827;">${course}</strong>
+                    </div>
+                    ${semester ? `
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Semester:</span>
+                        <strong style="color:#111827;">${semester}</strong>
+                    </div>` : ''}
+                    <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                        <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
+                        <span style="color:#6b7280;">Number of HTEs:</span>
+                        <strong style="color:#111827;">${total} &nbsp;<span style="color:#6b7280; font-weight:normal;">/ HTEs w/ NDA:</span> ______</strong>
+                    </div>
+                </div>
+                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
+            </div>
+
+            <!-- SECTION LABEL -->
+            <div style="padding:9px 22px 3px 22px;">
+                <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">MOA Monitoring Details — Page ${pageNum}</div>
+            </div>
+
+            <!-- DATA TABLE (Template columns: No., Company Name, Nature of Business, Validity of MOA, Date Notarized, Status, Remarks) -->
+            <div style="padding:4px 22px 0 22px;">
+                <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
+                    <colgroup>
+                        <col style="width:4%;">   <!-- No. -->
+                        <col style="width:26%;">  <!-- Company Name -->
+                        <col style="width:22%;">  <!-- Nature of Business -->
+                        <col style="width:14%;">  <!-- Validity of MOA -->
+                        <col style="width:14%;">  <!-- Date Notarized -->
+                        <col style="width:9%;">   <!-- Status -->
+                        <col style="width:11%;">  <!-- Remarks -->
+                    </colgroup>
+                    <thead>
+                        <tr style="background:#7f0000;">
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">NO.</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">COMPANY NAME</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">NATURE OF BUSINESS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">VALIDITY OF MOA</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">DATE NOTARIZED</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">STATUS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left;">REMARKS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHTML || `<tr><td colspan="7" style="text-align:center; padding:28px; color:#9ca3af; font-size:11px; font-style:italic; background:#fff;">No records found for the selected filters.</td></tr>`}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SUBMITTED BY SECTION -->
+            <div style="padding:22px 22px 10px 22px; font-size:11px;">
+                <div style="width:40%;">
+                    <div style="color:#4b5563; font-weight:600; text-transform:uppercase; font-size:9.5px; letter-spacing:0.5px;">Submitted by:</div>
+                    <div style="font-weight:800; color:#111827; margin-top:8px; font-size:11.5px;">${window.professorMoaConfig?.coordinatorName || 'OJT Coordinator'}</div>
+                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">OJT Coordinator</div>
+                </div>
+            </div>
+
+            <!-- REPORT DISCLAIMER -->
+            <div style="padding:10px 22px 12px 22px;">
+                <div style="border-top:1px dashed #d1d5db; padding-top:14px;">
+                    <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                        <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Disclaimer</div>
+                        <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">
+                            This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOCUMENT FOOTER -->
+            <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
+                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                </div>
+                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
+            </div>
+
+        </div>`;
+    }
+
+    /* ── Modal (single instance, no double-trigger) ── */
+    const previewModalEl = document.getElementById('printPreviewModal');
+    const previewModal   = new bootstrap.Modal(previewModalEl, { backdrop: 'static', keyboard: true });
+
+    document.getElementById('openPreviewBtn').addEventListener('click', function () {
+        document.getElementById('printPreviewContent').innerHTML = buildPrintHTML();
+        previewModal.show();
+    });
+
+    /* ── Print ── */
+    document.getElementById('doPrintBtn').addEventListener('click', function () {
+        // 1. Put the generated HTML into the hidden print wrapper on the main page
+        document.getElementById('print-area-wrapper').innerHTML = buildPrintHTML();
+        
+        // 2. Trigger the native browser print dialog
+        window.print();
+        
+        // 3. Clear the wrapper after printing to free memory
+        setTimeout(function() {
+            document.getElementById('print-area-wrapper').innerHTML = '';
+        }, 1000);
+    });
+
+    /* ── Send email (preserved from original) ── */
+    function sendEmail(course, userEmail) {
+        document.getElementById('sendEmailBtn') &&
+            (document.getElementById('sendEmailBtn').disabled = true);
+        $.ajax({
+            url: (window.professorMoaConfig?.sendEmailUrl || '/reportsExpired/send-email'),
+            method: 'POST',
+            data: { _token: (window.professorMoaConfig?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''), email: userEmail, course: course },
+            success:  function ()    { alert('Email sent successfully!'); },
+            error:    function (xhr) { console.error(xhr.responseText); },
+            complete: function ()    {
+                document.getElementById('sendEmailBtn') &&
+                    (document.getElementById('sendEmailBtn').disabled = false);
+            }
+        });
+    }
+
+    function printUploadedMoa(fileUrl) {
+        if (!fileUrl) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.src = fileUrl;
+
+        iframe.onload = function () {
+            try {
+                const pdfWindow = iframe.contentWindow;
+                pdfWindow.focus();
+                pdfWindow.print();
+            } catch (error) {
+                window.open(fileUrl, '_blank');
+            }
+
+            setTimeout(function () {
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+            }, 2000);
+        };
+
+        document.body.appendChild(iframe);
+    }

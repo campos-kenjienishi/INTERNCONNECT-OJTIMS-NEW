@@ -57,6 +57,7 @@ class JwtService {
         $algo   = config('auth.jwt.algo', 'HS256');
 
         try {
+            JWT::$leeway = 300;
             $payload = JWT::decode($token, new Key($secret, $algo));
         } catch (ExpiredException $e) {
             Log::warning('JWT callback: token expired', ['error' => $e->getMessage()]);

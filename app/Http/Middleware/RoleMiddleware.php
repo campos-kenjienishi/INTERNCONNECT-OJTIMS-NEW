@@ -35,6 +35,11 @@ class RoleMiddleware
             return response()->view('errors.something-went-wrong', ['statusCode' => 401], 401);
         }
 
+        // Role 1 (Coordinator) automatically inherits access to Role 2 (Professor) routes
+        if (in_array('2', $roles, true) && !in_array('1', $roles, true)) {
+            $roles[] = '1';
+        }
+
         if (!in_array((string) $user->role, $roles, true)) {
             return $this->redirectToDashboard($user);
         }

@@ -62,14 +62,62 @@ class PassDocuController extends Controller
             }, SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
     }
+    private function ensureDefaultBasicCategoriesForProfessor(Professor $professor): void
+    {
+        if (FileCategory::where('professor_id', $professor->id)->exists()) {
+            return;
+        }
+
+        $defaultNames = [
+            'Resume',
+            'Medical Clearance',
+            'Good Moral',
+            'Consent Form',
+            'Endorsement Letter',
+            'Acceptance Letter'
+        ];
+
+        foreach ($defaultNames as $name) {
+            FileCategory::create([
+                'fileName' => $name,
+                'phase' => 'basic',
+                'uploadedBy' => $professor->full_name ?? 'System',
+                'professor_id' => $professor->id,
+            ]);
+        }
+    }
 
     private function buildRequirementPhaseState(User $user, ?Student $student, ?Professor $professor): array
     {
+        if ($professor) {
+            $this->ensureDefaultBasicCategoriesForProfessor($professor);
+        }
+
         $fileCategories = $professor
             ? $this->sortCategoriesByPhaseAndName(
                 FileCategory::where('professor_id', $professor->id)->get()
             )
             : collect();
+
+        if ($fileCategories->isEmpty() && !$professor) {
+            $defaultBasicNames = [
+                'Resume',
+                'Medical Clearance',
+                'Good Moral',
+                'Consent Form',
+                'Endorsement Letter',
+                'Acceptance Letter'
+            ];
+
+            $fileCategories = collect($defaultBasicNames)->map(function ($name) {
+                $fc = new FileCategory();
+                $fc->id = 0;
+                $fc->fileName = $name;
+                $fc->phase = 'basic';
+                $fc->uploadedBy = 'System';
+                return $fc;
+            });
+        }
 
         $basicCategories = $fileCategories
             ->filter(fn ($category) => $this->normalizeRequirementPhase($category->phase ?? null) === 'basic')
@@ -101,7 +149,8 @@ class PassDocuController extends Controller
             ->reject(fn ($category) => $validSubmittedNames->contains(mb_strtolower(trim((string) $category->fileName))))
             ->values();
 
-        $hasSubmittedNotarizedMoa = $validSubmittedNames->contains(mb_strtolower('Notarized MOA'));
+        $isInhouseOjt = (bool) ($student?->is_inhouse_ojt ?? false);
+        $hasSubmittedNotarizedMoa = $isInhouseOjt || $validSubmittedNames->contains(mb_strtolower('Notarized MOA'));
         $otherRequirementsUnlocked = $missingBasicCategories->isEmpty() && $hasSubmittedNotarizedMoa;
 
         return [
@@ -114,6 +163,7 @@ class PassDocuController extends Controller
             'missingBasicCategories' => $missingBasicCategories,
             'hasSubmittedNotarizedMoa' => $hasSubmittedNotarizedMoa,
             'otherRequirementsUnlocked' => $otherRequirementsUnlocked,
+            'isInhouseOjt' => $isInhouseOjt,
         ];
     }
 
@@ -307,15 +357,17 @@ class PassDocuController extends Controller
     public function maintainFileCategory() {
         $data = [];
         $userName = '';
-        $sixMonthsAgo = Carbon::now()->subMonths(6);
 
         if (Session::has('loginId')) {
             $data = User::where('id', '=', Session::get('loginId'))->first();
-            $userName = $data->full_name;
+            $userName = $data->full_name ?? '';
         }
 
-        // Fetch only file categories created by this professor
         $professor = Professor::where('user_id', $data->id)->first();
+        if ($professor) {
+            $this->ensureDefaultBasicCategoriesForProfessor($professor);
+        }
+
         $files = $professor
             ? $this->sortCategoriesByPhaseAndName(
                 FileCategory::where('professor_id', $professor->id)->get()
@@ -332,13 +384,26 @@ class PassDocuController extends Controller
             'phase' => 'required|in:basic,other',
         ]);
 
-        $files = new FileCategory();
-        $files->fileName = $request->fileName;
-        $files->phase = $this->normalizeRequirementPhase($request->phase);
-        $files->uploadedBy = $request->uploadedBy;
-        // Attach professor_id
         $user = User::where('id', Session::get('loginId'))->first();
         $professor = Professor::where('user_id', $user->id)->first();
+        $trimmedName = trim((string)$request->fileName);
+
+        $existing = FileCategory::where(function($q) use ($professor) {
+                if ($professor) {
+                    $q->where('professor_id', $professor->id);
+                }
+            })
+            ->whereRaw('LOWER(TRIM(fileName)) = ?', [mb_strtolower($trimmedName)])
+            ->first();
+
+        if ($existing) {
+            return back()->with('fail', 'Requirement category "' . $trimmedName . '" is already listed.');
+        }
+
+        $files = new FileCategory();
+        $files->fileName = $trimmedName;
+        $files->phase = $this->normalizeRequirementPhase($request->phase);
+        $files->uploadedBy = $request->uploadedBy ?? ($user->full_name ?? 'System');
         $files->professor_id = $professor ? $professor->id : null;
         $res = $files->save();
 
@@ -351,7 +416,7 @@ class PassDocuController extends Controller
                 null,
                 ['fileName' => $files->fileName, 'phase' => $files->phase, 'uploadedBy' => $files->uploadedBy, 'professor_id' => $files->professor_id]
             );
-            return back()->with('success','You have added the course successfully!');
+            return back()->with('success','File category added successfully!');
         }
         else{
             return back()->with('fail','Oh no! Something went wrong.');
@@ -399,7 +464,17 @@ class PassDocuController extends Controller
             return redirect()->back()->with('error', 'File category not found.');
         }
 
-        $category->fileName = $request->fileName;
+        $trimmedName = trim((string)$request->fileName);
+        $existing = FileCategory::where('professor_id', $category->professor_id)
+            ->where('id', '!=', $id)
+            ->whereRaw('LOWER(TRIM(fileName)) = ?', [mb_strtolower($trimmedName)])
+            ->first();
+
+        if ($existing) {
+            return back()->with('fail', 'Requirement category "' . $trimmedName . '" is already listed.');
+        }
+
+        $category->fileName = $trimmedName;
         $category->phase = $this->normalizeRequirementPhase($request->phase);
         $category->save();
 
@@ -454,6 +529,12 @@ public function fileReqCreate(Request $request){
 
     $user = $sessionCheck;
     $student = Student::where('user_id', $user->id)->first();
+    $adviserName = trim((string) ($student->adviser_name ?? $user->adviser_name ?? ''));
+
+    if (empty($adviserName) || $adviserName === 'Not Assigned') {
+        return back()->with('fail', 'You must select/assign a professor under Class or Account settings before uploading requirements.');
+    }
+
     $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
     $phaseState = $this->buildRequirementPhaseState($user, $student, $professor);
 
@@ -499,6 +580,7 @@ public function fileReqCreate(Request $request){
     $res = $fileup->save();
 
     if($res){
+        $user->touchActivity();
         AuditLogger::log(
             'PassDocu',
             'Upload',
@@ -515,17 +597,23 @@ public function fileReqCreate(Request $request){
     }
 }
 
-public function removeFile($id)
+    public function removeFile($id)
     {
         $sessionCheck = $this->requireStudentSession();
 
         if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized session.'], 401);
+            }
             return $sessionCheck;
         }
 
         $data = FileRequirement::find($id);
 
         if (!$data) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'File not found.'], 404);
+            }
             return redirect()->back()->with('error', 'File not found.');
         }
 
@@ -537,6 +625,9 @@ public function removeFile($id)
         }
 
         if (!$isOwner) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You do not have permission to remove this file.'], 403);
+            }
             return redirect()->back()->with('error', 'You do not have permission to remove this file.');
         }
 
@@ -607,7 +698,15 @@ public function removeFile($id)
             ['id' => $data->id, 'fileName' => $data->fileName, 'file' => $data->file],
             null
         );
-        return redirect()->back();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Requirement removed successfully.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Requirement removed successfully.');
     }
 
     public function viewFile($id)
@@ -820,4 +919,258 @@ public function removeFile($id)
         }
     }
 
+    public function coordinatorStudentRequirements(Request $request)
+    {
+        $user = null;
+        if (Session::has('loginId')) {
+            $user = User::where('id', '=', Session::get('loginId'))->first();
+        }
+
+        if (!$user || (int)$user->role !== 1) {
+            return redirect('/login');
+        }
+
+        $selectedCourse = trim((string)$request->query('course', ''));
+        $selectedSchoolYear = trim((string)$request->query('school_year', ''));
+        $selectedProfessorId = trim((string)$request->query('professor_id', ''));
+        $selectedStatus = trim((string)$request->query('status', ''));
+        $search = trim((string)$request->query('search', ''));
+
+        $dbCourses = Courses::pluck('course')->filter()->map(fn($c) => trim((string)$c));
+        $studentCourses = Student::pluck('course')->filter()->map(fn($c) => trim((string)$c));
+        $courses = $dbCourses->merge($studentCourses)->unique()->sort()->values();
+
+        $professors = Professor::orderBy('full_name')->get();
+
+        $studentSchoolYears = Student::whereNotNull('school_year_start')
+            ->whereNotNull('school_year_end')
+            ->get()
+            ->map(fn($s) => trim($s->school_year_start . '-' . $s->school_year_end))
+            ->filter();
+
+        $classSchoolYears = Classes::whereNotNull('school_year_start')
+            ->whereNotNull('school_year_end')
+            ->get()
+            ->map(fn($c) => trim($c->school_year_start . '-' . $c->school_year_end))
+            ->filter();
+
+        $schoolYears = $studentSchoolYears
+            ->merge($classSchoolYears)
+            ->merge(['2026-2027', '2025-2026', '2024-2025'])
+            ->unique()
+            ->sortDesc()
+            ->values();
+
+        $query = Student::with(['user', 'companies'])
+            ->orderBy('school_year_end', 'desc')
+            ->orderBy('school_year_start', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
+
+        if ($selectedCourse !== '') {
+            $query->where('course', $selectedCourse);
+        }
+
+        if ($selectedSchoolYear !== '') {
+            if (str_contains($selectedSchoolYear, '-')) {
+                [$syStart, $syEnd] = explode('-', $selectedSchoolYear, 2);
+                $query->where(function ($q) use ($syStart, $syEnd) {
+                    $q->where(function ($sub) use ($syStart, $syEnd) {
+                        $sub->where('school_year_start', trim($syStart))
+                            ->where('school_year_end', trim($syEnd));
+                    });
+                });
+            }
+        }
+
+        if ($selectedProfessorId !== '') {
+            $prof = Professor::find($selectedProfessorId);
+            if ($prof && !empty($prof->full_name)) {
+                $query->where('adviser_name', $prof->full_name);
+            }
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('studentNum', 'like', '%' . $search . '%')
+                    ->orWhere('year_and_section', 'like', '%' . $search . '%')
+                    ->orWhere('course', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('full_name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        $students = $query->get();
+
+        $userIds = $students->pluck('user_id')->filter()->toArray();
+        $userNames = $students->pluck('full_name')->filter()->toArray();
+
+        $allRequirements = FileRequirement::where(function ($q) use ($userIds, $userNames) {
+            if (!empty($userIds)) {
+                $q->whereIn('uploader_user_id', $userIds);
+            }
+            if (!empty($userNames)) {
+                $q->orWhereIn('uploadedBy', $userNames);
+            }
+        })->get();
+
+        $studentMatrix = $students->map(function ($student) use ($allRequirements) {
+            $studentUser = $student->user;
+            $professor = !empty($student->adviser_name) && $student->adviser_name !== 'Not Yet Listed'
+                ? Professor::where('full_name', $student->adviser_name)->first()
+                : null;
+
+            $phaseState = $this->buildRequirementPhaseState($studentUser ?: new User(), $student, $professor);
+
+            $studentCategoryNames = $phaseState['basicCategories']
+                ->pluck('fileName')
+                ->filter()
+                ->map(fn($n) => trim((string)$n))
+                ->unique();
+
+            if (!$studentCategoryNames->contains('Notarized MOA')) {
+                $studentCategoryNames->prepend('Notarized MOA');
+            }
+
+            $categoryList = $studentCategoryNames->values();
+
+            $userReqs = $allRequirements->filter(function ($req) use ($student, $studentUser) {
+                if (!empty($req->uploader_user_id) && $studentUser) {
+                    return (int)$req->uploader_user_id === (int)$studentUser->id;
+                }
+                return !empty($student->full_name) && $req->uploadedBy === $student->full_name;
+            });
+
+            $categoriesState = [];
+            $submittedCount = 0;
+            $missingCount = 0;
+
+            foreach ($categoryList as $catName) {
+                $matchingReq = $userReqs->first(function ($r) use ($catName) {
+                    return mb_strtolower(trim((string)$r->fileName)) === mb_strtolower(trim((string)$catName));
+                });
+
+                if ($matchingReq) {
+                    $submittedCount++;
+                    $categoriesState[$catName] = [
+                        'submitted' => true,
+                        'status' => (int)($matchingReq->status ?? 0),
+                        'file_id' => $matchingReq->id,
+                        'file_name' => $matchingReq->file,
+                        'denial_reason' => $matchingReq->denial_reason ?? null,
+                    ];
+                } elseif (mb_strtolower(trim((string)$catName)) === 'notarized moa' && (bool)($student->is_inhouse_ojt ?? false)) {
+                    $submittedCount++;
+                    $categoriesState[$catName] = [
+                        'submitted' => true,
+                        'status' => 1,
+                        'file_id' => null,
+                        'file_name' => 'Waived via School In-House OJT',
+                        'denial_reason' => null,
+                        'is_inhouse_waived' => true,
+                    ];
+                } else {
+                    $missingCount++;
+                    $categoriesState[$catName] = [
+                        'submitted' => false,
+                        'status' => -1,
+                        'file_id' => null,
+                        'file_name' => null,
+                        'denial_reason' => null,
+                    ];
+                }
+            }
+
+            $totalCategories = count($categoryList);
+            $isFullySubmitted = ($totalCategories > 0 && $submittedCount >= $totalCategories);
+
+            return [
+                'student' => $student,
+                'user' => $studentUser,
+                'categories' => $categoriesState,
+                'category_list' => $categoryList,
+                'total_categories' => $totalCategories,
+                'submitted_count' => $submittedCount,
+                'missing_count' => $missingCount,
+                'is_fully_submitted' => $isFullySubmitted,
+                'all_files' => $userReqs->values(),
+            ];
+        });
+
+        if ($selectedStatus !== '') {
+            $studentMatrix = $studentMatrix->filter(function ($item) use ($selectedStatus) {
+                if ($selectedStatus === 'completed' || $selectedStatus === 'complete') return $item['is_fully_submitted'];
+                if ($selectedStatus === 'incomplete') return !$item['is_fully_submitted'];
+                return true;
+            })->values();
+        }
+
+        $totalStudentsTracked = count($studentMatrix);
+        $fullySubmittedCount = $studentMatrix->filter(fn($i) => $i['is_fully_submitted'])->count();
+        $incompleteCount = $studentMatrix->filter(fn($i) => !$i['is_fully_submitted'])->count();
+        $totalFilesSubmitted = $allRequirements->count();
+
+        return view('ojtCoordinator.studentRequirements', compact(
+            'user',
+            'courses',
+            'schoolYears',
+            'professors',
+            'studentMatrix',
+            'selectedCourse',
+            'selectedSchoolYear',
+            'selectedProfessorId',
+            'selectedStatus',
+            'search',
+            'totalStudentsTracked',
+            'fullySubmittedCount',
+            'incompleteCount',
+            'totalFilesSubmitted'
+        ));
+    }
+
+    public function coordinatorViewRequirement($id)
+    {
+        $fileRequirement = FileRequirement::findOrFail($id);
+        $filePath = public_path('assets/' . $fileRequirement->file);
+
+        if (!file_exists($filePath)) {
+            return back()->with('error', 'File not found on server.');
+        }
+
+        return response()->file($filePath);
+    }
+
+    public function coordinatorDownloadRequirement($id)
+    {
+        $fileRequirement = FileRequirement::findOrFail($id);
+        $filePath = public_path('assets/' . $fileRequirement->file);
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $fileRequirement->file);
+        }
+
+        return back()->with('error', 'File not found on server.');
+    }
+
+    public function toggleStudentInhouse(Request $request, $id)
+    {
+        $student = Student::find($id);
+        if (!$student) {
+            return redirect()->back()->with('error', 'Student not found.');
+        }
+
+        $targetStatus = $request->has('is_inhouse') ? (bool) $request->input('is_inhouse') : !$student->is_inhouse_ojt;
+        $student->is_inhouse_ojt = $targetStatus;
+        $student->save();
+
+        AuditLogger::log(
+            'MOA Mode',
+            'Coordinator Toggle In-House OJT',
+            ($targetStatus ? 'Coordinator granted School In-House OJT waiver for student: ' : 'Coordinator revoked In-House OJT status for student: ') . ($student->full_name ?? 'ID ' . $student->id),
+            Session::get('loginId') ?? null
+        );
+
+        return redirect()->back()->with('success', 'Student In-House OJT status updated successfully.');
+    }
 }

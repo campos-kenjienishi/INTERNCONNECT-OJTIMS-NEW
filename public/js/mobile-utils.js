@@ -262,18 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('orientationchange', updateHeight);
     };
 
-    // =============== PREVENT ZOOM ON DOUBLE TAP ===============
-    const preventDoubleTabZoom = () => {
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(event) {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-    };
-
     // =============== INITIALIZE ALL ===============
     const initialize = () => {
         if (window.innerWidth < 768) {
@@ -285,7 +273,6 @@ document.addEventListener('DOMContentLoaded', function() {
             initMobileDropdowns();
             initNumberInputs();
             initViewportHeightFix();
-            preventDoubleTabZoom();
 
             // Expose notification function globally
             window.showMobileNotification = showMobileNotification;

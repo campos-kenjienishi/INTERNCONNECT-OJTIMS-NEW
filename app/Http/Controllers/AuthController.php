@@ -27,13 +27,482 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
+use App\Services\GuidanceApiService;
+use App\Services\SyncFacultyFromFlss;
+use App\Services\SyncUsersFromIdp;
+use App\Services\SyncStudentsUnified;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Helpers\AuditLogger;
 use App\Services\ReportAiInsightService;
+use App\Services\IdpService;
+use App\Services\FacultyApiService;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    protected IdpService $idpService;
+
+    public function __construct(IdpService $idpService)
+    {
+        $this->idpService = $idpService;
+    }
+
+    public function loginGateway(Request $request)
+    {
+        $portal = $request->query('portal');
+        if ($portal && in_array($portal, ['student', 'faculty'], true)) {
+            Session::put('target_login_portal', $portal);
+        }
+
+        if (config('services.idp.enabled')) {
+            return view('auth.login-gateway');
+        }
+
+        return view('auth.login');
+    }
+
+    public function showIdpTransition()
+    {
+        if (!$this->idpService->isReachable()) {
+            return view('auth.idp-transition', [
+                'error' => 'Unable to connect to Identity Provider. The service may be offline or unreachable.'
+            ]);
+        }
+
+        return view('auth.idp-transition');
+    }
+
+    public function redirectToIdp(Request $request)
+    {
+        $portal = $request->query('portal');
+        if ($portal && in_array($portal, ['student', 'faculty'], true)) {
+            Session::put('target_login_portal', $portal);
+        }
+
+        return redirect()->away($this->idpService->getAuthorizeUrl());
+    }
+
+    public function handleIdpCallback(Request $request, FacultyApiService $flssApi)
+    {
+        $code = $request->query('code');
+
+        if (!$code) {
+            return view('auth.idp-transition', [
+                'error' => 'Authorization code was not provided by Identity Provider.'
+            ]);
+        }
+
+        try {
+            // 1. Exchange code for tokens
+            $tokens = $this->idpService->exchangeCode($code);
+            $accessToken = $tokens['access_token'] ?? null;
+
+            if (!$accessToken) {
+                throw new \RuntimeException('No access token received from Identity Provider.');
+            }
+
+            // 2. Validate token structure & signature via JWKS
+            $this->idpService->validateToken($accessToken);
+
+            // 3. Get User Profile from IdP
+            $idpUser = $this->idpService->getUserInfo($accessToken);
+            $idpUserId = $idpUser['id'] ?? null;
+            $email = $idpUser['email'] ?? null;
+
+            if (!$idpUserId || !$email) {
+                throw new \RuntimeException('Incomplete user profile received from Identity Provider.');
+            }
+
+            // Store IdP access token in session and cache for admin sync requests
+            Session::put('idp_access_token', $accessToken);
+            Cache::put('idp_admin_access_token', $accessToken, now()->addMinutes(55));
+
+            // 4. Find local user by idp_user_id or email
+            $user = User::findByIdpId($idpUserId);
+
+            if (!$user) {
+                $user = User::where('email', $email)->first();
+            }
+
+            // Fallback: match by multi-tier name/initial matching if student updated email to official PUP webmail
+            if (!$user && !empty($idpUser['first_name']) && !empty($idpUser['last_name'])) {
+                $idpFirst = strtolower(trim($idpUser['first_name']));
+                $idpLast  = strtolower(trim($idpUser['last_name']));
+                $idpNormFull = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $idpFirst . $idpLast));
+                $idpNormLast = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $idpLast));
+                $idpFirstTokens = preg_split('/\s+/', $idpFirst);
+                $idpInitials = implode('', array_map(fn($t) => substr($t, 0, 1), $idpFirstTokens));
+
+                $candidates = [];
+                $candidateStudents = User::where('role', 0)->get();
+
+                foreach ($candidateStudents as $cand) {
+                    $cFirst = strtolower(trim($cand->first_name ?? ''));
+                    $cLast  = strtolower(trim($cand->last_name ?? ''));
+                    if (empty($cLast)) continue;
+
+                    $cNormFull = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $cFirst . $cLast));
+                    $cNormLast = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $cLast));
+
+                    // Exact full name match
+                    if ($cNormFull === $idpNormFull) {
+                        $user = $cand;
+                        break;
+                    }
+
+                    // Must have matching last name (allowing at most 1 typo)
+                    if ($cNormLast !== $idpNormLast && levenshtein($cNormLast, $idpNormLast) > 1) {
+                        continue;
+                    }
+
+                    $cFirstTokens = preg_split('/\s+/', $cFirst);
+                    $cInitials = implode('', array_map(fn($t) => substr($t, 0, 1), $cFirstTokens));
+
+                    // Primary First Name match ("John Cris" vs "John")
+                    if (!empty($idpFirstTokens[0]) && !empty($cFirstTokens[0]) && $idpFirstTokens[0] === $cFirstTokens[0]) {
+                        $candidates[] = ['user' => $cand, 'score' => 95];
+                        continue;
+                    }
+
+                    // Initials match ("JC" vs "John Cris")
+                    if ((!empty($cInitials) && $idpFirst === $cInitials) || (!empty($idpInitials) && $cFirst === $idpInitials) ||
+                        (!empty($cInitials) && strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $idpFirst)) === $cInitials) ||
+                        (!empty($idpInitials) && strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $cFirst)) === $idpInitials)) {
+                        $candidates[] = ['user' => $cand, 'score' => 90];
+                        continue;
+                    }
+
+                    // Prefix / Substring match
+                    if (str_starts_with($idpFirst, $cFirst) || str_starts_with($cFirst, $idpFirst)) {
+                        $candidates[] = ['user' => $cand, 'score' => 85];
+                        continue;
+                    }
+                }
+
+                if (!$user && !empty($candidates)) {
+                    usort($candidates, fn($a, $b) => $b['score'] <=> $a['score']);
+                    $user = $candidates[0]['user'];
+                }
+            }
+
+            if ($user) {
+                // Link idp_user_id if not linked yet
+                if (!$user->idp_user_id) {
+                    $user->idp_user_id = $idpUserId;
+                }
+                if ($user->email !== $email) {
+                    $user->email = $email;
+                }
+                $user->save();
+
+                // Log in existing user
+                return $this->loginLocalUser($user, $request);
+            }
+
+            // --- NEW USER HANDLING BASED ON TARGET PORTAL ---
+            $targetPortal = Session::get('target_login_portal', 'student');
+
+            if ($targetPortal === 'faculty') {
+                // Real-time verification against FLSS API
+                $flssData = $flssApi->getFacultyList();
+                $flssMatch = null;
+
+                if ($flssData && !empty($flssData['faculties'])) {
+                    foreach ($flssData['faculties'] as $fac) {
+                        if (!empty($fac['email']) && strtolower($fac['email']) === strtolower($email)) {
+                            $flssMatch = $fac;
+                            break;
+                        }
+                    }
+                }
+
+                if ($flssMatch) {
+                    // Auto-create new Faculty user (role=2)
+                    $firstName  = $flssMatch['first_name'] ?? ($idpUser['first_name'] ?? 'Faculty');
+                    $middleName = $flssMatch['middle_name'] ?? ($idpUser['middle_name'] ?? '');
+                    $lastName   = $flssMatch['last_name'] ?? ($idpUser['last_name'] ?? '');
+                    $suffix     = $flssMatch['suffix_name'] ?? '';
+                    $fullName   = trim($firstName . ' ' . $lastName);
+
+                    $user = new User();
+                    $user->first_name = $firstName;
+                    $user->middle_name = $middleName;
+                    $user->last_name = $lastName;
+                    $user->suffix = $suffix;
+                    $user->full_name = $fullName;
+                    $user->email = $email;
+                    $user->password = Hash::make('Password123!');
+                    $user->has_local_password = true;
+                    $user->role = 2; // Professor
+                    $user->idp_user_id = $idpUserId;
+                    $user->status = 'Active';
+                    $user->save();
+
+                    $professor = new Professor();
+                    $professor->user_id = $user->id;
+                    $professor->full_name = $fullName;
+                    $professor->email = $email;
+                    $professor->save();
+
+                    AuditLogger::log(
+                        'Faculty SSO Registration',
+                        'create',
+                        'Auto-registered faculty via IdP SSO & FLSS verification for: ' . $fullName,
+                        $user->id
+                    );
+
+                    return $this->loginLocalUser($user, $request);
+                }
+
+                // If not found in FLSS API
+                return view('auth.idp-transition', [
+                    'error' => "Your email ($email) was not found in the Faculty Loading & Scheduling System (FLSS). Please contact the OJT Coordinator to register your faculty account."
+                ]);
+            }
+
+            // Default Student Onboarding: Store IdP details in session and redirect to onboarding
+            Session::put('idp_onboarding_data', [
+                'idp_user_id' => $idpUserId,
+                'email'       => $email,
+                'first_name'  => $idpUser['first_name'] ?? '',
+                'middle_name' => $idpUser['middle_name'] ?? '',
+                'last_name'   => $idpUser['last_name'] ?? '',
+            ]);
+
+            return redirect()->route('onboarding.show');
+
+        } catch (\Exception $e) {
+            Log::error('IdP Callback Error', ['error' => $e->getMessage()]);
+            return view('auth.idp-transition', [
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    protected function loginLocalUser(User $user, Request $request)
+    {
+        $request->session()->put('loginId', $user->id);
+        $request->session()->put('show_terms', true);
+
+        // Prompt for local password setup if they don't have one set up yet
+        if (!$user->has_local_password) {
+            $request->session()->put('show_password_setup', true);
+        }
+
+        Cache::put(
+            'active_session_id:' . $user->id,
+            $request->session()->getId(),
+            now()->addMinutes((int) config('session.lifetime', 120))
+        );
+
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_login_at')) {
+                $user->last_login_at = now();
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_activity_at')) {
+                $user->last_activity_at = now();
+            }
+            $user->saveQuietly();
+        } catch (\Throwable $e) {
+            // Safe fallback if staging DB has not migrated new columns yet
+        }
+
+        AuditLogger::log(
+            'Authentication',
+            'login',
+            'User logged in via Identity Provider: ' . $user->email,
+            $user->id
+        );
+
+        if ($user->role == 0) {
+            return redirect()->route('student_home');
+        } else if ($user->role == 2) {
+            return redirect()->route('professor_home');
+        } else if ($user->role == 1) {
+            return redirect('dashboard');
+        }
+
+        return redirect('/login');
+    }
+
+    public function showOnboarding(GuidanceApiService $guidanceApi)
+    {
+        $idp = Session::get('idp_onboarding_data');
+
+        if (!$idp) {
+            return redirect('/')->with('fail', 'No active onboarding session found.');
+        }
+
+        // Auto-search student in GuiSIS by UUID, email, or name
+        $guisisData = null;
+        $idpUuid = strtolower(trim($idp['idp_user_id'] ?? ''));
+        $email = strtolower(trim($idp['email'] ?? ''));
+        $name = strtolower(preg_replace('/[^a-z0-9]/', '', ($idp['first_name'] ?? '') . ' ' . ($idp['last_name'] ?? '')));
+
+        try {
+            $profiles = $guidanceApi->getAllStudentProfiles();
+            foreach ($profiles as $p) {
+                $pUuid = strtolower(trim($p['idpUuid'] ?? ''));
+                $pEmail = strtolower(trim($p['email'] ?? ''));
+                $pName = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+
+                if (($idpUuid && $pUuid === $idpUuid) ||
+                    ($email && $pEmail === $email) ||
+                    ($name && $pName === $name)) {
+                    $guisisData = $p;
+                    break;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Onboarding GuiSIS lookup error: ' . $e->getMessage());
+        }
+
+        $professors = Professor::all();
+        $courses = Courses::all();
+        $schedules = Schedule::with('subject')->get();
+
+        return view('onboarding', compact('idp', 'guisisData', 'professors', 'courses', 'schedules'));
+    }
+
+    public function storeOnboarding(Request $request, string $email, GuidanceApiService $guidanceApi)
+    {
+        $idp = Session::get('idp_onboarding_data');
+
+        $request->validate([
+            'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
+            'course' => ['required', 'string', 'max:255'],
+            'adviser_name' => ['required', 'string', 'max:255'],
+            'academic_year_start' => ['required', 'integer'],
+            'academic_year_end' => ['required', 'integer', 'gt:academic_year_start'],
+            'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
+        ]);
+
+        $firstName = $idp['first_name'] ?? $request->input('first_name', '');
+        $middleName = $idp['middle_name'] ?? $request->input('middle_name', '');
+        $lastName = $idp['last_name'] ?? $request->input('last_name', '');
+        $idpUserId = $idp['idp_user_id'] ?? null;
+
+        $user = new User();
+        $user->first_name = $firstName;
+        $user->middle_name = $middleName;
+        $user->last_name = $lastName;
+        $user->email = $email;
+        $user->password = Hash::make(Str::random(32)); // Placeholder hash until local password is set
+        $user->has_local_password = false;
+        $user->idp_user_id = $idpUserId;
+        $user->full_name = trim($firstName . ' ' . $lastName);
+        $user->role = 0; // Default role: Student
+        $user->save();
+
+        $student = new OJTInformation();
+        $studentE = new Student();
+
+        $student->studentNum = $request->studentNum;
+        $studentE->studentNum = $request->studentNum;
+        $studentE->course = $request->course;
+        $studentE->year_and_section = $request->year_and_section;
+        $studentE->school_year_start = $request->academic_year_start;
+        $studentE->school_year_end = $request->academic_year_end;
+        $studentE->adviser_name = $request->adviser_name;
+        $studentE->user_id = $user->id;
+
+        // Auto-fetch additional demographic details from GuiSIS
+        try {
+            $studentNum = $request->studentNum;
+            $personalInfo = $guidanceApi->getPersonalInfo($studentNum);
+            if ($personalInfo && !empty($personalInfo['dateOfBirth'])) {
+                try {
+                    $studentE->date_of_birth = \Carbon\Carbon::parse($personalInfo['dateOfBirth'])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $studentE->date_of_birth = substr($personalInfo['dateOfBirth'], 0, 10);
+                }
+            }
+
+            $guisisProfile = $guidanceApi->getStudentByNumber($studentNum);
+            if ($guisisProfile) {
+                $mobile = $guisisProfile['mobileNumber'] ?? $guisisProfile['contactNumber'] ?? null;
+                if ($mobile) {
+                    $studentE->contact_number = $mobile;
+                }
+                $suffix = $guisisProfile['suffixName'] ?? null;
+                if ($suffix && empty($user->suffix)) {
+                    $user->suffix = $suffix;
+                    $user->save();
+                }
+            }
+
+            $addresses = $guidanceApi->getAddresses($studentNum);
+            if (!empty($addresses) && is_array($addresses)) {
+                $firstAddr = reset($addresses);
+                if (is_array($firstAddr)) {
+                    $street = $firstAddr['streetDetail'] ?? $firstAddr['street'] ?? '';
+                    $brgy = is_array($firstAddr['barangay'] ?? null) ? ($firstAddr['barangay']['name'] ?? '') : ($firstAddr['barangay'] ?? '');
+                    $city = is_array($firstAddr['city'] ?? null) ? ($firstAddr['city']['name'] ?? '') : ($firstAddr['city'] ?? '');
+                    $prov = is_array($firstAddr['province'] ?? null) ? ($firstAddr['province']['name'] ?? '') : ($firstAddr['province'] ?? '');
+                    $reg = is_array($firstAddr['region'] ?? null) ? ($firstAddr['region']['name'] ?? '') : ($firstAddr['region'] ?? '');
+
+                    $fullAddr = implode(', ', array_filter([$street, $brgy, $city, $prov ?: $reg]));
+                    if (!empty($fullAddr)) {
+                        $studentE->address = $fullAddr;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Onboarding background demographic fetch error: ' . $e->getMessage());
+        }
+
+        $student->save();
+        $studentE->save();
+
+        $this->autoAssignStudentToMatchingClass($user, $studentE);
+
+        Session::forget('idp_onboarding_data');
+
+        AuditLogger::log(
+            'Student Account',
+            'create',
+            'Completed IdP Onboarding for: ' . $user->full_name,
+            $user->id
+        );
+
+        return $this->loginLocalUser($user, $request);
+    }
+
+    public function setLocalPassword(Request $request)
+    {
+        $request->validate([
+            'new_password' => $this->passwordRules(),
+            'new_password_confirmation' => 'required|same:new_password',
+        ], $this->passwordValidationMessages('new_password', 'new_password_confirmation'));
+
+        $user = User::find(Session::get('loginId'));
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User session expired. Please log in again.'
+            ], 401);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->has_local_password = true;
+        $user->save();
+
+        Session::forget('show_password_setup');
+
+        AuditLogger::log(
+            'Account Security',
+            'update',
+            'Set local fallback password for IdP user: ' . $user->email,
+            $user->id
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Local fallback password created successfully!'
+        ]);
+    }
     public function login(){
         return view("auth.login");
     }
@@ -84,7 +553,7 @@ class AuthController extends Controller
             'email'=>'required|email|unique:users,email',
             'studentNum' => ['required', 'regex:' . $this->studentNumberValidationPattern()],
             'course' => ['required', 'string', 'max:255'],
-            'adviser_name' => ['nullable', 'string', 'max:255'],
+            'adviser_name' => ['required', 'string', 'max:255'],
             'academic_year_start' => ['required', 'integer'],
             'academic_year_end' => ['required', 'integer', 'gt:academic_year_start'],
             'year_and_section' => ['required', 'regex:' . $this->yearAndSectionValidationPattern()],
@@ -96,6 +565,7 @@ class AuthController extends Controller
             $this->yearAndSectionValidationMessages(),
             [
                 'course.required' => 'Course is required.',
+                'adviser_name.required' => 'Please select a professor or select "Not Yet Listed".',
                 'academic_year_start.required' => 'Start year is required.',
                 'academic_year_start.integer' => 'Start year must be a valid year.',
                 'academic_year_end.required' => 'End year is required.',
@@ -210,8 +680,18 @@ class AuthController extends Controller
         ]);
         $user = User::where('email','=',$request->email)->first();
 
-        if($user){
+        if ($user) {
             if(Hash::check($request->password, $user->password)){
+                $targetPortal = $request->input('portal', Session::get('target_login_portal', 'student'));
+
+                // Enforce portal isolation
+                if ($targetPortal === 'student' && (int) $user->role !== 0) {
+                    return back()->with('fail', 'Faculty & Staff accounts must log in under the Faculty & Staff Portal.');
+                }
+                if ($targetPortal === 'faculty' && (int) $user->role === 0) {
+                    return back()->with('fail', 'Student accounts must log in under the Student Portal.');
+                }
+
                 $request->session()->put('loginId',$user->id);
                 $request->session()->put('show_terms', true);
                 Cache::put(
@@ -219,6 +699,18 @@ class AuthController extends Controller
                     $request->session()->getId(),
                     now()->addMinutes((int) config('session.lifetime', 120))
                 );
+
+                try {
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_login_at')) {
+                        $user->last_login_at = now();
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_activity_at')) {
+                        $user->last_activity_at = now();
+                    }
+                    $user->saveQuietly();
+                } catch (\Throwable $e) {
+                    // Safe fallback if staging DB has not migrated new columns yet
+                }
 
                 if ($user->role == 0) {
                     return redirect()->route('student_home');
@@ -893,11 +1385,21 @@ class AuthController extends Controller
     public function logout(){
         if(Session::has('loginId')){
             $id = Session::get('loginId');
+            
+            // Perform IdP logout if token is present
+            if (Session::has('idp_access_token')) {
+                $token = Session::get('idp_access_token');
+                $this->idpService->logout($token);
+                Session::forget('idp_access_token');
+            }
+
             Session::pull('loginId');
             Session::forget('termsAccepted');
+            Session::forget('show_password_setup');
             Cache::forget('active_session_id:' . $id);
             return redirect('/');
         }
+        return redirect('/');
     }
 
     public function professorTab()
@@ -910,6 +1412,19 @@ class AuthController extends Controller
         $data = Professor::with('subjects')->get();
         $usersP = User::whereIn('email', $data->pluck('email'))->get();
 
+        // Fetch FLSS API emails & names for source detection
+        $flssApi = app(\App\Services\FacultyApiService::class);
+        $flssRes = $flssApi->getFacultyList();
+        $flssEmails = [];
+        $flssNames = [];
+        if ($flssRes && !empty($flssRes['faculties'])) {
+            foreach ($flssRes['faculties'] as $f) {
+                if (!empty($f['email'])) $flssEmails[] = strtolower(trim($f['email']));
+                $fn = ($f['first_name'] ?? '') . ' ' . ($f['last_name'] ?? '');
+                if (trim($fn)) $flssNames[] = strtolower(trim($fn));
+            }
+        }
+
         // Transform the subjects data
         $subjectData = $data->flatMap(function ($professor) {
             return $professor->subjects->map(function ($subject) {
@@ -920,7 +1435,179 @@ class AuthController extends Controller
             });
         })->toArray();
 
-        return view('ojtCoordinator.professorTab', compact('data', 'user', 'subjectData','usersP','course'));
+        return view('ojtCoordinator.professorTab', compact('data', 'user', 'subjectData','usersP','course', 'flssEmails', 'flssNames'));
+    }
+
+    public function syncFacultyFromFlss(SyncFacultyFromFlss $syncer)
+    {
+        $summary = $syncer->execute();
+
+        if (!empty($summary['errors']) && $summary['created'] === 0 && $summary['updated'] === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sync failed: ' . implode(' ', $summary['errors']),
+                'summary' => $summary,
+            ], 500);
+        }
+
+        $missingAccounts = $summary['missing_accounts'] ?? [];
+        $hasMissing = !empty($missingAccounts);
+
+        $message = "Faculty sync completed! Created: {$summary['created']} new accounts, Updated: {$summary['updated']} existing accounts, Skipped: {$summary['skipped']}.";
+
+        if ($hasMissing) {
+            $message .= " Note: " . count($missingAccounts) . " local faculty account(s) were not found in FLSS.";
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'summary' => $summary,
+            'has_missing' => $hasMissing,
+            'missing_accounts' => $missingAccounts,
+        ]);
+    }
+
+    /**
+     * Bulk sync all existing students from IDP to link their UUIDs.
+     * Accessible from the coordinator Students tab.
+     */
+    public function syncUsersFromIdp(SyncStudentsUnified $syncer)
+    {
+        @set_time_limit(300);
+        $summary = $syncer->syncIdpUuids();
+
+        $message = "IDP Sync completed! Newly Linked: {$summary['idp_linked']}, Already Linked: {$summary['already_linked']}.";
+
+        if (!empty($summary['errors'])) {
+            $message .= ' (Notes: ' . count($summary['errors']) . ')';
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'summary' => $summary,
+        ]);
+    }
+
+    /**
+     * Bulk sync existing students' profiles from GuiSIS.
+     */
+    public function syncUsersFromGuisis(SyncStudentsUnified $syncer)
+    {
+        @set_time_limit(300);
+        $summary = $syncer->syncGuisisOnly();
+
+        $pool = $summary['guisis_total_pool'] ?? 0;
+        return response()->json([
+            'success' => true,
+            'message' => "GuiSIS Demographic Sync completed! Profiles updated: {$summary['guisis_synced']}" . ($pool > 0 ? " from {$pool} GuiSIS records." : "."),
+            'summary' => $summary,
+        ]);
+    }
+
+    /**
+     * Remove selected faculty accounts that are no longer in FLSS.
+     */
+    public function pruneMissingFaculty(Request $request)
+    {
+        $currentUserId = Session::get('loginId') ?? Auth::id();
+        $currentUser = User::find($currentUserId);
+
+        if (!$currentUser || (int) $currentUser->role !== 1) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized operation.'], 403);
+        }
+
+        $request->validate([
+            'selected_user_ids' => 'required|array',
+            'selected_user_ids.*' => 'exists:users,id',
+        ]);
+
+        $userIds = $request->input('selected_user_ids', []);
+        $deletedNames = [];
+
+        foreach ($userIds as $id) {
+            // Prevent coordinator from deleting themselves
+            if ((int)$id === (int)$currentUser->id) {
+                continue;
+            }
+
+            $user = User::find($id);
+            if ($user && in_array((int)$user->role, [1, 2])) {
+                $name = $user->full_name ?: ($user->first_name . ' ' . $user->last_name);
+                $deletedNames[] = $name;
+
+                // Remove from professors table
+                \App\Models\Professor::where('user_id', $user->id)
+                    ->orWhere('email', $user->email)
+                    ->delete();
+
+                AuditLogger::log(
+                    'Faculty Pruning',
+                    'delete',
+                    'Pruned faculty account not found in FLSS: ' . $name . ' (' . $user->email . ')',
+                    $user->id
+                );
+
+                $user->delete();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => count($deletedNames) . ' missing faculty account(s) successfully removed.',
+            'pruned_names' => $deletedNames,
+        ]);
+    }
+
+    /**
+     * Transfer OJT Coordinator designation to another faculty member.
+     */
+    public function transferCoordinatorRole(Request $request)
+    {
+        $currentUserId = Session::get('loginId') ?? Auth::id();
+        $currentUser = User::find($currentUserId);
+
+        if (!$currentUser || (int) $currentUser->role !== 1) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized operation.'], 403);
+        }
+
+        $request->validate([
+            'target_user_id' => 'required|exists:users,id',
+        ]);
+
+        $targetUser = User::find($request->target_user_id);
+
+        if (!$targetUser || (int) $targetUser->role !== 2) {
+            return response()->json(['success' => false, 'message' => 'Target user must be an active Professor.'], 400);
+        }
+
+        if ($targetUser->id === $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'You are already the OJT Coordinator.'], 400);
+        }
+
+        DB::transaction(function () use ($currentUser, $targetUser) {
+            // Demote current coordinator to professor
+            $currentUser->role = 2;
+            $currentUser->save();
+
+            // Promote target professor to coordinator
+            $targetUser->role = 1;
+            $targetUser->save();
+        });
+
+        AuditLogger::log(
+            'Coordinator Designation Transfer',
+            'update',
+            'Transferred OJT Coordinator designation from ' . $currentUser->full_name . ' to ' . $targetUser->full_name,
+            $currentUser->id
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OJT Coordinator designation successfully transferred to ' . $targetUser->full_name . '!',
+            'redirect' => route('professor_home')
+        ]);
     }
 
     public function professorCreate(Request $request){
@@ -928,8 +1615,6 @@ class AuthController extends Controller
             'first_name' => ['required', 'regex:' . $this->nameValidationPattern()],
             'last_name' => ['required', 'regex:' . $this->nameValidationPattern()],
             'email' => ['required', 'email', 'unique:users,email'],
-            'subject_code' => 'required|string|max:255',
-            'subject_description' => 'required|string|max:255',
             'password' => $this->passwordRules(true),
         ], array_merge(
             $this->nameValidationMessages(),
@@ -943,10 +1628,6 @@ class AuthController extends Controller
 
         $user = new User();
         $professor = new Professor();
-        $subject = Subject::firstOrCreate([
-            'subject_code' => $request->subject_code,
-            'subject_description' => $request->subject_description,
-        ]);
 
         $user->email = $request->email;
         $user->first_name = $request->first_name;
@@ -963,14 +1644,11 @@ class AuthController extends Controller
         if ($res) {
             $professor->user_id = $user->id;
             $professor->save();
-        }
 
-        if($res){
-            $professor->subjects()->syncWithoutDetaching([$subject->id]);
             AuditLogger::log(
                 'Professor',
                 'create',
-                'Created professor account: ' . $professor->full_name . ' with subject: ' . $subject->subject_code,
+                'Created professor account: ' . $professor->full_name,
                 $user->id
             );
             return back()->with('success','You have registered successfully!');

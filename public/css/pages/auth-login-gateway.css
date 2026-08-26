@@ -1,0 +1,14 @@
+/* Auth Login Gateway Styles */
+
+        html {
+            background-color: #3b0000;
+        }
+
+        body {
+            background-color: #3b0000;
+            background-image: url('/images/20 Blur.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }

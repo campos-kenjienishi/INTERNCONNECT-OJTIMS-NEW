@@ -32,8 +32,16 @@ use App\Models\User;
 // ─── PUBLIC ROUTES (no auth required) ────────────────────────────────
 
 Route::view('/', 'landing')->name('landing');
+Route::get('/login-gateway', [AuthController::class, 'loginGateway'])->name('login.gateway');
 
+// IdP Authentication Routes
+Route::get('/auth/login/external', [AuthController::class, 'showIdpTransition'])->name('login.external');
+Route::get('/auth/redirect-to-idp', [AuthController::class, 'redirectToIdp'])->name('idp.redirect');
+Route::get('/auth/callback', [AuthController::class, 'handleIdpCallback'])->name('idp.callback');
 
+// IdP Onboarding
+Route::get('/onboarding', [AuthController::class, 'showOnboarding'])->name('onboarding.show');
+Route::post('/onboarding/{email}', [AuthController::class, 'storeOnboarding'])->name('onboarding.store');
 
 Route::get('/login', [AuthController::class,'login'])->name('login');
 Route::get('/registration', [AuthController::class,'registration']);
@@ -63,6 +71,8 @@ Route::get('/evaluation/submitted', [EvaluationController::class, 'thankYou'])->
 
 Route::middleware(['auth.session.custom'])->group(function () {
     Route::match(['get', 'post'], '/logout',[AuthController::class, 'logout']);
+    Route::post('/auth/set-local-password', [AuthController::class, 'setLocalPassword'])->name('auth.setLocalPassword');
+    Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
 });
 
 // ─── OJT COORDINATOR (role 1) ───────────────────────────────────────
@@ -76,6 +86,11 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/analytics/export/pdf',[AuthController::class,'coordinatorAnalyticsExportPdf'])->name('coordinator.analytics.export.pdf');
     Route::get('/professorTab', [AuthController::class,'professorTab']);
     Route::post('/professorCreate', [AuthController::class,'professorCreate'])->name('professorCreate');
+    Route::post('/coordinator/sync-faculty', [AuthController::class, 'syncFacultyFromFlss'])->name('coordinator.syncFaculty');
+    Route::post('/coordinator/sync-users-idp', [AuthController::class, 'syncUsersFromIdp'])->name('coordinator.syncUsersIdp');
+    Route::post('/coordinator/sync-users-guisis', [AuthController::class, 'syncUsersFromGuisis'])->name('coordinator.syncUsersGuisis');
+    Route::post('/coordinator/prune-missing-faculty', [AuthController::class, 'pruneMissingFaculty'])->name('coordinator.pruneMissingFaculty');
+    Route::post('/coordinator/transfer-role', [AuthController::class, 'transferCoordinatorRole'])->name('coordinator.transferRole');
     Route::put('/updateProfessor', [ProfessorController::class, 'update'])->name('updateProfessor');
     Route::get('/maintenance',[MaintenanceController::class,'maintenance']);
     Route::post('/remove/course/{id}', [MaintenanceController::class,'remove']);
@@ -94,6 +109,12 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::post('/uploadMOA', [MOAUploadController::class,'uploadfile']);
     Route::post('/moa/remove/{id}', [MOAUploadController::class,'remove']);
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');
+    Route::get('/moa/unlock-requests', [MOAUploadController::class, 'unlockRequests'])->name('coordinator.moa.unlockRequests');
+    Route::post('/moa/unlock-requests/{id}/approve', [MOAUploadController::class, 'approveUnlock'])->name('coordinator.moa.approveUnlock');
+    Route::post('/moa/unlock-requests/{id}/deny', [MOAUploadController::class, 'denyUnlock'])->name('coordinator.moa.denyUnlock');
+    Route::get('/coordinator/student-requirements', [PassDocuController::class, 'coordinatorStudentRequirements'])->name('coordinator.studentRequirements');
+    Route::get('/coordinator/requirements/view/{id}', [PassDocuController::class, 'coordinatorViewRequirement'])->name('coordinator.requirements.view');
+    Route::get('/coordinator/requirements/download/{id}', [PassDocuController::class, 'coordinatorDownloadRequirement'])->name('coordinator.requirements.download');
     Route::post('/sendFile', [MOAUploadController::class,'sendFiles']);
     Route::get('/send/download/{file}', [MOAUploadController::class, 'downloadFile'])->name('download.file');
     Route::post('/status/{studentNum}', [StudentController::class,'update']);
@@ -116,6 +137,7 @@ Route::middleware([
     Route::match(['get', 'post'], 'student/login',[AuthController::class, 'logout']);
     Route::get('/student/accountinfo', [StudentController::class,'student_acc']);
     Route::put('/student/edit/{email}', [StudentController::class,'edit']);
+    Route::post('/student/sync-guidance', [StudentController::class, 'syncFromGuidance'])->name('student.syncGuidance');
     Route::get('/student/class', [StudentController::class,'class']);
     Route::put('/student/update-professor', [StudentController::class, 'updateProfessor'])->name('student.updateProfessor');
     Route::post('/student/join/{email}/{classId}', [StudentController::class,'join']);
@@ -123,11 +145,12 @@ Route::middleware([
     Route::get('/student/files', [StudentController::class,'fileSee']);
     Route::get('/student/ojtinfo', [StudentController::class,'ojtInformation']);
     Route::put('/student/ojtEdit/{studentNum}', [StudentController::class,'ojt_edit']);
-    Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
     Route::get('/student/MOA', [CompanyController::class,'companiesup']);
     Route::post('/student/MOA/link', [CompanyController::class,'linkExistingMoa'])->name('student.moa.link');
     Route::put('/student/MOA/{id}', [CompanyController::class,'companyUpdate'])->name('student.moa.update');
     Route::post('/student/moa/remove/{id}', [MOAUploadController::class,'studentRemove'])->name('student.moa.remove');
+    Route::post('/student/moa/request-unlock', [MOAUploadController::class, 'requestUnlock'])->name('student.moa.requestUnlock');
+    Route::post('/student/moa/toggle-inhouse', [MOAUploadController::class, 'toggleInhouse'])->name('student.moa.toggleInhouse');
     Route::get('/student/pending', [CompanyController::class,'pending']);
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
@@ -231,6 +254,7 @@ Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
 Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
     Route::post('/uploadfile', [FileController::class,'uploadfile']);
     Route::get('/download/req/{file}', [PassDocuController::class,'download']);
+    Route::post('/coordinator/student/toggle-inhouse/{id}', [PassDocuController::class, 'toggleStudentInhouse'])->name('coordinator.student.toggleInhouse');
 });
 
 Route::middleware(['auth.session.custom', 'role:1'])->group(function () {

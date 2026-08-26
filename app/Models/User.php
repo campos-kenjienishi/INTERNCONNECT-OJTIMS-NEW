@@ -24,6 +24,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix',
+        'full_name',
+        'role',
+        'idp_user_id',
+        'has_local_password',
+        'last_login_at',
+        'last_activity_at',
     ];
 
     /**
@@ -43,8 +53,64 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'last_login_at'     => 'datetime',
+        'last_activity_at'  => 'datetime',
+        'password'          => 'hashed',
+        'has_local_password'=> 'boolean',
     ];
+
+    /**
+     * Check whether student is active based on 6-month enrollment window OR 90-day activity.
+     */
+    public function isStudentActive(int $inactivityDays = 90): bool
+    {
+        if ((int) $this->role !== 0) {
+            return true;
+        }
+
+        // 1. Account created within the last 6 months (current semester)
+        if ($this->created_at && $this->created_at->greaterThanOrEqualTo(now()->subMonths(6))) {
+            return true;
+        }
+
+        // 2. Activity / Process performed within 90 days
+        if (!empty($this->last_activity_at) && $this->last_activity_at->greaterThanOrEqualTo(now()->subDays($inactivityDays))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Touch student activity timestamp safely.
+     */
+    public function touchActivity(): void
+    {
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_activity_at')) {
+                $this->last_activity_at = now();
+                $this->saveQuietly();
+            }
+        } catch (\Throwable $e) {
+            // Ignore if column missing on unmigrated staging server
+        }
+    }
+
+    /**
+     * Find a user by their IDP user ID.
+     */
+    public static function findByIdpId(string $idpUserId): ?self
+    {
+        return static::where('idp_user_id', $idpUserId)->first();
+    }
+
+    /**
+     * Check if the user has set up a local password.
+     */
+    public function hasLocalPassword(): bool
+    {
+        return (bool) $this->has_local_password;
+    }
 
     public function studentInfo()
     {

@@ -12,6 +12,21 @@ class Student extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_id',
+        'studentNum',
+        'class_id',
+        'date_of_birth',
+        'contact_number',
+        'address',
+        'year_and_section',
+        'school_year_start',
+        'school_year_end',
+        'course',
+        'adviser_name',
+        'is_inhouse_ojt',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -20,6 +35,11 @@ class Student extends Model
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'company_student', 'student_id', 'company_id');
+    }
+
+    public function moaUnlockRequests()
+    {
+        return $this->hasMany(MoaUnlockRequest::class, 'student_id');
     }
 
     public function professor()

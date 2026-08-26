@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\FileRequirement;
+use App\Models\MoaUnlockRequest;
 use App\Helpers\AuditLogger;
 
 class MOAUploadController extends Controller
@@ -181,12 +182,16 @@ class MOAUploadController extends Controller
 
     private function deleteCompanyAssets(Company $company): void
     {
-        $this->deleteLinkedNotarizedRequirement($company);
+        $this->deleteAllLinkedNotarizedRequirements($company);
 
         if (!empty($company->file)) {
-            $filePath = public_path('assets/' . $company->file);
-            if (file_exists($filePath)) {
-                @unlink($filePath);
+            $otherCompanyUsingFile = Company::where('file', $company->file)->where('id', '!=', $company->id)->exists();
+            if (!$otherCompanyUsingFile) {
+                FileRequirement::where('file', $company->file)->delete();
+                $filePath = public_path('assets/' . $company->file);
+                if (file_exists($filePath)) {
+                    @unlink($filePath);
+                }
             }
         }
 
@@ -426,6 +431,17 @@ public function studentRemove($id)
         return redirect()->back()->with('error', 'MOA not found or you do not have permission to remove it.');
     }
 
+    if ((int) $user->role === 0) {
+        $approvedUnlock = MoaUnlockRequest::where('student_id', $student->id)
+            ->where('status', 'approved')
+            ->latest()
+            ->first();
+
+        if (!$approvedUnlock) {
+            return redirect()->back()->with('error', 'Your MOA selection is locked. You cannot unlink or remove this company without Internship Coordinator approval. Please use the "Request MOA Unlock" button.');
+        }
+    }
+
     $isOwner = $company->uploader_name === $user->full_name;
     $ownerRequirement = $isOwner
         ? FileRequirement::where('uploadedBy', $user->full_name)
@@ -473,7 +489,235 @@ public function studentRemove($id)
     return redirect()->back()->with('success', $isOwner ? 'MOA removed successfully.' : 'MOA unlinked successfully.');
 }
 
+public function requestUnlock(Request $request)
+{
+    $request->validate([
+        'reason' => 'required|string|min:5',
+        'request_type' => 'nullable|string',
+    ]);
 
+    $user = User::where('id', Session::get('loginId'))->first();
+    if (!$user || (int) $user->role !== 0) {
+        return redirect()->back()->with('error', 'Unauthorized.');
+    }
 
+    $student = Student::where('user_id', $user->id)->first();
+    if (!$student) {
+        return redirect()->back()->with('error', 'Student profile not found.');
+    }
 
+    $requestType = $request->input('request_type', 'unlink');
+
+    if ($student->is_inhouse_ojt) {
+        $requestType = 'switch_external';
+        $companyId = null;
+    } else {
+        $linkedCompany = $student->companies()->first();
+        if (!$linkedCompany && $requestType !== 'switch_inhouse') {
+            return redirect()->back()->with('error', 'You are not linked to any MOA.');
+        }
+
+        $companyId = $linkedCompany ? $linkedCompany->id : null;
+        if ($linkedCompany) {
+            $isOwner = $linkedCompany->uploader_name === $user->full_name;
+            if (!$isOwner && $requestType === 'edit') {
+                $requestType = 'unlink';
+            }
+        }
+    }
+
+    $existingPending = MoaUnlockRequest::where('student_id', $student->id)
+        ->where('status', 'pending')
+        ->first();
+
+    if ($existingPending) {
+        $existingPending->company_id = $companyId;
+        $existingPending->request_type = $requestType;
+        $existingPending->reason = $request->input('reason');
+        $existingPending->save();
+        return redirect()->back()->with('success', 'Your request reason has been updated and is pending coordinator review.');
+    }
+
+    MoaUnlockRequest::create([
+        'student_id' => $student->id,
+        'company_id' => $companyId,
+        'request_type' => $requestType,
+        'reason' => $request->input('reason'),
+        'status' => 'pending',
+    ]);
+
+    AuditLogger::log(
+        'MOA Lock',
+        'Request Unlock',
+        'Student submitted MOA request (' . $requestType . ')',
+        Session::get('loginId') ?? null,
+        ['request_type' => $requestType, 'reason' => $request->input('reason')]
+    );
+
+    return redirect()->back()->with('success', 'Request submitted successfully. Please wait for coordinator approval.');
+}
+
+public function unlockRequests()
+{
+    $user = [];
+    if (Session::has('loginId')) {
+        $user = User::where('id', '=', Session::get('loginId'))->first();
+    }
+
+    $requests = MoaUnlockRequest::with(['student.user', 'company'])
+        ->orderByRaw("FIELD(status, 'pending', 'approved', 'denied')")
+        ->orderByDesc('created_at')
+        ->get();
+
+    return view('ojtCoordinator.moaUnlockRequests', compact('requests', 'user'));
+}
+
+public function approveUnlock(Request $request, $id)
+{
+    $user = User::where('id', Session::get('loginId'))->first();
+    if (!$user || (int)$user->role !== 1) {
+        return redirect()->back()->with('error', 'Unauthorized.');
+    }
+
+    $unlockReq = MoaUnlockRequest::with(['student.user', 'company'])->find($id);
+    if (!$unlockReq) {
+        return redirect()->back()->with('error', 'Request not found.');
+    }
+
+    $student = $unlockReq->student;
+    $company = $unlockReq->company;
+
+    if ($student) {
+        if ($unlockReq->request_type === 'switch_external') {
+            $student->is_inhouse_ojt = false;
+            $student->save();
+        } elseif ($unlockReq->request_type === 'switch_inhouse') {
+            if ($company) {
+                if ($student->user) {
+                    $this->deleteStudentNotarizedRequirement($student->user, $company);
+                }
+                $company->students()->detach($student->id);
+                $company = $company->fresh('students');
+                if ($company->students->isEmpty()) {
+                    $this->deleteCompanyAssets($company);
+                }
+            }
+            $student->is_inhouse_ojt = true;
+            $student->save();
+        } elseif ($company && ($unlockReq->request_type ?? 'unlink') === 'unlink') {
+            $isOwner = $company->uploader_name === ($student->user ? $student->user->full_name : $student->full_name);
+            $ownerRequirement = $isOwner && $student->user
+                ? FileRequirement::where('uploadedBy', $student->user->full_name)
+                    ->where('fileName', 'Notarized MOA')
+                    ->where('file', $company->file)
+                    ->latest('id')
+                    ->first()
+                : null;
+
+            if ($student->user) {
+                $this->deleteStudentNotarizedRequirement($student->user, $company);
+            }
+            $company->students()->detach($student->id);
+            $company = $company->fresh('students');
+
+            if ($student->user) {
+                $this->updateCompanyStudentDisplay($company, $student->user->full_name);
+                $this->reconcileStudentNotarizedRequirements($student->user);
+            }
+
+            if ($company->students->isEmpty()) {
+                $owner = User::where('full_name', $company->uploader_name)->first();
+
+                if (!$owner || (int) $owner->role === 0) {
+                    $this->deleteCompanyAssets($company);
+                }
+            } elseif ($isOwner) {
+                $newOwnerName = $this->transferCompanyOwnership($company, $ownerRequirement);
+                if ($newOwnerName) {
+                    AuditLogger::log(
+                        'MOA Upload',
+                        'Transfer Ownership',
+                        'Transferred MOA ownership for ' . $company->company_name . ' to ' . $newOwnerName,
+                        Session::get('loginId') ?? null,
+                        ['previous_owner' => $student->full_name],
+                        ['new_owner' => $newOwnerName]
+                    );
+                }
+            }
+        }
+    }
+
+    $unlockReq->status = 'approved';
+    $unlockReq->admin_notes = $request->input('admin_notes', 'Approved by coordinator.');
+    $unlockReq->processed_by = $user->full_name;
+    $unlockReq->save();
+
+    AuditLogger::log(
+        'MOA Lock',
+        'Approve Unlock',
+        'Approved MOA unlock request for student: ' . ($student ? $student->full_name : 'ID ' . $unlockReq->student_id),
+        Session::get('loginId') ?? null,
+        ['request_id' => $unlockReq->id]
+    );
+
+    return redirect()->back()->with('success', 'Unlock request approved. The student can now select a new MOA.');
+}
+
+public function denyUnlock(Request $request, $id)
+{
+    $user = User::where('id', Session::get('loginId'))->first();
+    if (!$user || (int)$user->role !== 1) {
+        return redirect()->back()->with('error', 'Unauthorized.');
+    }
+
+    $unlockReq = MoaUnlockRequest::with(['student'])->find($id);
+    if (!$unlockReq) {
+        return redirect()->back()->with('error', 'Request not found.');
+    }
+
+    $unlockReq->status = 'denied';
+    $unlockReq->admin_notes = $request->input('admin_notes', 'Denied by coordinator.');
+    $unlockReq->processed_by = $user->full_name;
+    $unlockReq->save();
+
+    AuditLogger::log(
+        'MOA Lock',
+        'Deny Unlock',
+        'Denied MOA unlock request for student: ' . ($unlockReq->student ? $unlockReq->student->full_name : 'ID ' . $unlockReq->student_id),
+        Session::get('loginId') ?? null,
+        ['request_id' => $unlockReq->id]
+    );
+
+    return redirect()->back()->with('success', 'Unlock request denied.');
+}
+
+public function toggleInhouse(Request $request)
+{
+    $user = User::where('id', Session::get('loginId'))->first();
+    if (!$user || (int) $user->role !== 0) {
+        return redirect()->back()->with('error', 'Unauthorized.');
+    }
+
+    $student = Student::where('user_id', $user->id)->first();
+    if (!$student) {
+        return redirect()->back()->with('error', 'Student profile not found.');
+    }
+
+    $targetStatus = $request->has('is_inhouse') ? (bool) $request->input('is_inhouse') : !$student->is_inhouse_ojt;
+    $student->is_inhouse_ojt = $targetStatus;
+    $student->save();
+
+    AuditLogger::log(
+        'MOA Mode',
+        'Toggle In-House OJT',
+        ($targetStatus ? 'Student declared School In-House OJT mode' : 'Student switched to External MOA mode'),
+        $user->id
+    );
+
+    $msg = $targetStatus 
+        ? 'Switched to School In-House OJT mode. External MOA requirement is waived and requirement slots are unlocked!' 
+        : 'Switched to External MOA mode.';
+
+    return redirect()->back()->with('success', $msg);
+}
 }

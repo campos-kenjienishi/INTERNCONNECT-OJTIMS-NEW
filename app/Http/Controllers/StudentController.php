@@ -25,8 +25,10 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentNotificationMail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use App\Helpers\AuditLogger;
 use App\Models\Company; // ADD THIS at the top
+use App\Services\GuidanceApiService;
 use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
@@ -134,8 +136,17 @@ public function home()
     // GET COMPANIES
     $companies = Company::all();
 
-    // GET FILE COUNT
-    $fileCount = UploadedFile::count();
+    // GET FILE COUNT — mirrors the fileSee() filter so the count matches what the student actually sees
+    if (\Illuminate\Support\Facades\Schema::hasColumn('uploaded_files', 'class_id')) {
+        $fileCount = UploadedFile::where(function ($q) {
+                $q->whereNull('class_id')->orWhere('class_id', 0);
+            })
+            ->where('name', '!=', '')
+            ->whereNotNull('name')
+            ->count();
+    } else {
+        $fileCount = UploadedFile::where('name', '!=', '')->whereNotNull('name')->count();
+    }
 
     $announcements = $this->visibleAnnouncementsForStudent($data)->take(5);
 
@@ -594,19 +605,14 @@ public function StuList()
         $user = User::where('id', '=', Session::get('loginId'))->first();
     }
 
-    // Get the current date and subtract 6 months
-    $sixMonthsAgo = Carbon::now()->subMonths(6);
-
-    $students = User::where('role', 0)
-                ->where('status', 1)
-                ->where('created_at', '>=', $sixMonthsAgo) // Add condition for created_at
-                ->get();
+    // Fetch active students (created in last 6 months or active in last 90 days)
+    $allStudents = User::where('role', 0)->get();
+    $students = $allStudents->filter(fn ($s) => $s->isStudentActive(90));
     $studentData = [];
     
     // Initialize subject data array outside the loop
     $subjectData = [];
     $course = Courses::all();
-
 
     foreach ($students as $student) {
         $ojt = OJTInformation::where('studentNum', $student->studentNum)->first();
@@ -640,8 +646,13 @@ public function StuList()
             $schoolYearLabel = trim((string) $linkedMoa->school_year);
         }
     
-        // Find the professor associated with the logged-in user's adviser_name
-        $professor = Professor::where('full_name', $student->adviser_name)->first();
+        $adviserName = !empty($student->adviser_name)
+            ? $student->adviser_name
+            : ($studentProfile && !empty($studentProfile->adviser_name) ? $studentProfile->adviser_name : null);
+        $student->adviser_name = $adviserName;
+
+        // Find the professor associated with the student's adviser_name
+        $professor = !empty($adviserName) ? Professor::where('full_name', $adviserName)->first() : null;
     
         // Clear subject data array for each student
         $subjectData = [];
@@ -670,7 +681,7 @@ public function StuList()
         ];
     }
 
-    return view('ojtCoordinator.students', compact('studentData', 'user', 'subjectData','course'));
+    return view('ojtCoordinator.students', compact('studentData', 'user', 'subjectData', 'course'));
 }
 
 
@@ -837,8 +848,207 @@ public function ojt_edit(Request $request,$studentNum)
     
     public function acceptTerms(Request $request)
     {
-        Session::put('termsAccepted', true); // lasts for this session only
+        Session::put('termsAccepted', true);
+        Session::save();
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Sync logged-in student's profile information from GuiSIS (Guidance API).
+     */
+    public function syncFromGuidance(Request $request, GuidanceApiService $guidanceApi)
+    {
+        try {
+            $userId = Session::get('loginId') ?? Auth::id();
+            if (!$userId) {
+                return response()->json(['success' => false, 'message' => 'Unauthenticated session.'], 401);
+            }
+
+            $user = User::find($userId);
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'User record not found.'], 404);
+            }
+
+            // 1. Fetch student profile record
+            $student = Student::where('user_id', $user->id)->first();
+            if (!$student) {
+                $student = new Student();
+                $student->user_id = $user->id;
+            }
+
+            $studentNum = $student->studentNum;
+
+            // Try single lookup by student number if available
+            $guisisData = null;
+            if (!empty($studentNum)) {
+                $guisisData = $guidanceApi->getStudentByNumber($studentNum);
+            }
+
+            // If not found by studentNum, search in all GuiSIS profiles by idpUuid, email, studentNum, or name
+            if (!$guisisData) {
+                $profiles = $guidanceApi->getAllStudentProfiles();
+                $stUuid = strtolower(trim($user->idp_user_id ?? ''));
+                $stEmail = strtolower(trim($user->email ?? ''));
+                $stNum = strtolower(trim($studentNum ?? ''));
+                $stName = strtolower(preg_replace('/[^a-z0-9]/', '', ($user->first_name ?? '') . ' ' . ($user->last_name ?? '')));
+
+                foreach ($profiles as $p) {
+                    $pUuid = strtolower(trim($p['idpUuid'] ?? ''));
+                    $pEmail = strtolower(trim($p['email'] ?? ''));
+                    $pNum = strtolower(trim($p['studentNumber'] ?? ''));
+                    $pName = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+
+                    if (($stUuid && $pUuid === $stUuid) ||
+                        ($stEmail && $pEmail === $stEmail) ||
+                        ($stNum && $pNum === $stNum) ||
+                        ($stName && $pName === $stName)) {
+                        $guisisData = $p;
+                        break;
+                    }
+                }
+            }
+
+            if (!$guisisData) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No matching student record found in Guidance System (GuiSIS).'
+                ]);
+            }
+
+            // Backfill IDP UUID if missing on User
+            if (empty($user->idp_user_id) && !empty($guisisData['idpUuid'])) {
+                $uuidTaken = User::where('idp_user_id', $guisisData['idpUuid'])->where('id', '!=', $user->id)->exists();
+                if (!$uuidTaken) {
+                    $user->idp_user_id = $guisisData['idpUuid'];
+                    $user->save();
+                }
+            }
+
+            $matchedNum = $guisisData['studentNumber'] ?? $guisisData['student_number'] ?? null;
+            $course = (is_array($guisisData['program'] ?? null) ? ($guisisData['program']['name'] ?? $guisisData['program']['code'] ?? '') : ($guisisData['program'] ?? ''))
+                ?: (is_array($guisisData['course'] ?? null) ? ($guisisData['course']['name'] ?? $guisisData['course']['course'] ?? '') : ($guisisData['course'] ?? ''));
+
+            $yearSection = null;
+            if (isset($guisisData['yearLevel']) && isset($guisisData['section'])) {
+                $yearSection = $guisisData['yearLevel'] . '-' . $guisisData['section'];
+            } else {
+                $yearSection = $guisisData['year_and_section'] ?? $guisisData['year_section'] ?? null;
+            }
+
+            $firstName = $guisisData['firstName'] ?? $guisisData['first_name'] ?? null;
+            $middleName = $guisisData['middleName'] ?? $guisisData['middle_name'] ?? null;
+            $lastName = $guisisData['lastName'] ?? $guisisData['last_name'] ?? null;
+            $suffixName = $guisisData['suffixName'] ?? $guisisData['suffix_name'] ?? $guisisData['suffix'] ?? null;
+
+            if ($firstName) {
+                $user->first_name = $firstName;
+            }
+            if ($middleName !== null) {
+                $user->middle_name = $middleName;
+            }
+            if ($lastName) {
+                $user->last_name = $lastName;
+            }
+            if ($firstName || $lastName) {
+                $user->full_name = trim(($user->first_name ?: $firstName) . ' ' . ($user->last_name ?: $lastName));
+            }
+            if ($suffixName !== null) {
+                $user->suffix = $suffixName;
+            }
+            $user->save();
+
+            if ($matchedNum) {
+                $student->studentNum = $matchedNum;
+                $ojtInfo = OJTInformation::where('studentNum', $student->studentNum)->first();
+                if ($ojtInfo) {
+                    $ojtInfo->studentNum = $matchedNum;
+                    $ojtInfo->save();
+                }
+            }
+
+            if ($course) {
+                $student->course = $course;
+            }
+
+            if ($yearSection) {
+                $student->year_and_section = $yearSection;
+            }
+
+            $mobile = $guisisData['mobileNumber'] ?? $guisisData['mobile_number'] ?? $guisisData['contactNumber'] ?? $guisisData['contact_number'] ?? null;
+            if ($mobile) {
+                $student->contact_number = $mobile;
+            }
+
+            $effectiveNum = $matchedNum ?: $studentNum;
+
+            // Fetch personal info (DOB)
+            $dob = $guisisData['dateOfBirth'] ?? $guisisData['date_of_birth'] ?? null;
+            if ($effectiveNum) {
+                $personalInfo = $guidanceApi->getPersonalInfo($effectiveNum);
+                if ($personalInfo && !empty($personalInfo['dateOfBirth'])) {
+                    $dob = $personalInfo['dateOfBirth'];
+                }
+            }
+
+            if ($dob) {
+                try {
+                    $formattedDob = Carbon::parse($dob)->format('Y-m-d');
+                    $student->date_of_birth = $formattedDob;
+                } catch (\Exception $e) {
+                    $student->date_of_birth = substr($dob, 0, 10);
+                }
+            }
+
+            // Fetch addresses
+            if ($effectiveNum) {
+                $addresses = $guidanceApi->getAddresses($effectiveNum);
+                if (!empty($addresses) && is_array($addresses)) {
+                    $firstAddr = reset($addresses);
+                    if (is_array($firstAddr)) {
+                        $street = $firstAddr['streetDetail'] ?? $firstAddr['street'] ?? '';
+                        $brgy = is_array($firstAddr['barangay'] ?? null) ? ($firstAddr['barangay']['name'] ?? '') : ($firstAddr['barangay'] ?? '');
+                        $city = is_array($firstAddr['city'] ?? null) ? ($firstAddr['city']['name'] ?? '') : ($firstAddr['city'] ?? '');
+                        $prov = is_array($firstAddr['province'] ?? null) ? ($firstAddr['province']['name'] ?? '') : ($firstAddr['province'] ?? '');
+                        $reg = is_array($firstAddr['region'] ?? null) ? ($firstAddr['region']['name'] ?? '') : ($firstAddr['region'] ?? '');
+
+                        $fullAddr = implode(', ', array_filter([$street, $brgy, $city, $prov ?: $reg]));
+                        if (!empty($fullAddr)) {
+                            $student->address = $fullAddr;
+                        }
+                    }
+                }
+            }
+
+            $student->save();
+
+            AuditLogger::log(
+                'Student Profile',
+                'update',
+                'Synced profile details from Guidance System (GuiSIS) for: ' . $user->full_name,
+                $user->id
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile details successfully synced from Guidance System (GuiSIS)!',
+                'data' => [
+                    'studentNum' => $student->studentNum,
+                    'course' => $student->course,
+                    'year_and_section' => $student->year_and_section,
+                    'contact_number' => $student->contact_number,
+                    'address' => $student->address,
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('GuiSIS sync exception: ' . $e->getMessage(), [
+                'exception' => $e
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error connecting to Guidance System (GuiSIS): ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 }

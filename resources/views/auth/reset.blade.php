@@ -3,13 +3,8 @@ $email = $_GET['email'] ?? '';
 ?>
 
 <!DOCTYPE html>
-<html lang="en" style="background: #3b0000;">
+<html lang="en">
 <head>
-    <!-- CRITICAL: Prevents white flash -->
-    <style>
-        html, body { background: #3b0000 !important; }
-    </style>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Reset Password</title>
@@ -18,137 +13,8 @@ $email = $_GET['email'] ?? '';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
-
-    <style>
-        body.auth-centered-page .login-container {
-            max-width: 560px;
-            min-height: auto;
-        }
-
-        body.auth-centered-page .left-panel {
-            display: none !important;
-        }
-
-        body.auth-centered-page .right-panel {
-            width: 100%;
-            flex: 1 1 auto;
-            min-height: 620px;
-            padding: 48px 42px;
-            justify-content: center;
-        }
-
-        body.auth-centered-page .right-panel.success-state {
-            min-height: auto;
-            padding: 36px 42px;
-            justify-content: center;
-        }
-
-        .success-compact {
-            width: 100%;
-            max-width: 460px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .success-compact .reset-header {
-            margin-bottom: 0;
-        }
-
-        .success-compact .reset-header h2 {
-            margin-bottom: 6px;
-        }
-
-        .success-compact .reset-header p {
-            margin-bottom: 0;
-        }
-
-        .success-compact .alert {
-            margin-bottom: 0;
-            padding: 10px 14px;
-            font-size: 14px;
-            line-height: 1.35;
-        }
-
-        .success-compact .btn-wrap {
-            margin-top: 0;
-        }
-
-        body.auth-centered-page .shield-icon-wrap {
-            display: none !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap input,
-        body.auth-centered-page .right-panel .input-wrap select {
-            background: #f7f4ee !important;
-            border: 1px solid #ddd7cb !important;
-            color: #3b0000 !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap input::placeholder {
-            color: #9a9080 !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap input:focus,
-        body.auth-centered-page .right-panel .input-wrap select:focus {
-            background: #fffdf9 !important;
-            border-color: #cdbfa9 !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap .i-icon,
-        body.auth-centered-page .right-panel .input-wrap .toggle-pw {
-            color: #ef4444 !important;
-            z-index: 2;
-        }
-
-        .auth-brand {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .auth-logo {
-            width: 72px;
-            height: 72px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
-        }
-
-        .auth-brand-copy .brand-name {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .auth-brand-copy .system-title {
-            font-size: 10px;
-            letter-spacing: 2px;
-        }
-
-        @media (max-width: 767px) {
-            body.auth-centered-page .right-panel {
-                min-height: auto;
-                padding: 40px 24px;
-            }
-
-            body.auth-centered-page .right-panel.success-state {
-                padding: 28px 20px;
-            }
-
-            .auth-logo {
-                width: 58px;
-                height: 58px;
-            }
-
-            .auth-brand-copy .brand-name {
-                font-size: 20px;
-            }
-        }
-    </style>
-
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/pages/auth-reset.css') }}">
 </head>
 
 <body class="auth-centered-page">
@@ -209,10 +75,12 @@ $email = $_GET['email'] ?? '';
 
         <!-- RIGHT PANEL -->
         <div class="right-panel{{ Session::has('success') ? ' success-state' : '' }}">
-            <!-- Floating shield icon -->
-            <div class="shield-icon-wrap">
-                <div class="shield-circle">
-                    <i class="fa fa-shield-alt"></i>
+            
+            <div class="auth-brand">
+                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
+                <div class="auth-brand-copy">
+                    <div class="brand-name">Intern<span>Connect</span> - BETA</div>
+                    <div class="system-title">On-The-Job Training Information Management System</div>
                 </div>
             </div>
 
@@ -225,7 +93,7 @@ $email = $_GET['email'] ?? '';
 
                     <div class="alert alert-success">{{ Session::get('success') }}</div>
                     <div class="btn-wrap">
-                        <a href="{{ url('/login') }}" class="btn-reset" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                        <a href="{{ url('/login') }}" class="btn-reset">
                             <i class="fa fa-arrow-right me-2"></i> Proceed to Login
                         </a>
                     </div>
@@ -239,21 +107,48 @@ $email = $_GET['email'] ?? '';
                 <form action="{{ url('/reset-password') }}?email={{ $email }}" method="post">
                     @csrf
 
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle me-1"></i>
+                            @foreach($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                    @endif
+
                     @if(Session::has('fail'))
-                        <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle me-1"></i> {{ Session::get('fail') }}
+                        </div>
                     @endif
 
                     <!-- New Password -->
-                    <div class="field-group">
+                    <div class="field-group" style="position: relative;">
                         <label class="form-label">New Password</label>
                         <div class="input-wrap">
                             <i class="fa fa-lock i-icon"></i>
-                            <input type="password" placeholder="Enter new password" name="password" id="new_password">
+                            <input type="password" placeholder="Enter new password" name="password" id="new_password" autocomplete="new-password">
                             <i class="far fa-eye toggle-pw" id="toggleNewPassword"></i>
                         </div>
-                        <div style="margin-top:8px; padding:8px 10px; border-radius:8px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; line-height:1.4;">
-                            <strong>Password requirements:</strong> Use at least 8 characters with uppercase, lowercase, a number, and one of these symbols: ! @ # $ % ^ & *.
+
+                        <!-- Interactive Speech Bubble Warning & Checklist -->
+                        <div class="password-bubble" id="passwordBubble">
+                            <div class="bubble-arrow"></div>
+                            <div class="bubble-header">
+                                <i class="fa fa-shield-alt"></i> Password Requirements
+                            </div>
+                            <div class="bubble-warning" id="bubbleWarning" style="display: none;">
+                                <i class="fa fa-exclamation-circle"></i> Please fulfill all criteria below:
+                            </div>
+                            <ul class="bubble-checklist">
+                                <li id="req-length"><i class="fa fa-circle"></i> At least 8 characters</li>
+                                <li id="req-upper"><i class="fa fa-circle"></i> At least one uppercase letter (A-Z)</li>
+                                <li id="req-lower"><i class="fa fa-circle"></i> At least one lowercase letter (a-z)</li>
+                                <li id="req-num"><i class="fa fa-circle"></i> At least one number (0-9)</li>
+                                <li id="req-sym"><i class="fa fa-circle"></i> One symbol: ! @ # $ % ^ & *</li>
+                            </ul>
                         </div>
+
                         <!-- Strength bar -->
                         <div class="strength-wrap">
                             <div class="strength-bar-bg">
@@ -264,12 +159,16 @@ $email = $_GET['email'] ?? '';
                     </div>
 
                     <!-- Confirm Password -->
-                    <div class="field-group">
+                    <div class="field-group" style="position: relative;">
                         <label class="form-label">Confirm Password</label>
                         <div class="input-wrap">
                             <i class="fa fa-lock i-icon"></i>
-                            <input type="password" placeholder="Confirm new password" name="confirm_password" id="confirm_password">
+                            <input type="password" placeholder="Confirm new password" name="confirm_password" id="confirm_password" autocomplete="new-password">
                             <i class="far fa-eye toggle-pw" id="toggleConfirmPassword"></i>
+                        </div>
+                        <div class="confirm-bubble" id="confirmBubble" style="display: none;">
+                            <div class="bubble-arrow"></div>
+                            <i class="fa fa-exclamation-triangle me-1"></i> Passwords do not match
                         </div>
                         <div class="match-indicator" id="matchIndicator">
                             <i class="fa fa-check-circle"></i>
@@ -295,114 +194,7 @@ $email = $_GET['email'] ?? '';
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url('/frontend/js/script.js') }}"></script>
-<script>
-    const toggleNewPassword = document.getElementById('toggleNewPassword');
-    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-    const newPasswordInput  = document.getElementById('new_password');
-    const confirmInput      = document.getElementById('confirm_password');
-    const strengthBar       = document.getElementById('strengthBar');
-    const strengthLabel     = document.getElementById('strengthLabel');
-    const matchIndicator    = document.getElementById('matchIndicator');
-    const matchText         = document.getElementById('matchText');
-
-    if (toggleNewPassword && newPasswordInput) {
-        toggleNewPassword.addEventListener('click', function () {
-            newPasswordInput.type = newPasswordInput.type === 'password' ? 'text' : 'password';
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-            this.classList.remove('toggled');
-            void this.offsetWidth;
-            this.classList.add('toggled');
-        });
-    }
-
-    if (toggleConfirmPassword && confirmInput) {
-        toggleConfirmPassword.addEventListener('click', function () {
-            confirmInput.type = confirmInput.type === 'password' ? 'text' : 'password';
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-            this.classList.remove('toggled');
-            void this.offsetWidth;
-            this.classList.add('toggled');
-        });
-    }
-
-    function checkStrength(password) {
-        let score = 0;
-        if (password.length >= 8)  score++;
-        if (password.length >= 12) score++;
-        if (/[A-Z]/.test(password)) score++;
-        if (/[0-9]/.test(password)) score++;
-        if (/[^A-Za-z0-9]/.test(password)) score++;
-        return score;
-    }
-
-    function checkMatch() {
-        if (!newPasswordInput || !confirmInput || !matchIndicator || !matchText) {
-            return;
-        }
-
-        const pw  = newPasswordInput.value;
-        const cpw = confirmInput.value;
-
-        if (cpw.length === 0) {
-            matchIndicator.classList.remove('visible', 'match', 'no-match');
-            return;
-        }
-
-        matchIndicator.classList.add('visible');
-
-        if (pw === cpw) {
-            matchIndicator.classList.add('match');
-            matchIndicator.classList.remove('no-match');
-            matchIndicator.querySelector('i').className = 'fa fa-check-circle';
-            matchText.textContent = 'Passwords match';
-        } else {
-            matchIndicator.classList.add('no-match');
-            matchIndicator.classList.remove('match');
-            matchIndicator.querySelector('i').className = 'fa fa-times-circle';
-            matchText.textContent = 'Passwords do not match';
-        }
-    }
-
-    if (newPasswordInput && strengthBar && strengthLabel) {
-        newPasswordInput.addEventListener('input', function () {
-            const val   = this.value;
-            const score = checkStrength(val);
-
-            const levels = [
-                { width: '0%',   color: 'transparent',               label: 'Enter a password' },
-                { width: '20%',  color: '#ef4444',                   label: 'Very weak' },
-                { width: '40%',  color: '#f97316',                   label: 'Weak' },
-                { width: '60%',  color: '#eab308',                   label: 'Fair' },
-                { width: '80%',  color: '#84cc16',                   label: 'Strong' },
-                { width: '100%', color: '#22c55e',                   label: 'Very strong' },
-            ];
-
-            const level = val.length === 0 ? levels[0] : levels[Math.min(score, 5)];
-            strengthBar.style.width      = level.width;
-            strengthBar.style.background = level.color;
-            strengthLabel.textContent    = level.label;
-            strengthLabel.style.color    = val.length === 0 ? 'rgba(255,255,255,0.4)' : level.color;
-
-            checkMatch();
-        });
-    }
-
-    if (confirmInput) {
-        confirmInput.addEventListener('input', checkMatch);
-    }
-
-    // Email from URL
-    function getEmailQueryParam() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('email');
-    }
-
-    const email = getEmailQueryParam();
-</script>
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ vasset('js/pages/auth-reset.js') }}"></script>
 </body>
 </html>

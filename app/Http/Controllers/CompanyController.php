@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\OJTInformation;
 use App\Models\FileRequirement;
+use App\Models\MoaUnlockRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -348,26 +349,46 @@ public function companiesup(Request $request)
 
     $linkedCompanyIds = $companies->pluck('id');
 
-    $availableLinkableCompanies = Company::with('students')
-        ->whereNotIn('id', $linkedCompanyIds)
-        ->orderBy('company_name')
-        ->get()
-        ->filter(function ($company) use ($studentProfile) {
-            if (empty($company->file)) {
-                return false;
-            }
+    $isLocked = $companies->isNotEmpty();
 
-            if (!$this->isMoaActive($company)) {
-                return false;
-            }
+    if ($isLocked) {
+        $availableLinkableCompanies = collect();
+    } else {
+        $availableLinkableCompanies = Company::with('students')
+            ->whereNotIn('id', $linkedCompanyIds)
+            ->orderBy('company_name')
+            ->get()
+            ->filter(function ($company) use ($studentProfile) {
+                if (empty($company->file)) {
+                    return false;
+                }
 
-            if (empty($studentProfile?->course)) {
-                return true;
-            }
+                if (!$this->isMoaActive($company)) {
+                    return false;
+                }
 
-            return $this->companyMatchesCourse($company, $studentProfile->course);
-        })
-        ->values();
+                if (empty($studentProfile?->course)) {
+                    return true;
+                }
+
+                return $this->companyMatchesCourse($company, $studentProfile->course);
+            })
+            ->values();
+    }
+
+    $unlockRequest = $studentProfile 
+        ? MoaUnlockRequest::where('student_id', $studentProfile->id)->latest()->first() 
+        : null;
+
+    $hasApprovedEditUnlock = function ($companyId) use ($studentProfile) {
+        if (!$studentProfile) return false;
+        return MoaUnlockRequest::where('student_id', $studentProfile->id)
+            ->where('company_id', $companyId)
+            ->where('request_type', 'edit')
+            ->where('status', 'approved')
+            ->exists();
+    };
+
     $stu= Student::all();
 
     $companyNames = $companies->pluck('company_name')->toArray(); // Get an array of company names
@@ -378,7 +399,7 @@ public function companiesup(Request $request)
     })->get();
     $ojt = OJTInformation::where('studentNum', $user->studentNum)->get();
 
-    return view('students.companiesup', compact('companies', 'students', 'user','stu','ojt', 'availableLinkableCompanies'));
+    return view('students.companiesup', compact('companies', 'students', 'user','stu','ojt', 'availableLinkableCompanies', 'isLocked', 'unlockRequest', 'hasApprovedEditUnlock'));
 }
 
 public function linkExistingMoa(Request $request)
@@ -394,6 +415,10 @@ public function linkExistingMoa(Request $request)
 
     if (!$studentProfile) {
         return back()->with('fail', 'Student profile not found.');
+    }
+
+    if ($studentProfile->companies()->exists()) {
+        return back()->with('fail', 'Your MOA selection is currently locked. You must submit an unlock request to your coordinator to change companies.');
     }
 
     $validated = $request->validate([
@@ -558,8 +583,12 @@ $res = $fileup->save();
     }
 
     // Resolve selected student names via users table and map to student profiles via user_id.
-    $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
-    $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
+    if ($data->role == 0) {
+        $existingStudents = Student::where('user_id', $data->id)->with('user')->get();
+    } else {
+        $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
+        $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
+    }
     $selectedCourses = $data->role == 1 ? $this->normalizeCourseSelection($request->input('course')) : $this->normalizeCourseSelection($com->course);
 
     if ($data->role == 1 && !empty($studentNames)) {
@@ -630,6 +659,21 @@ public function companyUpdate(Request $request, $id)
 
     if ($data->role == 0 && $company->uploader_name !== $data->full_name) {
         return back()->with('fail', 'You do not have permission to update this MOA.');
+    }
+
+    if ($data->role == 0 && $company->students()->count() > 1) {
+        $student = Student::where('user_id', $data->id)->first();
+        $hasApprovedEditUnlock = $student
+            ? MoaUnlockRequest::where('student_id', $student->id)
+                ->where('company_id', $company->id)
+                ->where('request_type', 'edit')
+                ->where('status', 'approved')
+                ->exists()
+            : false;
+
+        if (!$hasApprovedEditUnlock) {
+            return back()->with('fail', 'This MOA is locked because multiple students are linked to it. Company details and files cannot be edited without Coordinator unlock approval.');
+        }
     }
 
     $rules = [
@@ -738,8 +782,12 @@ public function companyUpdate(Request $request, $id)
             ->with('fail', 'Manual student names cannot be saved yet. Please add column companies.student_names_display first.');
     }
 
-    $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
-    $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
+    if ($data->role == 0) {
+        $existingStudents = Student::where('user_id', $data->id)->with('user')->get();
+    } else {
+        $selectedUserIds = User::whereIn('full_name', $studentNames)->pluck('id');
+        $existingStudents = Student::whereIn('user_id', $selectedUserIds)->with('user')->get();
+    }
     $selectedCourses = $data->role == 0 ? $this->normalizeCourseSelection($company->course) : $this->normalizeCourseSelection($request->input('course'));
     $effectiveCourses = !empty($selectedCourses) ? $selectedCourses : $this->normalizeCourseSelection($company->course);
 

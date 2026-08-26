@@ -48,5 +48,32 @@ return [
         'auto_insights' => filter_var(env('AI_AUTO_INSIGHTS', false), FILTER_VALIDATE_BOOL),
     ],
 
+    'idp' => [
+        'enabled'       => filter_var(env('IDP_ENABLED', false), FILTER_VALIDATE_BOOL),
+        'base_url'      => env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com'),
+        'authorize_url' => env('IDP_AUTH_URL', env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/auth/authorize'),
+        'token_url'     => env('IDP_TOKEN_URL', env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/auth/token'),
+        'me_url'        => env('IDP_ME_URL', env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/me'),
+        'jwks_url'      => env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/.well-known/jwks.json',
+        'logout_url'    => env('IDP_BASE_URL', 'https://identity-provider.isaxbsit2027.com') . '/api/v1/auth/logout',
+        'client_id'     => env('IDP_CLIENT_ID'),
+        'client_secret' => env('IDP_CLIENT_SECRET'),
+        'admin_access_token' => env('IDP_ADMIN_ACCESS_TOKEN'),
+        'session_cookie' => env('IDP_SESSION_COOKIE'),
+        'callback_url'  => env('IDP_CALLBACK_URL', env('APP_URL', 'http://127.0.0.1:8000') . '/auth/callback'),
+        'verify_tls'    => filter_var(env('IDP_VERIFY_TLS', true), FILTER_VALIDATE_BOOL),
+    ],
+
+    'guisis' => [
+        'base_url' => env('GUISIS_BASE_URL', 'https://api-guisis.dllbsit2027.com/api/v1'),
+        'api_key' => env('GUISIS_API_KEY', ''),
+        'client_id' => env('GUISIS_CLIENT_ID', '40284c44-2d44-42ce-88bc-b4e5cc9e8be7'),
+        'client_secret' => env('GUISIS_CLIENT_SECRET', '6f99e1b82ddb71d40b5f5dc30d7ef8e755455982c2bbb92ba68322278adf05fa'),
+    ],
+
+    'flss' => [
+        'base_url' => env('FLSS_BASE_URL', 'https://flss.alquatrilixbsit2027.com'),
+        'api_key'  => env('FLSS_API_KEY', ''),
+    ],
 
 ];

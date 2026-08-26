@@ -20,6 +20,8 @@
 
     <script src="js/jquery.printPage.js"></script>
     
+    <link rel="stylesheet" href="{{ vasset('css/student/pending.css') }}">
+</head>
 </head>
 
 <body>
@@ -203,13 +205,13 @@
         </div> 
     </div>
 </div>
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
 
 
 <!-- =========== Scripts =========  -->
-<script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="{{ vasset('assets/js/main.js') }}"></script>
 
 <!-- ====== ionicons ======= -->
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -451,13 +453,13 @@ $(document).ready(function() {
         </div> 
     </div>
 </div>
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
 
 
 <!-- =========== Scripts =========  -->
-<script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="{{ vasset('assets/js/main.js') }}"></script>
 
 <!-- ====== ionicons ======= -->
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -495,3 +497,6 @@ $(document).ready(function() {
     });
 });
 </script>
+
+</body>
+</html>

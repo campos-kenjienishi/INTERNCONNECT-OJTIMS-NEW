@@ -12,1035 +12,11 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --red:        #dc2626;
-            --red-dark:   #991b1b;
-            --red-deeper: #7f0000;
-            --sidebar-w:  260px;
-            --sidebar-w-collapsed: 70px;
-            --topbar-h:   64px;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f5f5f5;
-            color: #1a1a1a;
-            min-height: 100vh;
-        }
-
-        body.dark-mode {
-            background: #000000;
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .sidebar {
-            box-shadow: 4px 0 24px rgba(0,0,0,0.4);
-        }
-
-        /* =============== SIDEBAR =============== */
-        .sidebar {
-            position: fixed; top: 0; left: 0;
-            width: var(--sidebar-w); height: 100vh;
-            background: linear-gradient(160deg, #1a0000 0%, #4a0000 50%, #7f0000 100%);
-            display: flex; flex-direction: column;
-            z-index: 1000;
-            transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
-            overflow: hidden;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.18);
-        }
-
-        .sidebar.collapsed { width: var(--sidebar-w-collapsed); }
-
-        .sidebar-brand {
-            display: flex; align-items: center; gap: 12px;
-            padding: 22px 18px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            text-decoration: none; flex-shrink: 0;
-        }
-
-        .sidebar-brand img {
-            width: 36px; height: 36px; object-fit: contain; flex-shrink: 0;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
-        }
-
-        .sidebar-brand-text {
-            display: flex; flex-direction: column;
-            white-space: nowrap; overflow: hidden;
-            transition: opacity 0.25s, width 0.25s;
-        }
-
-        .sidebar-brand-name { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px; line-height: 1; }
-        .sidebar-brand-name span { color: #fca5a5; }
-        .sidebar-brand-sub { font-size: 9px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px; }
-        .sidebar.collapsed .sidebar-brand-text { opacity: 0; width: 0; }
-
-        .sidebar-user {
-            display: flex; align-items: center; gap: 12px;
-            padding: 16px 18px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            text-decoration: none; flex-shrink: 0; transition: background 0.2s;
-        }
-
-        .sidebar-user:hover { background: rgba(255,255,255,0.05); }
-
-        .user-avatar {
-            width: 38px; height: 38px; border-radius: 50%;
-            background: rgba(239,68,68,0.25);
-            border: 1.5px solid rgba(239,68,68,0.4);
-            display: flex; align-items: center; justify-content: center;
-            color: #fca5a5; font-size: 16px; flex-shrink: 0; overflow: hidden;
-        }
-
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .user-info { overflow: hidden; white-space: nowrap; transition: opacity 0.25s, width 0.25s; }
-        .user-name { font-size: 13px; font-weight: 600; color: #fff; display: block; text-overflow: ellipsis; overflow: hidden; }
-        .user-role { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
-        .sidebar.collapsed .user-info { opacity: 0; width: 0; }
-
-        .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
-        .sidebar-nav::-webkit-scrollbar { width: 3px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(239,68,68,0.3); border-radius: 10px; }
-
-        .nav-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 12px 20px; color: rgba(255,255,255,0.55);
-            text-decoration: none; font-size: 14px; font-weight: 500;
-            transition: all 0.25s; position: relative;
-            white-space: nowrap; border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.06); }
-        .nav-item.active { color: #fff; background: rgba(239,68,68,0.15); border-left-color: #ef4444; }
-        .nav-item .nav-icon { font-size: 18px; flex-shrink: 0; width: 22px; text-align: center; }
-        .nav-item .nav-label { transition: opacity 0.25s; overflow: hidden; }
-        .sidebar.collapsed .nav-label { opacity: 0; width: 0; }
-
-        .nav-item .tooltip-label {
-            position: absolute; left: calc(var(--sidebar-w-collapsed) + 8px);
-            background: #1a0000; color: #fff; font-size: 12px;
-            padding: 5px 10px; border-radius: 6px; white-space: nowrap;
-            pointer-events: none; opacity: 0; transition: opacity 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999;
-        }
-
-        .sidebar.collapsed .nav-item:hover .tooltip-label { opacity: 1; }
-        .sidebar-footer { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
-
-        /* =============== MAIN =============== */
-        .main-content {
-            margin-left: var(--sidebar-w);
-            transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
-            min-height: 100vh; display: flex; flex-direction: column;
-        }
-
-        body.dark-mode .main-content { background: #000000; }
-
-        .main-content.expanded { margin-left: var(--sidebar-w-collapsed); }
-
-        .topbar {
-            height: var(--topbar-h); background: #fff;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 28px; position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        body.dark-mode .topbar {
-            background: #252525;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-            border-bottom: 1px solid #3a3a3a;
-        }
-
-        .topbar-left { display: flex; align-items: center; gap: 16px; }
-
-        body.dark-mode .topbar-left { color: #e0e0e0; }
-
-        .menu-toggle {
-            width: 38px; height: 38px; border-radius: 10px;
-            background: #f5f5f5; border: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            color: #333; font-size: 18px; transition: all 0.2s;
-        }
-
-        body.dark-mode .menu-toggle {
-            background: #3a3a3a;
-            color: #e0e0e0;
-        }
-
-        .menu-toggle:hover { background: #fee2e2; color: var(--red); }
-
-        body.dark-mode .menu-toggle:hover {
-            background: rgba(220,38,38,0.2);
-        }
-
-        .darkmode-toggle {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-            flex-shrink: 0;
-            padding: 0;
-        }
-
-        .darkmode-toggle:hover {
-            background: #fee2e2; color: var(--red); border-color: #fecaca;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
-        }
-
-        .darkmode-toggle:active { transform: scale(0.95); }
-
-        body.dark-mode .darkmode-toggle {
-            background: #2a2a2a;
-            border-color: #3a3a3a;
-            color: #e8e8e8;
-        }
-
-        body.dark-mode .darkmode-toggle:hover {
-            background: rgba(220,38,38,0.2);
-            color: #ff6b6b;
-            border-color: rgba(220,38,38,0.3);
-            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
-            transform: translateY(-2px);
-        }
-        .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
-        .topbar-title span { color: var(--red); font-weight: 600; }
-
-        body.dark-mode .topbar-title { color: #999; }
-
-        .topbar-badge {
-            display: flex; align-items: center; gap: 8px;
-            background: #fff5f5; border: 1px solid #fecaca;
-            border-radius: 20px; padding: 6px 14px;
-            font-size: 12.5px; font-weight: 600; color: var(--red-dark);
-        }
-
-        body.dark-mode .topbar-badge {
-            background: rgba(220,38,38,0.15);
-            border: 1px solid rgba(220,38,38,0.3);
-            color: #ff6b6b;
-        }
-
-        /* =============== PAGE =============== */
-        .page-content { padding: 28px; flex: 1; }
-
-        body.dark-mode .page-content { background: #000000; }
-
-        .page-header {
-            display: flex; align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-        }
-
-        .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
-        .page-header h1 span { color: var(--red); }
-
-        body.dark-mode .page-header h1 { color: #fff; }
-
-        .breadcrumb {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 13px; color: #888; margin-top: 6px;
-        }
-
-        body.dark-mode .breadcrumb { color: #999; }
-
-        /* ===== DARK MODE: STAT CARDS ===== */
-        body.dark-mode .stat-card {
-            background: #2a2a2a; border: 1px solid #3a3a3a;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        body.dark-mode .stat-icon.red    { background: rgba(220,38,38,0.2); }
-        body.dark-mode .stat-icon.blue   { background: rgba(37,99,235,0.2); color: #60a5fa; }
-        body.dark-mode .stat-icon.green  { background: rgba(22,163,74,0.2); color: #4ade80; }
-        body.dark-mode .stat-icon.purple { background: rgba(124,58,237,0.2); color: #c084fc; }
-
-        body.dark-mode .stat-num  { color: #fff; }
-        body.dark-mode .stat-name { color: #999; }
-
-        /* ===== DARK MODE: TABLE CARDS ===== */
-        body.dark-mode .table-card {
-            background: #2a2a2a; border: 1px solid #3a3a3a;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-        }
-
-        body.dark-mode .table-card-header {
-            background: #2a2a2a; border-bottom: 1px solid #3a3a3a;
-        }
-
-        body.dark-mode .header-icon {
-            background: rgba(220,38,38,0.2); color: #ff6b6b;
-        }
-
-        body.dark-mode .table-card-header h2 { color: #fff; }
-        body.dark-mode .table-card-header p  { color: #999; }
-
-        body.dark-mode .prof-count-badge {
-            background: rgba(220,38,38,0.15); color: #ff6b6b;
-        }
-
-        /* ===== DARK MODE: DATATABLES ===== */
-        body.dark-mode .table-card-body table.dataTable thead th {
-            background: #2a2a2a; color: #aaa;
-            border-bottom: 1px solid #3a3a3a;
-        }
-
-        body.dark-mode .table-card-body table.dataTable thead th:first-child {
-            background: #2a2a2a;
-        }
-
-        body.dark-mode .table-card-body table.dataTable tbody td {
-            color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        body.dark-mode .table-card-body table.dataTable tbody td:first-child {
-            background: #2a2a2a;
-        }
-
-        body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.08); }
-
-        body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child { background: rgba(220,38,38,0.08); }
-
-        body.dark-mode .dataTables_filter input {
-            background: #3a3a3a !important; color: #e0e0e0 !important;
-            border: 1px solid #3a3a3a !important;
-        }
-
-        body.dark-mode .dataTables_filter input::placeholder {
-            color: #777 !important;
-        }
-
-        body.dark-mode .dataTables_filter input:focus {
-            border-color: #ff6b6b !important;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.15) !important;
-        }
-
-        body.dark-mode .dataTables_length select {
-            background: #3a3a3a !important; color: #e0e0e0 !important;
-            border: 1px solid #3a3a3a !important;
-        }
-
-        body.dark-mode .dataTables_paginate .paginate_button {
-            color: #e0e0e0 !important; border: 1px solid #3a3a3a !important;
-        }
-
-        body.dark-mode .dataTables_paginate .paginate_button.current {
-            background: #dc2626 !important; border-color: #dc2626 !important;
-        }
-
-        body.dark-mode .dataTables_paginate .paginate_button:hover {
-            background: rgba(220,38,38,0.15) !important; color: #ff6b6b !important;
-        }
-
-        /* ===== DARK MODE: PROFESSOR CELLS ===== */
-        body.dark-mode .prof-avatar {
-            background: rgba(220,38,38,0.2); color: #ff6b6b;
-        }
-
-        body.dark-mode .prof-name-text { color: #e0e0e0; }
-
-        /* ===== DARK MODE: SUBJECT BADGES ===== */
-        body.dark-mode .subject-code-badge {
-            background: rgba(124,58,237,0.2); color: #c084fc;
-        }
-
-        /* ===== DARK MODE: ACTION BUTTONS ===== */
-        body.dark-mode .btn-edit {
-            background: #3a3a3a; border: 1.5px solid rgba(79,70,229,0.2); color: #60a5fa;
-        }
-
-        body.dark-mode .btn-edit:hover { background: rgba(79,70,229,0.15); }
-
-        body.dark-mode .btn-remove {
-            background: #3a3a3a; border: 1.5px solid rgba(220,38,38,0.2); color: #ff6b6b;
-        }
-
-        body.dark-mode .btn-remove:hover { background: rgba(220,38,38,0.15); }
-
-        /* ===== DARK MODE: MODALS ===== */
-        body.dark-mode .modal-content {
-            background: #2a2a2a;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-        }
-
-        body.dark-mode .modal-body {
-            background: #2a2a2a; color: #e0e0e0;
-        }
-
-        body.dark-mode .modal-body::-webkit-scrollbar-thumb { background: rgba(220,38,38,0.3); }
-
-        body.dark-mode .field-label {
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .field-input, body.dark-mode .field-select {
-            background: #3a3a3a; color: #e0e0e0;
-            border: 1.5px solid #3a3a3a;
-        }
-
-        body.dark-mode .field-input::placeholder {
-            color: #777;
-        }
-
-        body.dark-mode .field-input:focus, body.dark-mode .field-select:focus {
-            border-color: #ff6b6b; background: #3a3a3a;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.15);
-        }
-
-        /* ===== DARK MODE: CHECKBOXES ===== */
-        body.dark-mode .checkbox-item {
-            background: #3a3a3a; border: 1.5px solid #3a3a3a;
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .checkbox-item:has(input:checked) {
-            border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.1);
-            color: #ff6b6b;
-        }
-
-        /* ===== DARK MODE: MODAL SECTIONS ===== */
-        body.dark-mode .modal-section {
-            color: #666; border-bottom: 1px solid #3a3a3a;
-        }
-
-        /* ===== DARK MODE: MODAL FOOTER ===== */
-        body.dark-mode .modal-footer {
-            background: #2a2a2a; border-top: 1px solid #3a3a3a;
-        }
-
-        body.dark-mode .btn-modal-close {
-            background: #3a3a3a; border: 1px solid #3a3a3a;
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .btn-modal-close:hover {
-            background: rgba(220,38,38,0.15); border-color: rgba(220,38,38,0.3);
-            color: #ff6b6b;
-        }
-
-        body.dark-mode .btn-modal-submit {
-            box-shadow: 0 3px 10px rgba(220,38,38,0.3);
-        }
-
-        body.dark-mode .btn-modal-submit:hover {
-            box-shadow: 0 6px 16px rgba(220,38,38,0.4);
-        }
-
-        /* ===== DARK MODE: DASHBOARD FOOTER ===== */
-        body.dark-mode .dashboard-footer {
-            background: #2a2a2a; border-top: 1px solid rgba(255,255,255,0.08);
-            color: #999;
-        }
-
-        body.dark-mode .dashboard-footer a {
-            color: #999;
-        }
-
-        body.dark-mode .dashboard-footer a:hover {
-            color: #ff6b6b;
-        }
-
-        body.dark-mode .dashboard-footer .divider {
-            color: rgba(255,255,255,0.1);
-        }
-
-        body.dark-mode .breadcrumb { color: #999; }
-
-        .breadcrumb a { color: var(--red); text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        .breadcrumb i { font-size: 10px; }
-
-        /* Add Professor button */
-        .btn-add {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 11px 22px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 10px; color: #fff;
-            font-family: 'Poppins', sans-serif; font-size: 14px;
-            font-weight: 600; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.25);
-        }
-
-        body.dark-mode .btn-add {
-            box-shadow: 0 4px 16px rgba(220,38,38,0.4);
-        }
-
-        .btn-add:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(220,38,38,0.35);
-        }
-
-        body.dark-mode .btn-add:hover {
-            box-shadow: 0 8px 24px rgba(220,38,38,0.5);
-        }
-
-        /* Stats row */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px; margin-bottom: 22px;
-        }
-
-        .stat-card {
-            background: #fff; border-radius: 14px;
-            padding: 18px 20px;
-            display: flex; align-items: center; gap: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04);
-        }
-
-        .stat-icon {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; flex-shrink: 0;
-        }
-
-        .stat-icon.red    { background: #fee2e2; color: var(--red); }
-        .stat-icon.blue   { background: #dbeafe; color: #2563eb; }
-        .stat-icon.green  { background: #dcfce7; color: #16a34a; }
-        .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
-
-        .stat-num  { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
-        .stat-name { font-size: 12px; color: #888; margin-top: 3px; }
-
-        /* Table card */
-        .table-card {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04);
-            overflow: hidden;
-        }
-
-        .table-card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; padding: 18px 24px;
-            border-bottom: 1px solid #f0f0f0;
-            background: #fafafa; flex-wrap: wrap;
-        }
-
-        .table-card-header-left { display: flex; align-items: center; gap: 12px; }
-
-        .header-icon {
-            width: 38px; height: 38px; border-radius: 10px;
-            background: #fee2e2; display: flex;
-            align-items: center; justify-content: center;
-            color: var(--red); font-size: 15px; flex-shrink: 0;
-        }
-
-        .table-card-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
-        .table-card-header p  { font-size: 12.5px; color: #888; margin-top: 2px; }
-
-        .prof-count-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #fee2e2; color: var(--red);
-            border-radius: 20px; padding: 5px 14px;
-            font-size: 12.5px; font-weight: 700;
-        }
-
-        /* DataTables */
-        .table-card-body .dataTables_wrapper {
-            padding: 16px 22px;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-        }
-
-        /* Horizontal scroll container for mobile */
-        .table-card-body {
-            position: relative;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
-
-        .table-card-body table.dataTable thead th {
-            background: #fafafa; color: #555;
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            padding: 10px 12px;
-            border-bottom: 1px solid #f0f0f0; border-top: none;
-        }
-
-        /* Sticky first column header */
-        .table-card-body table.dataTable thead th:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 10;
-        }
-
-        .table-card-body table.dataTable tbody td {
-            padding: 13px 12px; color: #333;
-            border-bottom: 1px solid #f9f9f9;
-            font-size: 13px; vertical-align: middle;
-        }
-
-        /* Sticky first column body */
-        .table-card-body table.dataTable tbody td:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 9;
-            background: #fff;
-        }
-
-        .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
-        .table-card-body table.dataTable tbody tr:hover td:first-child { background: #fff5f5; }
-        
-        .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
-
-        .dataTables_filter input {
-            border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
-            padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important; outline: none !important;
-        }
-
-        .dataTables_filter input:focus {
-            border-color: var(--red) !important;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important;
-        }
-
-        .dataTables_length select {
-            border: 1px solid #e5e5e5 !important; border-radius: 8px !important;
-            padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important;
-        }
-
-        .dataTables_paginate .paginate_button {
-            border-radius: 6px !important; font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important;
-        }
-
-        .dataTables_paginate .paginate_button.current {
-            background: var(--red) !important; border-color: var(--red) !important; color: #fff !important;
-        }
-
-        .dataTables_paginate .paginate_button:hover {
-            background: #fee2e2 !important; border-color: #fecaca !important; color: var(--red) !important;
-        }
-
-        /* Professor cell */
-        .prof-cell { display: flex; align-items: center; gap: 10px; }
-
-        .prof-avatar {
-            width: 34px; height: 34px; border-radius: 50%;
-            background: #fee2e2; display: flex;
-            align-items: center; justify-content: center;
-            color: var(--red); font-size: 13px; font-weight: 700; flex-shrink: 0;
-        }
-
-        .prof-name-text { font-weight: 600; color: #1a1a1a; }
-
-        /* Subject badges */
-        .subject-code-badge {
-            display: inline-flex; align-items: center;
-            background: #ede9fe; color: #7c3aed;
-            border-radius: 20px; padding: 3px 10px;
-            font-size: 11.5px; font-weight: 600;
-            margin: 2px 2px 0 0;
-        }
-
-        /* Action buttons */
-        .btn-edit {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 14px; border-radius: 8px;
-            background: #fff; border: 1.5px solid #e0e7ff; color: #4f46e5;
-            font-family: 'Poppins', sans-serif; font-size: 12px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-
-        .btn-edit:hover { background: #e0e7ff; }
-
-        .btn-remove {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 14px; border-radius: 8px;
-            background: #fff; border: 1.5px solid #fecaca; color: var(--red);
-            font-family: 'Poppins', sans-serif; font-size: 12px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-
-        .btn-remove:hover { background: #fee2e2; }
-
-        .actions-wrap { display: flex; align-items: center; gap: 6px; }
-
-        /* =============== MODAL =============== */
-        .modal-content {
-            border-radius: 16px; border: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            font-family: 'Poppins', sans-serif; overflow: hidden;
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%);
-            border-bottom: none; padding: 20px 24px;
-        }
-
-        .modal-title {
-            color: #fff; font-size: 16px; font-weight: 700;
-            display: flex; align-items: center; gap: 10px;
-        }
-
-        .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
-
-        .modal-body {
-            padding: 24px; background: #fff;
-            max-height: 520px; overflow-y: auto;
-        }
-
-        .modal-body::-webkit-scrollbar { width: 4px; }
-        .modal-body::-webkit-scrollbar-thumb { background: #fecaca; border-radius: 10px; }
-
-        /* Modal form fields */
-        .field-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
-        .field-group.has-bubble { overflow: visible; }
-
-        .field-label {
-            font-size: 12px; font-weight: 600; color: #444;
-            display: flex; align-items: center; gap: 5px;
-        }
-
-        .field-label i { color: var(--red); font-size: 11px; }
-
-        .field-input, .field-select {
-            width: 100%; background: #fafafa;
-            border: 1.5px solid #e8e8e8; border-radius: 10px;
-            color: #1a1a1a; font-family: 'Poppins', sans-serif;
-            font-size: 13px; padding: 10px 13px; outline: none;
-            transition: all 0.25s;
-        }
-
-        .field-input:focus, .field-select:focus {
-            border-color: var(--red); background: #fff;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
-        }
-
-        .field-input-wrap { position: relative; }
-
-        .field-input-wrap.has-toggle .field-input {
-            padding-right: 42px;
-        }
-
-        .field-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #9ca3af;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0;
-            z-index: 2;
-            transition: color 0.2s;
-        }
-
-        .field-toggle:hover { color: var(--red); }
-
-        .field-bubble {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: calc(100% + 10px);
-            padding: 10px 12px;
-            border-radius: 12px;
-            border: 1px solid #fecaca;
-            background: #fff7f7;
-            color: var(--red-dark);
-            font-size: 11.5px;
-            line-height: 1.45;
-            box-shadow: 0 12px 24px rgba(127,0,0,0.12);
-            visibility: hidden;
-            opacity: 0;
-            transform: translateY(6px);
-            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .field-bubble.active {
-            visibility: visible;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .field-bubble::after {
-            content: '';
-            position: absolute;
-            left: 22px;
-            top: 100%;
-            width: 14px;
-            height: 14px;
-            background: #fff7f7;
-            border-right: 1px solid #fecaca;
-            border-bottom: 1px solid #fecaca;
-            transform: rotate(45deg) translateY(-7px);
-        }
-
-        .modal-alert-errors {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 16px;
-        }
-
-        .modal-alert-errors ul {
-            margin: 0;
-            padding-left: 18px;
-        }
-
-        .modal-alert-errors li {
-            font-size: 12.5px;
-            color: var(--red);
-            line-height: 1.5;
-        }
-
-        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        /* Checkboxes */
-        .checkbox-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 8px; margin-top: 4px;
-        }
-
-        .checkbox-item {
-            display: flex; align-items: center; gap: 6px;
-            padding: 7px 10px; border-radius: 8px;
-            border: 1.5px solid #e8e8e8; background: #fafafa;
-            cursor: pointer; transition: all 0.2s; font-size: 12.5px;
-        }
-
-        .checkbox-item input[type="checkbox"] { accent-color: var(--red); width: 14px; height: 14px; }
-        .checkbox-item:has(input:checked) { border-color: #fecaca; background: #fff5f5; color: var(--red); }
-
-        /* Section divider */
-        .modal-section {
-            font-size: 11px; font-weight: 700; color: #aaa;
-            text-transform: uppercase; letter-spacing: 1px;
-            margin: 18px 0 10px; padding-bottom: 6px;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .modal-section i { color: var(--red); font-size: 12px; }
-
-        .modal-footer {
-            background: #fafafa; border-top: 1px solid #f0f0f0;
-            padding: 14px 24px; display: flex;
-            justify-content: flex-end; gap: 10px;
-        }
-
-        .btn-modal-close {
-            padding: 9px 20px; background: #f3f4f6;
-            border: 1px solid #e5e5e5; border-radius: 8px; color: #555;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-
-        .btn-modal-close:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
-
-        .btn-modal-submit {
-            padding: 9px 24px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 8px; color: #fff;
-            font-family: 'Poppins', sans-serif; font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: all 0.25s;
-            box-shadow: 0 3px 10px rgba(220,38,38,0.2);
-        }
-
-        .btn-modal-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.3); }
-
-        /* Year select row */
-        .year-row { display: flex; align-items: center; gap: 10px; }
-        .year-row span { font-weight: 700; color: #aaa; font-size: 14px; flex-shrink: 0; }
-        .year-row .field-select { flex: 1; }
-
-        /* Mobile overlay */
-        .sidebar-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); z-index: 999;
-        }
-
-        @media (max-width: 900px) {
-            .sidebar {
-                width: var(--sidebar-w);
-                transform: translateX(-100%);
-                transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-            }
-            .sidebar.mobile-open { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
-            .main-content { margin-left: 0 !important; }
-            .page-content { padding: 18px; }
-            .topbar-title { display: none; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
-            .field-row { grid-template-columns: 1fr; }
-            .checkbox-grid { grid-template-columns: repeat(2, 1fr); }
-
-            /* Mobile table scrolling */
-            .table-card-body {
-                overflow-x: hidden;
-                min-width: 0;
-            }
-
-            .table-card-body .dataTables_wrapper {
-                padding: 12px 16px;
-                overflow: visible !important;
-            }
-
-            .table-card-body .dataTables_scroll,
-            .table-card-body .dataTables_scrollHead,
-            .table-card-body .dataTables_scrollHeadInner,
-            .table-card-body .dataTables_scrollBody {
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-
-            .table-card-body .dataTables_scrollBody {
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .table-card-body table.dataTable,
-            .table-card-body .dataTables_scrollHeadInner table {
-                min-width: 700px;
-            }
-        }
-        /* Dashboard Footer */
-.dashboard-footer {
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    color: #888;
-    text-align: center;
-    padding: 18px 28px;
-    font-size: 12.5px;
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-logo {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    opacity: 0.6;
-}
-
-.dashboard-footer .footer-copy {
-    font-size: 12.5px;
-    color: #aaa;
-    font-weight: 500;
-}
-
-.dashboard-footer .footer-copy span {
-    color: var(--red);
-    font-weight: 600;
-}
-
-.dashboard-footer .footer-links {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.dashboard-footer a {
-    color: #888;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 12.5px;
-    transition: color 0.2s;
-}
-
-.dashboard-footer a:hover {
-    color: var(--red);
-    text-decoration: none;
-}
-
-.dashboard-footer .divider {
-    color: #e5e5e5;
-    margin: 0 2px;
-}
-/* Dashboard Footer */
-.dashboard-footer {
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    color: #888;
-    text-align: center;
-    padding: 18px 28px;
-    font-size: 12.5px;
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-logo {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    opacity: 0.6;
-}
-
-.dashboard-footer .footer-copy {
-    font-size: 12.5px;
-    color: #aaa;
-    font-weight: 500;
-}
-
-.dashboard-footer .footer-copy span {
-    color: var(--red);
-    font-weight: 600;
-}
-
-.dashboard-footer .footer-links {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.dashboard-footer a {
-    color: #888;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 12.5px;
-    transition: color 0.2s;
-}
-
-.dashboard-footer a:hover {
-    color: var(--red);
-    text-decoration: none;
-}
-
-.dashboard-footer .divider {
-    color: #e5e5e5;
-    margin: 0 2px;
-}
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="{{ vasset('css/coordinator/professors.css') }}?v={{ time() }}">
 </head>
 
 <body>
@@ -1113,14 +89,12 @@
             <span class="nav-label">Analytics</span>
             <span class="tooltip-label">Analytics</span>
         </a>
-        <li>
-    <a href="{{ url('/auditlog') }}" class="nav-item">
+        <a href="{{ route('auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-</li>
-</nav>
+    </nav>
 
     <div class="sidebar-footer">
         <a href="{{ url('/logout') }}" class="nav-item">
@@ -1166,13 +140,34 @@
                     <span>Professors</span>
                 </div>
             </div>
-            <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addProfessorModal">
-                <i class="fa fa-plus"></i> Add New Professor
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#transferCoordinatorModal" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
+                    <i class="fa fa-user-shield"></i>
+                    <span>Transfer Coordinator Role</span>
+                </button>
+                <button type="button" id="btnSyncFlss" class="btn-sync-flss" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);">
+                    <i class="fa fa-sync-alt" id="flssSyncIcon"></i>
+                    <span>Sync Faculty from FLSS</span>
+                </button>
+                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addProfessorModal">
+                    <i class="fa fa-plus"></i> Add New Professor
+                </button>
+            </div>
         </div>
 
         <!-- Stats Row -->
-        @php $totalProfs = count($data); @endphp
+        @php 
+            $totalProfs = count($data); 
+            $syncedCount = 0;
+            foreach ($data as $prof) {
+                $uRec = $usersP->where('email', $prof->email)->first();
+                $eLower = strtolower(trim($prof->email ?? ''));
+                $nLower = strtolower(trim($prof->full_name ?? ''));
+                if (($uRec && !empty($uRec->idp_user_id)) || str_ends_with($eLower, '@pup.edu.ph') || in_array($eLower, $flssEmails ?? []) || in_array($nLower, $flssNames ?? [])) {
+                    $syncedCount++;
+                }
+            }
+        @endphp
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-chalkboard-teacher"></i></div>
@@ -1182,19 +177,17 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fa fa-book"></i></div>
+                <div class="stat-icon purple"><i class="fa fa-sync-alt"></i></div>
                 <div>
-                    <div class="stat-num">
-                        {{ collect($data)->sum(fn($p) => $p->subjects->count()) }}
-                    </div>
-                    <div class="stat-name">Total Subjects</div>
+                    <div class="stat-num">{{ $syncedCount }}</div>
+                    <div class="stat-name">FLSS Synced</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-graduation-cap"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-user-tag"></i></div>
                 <div>
-                    <div class="stat-num">OJT</div>
-                    <div class="stat-name">Active Program</div>
+                    <div class="stat-num">{{ $totalProfs - $syncedCount }}</div>
+                    <div class="stat-name">Manually Added</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -1213,7 +206,7 @@
                     <div class="header-icon"><i class="fa fa-chalkboard-teacher"></i></div>
                     <div>
                         <h2>Professor List</h2>
-                        <p>Manage all OJT professors and their subject assignments</p>
+                        <p>Manage all OJT professors and faculty accounts</p>
                     </div>
                 </div>
                 <div class="prof-count-badge">
@@ -1228,14 +221,34 @@
                         <tr>
                             <th>Professor Name</th>
                             <th>Email</th>
-                            <th>Subject Code</th>
-                            <th>Subject Description</th>
+                            <th>Role</th>
+                            <th>Account Source</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($data as $professor)
-                        @php $subject = $professor->subjects->first(); @endphp
+                        @php
+                            $userRec = $usersP->where('email', $professor->email)->first();
+                            $isCoordinator = ($userRec && (int)$userRec->role === 1);
+                            $roleLabel = $isCoordinator ? 'OJT Coordinator' : 'Professor';
+                            $roleStyle = $isCoordinator 
+                                ? 'background: #6b21a8 !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;' 
+                                : 'background: #0284c7 !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;';
+
+                            $emailLower = strtolower(trim($professor->email ?? ''));
+                            $nameLower = strtolower(trim($professor->full_name ?? ''));
+
+                            $isFlssSynced = ($userRec && !empty($userRec->idp_user_id))
+                                || str_ends_with($emailLower, '@pup.edu.ph')
+                                || in_array($emailLower, $flssEmails ?? [])
+                                || in_array($nameLower, $flssNames ?? []);
+
+                            $sourceLabel = $isFlssSynced ? 'FLSS / IdP Synced' : 'Manually Added';
+                            $sourceStyle = $isFlssSynced 
+                                ? 'background: #475569 !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;' 
+                                : 'background: #2563eb !important; color: #ffffff !important; font-weight: 600 !important; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; display: inline-block;';
+                        @endphp
                         <tr>
                             <!-- Name -->
                             <td>
@@ -1255,18 +268,14 @@
                                 </div>
                             </td>
 
-                            <!-- Subject Code -->
+                            <!-- Role -->
                             <td>
-                                @foreach ($professor->subjects as $s)
-                                    <span class="subject-code-badge">{{ $s->subject_code }}</span>
-                                @endforeach
+                                <span class="badge" style="{{ $roleStyle }}">{{ $roleLabel }}</span>
                             </td>
 
-                            <!-- Subject Description -->
-                            <td style="font-size:13px; color:#555;">
-                                @foreach ($professor->subjects as $s)
-                                    {{ $s->subject_description }}@if(!$loop->last), @endif
-                                @endforeach
+                            <!-- Source -->
+                            <td>
+                                <span class="badge" style="{{ $sourceStyle }}">{{ $sourceLabel }}</span>
                             </td>
 
                             <!-- Actions -->
@@ -1275,10 +284,10 @@
                                     <button class="btn-edit btnView1"
                                         data-professor-id="{{ $professor->id }}"
                                         data-email="{{ $professor->email }}"
-                                        data-subject-code="{{ $subject->subject_code ?? '' }}"
-                                        data-subject-description="{{ $subject->subject_description ?? '' }}"
-                                        data-first-name="{{ $usersP->where('email', $professor->email)->first()->first_name ?? '' }}"
-                                        data-last-name="{{ $usersP->where('email', $professor->email)->first()->last_name ?? '' }}"
+                                        data-first-name="{{ $userRec->first_name ?? '' }}"
+                                        data-middle-name="{{ $userRec->middle_name ?? '' }}"
+                                        data-last-name="{{ $userRec->last_name ?? '' }}"
+                                        data-full-name="{{ $professor->full_name }}"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editProfessorModal">
                                         <i class="fa fa-edit"></i> Edit
@@ -1302,7 +311,7 @@
     <div style="display:flex; align-items:center; gap:8px;">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            &copy; 1998&ndash;2026 <span>Polytechnic University of the Philippines</span>
         </span>
     </div>
     <div class="footer-links">
@@ -1370,20 +379,6 @@
                         </div>
                     </div>
 
-                    <div class="modal-section"><i class="fa fa-book"></i> Subject Details</div>
-
-                    <div class="field-row">
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-tag"></i> Subject Code</label>
-                            <input class="field-input" type="text" name="subject_code" placeholder="e.g. OJT101" value="{{ old('subject_code') }}" required>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-align-left"></i> Subject Description</label>
-                            <input class="field-input" type="text" name="subject_description" placeholder="Subject description" value="{{ old('subject_description') }}" required>
-                        </div>
-                    </div>
-
-
                     <div class="modal-section"><i class="fa fa-lock"></i> Set Password</div>
                     <div class="field-group has-bubble">
                         <label class="field-label"><i class="fa fa-lock"></i> Password</label>
@@ -1428,38 +423,50 @@
 
 <!-- =============== EDIT PROFESSOR MODAL =============== -->
 <div class="modal fade" id="editProfessorModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fa fa-user-edit"></i> Edit Professor
+                    <i class="fa fa-user-edit"></i> Edit Professor Details
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ url('/updateProfessor') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ url('/updateProfessor') }}" method="post" id="editProfessorForm">
                 @csrf
                 @method('PUT')
                 <input type="hidden" id="editProfessorId" name="professor_id">
 
                 <div class="modal-body">
-                    <div class="modal-section"><i class="fa fa-envelope"></i> Contact Details</div>
+                    <!-- Personal Info Section -->
+                    <div class="modal-section"><i class="fa fa-user"></i> Personal Information</div>
 
-                    <div class="field-group">
-                        <label class="field-label"><i class="fa fa-envelope"></i> Email Address</label>
-                        <input class="field-input" type="text" name="email" id="editEmail" placeholder="Enter email address">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="field-group">
+                                <label class="field-label"><i class="fa fa-user"></i> First Name <span style="color:var(--red);">*</span></label>
+                                <input class="field-input" type="text" name="first_name" id="editFirstName" placeholder="e.g. Juan" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="field-group">
+                                <label class="field-label"><i class="fa fa-user"></i> Middle Name</label>
+                                <input class="field-input" type="text" name="middle_name" id="editMiddleName" placeholder="e.g. Santos (optional)">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="field-group">
+                                <label class="field-label"><i class="fa fa-user"></i> Last Name <span style="color:var(--red);">*</span></label>
+                                <input class="field-input" type="text" name="last_name" id="editLastName" placeholder="e.g. Dela Cruz" required>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="modal-section"><i class="fa fa-book"></i> Subject Details</div>
+                    <!-- Contact Details Section -->
+                    <div class="modal-section mt-3"><i class="fa fa-envelope"></i> Contact Details</div>
 
-                    <div class="field-row">
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-tag"></i> Subject Code</label>
-                            <input class="field-input" type="text" name="subject_code" id="editSubjectCode" placeholder="Subject code">
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class="fa fa-align-left"></i> Subject Description</label>
-                            <input class="field-input" type="text" name="subject_description" id="editSubjectDescription" placeholder="Subject description">
-                        </div>
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-envelope"></i> Email Address <span style="color:var(--red);">*</span></label>
+                        <input class="field-input" type="email" name="email" id="editEmail" placeholder="Enter email address" required>
                     </div>
                 </div>
 
@@ -1474,11 +481,12 @@
             </form>
         </div>
     </div>
+</div>
     <footer class="dashboard-footer">
     <div class="footer-left">
         <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
         <span class="footer-copy">
-            © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            &copy; 1998&ndash;2026 <span>Polytechnic University of the Philippines</span>
         </span>
     </div>
     <div class="footer-links">
@@ -1495,522 +503,134 @@
 </div>
 
 <!-- Scripts -->
+<!-- Transfer Coordinator Designation Modal -->
+<div class="modal fade" id="transferCoordinatorModal" tabindex="-1" aria-labelledby="transferCoordinatorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 14px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 18px 24px;">
+                <h5 class="modal-title font-weight-bold" id="transferCoordinatorModalLabel" style="font-size: 16px;">
+                    <i class="fa fa-user-shield me-2"></i> Transfer OJT Coordinator Designation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <p style="font-size: 13.5px; color: #555; line-height: 1.5; margin-bottom: 18px;">
+                    Select an active professor from the faculty list below to transfer the <strong>OJT Coordinator designation</strong> to them.
+                </p>
+                <div class="alert alert-warning d-flex align-items-center" style="font-size: 12.5px; border-radius: 8px;">
+                    <i class="fa fa-exclamation-triangle me-2" style="font-size: 16px; color: #d97706;"></i>
+                    <div>
+                        <strong>Important:</strong> Upon transfer, your account will revert to a standard Professor account, and the selected faculty member will become the active OJT Coordinator.
+                    </div>
+                </div>
+                <form id="transferCoordinatorForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label font-weight-semibold" style="font-size: 13px;">Select New Coordinator</label>
+                        <select name="target_user_id" id="targetUserId" class="form-select" required style="border-radius: 8px; font-size: 13.5px;">
+                            <option value="">-- Choose Active Faculty Member --</option>
+                            @foreach($usersP as $uProf)
+                                @if($uProf->id !== session('loginId'))
+                                    <option value="{{ $uProf->id }}">{{ $uProf->full_name }} ({{ $uProf->email }})</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 500;">Cancel</button>
+                        <button type="submit" class="btn btn-purple" id="btnConfirmTransfer" style="background: #7c3aed; color: white; border-radius: 8px; font-weight: 600;">
+                            Confirm Transfer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prune Missing Faculty Confirmation Modal -->
+<div class="modal fade" id="pruneMissingFacultyModal" tabindex="-1" aria-labelledby="pruneMissingFacultyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 18px 24px;">
+                <h5 class="modal-title font-weight-bold" id="pruneMissingFacultyModalLabel" style="font-size: 17px; margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-user-minus"></i> Review Missing Faculty Accounts
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="background: #ffffff;">
+                <div class="alert alert-warning d-flex align-items-start gap-2 mb-3" style="font-size: 13.5px; border-radius: 10px;">
+                    <i class="fas fa-exclamation-triangle mt-1 text-warning" style="font-size: 18px;"></i>
+                    <div>
+                        <strong>Notice:</strong> The following faculty member(s) exist in InternConnect but were <strong>not found in the latest FLSS data</strong>. Select which accounts should be removed or kept.
+                    </div>
+                </div>
+
+                <!-- Search Bar & Controls -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">
+                    <div class="input-group" style="max-width: 380px;">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="pruneFacultySearchInput" class="form-control border-start-0 bg-light" placeholder="Search missing faculty name or email..." style="font-size: 13.5px;">
+                    </div>
+                    <div class="form-check form-switch ps-0 d-flex align-items-center gap-2">
+                        <input class="form-check-input ms-0" type="checkbox" id="selectAllPruneAccounts" checked style="width: 38px; height: 20px; cursor: pointer;">
+                        <label class="form-check-input-label font-weight-bold" for="selectAllPruneAccounts" style="font-size: 13px; cursor: pointer; user-select: none;">
+                            Select / Deselect All
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Missing Accounts Table -->
+                <div class="table-responsive" style="max-height: 340px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px;">
+                    <table class="table table-hover align-middle mb-0" id="pruneFacultyTable">
+                        <thead class="table-light sticky-top" style="z-index: 5;">
+                            <tr style="font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;">
+                                <th style="width: 44px;" class="text-center">Select</th>
+                                <th>Faculty Name & Email</th>
+                                <th>Role</th>
+                                <th>Account Source</th>
+                                <th>Active Assignments</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pruneFacultyTableBody" style="font-size: 13.5px;">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-2 d-flex justify-content-between" style="font-size: 12px;">
+                    <span id="pruneSelectionCountText">Selected 0 of 0 accounts for removal</span>
+                    <span class="text-secondary"><i class="fas fa-info-circle me-1"></i> Unchecked accounts will stay in InternConnect</span>
+                </div>
+            </div>
+            <div class="modal-footer bg-light p-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">
+                    Skip Removal (Keep All)
+                </button>
+                <button type="button" class="btn btn-danger btn-sm px-4 font-weight-bold" id="btnConfirmPruneFaculty">
+                    <i class="fas fa-trash-alt me-1"></i> Confirm & Remove Selected (<span id="pruneSelectedCountBadge">0</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    // Sidebar toggle
-    const sidebar     = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const menuToggle  = document.getElementById('menuToggle');
-    const overlay     = document.getElementById('sidebarOverlay');
-
-    menuToggle.addEventListener('click', function () {
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-    });
-
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    });
-
-    $(document).ready(function () {
-
-        // DataTable
-        $('#profTable').DataTable({
-            scrollX: true,
-            scrollCollapse: true,
-            autoWidth: false
-        });
-
-        // Academic year end options
-        const startYearSelect = document.getElementById('academic_year_start');
-        const endYearSelect   = document.getElementById('academic_year_end');
-
-        function updateEndYearOptions() {
-            const selectedStart = parseInt(startYearSelect.value);
-            endYearSelect.innerHTML = '<option value="">End Year</option>';
-            for (let y = selectedStart + 1; y <= selectedStart + 10; y++) {
-                const opt = document.createElement('option');
-                opt.value = y; opt.textContent = y;
-                endYearSelect.appendChild(opt);
-            }
-        }
-
-        if (startYearSelect) {
-            updateEndYearOptions();
-            startYearSelect.addEventListener('change', updateEndYearOptions);
-        }
-
-        function buildTimeOptions() {
-            let options = '';
-
-            for (let hour = 0; hour < 24; hour++) {
-                for (let minute = 0; minute < 60; minute += 15) {
-                    const value = String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
-                    options += '<option value="' + value + '"></option>';
-                }
-            }
-
-            return options;
-        }
-
-        function ensureTimeSuggestions() {
-            if (document.getElementById('scheduleTimeSuggestions')) {
-                return;
-            }
-
-            const datalist = document.createElement('datalist');
-            datalist.id = 'scheduleTimeSuggestions';
-            datalist.innerHTML = buildTimeOptions();
-            document.body.appendChild(datalist);
-        }
-
-        // Time slots dynamic inputs
-        $('#time_slots').change(function () {
-            const numSlots = parseInt($(this).val());
-            $('#timeInputs').empty();
-            ensureTimeSuggestions();
-            if (numSlots > 0) {
-                $('input[name="schedule_day[]"]:checked').each(function () {
-                    const day = $(this).val();
-                    for (let i = 1; i <= numSlots; i++) {
-                        $('#timeInputs').append(`
-                            <div style="margin-bottom:12px;">
-                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                                    <div class="field-group">
-                                        <label class="field-label"><i class="fa fa-clock"></i> Start Time ${i} (${day})</label>
-                                        <input class="field-select schedule-time-input" type="text" name="${day}_start_time_${i}" placeholder="HH:MM" inputmode="numeric" list="scheduleTimeSuggestions" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" title="Enter time in 24-hour format like 08:00 or 13:30" required>
-                                    </div>
-                                    <div class="field-group">
-                                        <label class="field-label"><i class="fa fa-clock"></i> End Time ${i} (${day})</label>
-                                        <input class="field-select schedule-time-input" type="text" name="${day}_end_time_${i}" placeholder="HH:MM" inputmode="numeric" list="scheduleTimeSuggestions" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" title="Enter time in 24-hour format like 08:00 or 13:30" required>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-                    }
-                });
-            }
-        });
-
-        $(document).on('input change', '.schedule-time-input', function () {
-            const isValid = /^([01]\d|2[0-3]):([0-5]\d)$/.test(this.value.trim());
-            this.setCustomValidity(this.value.trim() === '' || isValid
-                ? ''
-                : 'Use HH:MM in 24-hour format, like 08:00 or 13:30.');
-        });
-
-        // Edit professor modal populate
-        $(document).on('click', '.btnView1', function () {
-            $('#editProfessorId').val($(this).data('professor-id'));
-            $('#editEmail').val($(this).data('email'));
-            $('#editSubjectCode').val($(this).data('subject-code'));
-            $('#editSubjectDescription').val($(this).data('subject-description'));
-        });
-
-        // Remove professor with SweetAlert
-        $(document).on('click', '.btnRemove', function () {
-            const professorId = $(this).data('professor-id');
-            Swal.fire({
-                title: 'Remove Professor?',
-                text: 'This will permanently remove the professor.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, remove!',
-                cancelButtonText: 'Cancel',
-                borderRadius: '16px',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/removeProfessor/' + professorId,
-                        data: { _token: $('meta[name="csrf-token"]').attr('content') },
-                        success: function (response) {
-                            Swal.fire({
-                                title: 'Removed!',
-                                text: response.message,
-                                icon: 'success',
-                                confirmButtonColor: '#dc2626'
-                            }).then(() => location.reload());
-                        },
-                        error: function (xhr) {
-                            Swal.fire('Error', 'Something went wrong.', 'error');
-                            console.log(xhr.responseText);
-                        }
-                    });
-                }
-            });
-        });
-
-        const addProfessorForm = document.getElementById('addProfessorForm');
-        if (addProfessorForm) {
-            const firstNameInput = document.getElementById('prof_first_name');
-            const lastNameInput = document.getElementById('prof_last_name');
-            const emailInput = document.getElementById('prof_email');
-            const passwordInput = document.getElementById('prof_password');
-            const confirmPasswordInput = document.getElementById('prof_password_confirmation');
-            const togglePasswordButton = document.getElementById('toggleProfPassword');
-            const toggleConfirmPasswordButton = document.getElementById('toggleProfPasswordConfirmation');
-            const emailCheckUrl = addProfessorForm.dataset.emailCheckUrl || '';
-            let emailCheckTimer = null;
-            let emailRequestCounter = 0;
-
-            function setupPasswordToggle(toggle, input) {
-                if (!toggle || !input) return;
-
-                toggle.addEventListener('click', function () {
-                    const isHidden = input.type === 'password';
-                    input.type = isHidden ? 'text' : 'password';
-
-                    const icon = toggle.querySelector('i');
-                    if (icon) {
-                        icon.classList.toggle('fa-eye');
-                        icon.classList.toggle('fa-eye-slash');
-                    }
-                });
-            }
-
-            function setInputErrorState(input, hasError) {
-                if (!input) return;
-                input.style.borderColor = hasError ? '#dc2626' : '';
-                input.style.boxShadow = hasError ? '0 0 0 3px rgba(220,38,38,0.1)' : '';
-            }
-
-            function showFieldBubble(bubbleId, message) {
-                const bubble = document.getElementById(bubbleId);
-                if (!bubble) return;
-
-                if (!message) {
-                    bubble.innerHTML = '';
-                    bubble.classList.remove('active');
-                    return;
-                }
-
-                const messages = Array.isArray(message) ? message : [message];
-                bubble.innerHTML = messages.map(function (item) {
-                    return '<div>' + item + '</div>';
-                }).join('');
-                bubble.classList.add('active');
-            }
-
-            function sanitizeNameValue(value, preserveTrailingSeparator = false) {
-                const endsWithSeparator = preserveTrailingSeparator && /[\s'-]$/.test(value || '');
-                let sanitized = (value || '').replace(/[^\p{L}\s'\-]/gu, '');
-                sanitized = sanitized.replace(/\s+/g, ' ');
-                sanitized = sanitized.replace(/\s*-\s*/g, '-');
-                sanitized = sanitized.replace(/\s*'\s*/g, "'");
-                sanitized = sanitized.replace(/-{2,}/g, '-');
-                sanitized = sanitized.replace(/'{2,}/g, "'");
-                sanitized = sanitized.trim();
-
-                sanitized = sanitized.replace(/(^|[\s'-])(\p{L})/gu, function (_, separator, character) {
-                    return separator + character.toUpperCase();
-                });
-
-                if (endsWithSeparator && sanitized) {
-                    const trailingCharacter = (value || '').slice(-1);
-                    if (!/[\s'-]$/.test(sanitized)) {
-                        sanitized += trailingCharacter;
-                    }
-                }
-
-                return sanitized;
-            }
-
-            function getNameValidationError(value) {
-                const trimmed = (value || '').trim();
-                if (!trimmed) {
-                    return 'This field is required.';
-                }
-
-                if (!/^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u.test(trimmed)) {
-                    return 'Use letters only. Apostrophes and hyphens are allowed.';
-                }
-
-                if (!/^[\p{Lu}]/u.test(trimmed)) {
-                    return 'Name must start with a capital letter.';
-                }
-
-                return '';
-            }
-
-            function evaluatePasswordRequirements(password) {
-                const unmet = [];
-                if (password.length < 8) {
-                    unmet.push('Use at least 8 characters.');
-                }
-                if (!/[A-Z]/.test(password)) {
-                    unmet.push('Add an uppercase letter.');
-                }
-                if (!/[a-z]/.test(password)) {
-                    unmet.push('Add a lowercase letter.');
-                }
-                if (!/\d/.test(password)) {
-                    unmet.push('Add a number.');
-                }
-                if (!/[!@#$%^&*]/.test(password)) {
-                    unmet.push('Add one symbol: ! @ # $ % ^ & *.');
-                }
-                if (/[^A-Za-z\d!@#$%^&*]/.test(password)) {
-                    unmet.push('Use only these symbols: ! @ # $ % ^ & *.');
-                }
-
-                return {
-                    isValid: unmet.length === 0,
-                    unmet: unmet,
-                };
-            }
-
-            async function checkEmailAvailability(email) {
-                const trimmedEmail = (email || '').trim();
-
-                if (!trimmedEmail) {
-                    return { available: false, message: 'Email is required.' };
-                }
-
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-                    return { available: false, message: 'Please enter a valid email address.' };
-                }
-
-                const requestId = ++emailRequestCounter;
-
-                try {
-                    const response = await fetch(emailCheckUrl + '?email=' + encodeURIComponent(trimmedEmail), {
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    const payload = await response.json();
-
-                    if (requestId !== emailRequestCounter) {
-                        return { available: false, message: 'Checking email availability...' };
-                    }
-
-                    return {
-                        available: Boolean(payload.available),
-                        message: payload.message || (payload.available ? 'Email is available.' : 'This email is already in use.')
-                    };
-                } catch (error) {
-                    return { available: false, message: 'Unable to verify email right now. Please try again.' };
-                }
-            }
-
-            [
-                { input: firstNameInput, bubbleId: 'profFirstNameBubble' },
-                { input: lastNameInput, bubbleId: 'profLastNameBubble' }
-            ].forEach(function (field) {
-                if (!field.input) return;
-
-                function syncNameField(showBubble, isLive = false) {
-                    field.input.value = sanitizeNameValue(field.input.value, isLive);
-                    const validationError = getNameValidationError(field.input.value);
-                    field.input.setCustomValidity(validationError);
-                    setInputErrorState(field.input, Boolean(validationError));
-                    showFieldBubble(field.bubbleId, showBubble ? validationError : '');
-                }
-
-                field.input.addEventListener('input', function () {
-                    syncNameField(false, true);
-                });
-
-                field.input.addEventListener('blur', function () {
-                    syncNameField(Boolean(field.input.value.trim()), false);
-                });
-            });
-
-            if (emailInput) {
-                emailInput.addEventListener('input', function () {
-                    const value = emailInput.value.trim();
-
-                    if (emailCheckTimer) {
-                        clearTimeout(emailCheckTimer);
-                    }
-
-                    if (!value) {
-                        emailInput.setCustomValidity('Email is required.');
-                        setInputErrorState(emailInput, false);
-                        showFieldBubble('profEmailBubble', '');
-                        return;
-                    }
-
-                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                        emailInput.setCustomValidity('Please enter a valid email address.');
-                        setInputErrorState(emailInput, true);
-                        showFieldBubble('profEmailBubble', 'Please enter a valid email address.');
-                        return;
-                    }
-
-                    emailInput.setCustomValidity('');
-                    setInputErrorState(emailInput, false);
-                    showFieldBubble('profEmailBubble', '');
-
-                    emailCheckTimer = setTimeout(async function () {
-                        const result = await checkEmailAvailability(value);
-                        if (emailInput.value.trim() !== value) {
-                            return;
-                        }
-
-                        if (!result.available) {
-                            emailInput.setCustomValidity(result.message);
-                            setInputErrorState(emailInput, true);
-                            showFieldBubble('profEmailBubble', result.message);
-                        } else {
-                            emailInput.setCustomValidity('');
-                            setInputErrorState(emailInput, false);
-                            showFieldBubble('profEmailBubble', '');
-                        }
-                    }, 350);
-                });
-            }
-
-            function syncPasswordValidationState() {
-                if (!passwordInput || !confirmPasswordInput) {
-                    return;
-                }
-
-                const passwordValidation = evaluatePasswordRequirements(passwordInput.value);
-                const hasPasswordValue = passwordInput.value.length > 0;
-                const hasConfirmValue = confirmPasswordInput.value.length > 0;
-                const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
-
-                if (!hasPasswordValue && !hasConfirmValue) {
-                    showFieldBubble('profPasswordBubble', '');
-                    showFieldBubble('profConfirmPasswordBubble', '');
-                    setInputErrorState(passwordInput, false);
-                    setInputErrorState(confirmPasswordInput, false);
-                    return;
-                }
-
-                if (!passwordValidation.isValid) {
-                    showFieldBubble('profPasswordBubble', passwordValidation.unmet);
-                    setInputErrorState(passwordInput, true);
-                } else {
-                    showFieldBubble('profPasswordBubble', '');
-                    setInputErrorState(passwordInput, false);
-                }
-
-                if (hasConfirmValue && !passwordsMatch) {
-                    showFieldBubble('profConfirmPasswordBubble', 'Password confirmation does not match.');
-                    setInputErrorState(confirmPasswordInput, true);
-                } else {
-                    showFieldBubble('profConfirmPasswordBubble', '');
-                    setInputErrorState(confirmPasswordInput, false);
-                }
-            }
-
-            if (passwordInput) {
-                passwordInput.addEventListener('input', syncPasswordValidationState);
-            }
-
-            if (confirmPasswordInput) {
-                confirmPasswordInput.addEventListener('input', syncPasswordValidationState);
-            }
-
-            setupPasswordToggle(togglePasswordButton, passwordInput);
-            setupPasswordToggle(toggleConfirmPasswordButton, confirmPasswordInput);
-
-            addProfessorForm.addEventListener('submit', async function (event) {
-                if (addProfessorForm.dataset.submitting === 'true') {
-                    return;
-                }
-
-                event.preventDefault();
-                let hasError = false;
-
-                [
-                    { input: firstNameInput, bubbleId: 'profFirstNameBubble' },
-                    { input: lastNameInput, bubbleId: 'profLastNameBubble' }
-                ].forEach(function (field) {
-                    if (!field.input) return;
-                    field.input.value = sanitizeNameValue(field.input.value);
-                    const validationError = getNameValidationError(field.input.value);
-                    field.input.setCustomValidity(validationError);
-                    setInputErrorState(field.input, Boolean(validationError));
-                    showFieldBubble(field.bubbleId, validationError);
-                    if (validationError) {
-                        hasError = true;
-                    }
-                });
-
-                if (emailInput) {
-                    const value = emailInput.value.trim();
-                    if (!value) {
-                        emailInput.setCustomValidity('Email is required.');
-                        setInputErrorState(emailInput, true);
-                        showFieldBubble('profEmailBubble', 'Email is required.');
-                        hasError = true;
-                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                        emailInput.setCustomValidity('Please enter a valid email address.');
-                        setInputErrorState(emailInput, true);
-                        showFieldBubble('profEmailBubble', 'Please enter a valid email address.');
-                        hasError = true;
-                    } else {
-                        const result = await checkEmailAvailability(value);
-                        if (!result.available) {
-                            emailInput.setCustomValidity(result.message);
-                            setInputErrorState(emailInput, true);
-                            showFieldBubble('profEmailBubble', result.message);
-                            hasError = true;
-                        } else {
-                            emailInput.setCustomValidity('');
-                            setInputErrorState(emailInput, false);
-                            showFieldBubble('profEmailBubble', '');
-                        }
-                    }
-                }
-
-                if (passwordInput) {
-                    const passwordValidation = evaluatePasswordRequirements(passwordInput.value.trim());
-                    if (!passwordValidation.isValid) {
-                        setInputErrorState(passwordInput, true);
-                        showFieldBubble('profPasswordBubble', passwordValidation.unmet);
-                        hasError = true;
-                    } else {
-                        setInputErrorState(passwordInput, false);
-                        showFieldBubble('profPasswordBubble', '');
-                    }
-                }
-
-                if (confirmPasswordInput && passwordInput) {
-                    if (passwordInput.value.trim() !== confirmPasswordInput.value.trim()) {
-                        setInputErrorState(confirmPasswordInput, true);
-                        showFieldBubble('profConfirmPasswordBubble', 'Password confirmation does not match.');
-                        hasError = true;
-                    } else {
-                        setInputErrorState(confirmPasswordInput, false);
-                        showFieldBubble('profConfirmPasswordBubble', '');
-                    }
-                }
-
-                if (hasError) {
-                    return;
-                }
-
-                addProfessorForm.dataset.submitting = 'true';
-                addProfessorForm.submit();
-            });
-
-            @if ($errors->has('first_name') || $errors->has('last_name') || $errors->has('email') || $errors->has('subject_code') || $errors->has('subject_description') || $errors->has('password') || $errors->has('password_confirmation'))
-                const addProfessorModal = new bootstrap.Modal(document.getElementById('addProfessorModal'));
-                addProfessorModal.show();
-            @endif
-        }
-
-    });
+    window.professorsConfig = {
+        hasModalErrors: @json($errors->has('first_name') || $errors->has('last_name') || $errors->has('email') || $errors->has('subject_code') || $errors->has('subject_description') || $errors->has('password') || $errors->has('password_confirmation')),
+        syncFacultyUrl: @json(route('coordinator.syncFaculty')),
+        transferRoleUrl: @json(route('coordinator.transferRole')),
+        professorHomeUrl: @json(route('professor_home')),
+        pruneMissingFacultyUrl: @json(route('coordinator.pruneMissingFaculty')),
+        csrfToken: @json(csrf_token())
+    };
 </script>
-<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
-
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ vasset('js/coordinator/professors.js') }}?v={{ time() }}"></script>
+<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

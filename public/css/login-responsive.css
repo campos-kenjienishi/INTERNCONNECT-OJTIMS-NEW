@@ -1,9 +1,4 @@
-/* ===================================================
-   LOGIN PAGE RESPONSIVE STYLES
-   InternConnect
-=================================================== */
-
-/* Layout */
+/* Dynamic Fluid Container & Viewport Scaling */
 .main-wrapper {
     min-height: 100vh;
     min-height: 100dvh;
@@ -11,266 +6,211 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
+    padding: clamp(8px, 2vh, 20px);
+    width: 100%;
 }
 
 .login-container {
-    width: min(95%, 600px);
+    width: min(94vw, 560px);
     margin: 0 auto;
 }
 
 body.auth-centered-page .login-container {
-    max-width: 600px;
+    max-width: min(94vw, 560px) !important;
     min-height: auto;
-}
-
-body.auth-centered-page .main-wrapper {
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-}
-
-body.auth-centered-page .left-panel {
-    display: none !important;
 }
 
 body.auth-centered-page .right-panel {
     width: 100%;
     flex: 1 1 auto;
-    min-height: 450px;
-    padding: clamp(1.25rem, 4vw, 2.5rem);
+    padding: clamp(16px, 3.5vh, 32px) clamp(16px, 4vw, 36px) !important;
     justify-content: center;
-    border-radius: 24px;
+    border-radius: clamp(16px, 3vw, 24px) !important;
+    position: relative !important;
+    z-index: 99 !important;
+    pointer-events: auto !important;
 }
 
-/* Branding */
+/* Fluid Dynamic Branding */
 .auth-brand {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 10px;
-    margin-bottom: 30px;
+    gap: clamp(6px, 1.5vh, 10px) !important;
+    margin-bottom: clamp(10px, 2.5vh, 24px) !important;
 }
 
 .auth-logo {
-    width: clamp(50px, 10vw, 72px);
-    height: auto;
+    width: clamp(42px, 8vh, 68px) !important;
+    height: clamp(42px, 8vh, 68px) !important;
     object-fit: contain;
-    filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
+    filter: drop-shadow(0 0 14px rgba(255,255,255,0.18));
 }
 
 .auth-brand-copy .brand-name {
-    font-size: clamp(1.2rem, 4vw, 1.5rem);
-    margin-bottom: 4px;
+    font-size: clamp(17px, 3.2vw, 23px) !important;
+    margin-bottom: 2px !important;
+    font-weight: 800;
 }
 
 .auth-brand-copy .system-title {
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: clamp(8px, 1.6vw, 10px) !important;
+    letter-spacing: clamp(1px, 0.4vw, 2px) !important;
 }
 
-.auth-brand-copy .system-title,
-.login-header p {
-    text-transform: none;
-}
-
-/* Header */
+/* Fluid Header & Spacing */
 .login-header {
-    margin-bottom: 24px;
+    margin-bottom: clamp(10px, 2.2vh, 20px) !important;
     text-align: center;
 }
 
-.login-header p {
-    margin-bottom: 0;
-    font-size: clamp(0.85rem, 2vw, 1rem);
+.local-signin-badge {
+    padding: 4px 12px !important;
+    font-size: clamp(11px, 2.2vw, 12px) !important;
+    margin-bottom: 6px !important;
 }
 
-/* Form Fields */
 .field-group {
-    margin-bottom: 16px;
+    margin-bottom: clamp(10px, 2vh, 16px) !important;
 }
 
-.input-wrap {
-    position: relative;
+.field-group label {
+    font-size: clamp(11.5px, 2.2vw, 13px) !important;
+    margin-bottom: 4px !important;
 }
 
 .input-wrap input {
-    width: 100%;
-    min-height: 48px;
-    font-size: 16px; /* Prevents iOS zoom */
-    background: #f7f4ee;
-    border: 1px solid #ddd7cb;
-    color: #3b0000;
+    height: clamp(42px, 6vh, 48px) !important;
+    font-size: clamp(13px, 2.4vw, 14.5px) !important;
+    border-radius: clamp(8px, 1.8vw, 12px) !important;
 }
 
-.input-wrap input::placeholder {
-    color: #9a9080;
-}
-
-.input-wrap input:focus {
-    background: #fffdf9;
-    border-color: #cdbfa9;
-    outline: none;
-}
-
-.input-wrap .i-icon {
-    color: #ef4444 !important;
-    z-index: 2;
-}
-
-.toggle-pw {
-    cursor: pointer;
-}
-
-/* Browser Autofill Fix */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0px 1000px #f7f4ee inset;
-    -webkit-text-fill-color: #3b0000;
-}
-
-/* Buttons */
 .btn-wrap {
-    margin-top: 6px;
+    margin-top: clamp(8px, 1.8vh, 14px) !important;
 }
 
 .btn-login {
-    width: 100%;
-    min-height: 50px;
+    height: clamp(44px, 6.2vh, 50px) !important;
+    font-size: clamp(13.5px, 2.5vw, 15px) !important;
+    border-radius: clamp(8px, 1.8vw, 12px) !important;
 }
 
-/* Terms */
 .terms-wrap {
-    margin-top: 16px;
-    margin-bottom: 14px;
+    margin-top: clamp(8px, 1.8vh, 14px) !important;
+    margin-bottom: clamp(8px, 1.8vh, 12px) !important;
 }
 
 .terms-text {
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.terms-text span {
-    display: inline;
-}
-
-.terms-line-top {
-    display: block;
-    margin-bottom: 2px;
-    color: rgba(255,255,255,0.5);
-}
-
-.terms-line-bottom {
-    display: block;
-    color: #fff;
-}
-
-.terms-line-bottom a {
-    color: #fca5a5;
-    text-decoration: underline;
-}
-
-.terms-line-separator {
-    color: rgba(255,255,255,0.5);
-}
-
-/* Footer */
-.footer-wrap {
-    margin-top: 8px;
-}
-
-.signup-outside {
-    margin-top: 0;
-    text-align: center;
-    width: 100%;
-    max-width: 860px;
-}
-
-.signup-outside span {
-    color: #fff;
-}
-
-.signup-outside a {
-    color: #fca5a5;
-    text-decoration: underline;
-    font-weight: 600;
-}
-
-.signup-outside a:hover {
-    text-decoration: underline;
+    font-size: clamp(10.5px, 2.2vw, 12.5px) !important;
 }
 
 /* Tablet */
 @media (max-width: 991px) {
-    .login-container {
-        max-width: 500px;
-    }
-
-    body.auth-centered-page .right-panel {
-        padding: 2rem;
-        min-height: auto;
+    body.auth-centered-page .login-container {
+        max-width: min(92vw, 500px) !important;
     }
 }
 
 /* Mobile */
 @media (max-width: 767px) {
+    body.auth-centered-page {
+        padding: 8px !important;
+    }
+
+    .portal-selection-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .portal-card {
+        padding: 14px 12px !important;
+        flex-direction: row !important;
+        text-align: left !important;
+        gap: 12px !important;
+    }
+
+    .portal-icon {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 18px !important;
+    }
+
+    #step1 .fields-grid,
+    #step2 .fields-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+}
+
+/* Unified Top Back Pill Button */
+.back-btn-pill,
+.btn-switch-portal {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    color: #fca5a5 !important;
+    font-size: clamp(11.5px, 2.5vw, 13px) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    padding: clamp(5px, 1.2vh, 7px) clamp(12px, 3vw, 16px) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+}
+
+.back-btn-pill:hover,
+.btn-switch-portal:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Height-based media query for short screens like iPhone SE (667px height) */
+@media (max-height: 700px) {
     body.auth-centered-page .right-panel {
-        padding: 1.5rem;
+        padding: 14px 18px !important;
+    }
+
+    .auth-brand {
+        margin-bottom: 8px !important;
+        gap: 4px !important;
     }
 
     .auth-logo {
-        width: 58px;
+        width: 38px !important;
+        height: 38px !important;
     }
 
     .auth-brand-copy .brand-name {
-        font-size: 1.25rem;
+        font-size: 16px !important;
     }
 
-    .system-title {
-        letter-spacing: 1px;
-    }
-}
-
-/* Small Phones */
-@media (max-width: 480px) {
-    .main-wrapper {
-        padding: 0.75rem;
+    .login-header {
+        margin-bottom: 8px !important;
     }
 
-    body.auth-centered-page .right-panel {
-        padding: 1.25rem;
+    .field-group {
+        margin-bottom: 8px !important;
     }
 
-    .terms-text {
-        font-size: 12px;
+    .input-wrap input {
+        height: 40px !important;
+        font-size: 13px !important;
     }
 
-    .signup-outside {
-        font-size: 13px;
-    }
-}
-
-/* Extra Small Phones */
-@media (max-width: 375px) {
-    body.auth-centered-page .right-panel {
-        padding: 1rem;
+    .btn-login {
+        height: 42px !important;
+        font-size: 14px !important;
     }
 
-    .auth-brand-copy .brand-name {
-        font-size: 1rem;
-    }
-
-    .auth-brand-copy .system-title {
-        font-size: 8px;
-    }
-
-    .terms-text {
-        font-size: 11px;
-    }
-
-    .signup-outside {
-        font-size: 12px;
+    .terms-wrap {
+        margin-top: 6px !important;
+        margin-bottom: 6px !important;
     }
 }

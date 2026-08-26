@@ -11,946 +11,11 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/student_moa-responsive.css') }}">
-
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --red:        #dc2626;
-            --red-dark:   #991b1b;
-            --red-deeper: #7f0000;
-            --sidebar-w:  260px;
-            --sidebar-w-collapsed: 70px;
-            --topbar-h:   64px;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f5f5f5;
-            color: #1a1a1a;
-            min-height: 100vh;
-        }
-
-        /* =============== SIDEBAR =============== */
-        .sidebar {
-            position: fixed;
-            top: 0; left: 0;
-            width: var(--sidebar-w);
-            height: 100vh;
-            background: linear-gradient(160deg, #1a0000 0%, #4a0000 50%, #7f0000 100%);
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
-            overflow: hidden;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.18);
-        }
-
-        .sidebar.collapsed { width: var(--sidebar-w-collapsed); }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 22px 18px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            text-decoration: none;
-            flex-shrink: 0;
-        }
-
-        .sidebar-brand img {
-            width: 36px; height: 36px;
-            object-fit: contain;
-            flex-shrink: 0;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
-        }
-
-        .sidebar-brand-text {
-            display: flex;
-            flex-direction: column;
-            white-space: nowrap;
-            overflow: hidden;
-            transition: opacity 0.25s, width 0.25s;
-        }
-
-        .sidebar-brand-name {
-            font-size: 16px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: -0.3px;
-            line-height: 1;
-        }
-
-        .sidebar-brand-name span { color: #fca5a5; }
-
-        .sidebar-brand-sub {
-            font-size: 9px;
-            color: rgba(255,255,255,0.45);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 3px;
-        }
-
-        .sidebar.collapsed .sidebar-brand-text { opacity: 0; width: 0; }
-
-        .sidebar-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 18px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            text-decoration: none;
-            flex-shrink: 0;
-            transition: background 0.2s;
-        }
-
-        .sidebar-user:hover { background: rgba(255,255,255,0.05); }
-
-        .user-avatar {
-            width: 38px; height: 38px;
-            border-radius: 50%;
-            background: rgba(239,68,68,0.25);
-            border: 1.5px solid rgba(239,68,68,0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fca5a5;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .user-info { overflow: hidden; white-space: nowrap; transition: opacity 0.25s, width 0.25s; }
-        .user-name { font-size: 13px; font-weight: 600; color: #fff; display: block; text-overflow: ellipsis; overflow: hidden; }
-        .user-role { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
-        .sidebar.collapsed .user-info { opacity: 0; width: 0; }
-
-        .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
-        .sidebar-nav::-webkit-scrollbar { width: 3px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(239,68,68,0.3); border-radius: 10px; }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 20px;
-            color: rgba(255,255,255,0.55);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.25s;
-            position: relative;
-            white-space: nowrap;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.06); }
-        .nav-item.active { color: #fff; background: rgba(239,68,68,0.15); border-left-color: #ef4444; }
-        .nav-item .nav-icon { font-size: 18px; flex-shrink: 0; width: 22px; text-align: center; }
-        .nav-item .nav-label { transition: opacity 0.25s; overflow: hidden; }
-        .sidebar.collapsed .nav-label { opacity: 0; width: 0; }
-
-        .nav-sub-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 9px 20px 9px 56px;
-            color: rgba(255,255,255,0.4);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 400;
-            transition: all 0.25s;
-            position: relative;
-            white-space: nowrap;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-sub-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
-        .nav-sub-item.active { color: #fca5a5; border-left-color: rgba(239,68,68,0.5); }
-        .sidebar.collapsed .nav-sub-item { display: none; }
-
-        .nav-item .tooltip-label {
-            position: absolute;
-            left: calc(var(--sidebar-w-collapsed) + 8px);
-            background: #1a0000;
-            color: #fff;
-            font-size: 12px;
-            padding: 5px 10px;
-            border-radius: 6px;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 9999;
-        }
-
-        .sidebar.collapsed .nav-item:hover .tooltip-label { opacity: 1; }
-        .sidebar-footer { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
-
-        /* =============== MAIN =============== */
-        .main-content {
-            margin-left: var(--sidebar-w);
-            transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-content.expanded { margin-left: var(--sidebar-w-collapsed); }
-
-        .topbar {
-            height: var(--topbar-h);
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 28px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .topbar-left { display: flex; align-items: center; gap: 16px; }
-
-        .menu-toggle {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: #f5f5f5;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-size: 18px;
-            transition: all 0.2s;
-            position: relative; /* Add this */
-            z-index: 110;       /* Add this */
-        }
-
-        .menu-toggle:hover { background: #fee2e2; color: var(--red); }
-
-        .darkmode-toggle {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-            flex-shrink: 0;
-            padding: 0;
-            position: relative; /* Add this */
-            z-index: 110;       /* Add this */
-        }
-
-        .darkmode-toggle:hover {
-            background: #fee2e2; color: var(--red); border-color: #fecaca;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(220,38,38,0.2);
-        }
-
-        .darkmode-toggle:active { transform: scale(0.95); }
-
-        body.dark-mode .darkmode-toggle {
-            background: #2a2a2a;
-            border-color: #3a3a3a;
-            color: #e8e8e8;
-        }
-
-        body.dark-mode .darkmode-toggle:hover {
-            background: rgba(220,38,38,0.2);
-            color: #ff6b6b;
-            border-color: rgba(220,38,38,0.3);
-            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
-            transform: translateY(-2px);
-        }
-
-        .topbar-title { font-size: 13.5px; font-weight: 500; color: #888; }
-        .topbar-title span { color: var(--red); font-weight: 600; }
-
-        .topbar-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #fff5f5;
-            border: 1px solid #fecaca;
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 12.5px;
-            font-weight: 600;
-            color: var(--red);
-        }
-
-        /* =============== PAGE =============== */
-        .page-content { padding: 28px; flex: 1; }
-
-        .page-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .page-header h1 { font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
-        .page-header h1 span { color: var(--red); }
-
-        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888; margin-top: 6px; }
-        .breadcrumb a { color: var(--red); text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        .breadcrumb i { font-size: 10px; }
-
-        /* Add MOA button */
-        .btn-add-moa {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 11px 22px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.25);
-            position: relative; /* Add this */
-            z-index: 50;        /* Add this */
-        }
-
-        .btn-add-moa:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(220,38,38,0.35);
-            color: #fff;
-        }
-
-        /* Info banner */
-        .info-banner {
-            background: linear-gradient(135deg, #7f0000 0%, #b91c1c 50%, #dc2626 100%);
-            border-radius: 16px;
-            padding: 22px 28px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 6px 24px rgba(185,28,28,0.2);
-        }
-
-        .info-banner::before {
-            content: '';
-            position: absolute;
-            top: -50px; right: -50px;
-            width: 180px; height: 180px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-        }
-
-        .info-banner::after {
-            content: '';
-            position: absolute;
-            bottom: -30px; right: 120px;
-            width: 120px; height: 120px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.03);
-        }
-
-        .info-banner-icon {
-            width: 52px; height: 52px;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 22px;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .info-banner-text { position: relative; z-index: 1; }
-        .info-banner-text h3 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-        .info-banner-text p { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; }
-
-        /* Table card */
-        .table-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04);
-            overflow: hidden;
-        }
-
-        .table-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 18px 24px;
-            border-bottom: 1px solid #f0f0f0;
-            background: #fafafa;
-            flex-wrap: wrap;
-        }
-
-        .table-card-header-left { display: flex; align-items: center; gap: 12px; }
-
-        .header-icon {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: #fee2e2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--red);
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-
-        .table-card-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
-        .table-card-header p  { font-size: 12.5px; color: #888; margin-top: 2px; }
-
-        .table-card-body { padding: 0; }
-
-        .moa-table-wrap { overflow: visible; }
-        #moaTable {
-            min-width: 860px;
-            table-layout: fixed;
-        }
-        #moaTable th,
-        #moaTable td {
-            white-space: normal !important;
-            overflow-wrap: anywhere;
-        }
-        #moaTable th:nth-child(1), #moaTable td:nth-child(1) { width: 30%; }
-        #moaTable th:nth-child(2), #moaTable td:nth-child(2) { width: 15%; }
-        #moaTable th:nth-child(3), #moaTable td:nth-child(3) { width: 20%; }
-        #moaTable th:nth-child(4), #moaTable td:nth-child(4) { width: 14%; }
-        #moaTable th:nth-child(5), #moaTable td:nth-child(5) { width: 21%; }
-
-        /* DataTables */
-        .table-card-body .dataTables_wrapper {
-            padding: 16px 22px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13.5px;
-        }
-
-        .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
-
-        .table-card-body table.dataTable thead th {
-            background: #fafafa;
-            color: #555;
-            font-size: 11.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 10px 14px;
-            border-bottom: 1px solid #f0f0f0;
-            border-top: none;
-        }
-
-        .table-card-body table.dataTable tbody td {
-            padding: 14px;
-            color: #333;
-            border-bottom: 1px solid #f9f9f9;
-            font-size: 13.5px;
-            vertical-align: middle;
-        }
-
-        .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
-        .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
-
-        .table-card {
-            overflow: hidden;
-        }
-
-        .table-card-body .dataTables_scroll {
-            width: 100%;
-        }
-
-        .table-card-body .dataTables_scrollBody {
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .dataTables_filter input {
-            border: 1px solid #e5e5e5 !important;
-            border-radius: 8px !important;
-            padding: 6px 12px !important;
-            font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important;
-            outline: none !important;
-        }
-
-        .dataTables_filter input:focus {
-            border-color: var(--red) !important;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important;
-        }
-
-        .dataTables_length select {
-            border: 1px solid #e5e5e5 !important;
-            border-radius: 8px !important;
-            padding: 4px 8px !important;
-            font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important;
-        }
-
-        .dataTables_paginate .paginate_button {
-            border-radius: 6px !important;
-            font-family: 'Poppins', sans-serif !important;
-            font-size: 13px !important;
-            padding: 4px 10px !important;
-        }
-
-        .dataTables_paginate .paginate_button.current {
-            background: var(--red) !important;
-            border-color: var(--red) !important;
-            color: #fff !important;
-        }
-
-        .dataTables_paginate .paginate_button:hover {
-            background: #fee2e2 !important;
-            border-color: #fecaca !important;
-            color: var(--red) !important;
-        }
-
-        /* Company cell */
-        .company-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
-
-        .company-avatar {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        .company-name-text { font-weight: 600; color: #1a1a1a; font-size: 13.5px; overflow-wrap: anywhere; }
-        .company-sub { font-size: 11.5px; color: #aaa; margin-top: 1px; overflow-wrap: anywhere; }
-
-        /* Year badge */
-        .year-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #fff5f5;
-            color: var(--red);
-            border: 1px solid #fecaca;
-        }
-
-        /* Action buttons */
-        .action-buttons {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 13px;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1.5px solid;
-            text-decoration: none;
-        }
-
-        .btn-download {
-            background: #eff6ff;
-            border-color: #bfdbfe;
-            color: #2563eb;
-        }
-
-        .btn-download:hover {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #fff;
-        }
-
-        .btn-print {
-            background: #fff7ed;
-            border-color: #fed7aa;
-            color: #ea580c;
-        }
-
-        .btn-print:hover {
-            background: #ea580c;
-            border-color: #ea580c;
-            color: #fff;
-        }
-
-        .btn-voucher {
-            background: #f0fdf4;
-            border-color: #bbf7d0;
-            color: #16a34a;
-        }
-
-        .btn-voucher:hover {
-            background: #16a34a;
-            border-color: #16a34a;
-            color: #fff;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 60px 24px;
-        }
-
-        .empty-state-icon {
-            width: 72px; height: 72px;
-            border-radius: 20px;
-            background: #fee2e2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--red);
-            font-size: 30px;
-            margin: 0 auto 16px;
-        }
-
-        .empty-state h3 { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 6px; }
-        .empty-state p  { font-size: 13.5px; color: #888; }
-
-        /* =============== MODAL =============== */
-        .modal-content {
-            border-radius: 16px;
-            border: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%);
-            border-bottom: none;
-            padding: 20px 24px;
-        }
-
-        .modal-title {
-            color: #fff;
-            font-size: 16px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
-
-        .modal-body { padding: 24px; background: #fff; }
-
-        .modal-field-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #444;
-            margin-bottom: 7px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .modal-field-label i { color: var(--red); font-size: 12px; }
-
-        .modal-field-input {
-            width: 100%;
-            background: #fafafa;
-            border: 1.5px solid #e8e8e8;
-            border-radius: 10px;
-            color: #1a1a1a;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13.5px;
-            padding: 11px 14px;
-            outline: none;
-            transition: all 0.25s;
-            margin-bottom: 16px;
-        }
-
-        .modal-field-input:focus {
-            border-color: var(--red);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
-        }
-
-        .school-year-row {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 10px;
-            margin-bottom: 16px;
-            width: 100%;
-        }
-
-        .school-year-row input {
-            flex: none;
-            width: 100%;
-            background: #fafafa;
-            border: 1.5px solid #e8e8e8;
-            border-radius: 10px;
-            color: #1a1a1a;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13.5px;
-            padding: 11px 14px;
-            outline: none;
-            transition: all 0.25s;
-        }
-
-        .school-year-row input:focus {
-            border-color: var(--red);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
-        }
-
-        .school-year-row .sep {
-            display: none;
-            font-size: 16px;
-            color: #aaa;
-            font-weight: 600;
-        }
-
-        /* File upload zone */
-        .file-upload-zone {
-            border: 2px dashed #e8e8e8;
-            border-radius: 12px;
-            padding: 22px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s;
-            margin-bottom: 16px;
-            position: relative;
-        }
-
-        .file-upload-zone:hover { border-color: var(--red); background: #fff5f5; }
-
-        .file-upload-zone input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-        }
-
-        .file-upload-zone .upload-icon {
-            font-size: 26px;
-            color: #ccc;
-            margin-bottom: 8px;
-            transition: color 0.25s;
-            display: block;
-        }
-
-        .file-upload-zone:hover .upload-icon { color: var(--red); }
-        .file-upload-zone p { font-size: 13px; color: #888; margin: 0; }
-        .file-upload-zone span { font-size: 12px; color: #bbb; }
-
-        .error-msg {
-            display: none;
-            font-size: 12px;
-            color: var(--red);
-            margin-top: -12px;
-            margin-bottom: 12px;
-            display: none;
-        }
-
-        .modal-footer {
-            background: #fafafa;
-            border-top: 1px solid #f0f0f0;
-            padding: 16px 24px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .btn-modal-close {
-            padding: 9px 20px;
-            background: #f3f4f6;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            color: #555;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13.5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-modal-close:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
-
-        .btn-modal-submit {
-            padding: 9px 24px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13.5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 3px 12px rgba(220,38,38,0.2);
-        }
-
-        .btn-modal-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(220,38,38,0.3);
-        }
-
-        /* Footer */
-         .dashboard-footer {
-    background: var(--footer-bg);
-    border-top: 3px solid #FDD700;
-    color: var(--text-secondary);
-    padding: 18px 28px;
-    font-size: 12.5px; margin-top: auto;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; gap: 6px;
-    transition: background 0.3s, border-color 0.3s;
-}
-
-        .dashboard-footer .footer-left { display: flex; align-items: center; gap: 8px; }
-        .dashboard-footer .footer-logo { width: 22px; height: 22px; object-fit: contain; opacity: 0.6; }
-        .dashboard-footer .footer-copy { font-size: 12.5px; color: #aaa; font-weight: 500; }
-        .dashboard-footer .footer-copy span { color: var(--red); font-weight: 600; }
-        .dashboard-footer .footer-links { display: flex; align-items: center; gap: 6px; }
-        .dashboard-footer a { color: #888; text-decoration: none; font-weight: 500; font-size: 12.5px; transition: color 0.2s; }
-        .dashboard-footer a:hover { color: var(--red); }
-        .dashboard-footer .divider { color: #e5e5e5; margin: 0 2px; }
-
-       /* Mobile overlay */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-    pointer-events: none; /* Add this to prevent phantom blocking */
-}
-
-@media (max-width: 900px) {
-    .sidebar {
-        width: var(--sidebar-w);
-        transform: translateX(-100%);
-        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-        pointer-events: none; /* Disables clicks when sidebar is hidden */
-    }
-    .sidebar.mobile-open { 
-        transform: translateX(0); 
-        pointer-events: auto; /* Re-enables clicks when open */
-    }
-    .sidebar-overlay.active { 
-        display: block; 
-        pointer-events: auto; /* Re-enables clicks when open */
-    }
-    .main-content { margin-left: 0 !important; }
-    .page-content { padding: 18px; }
-    .topbar-title { display: none; }
-    .info-banner { flex-direction: column; text-align: center; }
-    .action-buttons { flex-direction: column; align-items: flex-start; }
-}
-.school-year-row {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    margin-bottom: 16px;
-    width: 100%;
-}
-
-.school-year-row input {
-    flex: none;
-    width: 100%;
-    min-width: 0; /* prevents overflow in grid */
-    background: #fafafa;
-    border: 1.5px solid #e8e8e8;
-    border-radius: 10px;
-    color: #1a1a1a;
-    font-family: 'Poppins', sans-serif;
-    font-size: 13px;
-    padding: 11px 10px;
-    outline: none;
-    transition: all 0.25s;
-}
-
-.school-year-row input:focus {
-    border-color: var(--red);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(220,38,38,0.07);
-}
-
-.school-year-row .sep {
-    display: none;
-    font-size: 16px;
-    color: #aaa;
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-@media (min-width: 577px) {
-    .school-year-row {
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .school-year-row input {
-        flex: 1;
-        width: auto;
-    }
-
-    .school-year-row .sep {
-        display: inline;
-    }
-}
-.nav-item:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.1);
-    border-left-color: #f8c62b;
-}
-.nav-item:hover .tooltip-label {
-    color: #f8c62b;
-}
-.nav-item.active,
-.nav-item.active:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.12);
-    border-left-color: #f8c62b;
-}
-    </style>
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/student_moa-responsive.css') }}">
+
+    <link rel="stylesheet" href="{{ vasset('css/student/companies.css') }}">
+</head>
 </head>
 
 <body>
@@ -1050,6 +115,11 @@
     <!-- Page Content -->
     <div class="page-content">
 
+        @php
+            $studentProfile = \App\Models\Student::where('user_id', $user->id)->first();
+            $isInhouseOjt = (bool) ($studentProfile?->is_inhouse_ojt ?? false);
+        @endphp
+
         <!-- Page Header -->
         <div class="page-header">
             <div>
@@ -1060,10 +130,90 @@
                     <span>Notarized MOA</span>
                 </div>
             </div>
-            <button class="btn-add-moa" data-bs-toggle="modal" data-bs-target="#addMoaModal">
-                <i class="fa fa-plus-circle"></i> Add Notarized MOA
-            </button>
+            @if(empty($isLocked) && !$isInhouseOjt)
+                <button class="btn-add-moa" data-bs-toggle="modal" data-bs-target="#addMoaModal">
+                    <i class="fa fa-plus-circle"></i> Add Notarized MOA
+                </button>
+            @else
+                @if(isset($unlockRequest) && $unlockRequest->status === 'pending')
+                    <button class="btn-add-moa" style="background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); cursor: default;" disabled>
+                        <i class="fa fa-clock"></i> Unlock Request Pending
+                    </button>
+                @else
+                    <button class="btn-add-moa" style="background: linear-gradient(135deg, #475569 0%, #1e293b 100%);" onclick="openUnlockRequestModal('switch_external', true)">
+                        <i class="fa fa-key"></i> Request MOA Unlock
+                    </button>
+                @endif
+            @endif
         </div>
+
+        @if($isInhouseOjt)
+            <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); border-radius: 16px; padding: 22px 26px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(4,120,87,0.2);">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; flex-shrink: 0;">
+                        <i class="fa fa-university"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 16px; font-weight: 700; color: #ffffff;">School In-House OJT Mode Active</div>
+                        <div style="font-size: 13px; color: #d1fae5; margin-top: 2px;">
+                            You are registered for internal campus OJT. External notarized MOA requirement is <strong>waived</strong>, and all requirement submission slots are unlocked!
+                        </div>
+                    </div>
+                </div>
+                @if(!empty($unlockRequest) && $unlockRequest->status === 'pending')
+                    <button type="button" class="btn" disabled style="background: rgba(253, 230, 138, 0.2); color: #fef08a; border: 1px solid rgba(253, 230, 138, 0.4); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: not-allowed;">
+                        <i class="fa fa-clock me-1"></i> Switch Request Pending
+                    </button>
+                @else
+                    <button type="button" class="btn" onclick="openUnlockRequestModal('switch_external', true)" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                        <i class="fa fa-paper-plane me-1"></i> Request Switch to External MOA
+                    </button>
+                @endif
+            </div>
+        @elseif(empty($isLocked) && count($companies) === 0)
+            <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                        <i class="fa fa-university"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 700; color: #0f172a;">Doing OJT inside the School / Campus?</div>
+                        <div style="font-size: 12.5px; color: #64748b;">If your OJT is internal within PUP / School, no external MOA is required.</div>
+                    </div>
+                </div>
+                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#confirmInhouseLockModal" style="background: #0284c7; color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; box-shadow: 0 2px 8px rgba(2,132,199,0.25);">
+                    <i class="fa fa-check-circle me-1"></i> Declare School In-House OJT
+                </button>
+            </div>
+        @endif
+
+        @if(!empty($isLocked))
+            <!-- Lock Alert Banner -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 20px; flex-shrink: 0;">
+                        <i class="fa fa-lock"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 15px; font-weight: 700; color: #f8fafc;">MOA Selection Locked</div>
+                        <div style="font-size: 13px; color: #94a3b8; margin-top: 2px;">
+                            Your account is locked to your selected company MOA. Browsing or linking to other companies is disabled.
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    @if(isset($unlockRequest) && $unlockRequest->status === 'pending')
+                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15; font-size: 13px; font-weight: 600;">
+                            <i class="fa fa-clock"></i> Request Pending Review
+                        </span>
+                    @else
+                        <button type="button" class="btn" style="background: #ef4444; color: #fff; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 10px; border: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;" data-bs-toggle="modal" data-bs-target="#requestUnlockModal">
+                            <i class="fa fa-key"></i> Request MOA Reset / Change
+                        </button>
+                    @endif
+                </div>
+            </div>
+        @endif
 
         <!-- Info Banner -->
         <div class="info-banner">
@@ -1163,7 +313,8 @@
                                         onclick="openPdfPreview('{{ asset('assets/' . $company->file) }}')">
                                         <i class="fa fa-print"></i> Print PDF
                                     </button>
-                                    @if($isOwner)
+                                     @php $companyHasEditUnlock = is_callable($hasApprovedEditUnlock) ? $hasApprovedEditUnlock($company->id) : !empty($hasApprovedEditUnlock); @endphp
+                                     @if($isOwner && (empty($isLocked) || $companyHasEditUnlock))
                                         <button type="button"
                                             class="btn-action"
                                             style="background:#eff6ff; border-color:#bfdbfe; color:#2563eb;"
@@ -1181,13 +332,55 @@
                                             <i class="fa fa-edit"></i> Edit
                                         </button>
                                     @endif
-                                    <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
-                                        onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}', {{ $isOwner ? 'true' : 'false' }})">
-                                        <i class="fa fa-trash"></i> {{ $isOwner ? 'Remove' : 'Unlink' }}
-                                    </button>
-                                    <form id="student-remove-form-{{ $company->id }}" action="{{ route('student.moa.remove', $company->id) }}" method="POST" style="display:none;">
-                                        @csrf
-                                    </form>
+                                    @if(!empty($isLocked))
+                                        @if(!empty($unlockRequest) && $unlockRequest->status === 'pending')
+                                            <button type="button" class="btn-action" disabled style="border:1.5px solid #fcd34d; color:#b45309; background:#fffbeb; cursor:not-allowed; opacity:0.9;" title="Your unlock request is pending coordinator approval.">
+                                                <i class="fa fa-clock me-1"></i> Unlock Request Pending
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
+                                                onclick="openUnlockRequestModal('{{ $isOwner ? 'edit' : 'unlink' }}', {{ $isOwner ? 'true' : 'false' }})">
+                                                <i class="fa fa-key me-1"></i> {{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}
+                                            </button>
+                                             <script>
+                                                 function openUnlockRequestModal(type, isOwner) {
+                                                     const select = document.getElementById('modalRequestType');
+                                                     if (select) {
+                                                         const editOpt = select.querySelector('option[value="edit"]');
+                                                         const unlinkOpt = select.querySelector('option[value="unlink"]');
+                                                         const switchOpt = select.querySelector('option[value="switch_external"]');
+
+                                                         if (type === 'switch_external') {
+                                                             if (editOpt) editOpt.style.display = 'none';
+                                                             if (unlinkOpt) unlinkOpt.style.display = 'none';
+                                                             if (switchOpt) switchOpt.style.display = 'block';
+                                                             select.value = 'switch_external';
+                                                         } else if (isOwner === false) {
+                                                             if (editOpt) editOpt.style.display = 'none';
+                                                             if (unlinkOpt) unlinkOpt.style.display = 'block';
+                                                             if (switchOpt) switchOpt.style.display = 'none';
+                                                             select.value = 'unlink';
+                                                         } else {
+                                                             if (editOpt) editOpt.style.display = 'block';
+                                                             if (unlinkOpt) unlinkOpt.style.display = 'block';
+                                                             if (switchOpt) switchOpt.style.display = 'none';
+                                                             select.value = type || 'edit';
+                                                         }
+                                                     }
+                                                     const modal = new bootstrap.Modal(document.getElementById('requestUnlockModal'));
+                                                     modal.show();
+                                                 }
+                                             </script>
+                                        @endif
+                                    @else
+                                        <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
+                                            onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}', {{ $isOwner ? 'true' : 'false' }})">
+                                            <i class="fa fa-trash"></i> {{ $isOwner ? 'Remove' : 'Unlink' }}
+                                        </button>
+                                        <form id="student-remove-form-{{ $company->id }}" action="{{ route('student.moa.remove', $company->id) }}" method="POST" style="display:none;">
+                                            @csrf
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -1418,7 +611,7 @@
                                 <div style="font-size: 11.5px; color: #777; line-height: 1.6;">
                                     Ensure your MOA is properly <strong>notarized</strong> before submitting.
                                     Accepted format: <strong>PDF only</strong>.
-                                    Max file size: <strong>2 MB</strong>.
+                                    Max file size: <strong>30 MB</strong>.
                                 </div>
                             </div>
                         </div>
@@ -1870,22 +1063,76 @@
             });
         }
 
+        let pendingFormType = null;
+        let pendingCompanyId = null;
+
         document.querySelectorAll('.existing-moa-link-btn').forEach(function (button) {
             button.addEventListener('click', function () {
                 const companyIdInput = document.getElementById('linkExistingMoaCompanyId');
                 const linkForm = document.getElementById('linkExistingMoaForm');
+                if (!companyIdInput || !linkForm) return;
 
-                if (!companyIdInput || !linkForm) {
-                    return;
+                pendingCompanyId = this.dataset.companyId || '';
+                companyIdInput.value = pendingCompanyId;
+
+                const item = this.closest('.existing-moa-item');
+                const companyName = item ? (item.querySelector('[style*="font-weight:800"]')?.innerText || 'this company') : 'this company';
+
+                document.getElementById('confirmCompanyNameText').innerText = companyName;
+                pendingFormType = 'link';
+
+                // Close addMoaModal if open
+                const addModalEl = document.getElementById('addMoaModal');
+                if (addModalEl) {
+                    const addModalInst = bootstrap.Modal.getInstance(addModalEl);
+                    if (addModalInst) addModalInst.hide();
                 }
 
-                companyIdInput.value = this.dataset.companyId || '';
-                this.disabled = true;
-                this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Linking...';
-                linkForm.submit();
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmMoaLockModal'));
+                confirmModal.show();
             });
         });
+
+        const studentMoaForm = document.getElementById('studentMoaForm');
+        if (studentMoaForm) {
+            studentMoaForm.addEventListener('submit', function (e) {
+                if (window.moaLockConfirmed) return;
+
+                e.preventDefault();
+                const companyNameInput = this.querySelector('input[name="company_name"]');
+                const compName = companyNameInput ? companyNameInput.value.trim() : 'this company';
+
+                document.getElementById('confirmCompanyNameText').innerText = compName || 'this company';
+                pendingFormType = 'create';
+
+                const addModalEl = document.getElementById('addMoaModal');
+                if (addModalEl) {
+                    const addModalInst = bootstrap.Modal.getInstance(addModalEl);
+                    if (addModalInst) addModalInst.hide();
+                }
+
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmMoaLockModal'));
+                confirmModal.show();
+            });
+        }
+
+        const btnConfirmLockSubmit = document.getElementById('btnConfirmLockSubmit');
+        if (btnConfirmLockSubmit) {
+            btnConfirmLockSubmit.addEventListener('click', function () {
+                this.disabled = true;
+                this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Processing...';
+
+                if (pendingFormType === 'link') {
+                    const linkForm = document.getElementById('linkExistingMoaForm');
+                    if (linkForm) linkForm.submit();
+                } else if (pendingFormType === 'create') {
+                    window.moaLockConfirmed = true;
+                    if (studentMoaForm) studentMoaForm.submit();
+                }
+            });
+        }
     });
+
     document.addEventListener('click', function(e) {
     const btn = e.target.closest('.view-btn');
     if (btn) {
@@ -1900,9 +1147,122 @@
     });
 @endif
 </script>
-<script src="{{ url('/assets/js/dark-mode.js') }}"></script>
-<script src="{{ asset('assets/js/upload-size-guard.js') }}"></script>
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
-<script src="{{ url('/js/mobile-utils.js') }}"></script>
+
+<!-- =============== CONFIRM MOA LOCK MODAL =============== -->
+<div class="modal fade" id="confirmMoaLockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: #fff5f5; border-bottom: 1px solid #fee2e2;">
+                <h5 class="modal-title" style="color: var(--red); font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                    <i class="fa fa-exclamation-triangle"></i> Confirm MOA Lock
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <p style="font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 14px;">
+                    Are you sure you want to proceed with <strong id="confirmCompanyNameText" style="color:#111827;">this company</strong>?
+                </p>
+                <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 14px; font-size: 13px; color: #9f1239; line-height: 1.5;">
+                    <i class="fa fa-lock me-1"></i> <strong>Important:</strong> Once confirmed, your selection will be <strong>locked</strong>. You will not be able to browse or select other company MOAs without prior approval from your Internship Coordinator.
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #fafafa;">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-modal-submit" id="btnConfirmLockSubmit">
+                    <i class="fa fa-lock me-1"></i> Yes, Confirm & Lock Selection
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== REQUEST UNLOCK MODAL =============== -->
+<div class="modal fade" id="requestUnlockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.18);">
+            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 18px 24px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                        <i class="fa fa-key"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title" style="color: #0f172a; font-weight: 700; font-size: 16px; margin: 0;">
+                            Request MOA Unlock
+                        </h5>
+                        <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Coordinator approval required</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('student.moa.requestUnlock') }}" method="POST">
+                @csrf
+                <div class="modal-body" style="padding: 24px;">
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 18px; line-height: 1.5; background:#f8fafc; padding:10px 14px; border-radius:8px; border:1px solid #f1f5f9;">
+                        <i class="fa fa-info-circle me-1" style="color:#2563eb;"></i> Select your purpose and provide a clear explanation for your OJT Coordinator.
+                    </p>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-tasks"></i> Request Purpose <span style="color:#ef4444;">*</span>
+                    </label>
+                    <select name="request_type" id="modalRequestType" class="modal-field-input" required>
+                        <option value="edit">Edit MOA Details / Replace File</option>
+                        <option value="unlink">Remove / Unlink MOA</option>
+                        <option value="switch_external">Switch from In-House OJT to External MOA</option>
+                    </select>
+
+                    <label class="modal-field-label">
+                        <i class="fa fa-comment-alt"></i> Reason for Request <span style="color:#ef4444;">*</span>
+                    </label>
+                    <textarea name="reason" rows="4" class="modal-field-input" style="width:100%; font-family: inherit; resize: vertical;" placeholder="e.g. Need to update company address / replacement PDF file..." required minlength="5"></textarea>
+                </div>
+                <div class="modal-footer" style="background: #fafafa; padding: 14px 24px;">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modal-submit" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+                        <i class="fa fa-paper-plane me-1"></i> Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- =============== CONFIRM IN-HOUSE OJT LOCK MODAL =============== -->
+<div class="modal fade" id="confirmInhouseLockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: #e0f2fe; border-bottom: 1px solid #bae6fd;">
+                <h5 class="modal-title" style="color: #0369a1; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                    <i class="fa fa-university"></i> Confirm School In-House OJT
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('student.moa.toggleInhouse') }}" method="POST">
+                @csrf
+                <input type="hidden" name="is_inhouse" value="1">
+                <div class="modal-body" style="padding: 24px;">
+                    <p style="font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 14px;">
+                        Are you sure you want to register for <strong>School In-House OJT</strong>?
+                    </p>
+                    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 14px; font-size: 13px; color: #9f1239; line-height: 1.5;">
+                        <i class="fa fa-lock me-1"></i> <strong>Important Disclaimer:</strong> Once confirmed, your selection will be <strong>locked</strong> to School In-House OJT mode. You will not be able to upload or link to an external company MOA without prior unlock approval from your Internship Coordinator.
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #fafafa;">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modal-submit" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                        <i class="fa fa-lock me-1"></i> Yes, Confirm & Lock Selection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+<script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
+<script src="{{ vasset('js/mobile-utils.js') }}"></script>
+
+    <script src="{{ vasset('js/student/companies.js') }}"></script>
 </body>
 </html>

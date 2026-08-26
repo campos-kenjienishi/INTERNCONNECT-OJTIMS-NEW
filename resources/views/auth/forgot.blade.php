@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" style="background: #3b0000;">
 <head>
-    <!-- CRITICAL: Prevents white flash -->
-    <style>
-        html, body { background: #3b0000 !important; }
-    </style>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Reset Password</title>
@@ -14,94 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/forgotpassword-responsive.css') }}">
-
-    <style>
-        body.auth-centered-page .login-container {
-            max-width: 560px !important;
-            min-height: auto !important;
-        }
-
-        body.auth-centered-page .left-panel {
-            display: none !important;
-        }
-
-        body.auth-centered-page .right-panel {
-            width: 100% !important;
-            flex: 1 1 auto !important;
-            min-height: 520px !important;
-            padding: 36px 36px !important;
-            justify-content: center !important;
-            box-sizing: border-box !important;
-        }
-
-        body.auth-centered-page .lock-icon-wrap {
-            display: none !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap input {
-            background: #f7f4ee !important;
-            border: 1px solid #ddd7cb !important;
-            color: #3b0000 !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap input::placeholder {
-            color: #9a9080 !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap input:focus {
-            background: #fffdf9 !important;
-            border-color: #cdbfa9 !important;
-        }
-
-        body.auth-centered-page .right-panel .input-wrap .i-icon {
-            color: #ef4444 !important;
-            z-index: 2;
-        }
-
-        .auth-brand {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .auth-logo {
-            width: 72px;
-            height: 72px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 16px rgba(255,255,255,0.18));
-        }
-
-        .auth-brand-copy .brand-name {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .auth-brand-copy .system-title {
-            font-size: 10px;
-            letter-spacing: 2px;
-        }
-
-        @media (max-width: 767px) {
-            body.auth-centered-page .right-panel {
-                min-height: auto;
-                padding: 40px 24px;
-            }
-
-            .auth-logo {
-                width: 58px;
-                height: 58px;
-            }
-
-            .auth-brand-copy .brand-name {
-                font-size: 20px;
-            }
-        }
-    </style>
-
+    <link rel="stylesheet" href="{{ vasset('css/forgotpassword-responsive.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/pages/auth-forgot.css') }}">
 </head>
 
 <body class="auth-centered-page">
@@ -178,43 +87,60 @@
                 </div>
             </div>
 
+            @if(!Session::has('success'))
             <div class="forgot-header">
                 <h2>Forgot Password?</h2>
                 <p>Enter your registered email address and we'll send you a link to reset your password.</p>
             </div>
+            @endif
 
             <form action="{{url('/forgotPass')}}" method="post">
                 @csrf
 
                 @if(Session::has('success'))
-                    <div class="alert alert-success">{{ Session::get('success') }}</div>
-                @endif
-                @if(Session::has('fail'))
-                    <div class="alert alert-danger">{{ Session::get('fail') }}</div>
-                @endif
-
-                <div class="field-group">
-                    <label class="form-label">E-mail Address</label>
-                    <div class="input-wrap">
-                        <i class="fa fa-envelope i-icon"></i>
-                        <input type="text" placeholder="Enter your registered email" name="email" autocomplete="email">
+                    {{-- Success state: hide form, show confirmation only --}}
+                    <div class="reset-success-state">
+                        <div class="reset-success-icon">
+                            <i class="fa fa-check-circle"></i>
+                        </div>
+                        <div class="reset-success-title">Email Sent!</div>
+                        <div class="reset-success-msg">{{ Session::get('success') }}</div>
+                        <div class="reset-success-note">
+                            <i class="fa fa-info-circle"></i>
+                            Check your spam or junk folder if you don't see it within a few minutes.
+                        </div>
                     </div>
-                </div>
+                    <div class="footer-wrap" style="margin-top: 24px;">
+                        <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
+                    </div>
+                @else
+                    @if(Session::has('fail'))
+                        <div class="alert alert-danger">{{ Session::get('fail') }}</div>
+                    @endif
 
-                <div class="info-note">
-                    <i class="fa fa-info-circle"></i>
-                    <p>Make sure to check your spam or junk folder if you don't see the email in your inbox within a few minutes.</p>
-                </div>
+                    <div class="field-group">
+                        <label class="form-label">E-mail Address</label>
+                        <div class="input-wrap">
+                            <i class="fa fa-envelope i-icon"></i>
+                            <input type="text" placeholder="Enter your registered email" name="email" autocomplete="email">
+                        </div>
+                    </div>
 
-                <div class="btn-wrap">
-                    <button type="submit" class="btn-reset">
-                        <i class="fa fa-paper-plane me-2"></i> Send Reset Link
-                    </button>
-                </div>
+                    <div class="info-note">
+                        <i class="fa fa-info-circle"></i>
+                        <p>Make sure to check your spam or junk folder if you don't see the email in your inbox within a few minutes.</p>
+                    </div>
 
-                <div class="footer-wrap">
-                    <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
-                </div>
+                    <div class="btn-wrap">
+                        <button type="submit" class="btn-reset">
+                            <i class="fa fa-paper-plane me-2"></i> Send Reset Link
+                        </button>
+                    </div>
+
+                    <div class="footer-wrap">
+                        <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
+                    </div>
+                @endif
 
             </form>
         </div>
@@ -224,6 +150,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url('/frontend/js/script.js') }}"></script>
-<script src="{{ asset('assets/js/voice-input.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
