@@ -625,11 +625,17 @@
                         showConfirmButton: false
                     });
 
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
                     $.ajax({
                         url: (window.studentAccountConfig?.syncGuidanceUrl || '/student/sync-guidance'),
                         type: "POST",
                         data: {
-                            _token: (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '')
+                            _token: $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(res) {
                             if (res.success) {
