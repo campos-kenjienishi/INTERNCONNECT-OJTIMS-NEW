@@ -5,18 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Landing Page</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
-     <link rel="stylesheet" href="{{ vasset('css/pages/landing-page.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/pages/landing-page.css') }}">
 </head>
 <body>
     <header class="topbar">
     <div class="topbar-inner">
         <div class="brand">
-            <img src="/images/puplogo.png" alt="PUP Taguig">
+            <img src="{{ vasset('images/puplogo.png') }}" alt="PUP Taguig">
             <div class="brand-text">
                 <span class="brand-title">Polytechnic University of the Philippines &ndash; Taguig Campus</span>
                 <span class="brand-subtitle">The Country's 1st Polytechnic University</span>
@@ -43,7 +43,7 @@
 
     <div class="hero-card" id="heroCardDefault">
         <div class="hero-media reveal" data-reveal="bounce">
-            <img class="hero-mark" src="/images/OJTIMS LOGO.png" alt="InternConnect mark">
+            <img class="hero-mark" src="{{ vasset('images/OJTIMS LOGO.png') }}" alt="InternConnect mark">
             <p class="hero-tagline">Your OJT Journey, All in One Place</p>
         </div>
 
@@ -58,7 +58,7 @@
 
     <div class="hero-card hero-card-alt" id="heroCardTeam">
         <div class="hero-media reveal" data-reveal="bounce">
-            <img class="hero-mark" src="/images/WardsLogo.png" alt="InternConnect mark">
+            <img class="hero-mark" src="{{ vasset('images/WardsLogo.png') }}" alt="InternConnect mark">
             <p class="hero-tagline">Team Wards</p>
         </div>
 
@@ -163,7 +163,7 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP logo">
+                <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP logo">
                 <div class="footer-meta">
                     <span class="footer-copy">© {{ date('Y') }} <span>InternConnect</span></span>
                     <span class="footer-divider">|</span>
