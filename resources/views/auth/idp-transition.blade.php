@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connecting to Identity Provider - InternConnect</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
         <!-- Logo & Branding -->
         <div class="brand-section">
             <div class="logo-glow-wrapper">
-                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="brand-logo">
+                <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect Logo" class="brand-logo">
             </div>
             <div class="brand-name">Intern<span>Connect</span> <span class="badge-beta">BETA</span></div>
             <div class="brand-sub">Central Authentication Service</div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Login</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
         <!-- LEFT PANEL (hidden on centered layout) -->
         <div class="left-panel">
             <div class="left-panel-content">
-                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP Logo" class="side-logo">
+                <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP Logo" class="side-logo">
                 <h1 class="side-brand">InternConnect</h1>
                 <p class="side-desc">PUP Taguig On-the-Job Training Management System</p>
                 <div class="side-stats">
@@ -50,7 +50,7 @@
             </div>
 
             <div class="auth-brand">
-                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
+                <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect Logo" class="auth-logo">
                 <div class="auth-brand-copy">
                     <div class="brand-name">Intern<span>Connect</span></div>
                     <div class="system-title">On-the-Job Training (OJT) Information Management System</div>
