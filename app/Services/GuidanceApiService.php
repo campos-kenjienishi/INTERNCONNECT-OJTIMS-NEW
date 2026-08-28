@@ -181,7 +181,86 @@ class GuidanceApiService
     }
 
     /**
-     * Fetch single student record by student number.
+     * Find single student profile by UUID, email, or name with early exit and cache fallback.
+     */
+    public function findStudentProfile(?string $idpUuid = null, ?string $email = null, ?string $name = null): ?array
+    {
+        $idpUuid = strtolower(trim($idpUuid ?? ''));
+        $email = strtolower(trim($email ?? ''));
+        $cleanName = strtolower(preg_replace('/[^a-z0-9]/', '', $name ?? ''));
+
+        // 1. Check cached pool first
+        $cached = Cache::get('guisis_all_student_profiles');
+        if (is_array($cached) && !empty($cached)) {
+            foreach ($cached as $p) {
+                $pUuid = strtolower(trim($p['idpUuid'] ?? ''));
+                $pEmail = strtolower(trim($p['email'] ?? ''));
+                $pName = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+
+                if (($idpUuid && $pUuid === $idpUuid) ||
+                    ($email && $pEmail === $email) ||
+                    ($cleanName && $pName === $cleanName)) {
+                    return $p;
+                }
+            }
+        }
+
+        // 2. Fetch page by page with early exit and cache accumulation
+        @set_time_limit(120);
+        $page = 1;
+        $pageSize = 50;
+        $maxPages = 35;
+        $accumulated = [];
+        $matchedProfile = null;
+
+        while ($page <= $maxPages) {
+            $res = $this->getProfiles($page, $pageSize);
+            if (!$res) {
+                break;
+            }
+
+            $studentsList = $res['data']['students'] ?? $res['data']['profiles'] ?? $res['data']['data'] ?? $res['data'] ?? [];
+            if (empty($studentsList) || !is_array($studentsList)) {
+                break;
+            }
+
+            foreach ($studentsList as $p) {
+                if (!is_array($p)) continue;
+                $accumulated[] = $p;
+
+                if (!$matchedProfile) {
+                    $pUuid = strtolower(trim($p['idpUuid'] ?? ''));
+                    $pEmail = strtolower(trim($p['email'] ?? ''));
+                    $pName = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
+
+                    if (($idpUuid && $pUuid === $idpUuid) ||
+                        ($email && $pEmail === $email) ||
+                        ($cleanName && $pName === $cleanName)) {
+                        $matchedProfile = $p;
+                        // Return matched profile immediately!
+                        Cache::put('guisis_all_student_profiles', $accumulated, 1800);
+                        return $matchedProfile;
+                    }
+                }
+            }
+
+            $meta = $res['data']['meta'] ?? $res['meta'] ?? [];
+            $totalPages = $meta['totalPages'] ?? $meta['total_pages'] ?? null;
+            if ($totalPages && $page >= $totalPages) {
+                break;
+            }
+
+            $page++;
+        }
+
+        if (!empty($accumulated)) {
+            Cache::put('guisis_all_student_profiles', $accumulated, 1800);
+        }
+
+        return $matchedProfile;
+    }
+
+    /**
      * Endpoint: GET /integrations/students/{studentNumber}
      */
     public function getStudentByNumber(string $studentNumber): ?array

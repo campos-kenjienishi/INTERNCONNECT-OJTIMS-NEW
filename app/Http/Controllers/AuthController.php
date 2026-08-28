@@ -62,8 +62,13 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function showIdpTransition()
+    public function showIdpTransition(Request $request)
     {
+        $portal = $request->query('portal', Session::get('target_login_portal', 'student'));
+        if (in_array($portal, ['student', 'faculty'], true)) {
+            Session::put('target_login_portal', $portal);
+        }
+
         if (!$this->idpService->isReachable()) {
             return view('auth.idp-transition', [
                 'error' => 'Unable to connect to Identity Provider. The service may be offline or unreachable.'
@@ -75,8 +80,8 @@ class AuthController extends Controller
 
     public function redirectToIdp(Request $request)
     {
-        $portal = $request->query('portal');
-        if ($portal && in_array($portal, ['student', 'faculty'], true)) {
+        $portal = $request->query('portal', Session::get('target_login_portal', 'student'));
+        if (in_array($portal, ['student', 'faculty'], true)) {
             Session::put('target_login_portal', $portal);
         }
 
@@ -336,24 +341,12 @@ class AuthController extends Controller
 
         // Auto-search student in GuiSIS by UUID, email, or name
         $guisisData = null;
-        $idpUuid = strtolower(trim($idp['idp_user_id'] ?? ''));
-        $email = strtolower(trim($idp['email'] ?? ''));
-        $name = strtolower(preg_replace('/[^a-z0-9]/', '', ($idp['first_name'] ?? '') . ' ' . ($idp['last_name'] ?? '')));
-
         try {
-            $profiles = $guidanceApi->getAllStudentProfiles();
-            foreach ($profiles as $p) {
-                $pUuid = strtolower(trim($p['idpUuid'] ?? ''));
-                $pEmail = strtolower(trim($p['email'] ?? ''));
-                $pName = strtolower(preg_replace('/[^a-z0-9]/', '', ($p['firstName'] ?? '') . ' ' . ($p['lastName'] ?? '')));
-
-                if (($idpUuid && $pUuid === $idpUuid) ||
-                    ($email && $pEmail === $email) ||
-                    ($name && $pName === $name)) {
-                    $guisisData = $p;
-                    break;
-                }
-            }
+            $guisisData = $guidanceApi->findStudentProfile(
+                $idp['idp_user_id'] ?? null,
+                $idp['email'] ?? null,
+                ($idp['first_name'] ?? '') . ' ' . ($idp['last_name'] ?? '')
+            );
         } catch (\Throwable $e) {
             Log::warning('Onboarding GuiSIS lookup error: ' . $e->getMessage());
         }

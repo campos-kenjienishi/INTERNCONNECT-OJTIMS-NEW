@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="background: #3b0000;">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,8 +28,8 @@
                 <div class="logo-wrapper">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
                     <div>
-                        <div class="brand-name">Intern<span>Connect</span> - BETA</div>
-                        <div class="system-title">On-The-Job Training Information Management System</div>
+                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="system-title">On-the-Job Training (OJT) Information Management System</div>
                     </div>
                 </div>
 
@@ -75,8 +75,8 @@
             <div class="auth-brand">
                 <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
                 <div class="auth-brand-copy">
-                    <div class="brand-name">Intern<span>Connect</span> - BETA</div>
-                    <div class="system-title">On-The-Job Training Information Management System</div>
+                    <div class="brand-name">Intern<span>Connect</span></div>
+                    <div class="system-title">On-the-Job Training (OJT) Information Management System</div>
                 </div>
             </div>
 
@@ -101,17 +101,17 @@
                     {{-- Success state: hide form, show confirmation only --}}
                     <div class="reset-success-state">
                         <div class="reset-success-icon">
-                            <i class="fa fa-check-circle"></i>
+                            <i class="fa fa-check"></i>
                         </div>
                         <div class="reset-success-title">Email Sent!</div>
                         <div class="reset-success-msg">{{ Session::get('success') }}</div>
                         <div class="reset-success-note">
                             <i class="fa fa-info-circle"></i>
-                            Check your spam or junk folder if you don't see it within a few minutes.
+                            <span>Check your spam or junk folder if you don't see it within a few minutes.</span>
                         </div>
                     </div>
                     <div class="footer-wrap" style="margin-top: 24px;">
-                        <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
+                        <a href="{{ url('/login' . (request('portal') ? '?portal=' . request('portal') : '')) }}"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
                     </div>
                 @else
                     @if(Session::has('fail'))
@@ -138,7 +138,7 @@
                     </div>
 
                     <div class="footer-wrap">
-                        <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
+                        <a href="{{ url('/login' . (request('portal') ? '?portal=' . request('portal') : '')) }}"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
                     </div>
                 @endif
 

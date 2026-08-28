@@ -293,12 +293,12 @@
 
             <div class="terms-scroll-area">
                 <p><strong>Data Privacy & System Usage:</strong> By using InternConnect, you consent to the processing of your academic, training, and profile information for University OJT management purposes in accordance with the Data Privacy Act of 2012.</p>
-                <p>You may view the full <a href="{{ url('/terms') }}" target="_blank" style="color:#800000; font-weight:600;">Terms of Use</a> and <a href="{{ url('/privacy') }}" target="_blank" style="color:#800000; font-weight:600;">Privacy Policy</a> anytime.</p>
+                <p>You may view the official <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer" style="color:#800000; font-weight:600;">Terms of Use</a> and <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer" style="color:#800000; font-weight:600;">Privacy Statement</a> anytime.</p>
             </div>
 
             <div class="terms-checkbox-box" id="termsCheckboxCard">
                 <input type="checkbox" id="agreeTermsCheck">
-                <span>I accept the Terms of Use &amp; Privacy Policy</span>
+                <span>I accept the Terms of Use &amp; Privacy Statement</span>
             </div>
             <div class="terms-alert-notice" id="termsAlertNotice">
                 <i class="fas fa-exclamation-circle me-1"></i> Please check the box above before continuing.

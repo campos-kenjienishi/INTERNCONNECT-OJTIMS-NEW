@@ -79,8 +79,8 @@ $email = $_GET['email'] ?? '';
             <div class="auth-brand">
                 <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
                 <div class="auth-brand-copy">
-                    <div class="brand-name">Intern<span>Connect</span> - BETA</div>
-                    <div class="system-title">On-The-Job Training Information Management System</div>
+                    <div class="brand-name">Intern<span>Connect</span></div>
+                    <div class="system-title">On-the-Job Training (OJT) Information Management System</div>
                 </div>
             </div>
 
