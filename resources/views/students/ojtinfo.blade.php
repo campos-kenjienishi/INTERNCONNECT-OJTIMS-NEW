@@ -7,13 +7,23 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>InternConnect - OJT Information</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/ojtinfo-responsive.css') }}">
-
+    <link rel="stylesheet" href="{{ vasset('css/student_ojtinfo-responsive.css') }}">
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ vasset('css/student/ojt-info.css') }}">
-</head>
 </head>
 
 <body>
@@ -262,9 +272,9 @@
             PUP Website
         </a>
         <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
 </div>

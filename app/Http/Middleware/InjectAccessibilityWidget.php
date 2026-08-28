@@ -12,15 +12,8 @@ class InjectAccessibilityWidget
      */
     public function handle(Request $request, Closure $next)
     {
-        $routeName = optional($request->route())->getName();
-        $path = $request->path();
-
-        if (
-            (is_string($routeName) && str_ends_with($routeName, '.print')) ||
-            (is_string($path) && str_contains($path, '/print'))
-        ) {
-            return $next($request);
-        }
+        return $next($request);
+    }
 
         $response = $next($request);
 

@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/login-responsive.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/pages/auth-login.css') }}">
 </head>
 

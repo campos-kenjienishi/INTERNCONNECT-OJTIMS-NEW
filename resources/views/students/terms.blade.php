@@ -321,9 +321,9 @@
         <span>© 1998–2026 <a href="https://www.pup.edu.ph/" target="_blank">Polytechnic University of the Philippines</a></span>
     </div>
     <div>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
 

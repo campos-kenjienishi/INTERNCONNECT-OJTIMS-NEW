@@ -1,6 +1,5 @@
 /* =========================================
    STUDENT MOA RESPONSIVE CSS
-   Mobile-first approach
 ========================================= */
 
 /* ===== GLOBAL FIXES ===== */
@@ -14,83 +13,55 @@ img {
     overflow-x: auto;
 }
 
-/* ===== MOBILE (DEFAULT <640px) ===== */
-
-/* Sidebar hidden by default on mobile */
-/* ===== MOBILE (DEFAULT <640px) ===== */
-
-/* Sidebar hidden by default on mobile */
-.sidebar {
-    transform: translateX(-100%);
-    position: fixed;
-    pointer-events: none; /* FIX: Prevents the invisible box from blocking clicks */
-    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-}
-
-.sidebar.mobile-open {
-    transform: translateX(0);
-    pointer-events: auto; /* Re-enables clicks when the menu is opened */
-}
-
-/* Remove sidebar spacing */
-.main-content {
-    margin-left: 0; /* FIX: Removed !important so desktop media queries can override this */
-    transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
-}
-
-/* ... (keep your other mobile/tablet styles the same) ... */
-
-/* ===== LAPTOPS (≥1024px) ===== */
-@media (min-width: 1024px) {
-
+/* ===== TABLET / MOBILE (≤900px) ===== */
+@media (max-width: 900px) {
     .sidebar {
-        transform: translateX(0);
-        position: fixed;
-        width: var(--sidebar-w);
-        pointer-events: auto; /* FIX: Ensure the sidebar is clickable on desktop */
-    }
-
-    .main-content {
-        margin-left: var(--sidebar-w);
-    }
-
-    .main-content.expanded {
-        margin-left: var(--sidebar-w-collapsed);
-    }
-
-    .page-content {
-        padding: 24px;
-    }
-}
-/* ===== SMALL DEVICES (≥640px) ===== */
-@media (min-width: 640px) {
-
-    .page-content {
-        padding: 16px;
-    }
-
-    .btn-action {
-        font-size: 12px;
-    }
-}
-
-/* ===== TABLETS (≥768px) ===== */
-@media (min-width: 768px) {
-
-    /* Sidebar still hidden unless opened */
-    .sidebar {
+        position: fixed !important;
+        top: 0; left: 0;
+        width: var(--sidebar-w) !important;
+        height: 100vh !important;
         transform: translateX(-100%);
+        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        z-index: 2000 !important;
     }
 
     .sidebar.mobile-open {
         transform: translateX(0);
     }
 
-    .page-content {
-        padding: 20px;
+    .sidebar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        z-index: 1999 !important;
+        display: none;
+        pointer-events: none;
     }
 
-    /* Buttons nicer */
+    .sidebar-overlay.active {
+        display: block !important;
+        pointer-events: auto !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    .page-content {
+        padding: 18px;
+    }
+
+    .topbar-title {
+        display: none;
+    }
+}
+
+/* ===== TABLETS (≤768px) ===== */
+@media (max-width: 768px) {
+    .page-content {
+        padding: 16px;
+    }
+
     .action-buttons {
         flex-direction: row;
         flex-wrap: wrap;
@@ -102,55 +73,10 @@ img {
         font-size: 12px;
         padding: 6px 10px;
     }
-
-    /* Modal back to 2 columns */
-    .modal-body div[style*="grid-template-columns"] {
-        grid-template-columns: 1fr 1fr !important;
-    }
-
-    /* Show title again */
-    .topbar-title {
-        display: inline;
-    }
-}
-
-/* ===== LAPTOPS (≥1024px) ===== */
-@media (min-width: 1024px) {
-
-    .sidebar {
-        transform: translateX(0);
-        position: fixed;
-        width: var(--sidebar-w);
-    }
-
-    .main-content {
-        margin-left: var(--sidebar-w);
-    }
-
-    .main-content.expanded {
-        margin-left: var(--sidebar-w-collapsed);
-    }
-
-    .page-content {
-        padding: 24px;
-    }
-}
-
-/* ===== DESKTOP (≥1280px) ===== */
-@media (min-width: 1280px) {
-
-    .page-content {
-        padding: 28px;
-    }
-
-    .table-card {
-        font-size: 14px;
-    }
 }
 
 /* ===== LARGE SCREENS / TV (≥1536px) ===== */
 @media (min-width: 1536px) {
-
     .page-content {
         max-width: 1400px;
         margin: auto;
@@ -163,37 +89,6 @@ img {
     .topbar {
         padding: 0 40px;
     }
-}
-
-.sidebar-overlay {
-    pointer-events: none;
-    z-index: 995;
-}
-
-.sidebar-overlay.active {
-    pointer-events: auto;
-    display: block;
-}
-.table-card,
-.table-card-body,
-table.dataTable {
-    position: relative;
-    z-index: 1;
-}
-.table-card-body {
-    overflow-x: auto;
-}
-.btn-action {
-    position: relative;
-    z-index: 2;
-}
-.sidebar {
-    z-index: 1000;
-}
-
-.main-content {
-    position: relative;
-    z-index: 1;
 }
 /* ══════════════════════════════════════════
    MOA MODAL — RESPONSIVE FIXES
@@ -630,13 +525,81 @@ input[type="date"].modal-field-input:focus {
         margin-bottom: 0 !important;
     }
 
-    /* The global floating mic button — push it away from the form */
-    /* This targets the page-level mic (the big red one at bottom right) */
+    /* Hide any floating mic buttons */
+    .voice-guide-btn,
     .voice-input-btn,
     #voiceInputBtn,
-    button[id*="voice"],
+    button[id*="voice-guide"],
     button[class*="voice-float"] {
-        bottom: 80px !important; /* above mobile browser navigation bar */
-        right: 16px !important;
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   VOUCHER MODAL OPTIMIZATION
+   ============================================================ */
+#voucherModal .modal-dialog {
+    margin: 16px auto;
+    max-width: 760px;
+}
+
+#voucherModal .modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+#voucherModal .modal-header {
+    background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%);
+    color: #fff;
+    padding: 14px 18px;
+    border-bottom: none;
+}
+
+#voucherModal .modal-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+#voucherModal .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+}
+
+#voucherModal .modal-body {
+    padding: 0;
+    height: 75vh;
+    min-height: 400px;
+    background: #f8fafc;
+}
+
+#voucherModal .modal-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+#voucherModal .modal-footer {
+    padding: 10px 16px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+}
+
+@media (max-width: 600px) {
+    #voucherModal .modal-dialog {
+        margin: 8px;
+        max-width: calc(100vw - 16px);
+    }
+
+    #voucherModal .modal-body {
+        height: 78vh;
+        min-height: 340px;
     }
 }

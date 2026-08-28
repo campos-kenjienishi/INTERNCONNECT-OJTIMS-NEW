@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -391,9 +391,9 @@
                 PUP Website
             </a>
             <span style="color:#e5e5e5; margin:0 2px;">|</span>
-            <a href="{{ url('/terms') }}" style="color:#888; text-decoration:none; font-weight:500;">Terms of Use</a>
-            <span style="color:#e5e5e5; margin:0 2px;">|</span>
-            <a href="{{ url('/privacy') }}" style="color:#888; text-decoration:none; font-weight:500;">Privacy Statement</a>
+            <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer" style="color:#888; text-decoration:none; font-weight:500;">Terms of Use</a>
+            <span style="color:#ddd; margin:0 8px;">|</span>
+            <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer" style="color:#888; text-decoration:none; font-weight:500;">Privacy Statement</a>
         </div>
     </footer>
 

@@ -17,12 +17,15 @@
         // Setup all dark mode toggle buttons
         setupToggleButtons: function () {
             const self = this;
-            const toggleButtons = document.querySelectorAll('.darkmode-toggle');
+            const toggleButtons = document.querySelectorAll('.darkmode-toggle, #darkmodeToggle, .dark-mode-toggle');
             
             toggleButtons.forEach((btn) => {
+                if (btn.dataset.dmBound === 'true') return;
+                btn.dataset.dmBound = 'true';
+                
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
-                    const isDarkMode = document.body.classList.contains('dark-mode') ||
+                    const isDarkMode = (document.body && document.body.classList.contains('dark-mode')) ||
                                      document.documentElement.classList.contains('dark-mode');
                     self.setDarkMode(!isDarkMode);
                     
@@ -40,11 +43,11 @@
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             if (isDarkMode) {
                 this.setDarkMode(true);
+            } else if (localStorage.getItem('darkMode') === 'false') {
+                this.setDarkMode(false);
             } else {
                 // Check system preference if no saved preference
-                if (localStorage.getItem('darkMode') === null) {
-                    this.checkSystemPreference();
-                }
+                this.checkSystemPreference();
             }
         },
 
@@ -61,10 +64,10 @@
         // Set dark mode on or off
         setDarkMode: function (isDarkMode) {
             if (isDarkMode) {
-                document.body.classList.add('dark-mode');
+                if (document.body) document.body.classList.add('dark-mode');
                 document.documentElement.classList.add('dark-mode');
             } else {
-                document.body.classList.remove('dark-mode');
+                if (document.body) document.body.classList.remove('dark-mode');
                 document.documentElement.classList.remove('dark-mode');
             }
 
@@ -82,7 +85,7 @@
 
         // Update all toggle button icons
         updateToggleIcons: function (isDarkMode) {
-            const icons = document.querySelectorAll('#darkmodeIcon');
+            const icons = document.querySelectorAll('#darkmodeIcon, .darkmode-toggle i, #darkmodeToggle i, .dark-mode-toggle i');
             icons.forEach((icon) => {
                 if (isDarkMode) {
                     icon.classList.remove('fa-moon');
@@ -99,7 +102,7 @@
         // Observe DOM changes to setup new toggle buttons
         observeDOMChanges: function () {
             const self = this;
-            if (window.MutationObserver) {
+            if (window.MutationObserver && document.body) {
                 const observer = new MutationObserver(function (mutations) {
                     let hasNewToggleButton = false;
 
@@ -107,10 +110,10 @@
                         if (mutation.addedNodes.length) {
                             mutation.addedNodes.forEach((node) => {
                                 if (node.nodeType === 1) { // Element node
-                                    if (node.classList && node.classList.contains('darkmode-toggle')) {
+                                    if (node.classList && (node.classList.contains('darkmode-toggle') || node.classList.contains('dark-mode-toggle'))) {
                                         hasNewToggleButton = true;
                                     }
-                                    if (node.querySelector && node.querySelector('.darkmode-toggle')) {
+                                    if (node.querySelector && (node.querySelector('.darkmode-toggle') || node.querySelector('#darkmodeToggle') || node.querySelector('.dark-mode-toggle'))) {
                                         hasNewToggleButton = true;
                                     }
                                 }
@@ -130,6 +133,13 @@
             }
         }
     };
+
+    // Apply immediately to prevent flash
+    try {
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    } catch(e){}
 
     // Listen for storage changes from other tabs/windows
     window.addEventListener('storage', (e) => {

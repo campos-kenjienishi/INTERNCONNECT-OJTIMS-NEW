@@ -11,11 +11,20 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/student_moa-responsive.css') }}">
-
     <link rel="stylesheet" href="{{ vasset('css/student/companies.css') }}">
-</head>
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/student_moa-responsive.css') }}">
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
 </head>
 
 <body>
@@ -418,9 +427,9 @@
             PUP Website
         </a>
         <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
 
@@ -797,17 +806,17 @@
 <!-- =============== VOUCHER MODAL =============== -->
 <div class="modal fade" id="voucherModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color:#fff; padding:14px 18px; border-bottom:none;">
+                <h5 class="modal-title" style="font-size:15px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
                     <i class="fa fa-ticket-alt"></i> Voucher Preview
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.85;"></button>
             </div>
-            <div class="modal-body" style="padding: 0; height: 70vh; background:#f8fafc;">
-                <iframe id="voucherIframe" style="width:100%; height:100%; border:none;"></iframe>
+            <div class="modal-body" style="padding: 0; height: 75vh; min-height: 400px; background:#f8fafc;">
+                <iframe id="voucherIframe" style="width:100%; height:100%; border:none; display:block;"></iframe>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="padding:10px 16px; background:#fff; border-top:1px solid #f0f0f0;">
                 <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
                     <i class="fa fa-times me-1"></i> Close
                 </button>
@@ -822,39 +831,58 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
+    const SIDEBAR_COLLAPSED_KEY = 'internconnect_sidebar_collapsed';
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const menuToggle = document.getElementById('menuToggle');
     const overlay = document.getElementById('sidebarOverlay');
 
+    // Restore persisted desktop sidebar state
+    if (localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true' && window.innerWidth > 900) {
+        if (sidebar) sidebar.classList.add('collapsed');
+        if (mainContent) mainContent.classList.add('expanded');
+        document.documentElement.classList.add('sidebar-is-collapsed');
+    }
+
     function closeMobileSidebar() {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (overlay) overlay.classList.remove('active');
     }
 
     function openMobileSidebar() {
-        sidebar.classList.add('mobile-open');
-        overlay.classList.add('active');
+        if (sidebar) sidebar.classList.add('mobile-open');
+        if (overlay) overlay.classList.add('active');
     }
 
-    menuToggle.addEventListener('click', function (event) {
-        const isMobile = window.innerWidth <= 900;
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function (event) {
+            const isMobile = window.innerWidth <= 900;
 
-        if (isMobile) {
-            event.stopPropagation();
+            if (isMobile) {
+                event.stopPropagation();
 
-            if (sidebar.classList.contains('mobile-open')) {
-                closeMobileSidebar();
+                if (sidebar.classList.contains('mobile-open')) {
+                    closeMobileSidebar();
+                } else {
+                    openMobileSidebar();
+                }
             } else {
-                openMobileSidebar();
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem(SIDEBAR_COLLAPSED_KEY, isCollapsed ? 'true' : 'false');
+                if (isCollapsed) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                } else {
+                    document.documentElement.classList.remove('sidebar-is-collapsed');
+                }
             }
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-    });
+        });
+    }
 
-    overlay.addEventListener('click', closeMobileSidebar);
+    if (overlay) {
+        overlay.addEventListener('click', closeMobileSidebar);
+    }
 
     document.addEventListener('click', function (event) {
         if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
@@ -1261,7 +1289,6 @@
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
-<script src="{{ vasset('js/mobile-utils.js') }}"></script>
 
     <script src="{{ vasset('js/student/companies.js') }}"></script>
 </body>

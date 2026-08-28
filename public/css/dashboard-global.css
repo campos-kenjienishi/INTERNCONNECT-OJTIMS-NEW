@@ -20,6 +20,154 @@
     .hide-mobile { display: none !important; }
 }
 
+/* =============== UNIVERSAL MODAL BASELINE (DESKTOP & MOBILE) =============== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1055;
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+}
+
+.modal.show {
+    display: block !important;
+}
+
+.modal:not(.show) {
+    display: none !important;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+}
+
+.modal-backdrop.fade {
+    opacity: 0;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1999;
+    display: none;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block !important;
+    pointer-events: auto !important;
+}
+
+/* =============== UNIVERSAL DATATABLES CONTROLS =============== */
+.dataTables_wrapper {
+    width: 100%;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: left;
+    margin-bottom: 12px;
+}
+
+.dataTables_wrapper .dataTables_length label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    display: inline-block !important;
+    width: auto !important;
+    min-width: 60px !important;
+    padding: 4px 8px !important;
+    margin: 0 4px !important;
+    font-size: 13px !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    background-color: #fff !important;
+    color: #333 !important;
+    outline: none !important;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    margin-bottom: 12px;
+}
+
+.dataTables_wrapper .dataTables_filter label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_filter .voice-mic-host {
+    display: inline-flex !important;
+    align-items: center !important;
+    position: relative !important;
+    width: auto !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    display: inline-block !important;
+    width: 220px !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    background-color: #fff !important;
+    color: #333 !important;
+    outline: none !important;
+}
+
+/* =============== UNIVERSAL TOPBAR BADGE =============== */
+.topbar-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #fff5f5 !important;
+    border: 1px solid #fecaca !important;
+    border-radius: 20px !important;
+    padding: 5px 12px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: #991b1b !important;
+    white-space: nowrap !important;
+}
+
+body.dark-mode .topbar-badge,
+html.dark-mode .topbar-badge {
+    background: rgba(220, 38, 38, 0.15) !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+    color: #ff6b6b !important;
+}
+
 /* =============== GLOBAL MOBILE LAYOUT =============== */
 @media (max-width: 900px) {
     * {
@@ -573,14 +721,82 @@
     .drawer-overlay {
         position: fixed !important;
         inset: 0 !important;
-        background: rgba(0, 0, 0, 0) !important;
+        background: rgba(0, 0, 0, 0.5) !important;
         z-index: 1999 !important;
-        transition: background 0.3s !important;
+        display: none !important;
+        pointer-events: none !important;
+        transition: opacity 0.3s ease !important;
     }
 
     .sidebar-overlay.active,
     .drawer-overlay.active {
-        background: rgba(0, 0, 0, 0.5) !important;
+        display: block !important;
+        pointer-events: auto !important;
+    }
+
+    .sidebar.mobile-open {
+        z-index: 2000 !important;
+    }
+
+    /* Baseline Modal Protection */
+    .modal:not(.show) {
+        display: none !important;
+    }
+
+    /* ========== DATATABLES CONTROLS MOBILE =============== */
+    .dataTables_wrapper .dataTables_length {
+        float: none !important;
+        margin-bottom: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .dataTables_wrapper .dataTables_length label {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        font-size: 13px !important;
+        width: auto !important;
+        white-space: nowrap !important;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+        width: auto !important;
+        display: inline-block !important;
+        padding: 4px 8px !important;
+        margin: 0 4px !important;
+        font-size: 12px !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        float: none !important;
+        width: 100% !important;
+        margin-top: 6px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter .voice-mic-host {
+        display: flex !important;
+        flex: 1 !important;
+        width: 100% !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        display: block !important;
+        width: 100% !important;
+        flex: 1 !important;
+        margin: 0 !important;
+        font-size: 12px !important;
+        padding: 6px 12px !important;
     }
 
     /* ========== CUSTOM SCROLLBAR MOBILE =============== */
@@ -828,5 +1044,85 @@
         color: black !important;
         margin: 0 !important;
         padding: 0 !important;
+    }
+}
+
+/* ========================================
+   PERSISTED COLLAPSED SIDEBAR (ANTI-FLICKER)
+   ======================================== */
+@media (min-width: 901px) {
+    html.sidebar-is-collapsed .sidebar {
+        width: var(--sidebar-w-collapsed, 70px) !important;
+        overflow: hidden !important;
+    }
+    html.sidebar-is-collapsed .main-content {
+        margin-left: var(--sidebar-w-collapsed, 70px) !important;
+        width: calc(100% - var(--sidebar-w-collapsed, 70px)) !important;
+    }
+    html.sidebar-is-collapsed .sidebar-brand-text,
+    html.sidebar-is-collapsed .user-info,
+    html.sidebar-is-collapsed .nav-label {
+        opacity: 0 !important;
+        max-width: 0 !important;
+        transform: translateX(-8px) !important;
+        pointer-events: none !important;
+    }
+    html.sidebar-is-collapsed .sidebar-nav {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        padding: 10px 0 !important;
+    }
+    html.sidebar-is-collapsed .nav-item {
+        padding: 0 !important;
+        width: 46px !important;
+        height: 46px !important;
+        margin: 6px auto !important;
+        border-radius: 14px !important;
+        justify-content: center !important;
+        gap: 0 !important;
+    }
+    html.sidebar-is-collapsed .nav-item .nav-icon {
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+    html.sidebar-is-collapsed .sidebar-brand {
+        height: 76px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+        gap: 0 !important;
+        overflow: hidden !important;
+    }
+    html.sidebar-is-collapsed .sidebar-brand img {
+        margin: 0 auto !important;
+    }
+    html.sidebar-is-collapsed .sidebar-user {
+        height: 68px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+        gap: 0 !important;
+        overflow: hidden !important;
+    }
+    html.sidebar-is-collapsed .user-avatar {
+        margin: 0 auto !important;
+    }
+    html.sidebar-is-collapsed .sidebar-footer {
+        padding: 10px 0 !important;
+        overflow: hidden !important;
+    }
+    html.sidebar-is-collapsed .sidebar-footer .nav-item {
+        padding: 0 !important;
+        width: 46px !important;
+        height: 46px !important;
+        margin: 0 auto !important;
+        border-radius: 14px !important;
+        justify-content: center !important;
+        gap: 0 !important;
+    }
+    html.sidebar-is-collapsed .sidebar-footer .nav-item .nav-icon {
+        width: 100% !important;
+        margin: 0 !important;
     }
 }

@@ -1,147 +1,6 @@
 (function injectVoiceInputGuide() {
-        if (document.getElementById('voiceInputGuideModal')) return;
-        var guideHtml = `
-<!-- Voice Input Guide Modal -->
-<div id="voiceInputGuideModal" class="voice-guide-modal" tabindex="-1" role="dialog" aria-labelledby="voiceInputGuideLabel" aria-hidden="true" style="display:none;">
-    <div class="voice-guide-modal-dialog">
-        <div class="voice-guide-modal-content">
-            <div class="voice-guide-modal-header">
-                <div class="voice-guide-modal-title">
-                    <i class="fa fa-microphone-alt"></i> Voice Input Guide
-                </div>
-                <button type="button" class="voice-guide-close" aria-label="Close" onclick="document.getElementById('voiceInputGuideModal').style.display='none'">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="voice-guide-modal-body">
-                <ul>
-                    <li><b>Say field content directly</b> <span class="text-muted">(e.g., Juan Dela Cruz)</span></li>
-                    <li><b>Symbols:</b> <span class="text-muted">"at sign" → @, "slash" → /, "underscore" → _</span></li>
-                    <li><b>Spacing (email/username):</b> <span class="text-muted">Say "spacebar" to insert a space</span></li>
-                    <li><b>Commands:</b>
-                        <ul class="voice-guide-commands">
-                            <li><span class="cmd">backspace</span> – delete last character</li>
-                            <li><span class="cmd">delete word</span> – delete last word</li>
-                            <li><span class="cmd">clear field</span> – clear all text</li>
-                            <li><span class="cmd">new line</span> – new line (textarea only)</li>
-                            <li><span class="cmd">select all</span> – select all text</li>
-                            <li><span class="cmd">stop listening</span> – stop voice input</li>
-                        </ul>
-                    </li>
-                    <li><b>Suffixes:</b> <span class="text-muted">"junior" → Jr, "the third" → III, etc.</span></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-<style>
-.voice-guide-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 88px;
-    z-index: 1200;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #fff;
-    color: #7f0000;
-    box-shadow: 0 2px 8px rgba(127,0,0,0.13);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    cursor: pointer;
-    border: 2px solid #7f0000;
-    transition: background 0.2s, color 0.2s;
-}
-.voice-guide-btn:hover {
-    background: #7f0000;
-    color: #fff;
-}
-body.swal2-shown .voice-guide-btn,
-body.swal2-shown .voice-mic-button {
-    display: none !important;
-}
-@media (max-width: 600px) {
-    .voice-guide-btn { right: 80px; bottom: 16px; }
-}
-.voice-guide-modal {
-    position: fixed;
-    z-index: 1300;
-    left: 0; top: 0; width: 100vw; height: 100vh;
-    background: rgba(30,0,0,0.18);
-    display: flex; align-items: center; justify-content: center;
-}
-.voice-guide-modal-dialog {
-    max-width: 410px; width: 96vw;
-    margin: 0 auto;
-}
-.voice-guide-modal-content {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 32px rgba(127,0,0,0.13);
-    overflow: hidden;
-    border: 1.5px solid #7f0000;
-    animation: fadeInScale 0.25s cubic-bezier(0.4,0,0.2,1);
-}
-.voice-guide-modal-header {
-    background: linear-gradient(90deg, #7f0000 0%, #dc2626 100%);
-    color: #fff;
-    padding: 18px 24px 12px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-}
-.voice-guide-modal-title {
-    font-size: 1.18rem; font-weight: 700; display: flex; align-items: center; gap: 10px;
-    color: #fff !important;
-}
-.voice-guide-modal-title .fa-microphone-alt {
-    color: #fff !important;
-}
-.voice-guide-close {
-    background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; line-height: 1; opacity: 0.85;
-    transition: opacity 0.2s;
-}
-.voice-guide-close:hover { opacity: 1; }
-.voice-guide-modal-body {
-    padding: 22px 24px 24px 24px;
-    color: #333;
-    background: #fafafa;
-    font-size: 1rem;
-}
-.voice-guide-modal-body ul { padding-left: 18px; margin-bottom: 0; }
-.voice-guide-modal-body li { margin-bottom: 10px; }
-.voice-guide-commands { margin-top: 6px; margin-bottom: 0; padding-left: 18px; }
-.voice-guide-commands .cmd {
-    background: #f5e6e6;
-    color: #7f0000;
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-family: 'Poppins', monospace;
-    font-size: 0.98em;
-    margin-right: 6px;
-}
-.text-muted { color: #888; font-weight: 400; font-size: 0.97em; }
-@keyframes fadeInScale {
-    0% { opacity: 0; transform: scale(0.95); }
-    100% { opacity: 1; transform: scale(1); }
-}
-</style>
-<div class="voice-guide-btn" title="Voice Input Guide" onclick="document.getElementById('voiceInputGuideModal').style.display='block'">
-    <i class="fa fa-microphone-alt"></i>
-</div>
-<script>
-window.addEventListener('click', function(e) {
-    var modal = document.getElementById('voiceInputGuideModal');
-    if (modal && e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-</script>`;
-        var temp = document.createElement('div');
-        temp.innerHTML = guideHtml;
-        while (temp.firstChild) {
-                document.body.appendChild(temp.firstChild);
-        }
+    // Mic guide floating button disabled per design requirements
+    return;
 })();
 (function () {
     "use strict";
@@ -166,18 +25,19 @@ window.addEventListener('click', function(e) {
         style.id = STYLE_ID;
         style.textContent = [
             ".voice-mic-host{position:relative;display:block;width:100%;}",
+            "label .voice-mic-host, .dataTables_filter .voice-mic-host{display:inline-flex !important;width:auto !important;vertical-align:middle;}",
             ".voice-mic-host > input," +
                 ".voice-mic-host > textarea{padding-right:44px !important;}",
             "." + BUTTON_CLASS + "{" +
-                "position:absolute;right:10px;top:50%;transform:translateY(-50%);" +
-                "width:28px;height:28px;border:none;border-radius:999px;" +
-                "background:#fffaf7;color:#7f0000;cursor:pointer;z-index:5;" +
+                "position:absolute;right:12px;top:50%;transform:translateY(-50%);" +
+                "width:32px;height:32px;aspect-ratio:1/1;border:none;border-radius:50%;" +
+                "background:transparent;color:#ef4444;cursor:pointer;z-index:3;" +
                 "display:inline-flex;align-items:center;justify-content:center;" +
-                "font-size:13px;line-height:1;transition:all .2s ease;" +
-                "border:2px solid #7f0000;box-shadow:0 0 0 2px rgba(127,0,0,.12);}",
-            "." + BUTTON_CLASS + ":hover{background:#ffe3e3;border-color:#5f0000;box-shadow:0 0 0 2px rgba(127,0,0,.18);}",
+                "font-size:15px;line-height:1;transition:all .2s ease;" +
+                "filter:drop-shadow(0 0 4px rgba(239,68,68,0.45));}",
+            "." + BUTTON_CLASS + ":hover{color:#f87171;filter:drop-shadow(0 0 6px rgba(239,68,68,0.7));transform:translateY(-50%) scale(1.15);background:rgba(239,68,68,0.12);}",
             "." + BUTTON_CLASS + "." + ACTIVE_CLASS + "{" +
-                "background:#7f0000;color:#fff;border-color:#4d0000;box-shadow:0 0 0 3px rgba(127,0,0,.28);}",
+                "background:#ef4444 !important;color:#ffffff !important;border-radius:50% !important;border:none !important;box-shadow:0 0 12px rgba(239,68,68,0.6) !important;}",
             "textarea + ." + BUTTON_CLASS + "{top:10px;transform:none;}"
         ].join("");
 
@@ -465,7 +325,7 @@ window.addEventListener('click', function(e) {
         button.className = BUTTON_CLASS;
         button.setAttribute("aria-label", "Start voice input");
         button.setAttribute("title", "Start voice input");
-        button.textContent = "\uD83C\uDFA4";
+        button.innerHTML = '<i class="fa fa-microphone"></i>';
 
         var recognition = null;
         var listening = false;

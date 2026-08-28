@@ -6,15 +6,26 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>InternConnect - Downloadable Files</title>
         <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
         <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
         <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
         <link rel="stylesheet" href="{{ vasset('css/student_downloadablefile-responsive.css') }}">
-
-    <link rel="stylesheet" href="{{ vasset('css/student/file.css') }}">
-</head>
+        <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+        <script>
+            (function(){
+                try {
+                    if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                        document.documentElement.classList.add('sidebar-is-collapsed');
+                    }
+                } catch(e){}
+            })();
+        </script>
+        <link rel="stylesheet" href="{{ vasset('css/student/file.css') }}">
+    </head>
 
     <body>
 
@@ -70,7 +81,7 @@
                 <span class="nav-label">Requirements</span>
                 <span class="tooltip-label">Requirements</span>
             </a>
-                <a href="{{ url('/student/evaluation') }}" class="nav-item{{ request()->is('student/evaluation*') ? ' active' : '' }}">
+            <a href="{{ url('/student/evaluation') }}" class="nav-item">
                 <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
                 <span class="nav-label">Evaluation</span>
                 <span class="tooltip-label">Evaluation</span>
@@ -174,13 +185,13 @@
                     <script>
                         $(document).ready(function () {
                         $('#fileTable').DataTable({
+                            "dom": '<"table-top-controls"lf><"table-scroll-container"t><"table-bottom-controls"ip>',
                             "order": [[2, 'desc']],
                             "autoWidth": false
                         });
                     });
                     </script>
-                    <div style="overflow-x: auto; width: 100%;">
-                      <table id="fileTable" class="display" style="width:100%">
+                    <table id="fileTable" class="display" style="width:100%">
                         <thead>
                             <tr>
                                 <th>File Name</th>
@@ -210,35 +221,32 @@
                                             @endphp
                                             <i class="fa {{ $icon }}"></i>
                                         </div>
-                                        <div>
-                                            <div class="file-name-text">{{ $file->name }}</div>
-                                            <div class="file-ext">{{ strtoupper($ext) }} file</div>
+                                        <div style="min-width:0;">
+                                            <div class="file-name-text">{{ $file->title ?? $file->file }}</div>
+                                            <span class="file-ext">{{ strtoupper($ext) }}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td style="color:#888; font-size:12.5px;">{{ $file->file }}</td>
                                 <td>
-                                    <div class="date-cell">
-                                        {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
-                                        <div class="date-time">{{ \Carbon\Carbon::parse($file->created_at)->format('h:i A') }}</div>
-                                    </div>
+                                    <span style="font-size:12.5px; color:#555; word-break:break-all;">{{ $file->file }}</span>
                                 </td>
                                 <td>
-                                    <div class="uploader-cell">
-                                        <div class="uploader-avatar"><i class="fa fa-user"></i></div>
-                                        {{ $file->uploader_name }}
-                                    </div>
+                                    <span style="font-size:12.5px; color:#555;">{{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}</span>
                                 </td>
                                 <td>
-                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                        @if(in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
-                                            <button type="button"
-                                                    class="btn-view btn-preview-file"
-                                                    data-file-url="{{ url('/view/file', $file->file) }}"
-                                                    data-file-name="{{ $file->name }}"
-                                                    data-download-url="{{ url('/download', $file->file) }}">
-                                                <i class="fa fa-eye"></i> View
-                                            </button>
+                                    <span style="font-size:12.5px; color:#555;">{{ $file->uploadedBy ?? '-' }}</span>
+                                </td>
+                                <td>
+                                    <div class="file-actions" style="display:flex; gap:8px; align-items:center;">
+                                        @if(in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'txt', 'html', 'htm']))
+                                        <button type="button"
+                                                class="btn-preview-file"
+                                                data-file-url="{{ asset('uploads/' . $file->file) }}"
+                                                data-file-name="{{ $file->title ?? $file->file }}"
+                                                data-download-url="{{ url('/download', $file->file) }}"
+                                                style="display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px; background:#fff; border:1.5px solid #d1d5db; color:#374151; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                                            <i class="fa fa-eye"></i> View
+                                        </button>
                                         @endif
                                         <a href="{{ url('/download', $file->file) }}" class="btn-download">
                                             <i class="fa fa-download"></i> Download
@@ -249,7 +257,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
 
                 </div>
             </div>
@@ -268,9 +275,9 @@
                 PUP Website
             </a>
             <span class="divider">|</span>
-            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
             <span class="divider">|</span>
-            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+            <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
         </div>
     </footer>
     </div>

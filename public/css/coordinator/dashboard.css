@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Dashboard Styles
    Extracted from ojtCoordinator/dashboard.blade.php
    ========================================================================== */
@@ -70,7 +70,7 @@
             }
 
             .sidebar-brand-name { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px; line-height: 1; }
-            .sidebar-brand-name span { color: #fca5a5; }
+            .sidebar-brand-name span { color: #FED700; }
             .sidebar-brand-sub { font-size: 9px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px; }
             .sidebar.collapsed .sidebar-brand-text { opacity: 0; width: 0; }
 

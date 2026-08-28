@@ -6,7 +6,7 @@
             }
 
             const historyTable = $('#historyTable').DataTable({
-                dom: 't<"history-bottom"ip>',
+                dom: '<"table-scroll-container"t><"history-bottom"ip>',
                 order: [[3, 'desc']],
                 pageLength: 5,
                 lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],

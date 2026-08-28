@@ -8,14 +8,23 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Account Information</title>
     <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ vasset('css/student/account.css') }}">
-</head>
 </head>
 
 <body>
@@ -65,7 +74,7 @@
             <span class="tooltip-label">Downloadable Files</span>
         </a>
         <a href="{{ url('/student/MOA') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-file-contract"></i></span>
+            <span class="nav-icon"><i class="fa fa-file-alt"></i></span>
             <span class="nav-label">Notarized MOA</span>
             <span class="tooltip-label">Notarized MOA</span>
         </a>
@@ -74,7 +83,7 @@
             <span class="nav-label">Requirements</span>
             <span class="tooltip-label">Requirements</span>
         </a>
-            <a href="{{ url('/student/evaluation') }}" class="nav-item{{ request()->is('student/evaluation*') ? ' active' : '' }}">
+        <a href="{{ url('/student/evaluation') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
             <span class="nav-label">Evaluation</span>
             <span class="tooltip-label">Evaluation</span>
@@ -367,9 +376,9 @@
             PUP Website
         </a>
         <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
     

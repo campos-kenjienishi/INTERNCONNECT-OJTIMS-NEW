@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -84,14 +84,12 @@
             <span class="nav-label">Analytics</span>
             <span class="tooltip-label">Analytics</span>
         </a>
-        <li>
-    <a href="{{ url('/auditlog') }}" class="nav-item">
+        <a href="{{ url('/auditlog') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-list"></i></span>
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
-</li>
-</nav>
+    </nav>
     
 
     <div class="sidebar-footer">
@@ -309,9 +307,9 @@
             PUP Website
         </a>
         <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
 </div>

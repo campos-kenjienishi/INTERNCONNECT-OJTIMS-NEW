@@ -85,12 +85,103 @@
 @media (max-width: 640px) {
     .topbar { padding: 0 12px !important; }
 
-    /* Collapse badge to icon only */
-    .topbar-badge span { display: none !important; }
+    /* Keep "Student Portal" badge as clean pill */
     .topbar-badge {
+        padding: 5px 12px !important;
+        border-radius: 20px !important;
+        font-size: 11.5px !important;
+        gap: 6px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    /* Evaluation Table Controls */
+    .shell-table-controls {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 12px 14px 0 !important;
+    }
+
+    .shell-controls-left {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 8px !important;
+    }
+
+    .shell-controls-right {
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .shell-length-form {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        font-size: 12.5px !important;
+        width: auto !important;
+    }
+
+    .shell-length-select {
+        padding: 4px 6px !important;
+        font-size: 12px !important;
+    }
+
+    .shell-date-box {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        width: auto !important;
+    }
+
+    .shell-date-box .shell-filter-select {
+        width: auto !important;
+        min-width: 110px !important;
+        padding: 4px 8px !important;
+        font-size: 12px !important;
+    }
+
+    .shell-search-box {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    .shell-search-box .voice-mic-host {
+        display: flex !important;
+        flex: 1 !important;
+        width: 100% !important;
+    }
+
+    .shell-search-box .shell-filter-input {
+        display: block !important;
+        width: 100% !important;
+        flex: 1 !important;
+        font-size: 12px !important;
         padding: 6px 10px !important;
-        border-radius: 50% !important;
-        gap: 0 !important;
+    }
+
+    .table-scroll-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        margin-bottom: 12px !important;
+    }
+
+    .history-bottom {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 10px !important;
+        flex-wrap: wrap !important;
+        padding: 0 14px 14px !important;
+        width: 100% !important;
     }
 
     .page-content { padding: 12px !important; }

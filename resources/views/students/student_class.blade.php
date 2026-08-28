@@ -15,10 +15,18 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/student_class-responsive.css') }}">
-    
-
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ vasset('css/student/class.css') }}">
-</head>
 </head>
 
 <body>
@@ -442,17 +450,6 @@
                 <p>You haven't joined a room yet.</p>
                 <span class="empty-hint">Join a room above to access room-specific templates.</span>
             </div>
-            <table id="templateTable" class="display rooms-table" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Template Name</th>
-                        <th>File</th>
-                        <th>Date Uploaded</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
         @elseif ($roomTemplates->isEmpty())
             <div class="empty-state">
                 <div class="empty-icon-wrap">
@@ -461,17 +458,6 @@
                 <p>No room templates uploaded yet.</p>
                 <span class="empty-hint">Check back later — your adviser hasn't uploaded any templates.</span>
             </div>
-            <table id="templateTable" class="display rooms-table" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Template Name</th>
-                        <th>File</th>
-                        <th>Date Uploaded</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
         @else
             <table id="templateTable" class="display rooms-table" style="width:100%">
                 <thead>
@@ -671,9 +657,9 @@
             PUP Website
         </a>
         <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
 </div>
@@ -685,26 +671,45 @@
 
 <script>
     // Sidebar toggle
+    const SIDEBAR_COLLAPSED_KEY = 'internconnect_sidebar_collapsed';
     const sidebar     = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const menuToggle  = document.getElementById('menuToggle');
     const overlay     = document.getElementById('sidebarOverlay');
 
-    menuToggle.addEventListener('click', function () {
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-    });
+    // Restore persisted desktop sidebar state
+    if (localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true' && window.innerWidth > 900) {
+        if (sidebar) sidebar.classList.add('collapsed');
+        if (mainContent) mainContent.classList.add('expanded');
+        document.documentElement.classList.add('sidebar-is-collapsed');
+    }
 
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    });
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function () {
+            const isMobile = window.innerWidth <= 900;
+            if (isMobile) {
+                if (sidebar) sidebar.classList.toggle('mobile-open');
+                if (overlay) overlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem(SIDEBAR_COLLAPSED_KEY, isCollapsed ? 'true' : 'false');
+                if (isCollapsed) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                } else {
+                    document.documentElement.classList.remove('sidebar-is-collapsed');
+                }
+            }
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            if (sidebar) sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        });
+    }
 
     // Join student
     function joinStudent(url) {

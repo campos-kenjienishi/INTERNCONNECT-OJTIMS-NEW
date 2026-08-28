@@ -73,7 +73,7 @@
             <span class="nav-label">Maintenance</span>
             <span class="tooltip-label">Maintenance</span>
         </a>
-            <a href="{{ url('/professor/evaluation') }}" class="nav-item{{ request()->is('professor/evaluation*') ? ' active' : '' }}">
+        <a href="{{ url('/professor/evaluation') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
             <span class="nav-label">Evaluation</span>
             <span class="tooltip-label">Evaluation</span>
@@ -328,9 +328,9 @@
             PUP Website
         </a>
         <span class="divider">|</span>
-        <a href="{{ url('/terms') }}">Terms of Use</a>
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
 </div>
