@@ -806,11 +806,25 @@ body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
     color: #f8c62b;
 }
 
-.nav-item.active,
-.nav-item.active:hover {
-    color: #f8c62b;
-    background: rgba(248, 198, 43, 0.12);
-    border-left-color: #f8c62b;
+.sidebar .nav-item.active,
+.sidebar .nav-item.active:hover {
+    color: #2d1c00 !important;
+    background: linear-gradient(180deg, #FED700 0%, #f7ca00 100%) !important;
+    border-left-color: transparent !important;
+    box-shadow: inset 0 0 0 2px rgba(120,90,0,0.12), 0 8px 20px rgba(254,215,0,0.22) !important;
+    border-radius: 14px !important;
+    opacity: 1 !important;
+}
+
+.sidebar .nav-item.active .nav-icon,
+.sidebar .nav-item.active:hover .nav-icon {
+    color: #2d1c00 !important;
+}
+
+.sidebar .nav-item.active .nav-label,
+.sidebar .nav-item.active:hover .nav-label {
+    color: #2d1c00 !important;
+    font-weight: 800 !important;
 }
 
 .dashboard-footer {
