@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" style="background: #3b0000;">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Onboarding</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
@@ -13,20 +13,19 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <link rel="stylesheet" href="{{ vasset('css/pages/onboarding.css') }}">
-</head>
+    <link rel="stylesheet" href="{{ vasset('css/pages/onboarding.css') }}?v={{ time() }}">
 </head>
 <body class="auth-centered-page">
 <div class="main-wrapper">
     <div class="login-container">
         <div class="right-panel">
-            <div class="d-flex justify-content-center w-100 mb-3">
+            <div class="d-flex justify-content-center w-100 mb-2">
                 <div class="auth-brand">
-                    <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="auth-logo">
-                    <div class="auth-brand-copy">
-                        <div class="brand-name">Intern<span>Connect</span> <span style="font-size: 10px; font-weight: 700; background: rgba(220,38,38,0.4); color: #fca5a5; padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(220,38,38,0.5); vertical-align: middle; margin-left: 4px;">BETA</span></div>
-                        <div class="system-title">OJT Information Management System</div>
+                    <div class="auth-brand-row">
+                        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect Logo" class="auth-logo">
+                        <div class="brand-name">Intern<span>Connect</span></div>
                     </div>
+                    <div class="system-title">On-the-Job Training (OJT) Information Management System</div>
                 </div>
             </div>
             <!-- Step indicator -->
@@ -46,17 +45,17 @@
                     <!-- STEP 1: Personal Info -->
                     <div class="form-step active" id="step1">
                         @if(!empty($guisisData))
-                            <div class="alert alert-success-custom d-flex align-items-center mb-3" style="background: rgba(22, 163, 74, 0.18) !important; border: 1px solid rgba(134, 239, 172, 0.5) !important; color: #bbf7d0 !important;">
-                                <i class="fa fa-check-circle me-2" style="font-size: 18px; color: #86efac !important;"></i>
-                                <div style="color: #bbf7d0 !important;">
-                                    <strong style="color: #ffffff !important;">Guidance System (GuiSIS) Match:</strong> Your academic record was auto-found! Details have been pre-filled for verification.
+                            <div class="alert alert-success-custom d-flex align-items-center mb-3">
+                                <i class="fa fa-check-circle me-2 alert-icon"></i>
+                                <div>
+                                    <strong class="alert-title">Guidance System (GuiSIS) Match:</strong> Your academic record was auto-found! Details have been pre-filled for verification.
                                 </div>
                             </div>
                         @else
-                            <div class="alert alert-info-custom d-flex align-items-center mb-3" style="background: rgba(30, 144, 255, 0.18) !important; border: 1px solid rgba(147, 197, 253, 0.5) !important; color: #bfdbfe !important;">
-                                <i class="fa fa-info-circle me-2" style="font-size: 18px; color: #93c5fd !important;"></i>
-                                <div style="color: #bfdbfe !important;">
-                                    <strong style="color: #ffffff !important;">Manual Registration:</strong> Record not found in Guidance System (GuiSIS). Please complete your profile details manually.
+                            <div class="alert alert-info-custom d-flex align-items-center mb-3">
+                                <i class="fa fa-info-circle me-2 alert-icon"></i>
+                                <div>
+                                    <strong class="alert-title">Manual Registration:</strong> Record not found in Guidance System (GuiSIS). Please complete your profile details manually.
                                 </div>
                             </div>
                         @endif
@@ -66,28 +65,28 @@
                         </div>
                         <div class="fields-grid">
                             <div class="field-group span-3">
-                                <label class="form-label">First Name</label>
+                                <label class="form-label">First Name <span class="required-star">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" class="form-control" value="{{ $idp['first_name'] ?? '' }}" disabled>
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Middle Name</label>
+                                <label class="form-label">Middle Name <span class="required-star">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" class="form-control" value="{{ $idp['middle_name'] ?? '' }}" disabled>
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Last Name</label>
+                                <label class="form-label">Last Name <span class="required-star">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-user i-icon"></i>
                                     <input type="text" class="form-control" value="{{ $idp['last_name'] ?? '' }}" disabled>
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">E-mail Address</label>
+                                <label class="form-label">E-mail Address <span class="required-star">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-envelope i-icon"></i>
                                     <input type="email" class="form-control" value="{{ $idp['email'] ?? '' }}" disabled>
@@ -116,14 +115,14 @@
                         @endphp
                         <div class="fields-grid">
                             <div class="field-group span-3">
-                                <label class="form-label">Student Number</label>
+                                <label class="form-label">Student Number <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-id-card i-icon"></i>
                                     <input type="text" name="studentNum" class="form-control" required placeholder="Enter student number" value="{{ old('studentNum', $fetchedStudentNum) }}">
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Semester</label>
+                                <label class="form-label">Semester <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-calendar i-icon"></i>
                                     <select name="semester" class="form-control" required>
@@ -135,7 +134,7 @@
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Academic Year <small style="color: #fca5a5; font-size: 11px;">(Auto-consecutive)</small></label>
+                                <label class="form-label">Academic Year <span style="color:#fca5a5;">*</span> <small style="color: #fca5a5; font-size: 11px;">(Auto-consecutive)</small></label>
                                 <div class="year-row d-flex gap-2 align-items-center">
                                     <div class="input-wrap has-select flex-grow-1">
                                         <i class="fa fa-calendar-alt i-icon"></i>
@@ -161,14 +160,14 @@
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Year and Section</label>
+                                <label class="form-label">Year and Section <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap">
                                     <i class="fa fa-users i-icon"></i>
                                     <input type="text" name="year_and_section" class="form-control" required placeholder="e.g. 4-1" value="{{ old('year_and_section', $fetchedYearSection) }}">
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Course</label>
+                                <label class="form-label">Course <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-university i-icon"></i>
                                     <select name="course" class="form-control" required>
@@ -179,7 +178,7 @@
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Professor</label>
+                                <label class="form-label">Professor <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-chalkboard-teacher i-icon"></i>
                                     <select name="adviser_name" class="form-control" required>

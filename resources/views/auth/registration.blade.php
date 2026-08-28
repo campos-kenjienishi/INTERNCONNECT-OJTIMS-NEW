@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
-<html lang="en" style="background: #3b0000;">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Student Registration</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,7 +15,28 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
-        html, body { background: #3b0000 !important; }
+        html, body {
+            background-color: #240508 !important;
+            background-image: linear-gradient(135deg, rgba(45, 8, 12, 0.35) 0%, rgba(24, 3, 6, 0.55) 100%), url('/images/20 Blur.png') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+            position: relative !important;
+        }
+
+        /* Yellow / Gold Bottom Accent Bar */
+        body.auth-centered-page::after {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #d97706, #fbbf24, #d97706);
+            box-shadow: 0 -2px 10px rgba(245, 158, 11, 0.4);
+            z-index: 9999;
+        }
 
         /* Back to Portal Pill Button */
         .back-btn-pill,
@@ -23,15 +44,20 @@
             display: inline-flex !important;
             align-items: center !important;
             gap: 8px !important;
-            color: #fca5a5 !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
             text-decoration: none !important;
             background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             padding: 6px 16px !important;
             border-radius: 20px !important;
-            border: 1px solid rgba(255, 255, 255, 0.18) !important;
-            transition: all 0.25s ease !important;
+            border: 1px solid rgba(255, 255, 255, 0.16) !important;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25) !important;
+            transition: all 0.2s ease !important;
             cursor: pointer !important;
             line-height: 1.2 !important;
             white-space: nowrap !important;
@@ -39,11 +65,24 @@
 
         .back-btn-pill:hover,
         .btn-switch-portal:hover {
-            color: #ffffff !important;
-            background: rgba(255, 255, 255, 0.18) !important;
-            border-color: rgba(255, 255, 255, 0.4) !important;
-            transform: translateY(-1px) !important;
+            background: rgba(245, 158, 11, 0.2) !important;
+            border-color: #fbbf24 !important;
+            color: #fbbf24 !important;
+            transform: translateX(-2px) !important;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25) !important;
             text-decoration: none !important;
+        }
+
+        .back-btn-pill i,
+        .btn-switch-portal i {
+            color: #fbbf24 !important;
+            font-size: 11px !important;
+            transition: transform 0.2s ease;
+        }
+
+        .back-btn-pill:hover i,
+        .btn-switch-portal:hover i {
+            transform: translateX(-2px);
         }
 
         /* Select2 Dark Theme styling for registration */
@@ -213,6 +252,10 @@
         body.auth-centered-page .login-container {
             max-width: 940px;
             min-height: auto;
+            border-radius: 28px !important;
+            background: linear-gradient(180deg, #53181f 0%, #3e1015 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65) !important;
         }
 
         body.auth-centered-page .login-container.success-state {
@@ -288,13 +331,24 @@
 
         .auth-brand-copy .brand-name {
             font-size: 24px;
+            font-weight: 800;
             margin-bottom: 2px;
             text-align: left;
+            color: #ffffff;
+        }
+
+        .auth-brand-copy .brand-name span {
+            color: #f59e0b;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .auth-brand-copy .system-title {
             font-size: 10px;
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
+            color: rgba(255, 245, 235, 0.8) !important;
+            text-transform: none;
         }
 
         /* Make step connector line wider between step 1 and 2 */
@@ -363,36 +417,36 @@
         .step-dot {
             width: 36px; height: 36px;
             border-radius: 50%;
-            background: #f0f0f0;
-            border: 2px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 13px;
             font-weight: 700;
-            color: #aaa;
+            color: rgba(255, 255, 255, 0.6);
             transition: all 0.35s;
             position: relative;
             z-index: 1;
         }
 
         .step-dot.active {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            border-color: #dc2626;
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(220,38,38,0.35);
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-color: #fbbf24;
+            color: #3b0000;
+            box-shadow: 0 4px 14px rgba(245,158,11,0.4);
         }
 
         .step-dot.done {
-            background: #dcfce7;
-            border-color: #16a34a;
-            color: #16a34a;
+            background: #16a34a;
+            border-color: #86efac;
+            color: #fff;
         }
 
         .step-line {
             flex: 1;
             height: 2px;
-            background: #e0e0e0;
+            background: rgba(255, 255, 255, 0.15);
             max-width: 80px;
             transition: background 0.35s;
         }
@@ -440,16 +494,16 @@
         .btn-proceed {
             flex: 1;
             padding: 13px 0;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none;
+            background: #631a21;
+            border: 1.5px solid #d97706;
             border-radius: 12px;
             color: #fff !important;
             font-family: 'Poppins', sans-serif;
-            font-size: 14px;
+            font-size: 14.5px;
             font-weight: 700;
             cursor: pointer !important;
             transition: all 0.25s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.3);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -462,20 +516,22 @@
 
         .btn-proceed:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(220,38,38,0.4);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+            background: #752028;
+            border-color: #fbbf24;
             color: #fff !important;
         }
 
         /* ── Back step button ── */
         .btn-back-step {
             padding: 13px 20px;
-            background: #f5f5f5;
-            border: 1.5px solid #e5e5e5;
+            background: #ffffff;
+            border: none;
             border-radius: 12px;
-            color: #555;
+            color: #3b0000;
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.25s;
             display: flex;
@@ -484,12 +540,13 @@
             position: relative;
             z-index: 10;
             pointer-events: all !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .btn-back-step:hover {
-            background: #fee2e2;
-            border-color: #fecaca;
-            color: #dc2626;
+            background: #fef08a;
+            color: #1f0204;
+            transform: translateY(-1px);
         }
 
         /* ── Nav button row ── */
@@ -574,9 +631,9 @@
             <div class="brand-area">
                 <div class="logo-wrapper">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-img">
-                    <div>
-                        <div class="brand-name">Intern<span>Connect</span> - BETA</div>
-                        <div class="system-title">OJT Information Management System</div>
+                    <div class="auth-brand-copy">
+                        <div class="brand-name">Intern<span>Connect</span></div>
+                        <div class="system-title">On-the-Job Training (OJT) Information Management System</div>
                     </div>
                 </div>
 
