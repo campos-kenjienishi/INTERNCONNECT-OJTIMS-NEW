@@ -18,7 +18,8 @@
         <div class="brand">
             <img src="{{ vasset('images/puplogo.png') }}" alt="PUP Taguig">
             <div class="brand-text">
-                <span class="brand-title">Polytechnic University of the Philippines &ndash; Taguig Campus</span>
+                <span class="brand-title brand-title-full">Polytechnic University of the Philippines &ndash; Taguig Campus</span>
+                <span class="brand-title brand-title-short">PUP &ndash; Taguig</span>
                 <span class="brand-subtitle">The Country's 1st Polytechnic University</span>
             </div>
         </div>
