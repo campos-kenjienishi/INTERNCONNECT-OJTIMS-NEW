@@ -549,3 +549,56 @@ body::after {
         line-height: 1.35;
     }
 }
+
+/* ── Back to Landing Page Button ── */
+.back-to-landing {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 190px;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    border: 1px solid rgba(248, 198, 43, 0.35);
+    color: #fff7dc !important;
+    background: linear-gradient(180deg, rgba(248, 198, 43, 0.2) 0%, rgba(255, 255, 255, 0.06) 100%);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+    text-decoration: none !important;
+    font-size: 14px;
+    font-weight: 700;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.back-to-landing:hover {
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.3);
+    border-color: rgba(248, 198, 43, 0.65);
+    background: linear-gradient(180deg, rgba(248, 198, 43, 0.32) 0%, rgba(255, 255, 255, 0.12) 100%);
+}
+
+.back-to-landing i {
+    color: #fbbf24;
+    transition: transform 0.2s ease;
+}
+
+.back-to-landing:hover i {
+    transform: translateX(-3px);
+}
+
+@media (max-width: 640px) {
+    .back-to-landing {
+        position: static;
+        margin: 16px auto 0;
+        width: calc(100% - 32px);
+        max-width: 480px;
+    }
+}

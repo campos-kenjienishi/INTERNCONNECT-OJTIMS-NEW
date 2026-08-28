@@ -11,14 +11,10 @@
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/login-responsive.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/pages/auth-login.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/pages/auth-login.css') }}">
 </head>
 
 <body class="auth-centered-page">
-    <a class="back-to-landing" href="{{ route('landing') }}">
-        <i class="fa fa-arrow-left"></i>
-        Back to Landing Page
-    </a>
 <div class="main-wrapper">
     <div class="login-container">
 

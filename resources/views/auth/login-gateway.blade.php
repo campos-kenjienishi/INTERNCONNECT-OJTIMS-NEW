@@ -12,6 +12,10 @@
 </head>
 
 <body class="auth-centered-page">
+    <a class="back-to-landing" href="{{ route('landing') }}">
+        <i class="fa fa-arrow-left"></i>
+        Back to Landing Page
+    </a>
 <div class="main-wrapper">
     <div class="login-container">
         <!-- RIGHT PANEL / CARD -->
