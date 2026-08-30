@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>InternConnect - Professor Analytics</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div> 
 <div class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
+        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
             <span class="sidebar-brand-sub">OJTIMS</span>
@@ -430,7 +430,7 @@
             <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
             <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
                 <div style="width:50px; height:50px; background:rgba(255,255,255,0.18); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.25);">
-                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);" alt="PUP">
+                    <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);" alt="PUP">
                 </div>
                 <div style="flex:1;">
                     <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines - Taguig Campus</div>
@@ -578,7 +578,7 @@
 
         <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:6px;">
-                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:13px; height:13px; object-fit:contain; opacity:.7; filter:brightness(2);">
+                <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP" style="width:13px; height:13px; object-fit:contain; opacity:.7; filter:brightness(2);">
                 <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
             </div>
             <div style="font-size:8px; color:rgba(255,255,255,.5);">Ref: PROF-ANA-{{ now()->year }}</div>

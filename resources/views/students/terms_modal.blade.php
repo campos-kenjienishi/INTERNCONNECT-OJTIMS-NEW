@@ -285,7 +285,7 @@
 <div id="termsModalOverlay">
     <div class="terms-card">
         <div class="terms-card-header">
-            <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect Logo" class="logo-badge">
+            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect Logo" class="logo-badge">
             <h2>Terms & Privacy Notice</h2>
             <p>InternConnect — OJT Information Management System</p>
         </div>

@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png"> 
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png"> 
     <!-- ======= Styles ====== -->
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
@@ -31,7 +31,7 @@
                 <ul>
                     <li>
                         <a href="#">
-                            <img src="/images/final-puptg_logo-ojtims_nbg.png">
+                            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}">
                             <span class="toptitle">InternConnect</span>
                         </a>
     
@@ -258,7 +258,7 @@ $(document).ready(function() {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png"> 
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png"> 
     <!-- ======= Styles ====== -->
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
@@ -279,7 +279,7 @@ $(document).ready(function() {
                 <ul>
                     <li>
                         <a href="#">
-                            <img src="/images/final-puptg_logo-ojtims_nbg.png">
+                            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}">
                             <span class="toptitle">InternConnect</span>
                         </a>
     

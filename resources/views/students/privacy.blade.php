@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect – Privacy Statement</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -16,7 +16,7 @@
 <!-- ── TOP HEADER ── -->
 <header class="page-header">
     <a href="{{ url('/student/home') }}" class="header-brand">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect">
+        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect">
         <span class="header-brand-name">Intern<span>Connect</span></span>
     </a>
     <a href="javascript:history.back()" class="btn-back">
@@ -400,7 +400,7 @@
 <!-- ── PAGE FOOTER ── -->
 <footer class="page-footer">
     <div class="footer-left">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" class="footer-logo" alt="PUP">
         <span>© 1998–2026 <a href="https://www.pup.edu.ph/" target="_blank">Polytechnic University of the Philippines</a></span>
     </div>
     <div>

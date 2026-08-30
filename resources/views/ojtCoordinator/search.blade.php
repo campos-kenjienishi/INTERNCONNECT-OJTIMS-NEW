@@ -17,7 +17,7 @@
             <ul>
                 <li>
                     <a href="#">
-                        <img style="width: 55px; margin-left: 6px; padding-top: 30px;" src="/images/puplogo.png">
+                        <img style="width: 55px; margin-left: 6px; padding-top: 30px;" src="{{ vasset('images/puplogo.png') }}">
                         <span class="toptitle">InternConnect</span>
                     </a>
                 </li>

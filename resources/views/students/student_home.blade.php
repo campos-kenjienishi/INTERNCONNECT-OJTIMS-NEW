@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>InternConnect - Student Dashboard</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -34,7 +34,7 @@
 <!-- =============== SIDEBAR =============== -->
 <div class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand">
-        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="InternConnect logo">
+        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect logo">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-name">Intern<span>Connect</span></span>
             <span class="sidebar-brand-sub">OJTIMS</span>
@@ -395,7 +395,7 @@
     <!-- Footer -->
     <footer class="dashboard-footer">
         <div class="footer-inner">
-            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP logo">
+            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" class="footer-logo" alt="PUP logo">
             <span class="footer-copy">
                 © 1998–2026 <span>Polytechnic University of the Philippines</span>
             </span>

@@ -29,7 +29,7 @@
             <div class="print-area">
                 <div class="coupon">
                     <div class="coupon-left">
-                        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
+                        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
                     </div>
                     <div class="coupon-right">
                         <div class="coupon-copy">

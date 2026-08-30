@@ -344,7 +344,7 @@
                 <div class="report-head-inner">
                     <div class="brand">
                         <div class="brand-mark">
-                            <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
+                            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
                         </div>
                         <div class="brand-copy">
                             <div class="eyebrow">Polytechnic University of the Philippines - Taguig Campus</div>
@@ -499,7 +499,7 @@
                     </div>
                     <div class="footer-band">
                         <div class="system-line">
-                            <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
+                            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
                             <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                         </div>
                         <small>Ref: PROF-ANA-{{ now()->year }}</small>

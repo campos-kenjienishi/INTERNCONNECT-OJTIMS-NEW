@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect - Evaluation Report</title>
-    <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+    <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -321,7 +321,7 @@
             <div class="report-head-inner">
                 <div class="brand">
                     <div class="brand-mark">
-                        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
+                        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
                     </div>
                     <div class="brand-copy">
                         <div class="eyebrow">Polytechnic University of the Philippines - OJT Information Management System</div>
@@ -399,7 +399,7 @@
 
             <div class="footer-band">
                 <div class="left">
-                    <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
+                    <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
                     <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                 </div>
                 <div class="right">Ref: EVL-RPT-{{ now()->year }}</div>
