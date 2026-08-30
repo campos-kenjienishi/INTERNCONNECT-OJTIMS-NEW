@@ -11,7 +11,16 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/maintenance.css') }}?v={{ time() }}">
 </head>
@@ -72,11 +81,21 @@
             <span class="nav-label">MOA</span>
             <span class="tooltip-label">MOA</span>
         </a>
-        <a href="{{ url('/reports') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
-            <span class="nav-label">Reports</span>
-            <span class="tooltip-label">Reports</span>
-        </a>
+        <div class="nav-group-reports">
+            <a href="{{ url('/reports') }}" class="nav-item nav-item-reports">
+                <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
+                <span class="nav-label">Reports</span>
+                <span class="tooltip-label">Reports</span>
+            </a>
+            <div class="nav-sub">
+                <a href="{{ url('/reports') }}" class="nav-sub-item">
+                    <i class="fa fa-user-graduate"></i> Student OJT Info
+                </a>
+                <a href="{{ url('/reportsExpired') }}" class="nav-sub-item">
+                    <i class="fa fa-file-contract"></i> MOA
+                </a>
+            </div>
+        </div>
         <a href="{{ url('/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
             <span class="nav-label">Analytics</span>
@@ -354,6 +373,7 @@
     };
 </script>
 <script src="{{ vasset('js/coordinator/maintenance.js') }}?v={{ time() }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

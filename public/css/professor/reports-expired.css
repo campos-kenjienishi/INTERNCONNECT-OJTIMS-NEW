@@ -163,7 +163,9 @@
             padding: 22px 24px; display: flex;
             align-items: flex-end; gap: 20px; flex-wrap: wrap;
         }
+        .filter-card-body .filter-group { flex: 1; min-width: 150px; }
         .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-group .filter-select { width: 100%; }
         .filter-label { font-size: 12.5px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 6px; }
         .filter-label i { color: var(--red); font-size: 11px; }
         .filter-select {
@@ -190,12 +192,18 @@
         .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(220,38,38,0.35); }
         .btn-print-preview {
             display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px;
-            background: #fff; border: 1.5px solid #e0e7ff;
-            border-radius: 10px; color: #4f46e5;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none;
+            border-radius: 10px; color: #fff !important;
             font-family: 'Poppins', sans-serif; font-size: 13.5px; font-weight: 600;
             cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
         }
-        .btn-print-preview:hover { background: #e0e7ff; }
+        .btn-print-preview:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+            transform: translateY(-2px);
+            color: #fff !important;
+        }
         .ai-quick-question {
             display: inline-flex;
             align-items: center;
@@ -238,6 +246,7 @@
         .stat-icon.green  { background: #dcfce7; color: #16a34a; }
         .stat-icon.amber  { background: #fef9c3; color: #ca8a04; }
         .stat-icon.blue   { background: #dbeafe; color: #2563eb; }
+        .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
         .stat-num  { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
         .stat-name { font-size: 12px; color: #888; margin-top: 3px; }
 
@@ -337,8 +346,8 @@
         .modal-footer { background: #fafafa; border-top: 1px solid #f0f0f0; padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px; }
         .btn-modal-close { padding: 9px 20px; background: #f3f4f6; border: 1px solid #e5e5e5; border-radius: 8px; color: #555; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-modal-close:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
-        .btn-modal-print { padding: 9px 24px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border: none; border-radius: 8px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.25s; box-shadow: 0 3px 10px rgba(220,38,38,0.2); }
-        .btn-modal-print:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.3); }
+        .btn-modal-print { padding: 9px 24px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important; border: none; border-radius: 8px; color: #fff !important; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.25s; box-shadow: 0 3px 10px rgba(37,99,235,0.25) !important; }
+        .btn-modal-print:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37,99,235,0.35) !important; background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important; }
 
         /* Footer */
         .dashboard-footer { background: #fff; border-top: 1px solid #f0f0f0; color: #888; padding: 18px 28px; font-size: 12.5px; margin-top: auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
@@ -456,10 +465,11 @@
             }
         }
         /* Custom Status Filter Dropdown */
+        .status-filter-wrapper { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; font-size: 13px; margin: 0; white-space: nowrap; }
         .custom-status-filter {
             background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; 
-            padding: 4px 8px; font-family: 'Poppins', sans-serif; 
-            outline: none; color: #333; margin-left: 5px;
+            padding: 5px 10px; font-family: 'Poppins', sans-serif; 
+            outline: none; color: #333; margin: 0; font-size: 13px;
         }
         body.dark-mode .custom-status-filter {
             background: #2a2a2a; color: #e0e0e0; border-color: #555;

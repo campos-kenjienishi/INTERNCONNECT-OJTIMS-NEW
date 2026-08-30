@@ -12,6 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ vasset('css/professor_class-responsive.css') }}">
 
     <link rel="stylesheet" href="{{ vasset('css/professor/class.css') }}">
@@ -60,8 +70,8 @@
         </a>
         <a href="{{ route('professor.requirementStatus.classes') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-check"></i></span>
-            <span class="nav-label">Req. Status</span>
-            <span class="tooltip-label">Req. Status</span>
+            <span class="nav-label">Requirement Status</span>
+            <span class="tooltip-label">Requirement Status</span>
         </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
@@ -149,13 +159,13 @@
                 <div class="table-card-header-left">
                     <div class="header-icon"><i class="fa fa-chalkboard"></i></div>
                     <div>
-                        <h2>{{ $showArchived ? 'Archived Class Rooms' : 'Class Rooms' }}</h2>
-                        <p>{{ $showArchived ? 'Review archived rooms, restore them, or remove them permanently' : 'Manage your rooms, view students, and post announcements' }}</p>
+                        <h2>{{ $showArchived ? 'Archived Classes' : 'Classes' }}</h2>
+                        <p>{{ $showArchived ? 'Review archived classes, restore them, or remove them permanently' : 'Manage student enrollment, approve or deny requests, review requirements, upload templates, and post announcements' }}</p>
                     </div>
                 </div>
                 <div class="room-count-badge">
                     <i class="fa fa-door-open"></i>
-                    {{ count($class) }} {{ count($class) == 1 ? 'room' : 'rooms' }}
+                    {{ count($class) }} {{ count($class) == 1 ? 'class' : 'classes' }}
                 </div>
             </div>
 
@@ -165,7 +175,7 @@
                     <thead>
                         <tr>
                             <th>Course</th>
-                            <th>Room Name</th>
+                            <th>Class Name</th>
                             <th>Semester</th>
                             <th>School Year</th>
                             <th>Schedule</th>
@@ -418,7 +428,7 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">
-                                                    <i class="fa fa-edit"></i> Edit Room
+                                                    <i class="fa fa-edit"></i> Edit Class
                                                 </h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
@@ -426,8 +436,8 @@
                                                 @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
-                                                    <label class="modal-field-label"><i class="fa fa-chalkboard"></i> Room Name</label>
-                                                    <input class="modal-field-input" type="text" name="room" value="{{ $room->room }}" required>
+                                                    <label class="modal-field-label"><i class="fa fa-chalkboard"></i> Class Name</label>
+                                                    <input class="modal-field-input" type="text" name="room" value="{{ $room->room }}" placeholder="Enter class name" required>
 
                                                     <label class="modal-field-label"><i class="fa fa-graduation-cap"></i> Course</label>
                                                     <select name="course" class="modal-field-select" required>
@@ -444,10 +454,29 @@
                                                     </select>
 
                                                     <label class="modal-field-label"><i class="fa fa-calendar"></i> School Year</label>
-                                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                                                        <input class="modal-field-input" type="number" name="school_year_start" min="2000" max="2100" value="{{ $room->school_year_start }}" required>
-                                                        <input class="modal-field-input" type="number" name="school_year_end" min="2001" max="2101" value="{{ $room->school_year_end }}" required>
-                                                    </div>
+                                                    @php
+                                                        $currentY = (int) date('Y');
+                                                        $syStart = !empty($room->school_year_start) ? (int) $room->school_year_start : $currentY;
+                                                        $syEnd = !empty($room->school_year_end) ? (int) $room->school_year_end : ($syStart + 1);
+                                                        $selectedSyVal = $syStart . '-' . $syEnd;
+                                                        $syOptions = [];
+                                                        for ($y = $currentY + 2; $y >= $currentY - 5; $y--) {
+                                                            $syOptions[$y . '-' . ($y + 1)] = ['start' => $y, 'end' => $y + 1, 'label' => $y . ' - ' . ($y + 1)];
+                                                        }
+                                                        if (!empty($room->school_year_start) && !isset($syOptions[$selectedSyVal])) {
+                                                            $syOptions[$selectedSyVal] = ['start' => $syStart, 'end' => $syEnd, 'label' => $syStart . ' - ' . $syEnd];
+                                                        }
+                                                    @endphp
+                                                    <select class="modal-field-select school-year-select" required>
+                                                        <option value="">Select School Year</option>
+                                                        @foreach ($syOptions as $k => $opt)
+                                                            <option value="{{ $k }}" data-start="{{ $opt['start'] }}" data-end="{{ $opt['end'] }}" {{ $selectedSyVal === $k ? 'selected' : '' }}>
+                                                                {{ $opt['label'] }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <input type="hidden" name="school_year_start" value="{{ $syStart }}">
+                                                    <input type="hidden" name="school_year_end" value="{{ $syEnd }}">
 
                                                     @php
                                                         $existingSchedule = is_array($room->schedule_parsed ?? null) ? $room->schedule_parsed : [];
@@ -643,7 +672,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fa fa-plus-circle"></i> Add New Room
+                    <i class="fa fa-plus-circle"></i> Add New Class
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -651,10 +680,10 @@
                 @csrf
                 <div class="modal-body">
                     <label class="modal-field-label">
-                        <i class="fa fa-chalkboard"></i> Room Name
+                        <i class="fa fa-chalkboard"></i> Class Name
                     </label>
                     <input class="modal-field-input" type="text" name="room"
-                           placeholder="Enter room name" required>
+                           placeholder="Enter class name" required>
 
                     <label class="modal-field-label">
                         <i class="fa fa-graduation-cap"></i> Course
@@ -679,10 +708,19 @@
                     <label class="modal-field-label">
                         <i class="fa fa-calendar"></i> School Year
                     </label>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                        <input class="modal-field-input" type="number" name="school_year_start" min="2000" max="2100" placeholder="Start Year" required>
-                        <input class="modal-field-input" type="number" name="school_year_end" min="2001" max="2101" placeholder="End Year" required>
-                    </div>
+                    @php
+                        $currentY = (int) date('Y');
+                    @endphp
+                    <select class="modal-field-select school-year-select" required>
+                        <option value="">Select School Year</option>
+                        @for ($y = $currentY + 2; $y >= $currentY - 5; $y--)
+                            <option value="{{ $y }}-{{ $y + 1 }}" data-start="{{ $y }}" data-end="{{ $y + 1 }}" {{ $y === $currentY ? 'selected' : '' }}>
+                                {{ $y }} - {{ $y + 1 }}
+                            </option>
+                        @endfor
+                    </select>
+                    <input type="hidden" name="school_year_start" value="{{ $currentY }}">
+                    <input type="hidden" name="school_year_end" value="{{ $currentY + 1 }}">
 
                     <label class="modal-field-label">
                         <i class="fa fa-calendar-week"></i> Schedule Days
@@ -713,13 +751,12 @@
                         <i class="fa fa-times me-1"></i> Close
                     </button>
                     <button type="submit" class="btn-modal-submit">
-                        <i class="fa fa-check me-1"></i> Create Room
+                        <i class="fa fa-check me-1"></i> Create Class
                     </button>
                 </div>
             </form>
         </div>
     </div>
-    
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -729,6 +766,7 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="{{ vasset('js/professor/class.js') }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 @include('partials.password-setup-modal')

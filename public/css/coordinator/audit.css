@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Audit Logs Page Styles
    Extracted from ojtCoordinator/audit.blade.php
    ========================================================================== */
@@ -625,20 +625,23 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            border: 1px solid #fecaca;
-            background: #fff5f5;
-            color: var(--red);
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #ffffff;
             border-radius: 999px;
-            padding: 6px 12px;
+            padding: 6px 14px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
         }
 
         .btn-view-desc:hover {
-            background: #fee2e2;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            color: #ffffff;
         }
 
         .desc-modal {
@@ -975,6 +978,83 @@ body.dark-mode .dashboard-footer .footer-logo {
 
         /* Cards */
         body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
+
+        /* Unified Poppins Font Enforcement */
+        body, table, th, td, select, input, button, .stat-num, .stat-name, .table-card, .dataTables_wrapper, .audit-filter-select, .audit-filter-date, .btn-view-desc, .date-main, .date-sub, .name-cell, .role-badge, .module-badge, .action-badge {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+
+        /* Shimmer Skeleton Loader for Audit Table */
+        .audit-table-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px 12px;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        body.dark-mode .audit-table-loader {
+            background: #18181b;
+        }
+
+        .audit-skeleton-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        body.dark-mode .audit-skeleton-header {
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .audit-skeleton-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 6px;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        body.dark-mode .audit-skeleton-row {
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .skeleton-pill {
+            height: 18px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: auditSkeletonShimmer 1.5s infinite;
+        }
+
+        body.dark-mode .skeleton-pill {
+            background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+            background-size: 200% 100%;
+        }
+
+        @keyframes auditSkeletonShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton-pill.w-title { width: 140px; height: 26px; border-radius: 8px; }
+        .skeleton-pill.w-filter { width: 220px; height: 32px; border-radius: 8px; }
+        .skeleton-pill.w-date { width: 110px; height: 30px; border-radius: 6px; }
+        .skeleton-pill.w-badge { width: 68px; height: 22px; border-radius: 20px; }
+        .skeleton-pill.w-name { width: 170px; }
+        .skeleton-pill.w-role { width: 85px; height: 22px; border-radius: 20px; }
+        .skeleton-pill.w-module { width: 125px; height: 22px; border-radius: 20px; }
+        .skeleton-pill.w-btn { width: 68px; height: 26px; border-radius: 20px; margin-left: auto; }
 
         @media (max-width: 900px) {
             .sidebar {

@@ -13,6 +13,15 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
         <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+        <script>
+            (function(){
+                try {
+                    if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                        document.documentElement.classList.add('sidebar-is-collapsed');
+                    }
+                } catch(e){}
+            })();
+        </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/dashboard.css') }}?v={{ time() }}">
     </head>
@@ -77,11 +86,21 @@
                 <span class="nav-label">MOA</span>
                 <span class="tooltip-label">MOA</span>
             </a>
-            <a href="{{ url('/reports') }}" class="nav-item">
-                <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
-                <span class="nav-label">Reports</span>
-                <span class="tooltip-label">Reports</span>
-            </a>
+            <div class="nav-group-reports">
+                <a href="{{ url('/reports') }}" class="nav-item nav-item-reports">
+                    <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
+                    <span class="nav-label">Reports</span>
+                    <span class="tooltip-label">Reports</span>
+                </a>
+                <div class="nav-sub">
+                    <a href="{{ url('/reports') }}" class="nav-sub-item">
+                        <i class="fa fa-user-graduate"></i> Student OJT Info
+                    </a>
+                    <a href="{{ url('/reportsExpired') }}" class="nav-sub-item">
+                        <i class="fa fa-file-contract"></i> MOA
+                    </a>
+                </div>
+            </div>
             <a href="{{ url('/analytics') }}" class="nav-item">
                 <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
                 <span class="nav-label">Analytics</span>
@@ -229,7 +248,7 @@
                                 : ($dashboardAiSource === 'openai' ? 'OpenAI' : 'Internal insight');
                         @endphp
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <button type="button" data-ai-insight-button data-ai-context="dashboardAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:#dc2626; color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                            <button type="button" data-ai-insight-button data-ai-context="dashboardAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                                 <i class="fa fa-magic"></i> Generate AI Insight
                             </button>
                             <span style="display:inline-flex; align-items:center; gap:7px; border:1px solid #fecaca; background:#fff5f5; color:#b91c1c; border-radius:999px; padding:8px 13px; font-size:12px; font-weight:800;">
@@ -317,7 +336,7 @@
                             </div>
                             <div style="display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px; align-items:start;">
                                 <textarea id="dashboardAiQuestionInput" rows="3" placeholder="Ask about pending approvals, files, placements, MOAs, or next actions..." style="width:100%; min-height:82px; border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; resize:vertical;"></textarea>
-                                <button type="button" id="dashboardAskAiBtn" style="height:44px; border:none; border-radius:12px; padding:0 18px; background:#dc2626; color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px;"><i class="fa fa-paper-plane"></i> Ask</button>
+                                <button type="button" id="dashboardAskAiBtn" style="height:44px; border:none; border-radius:12px; padding:0 18px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 3px 10px rgba(16,185,129,0.25);"><i class="fa fa-paper-plane"></i> Ask</button>
                             </div>
                             <div id="dashboardAiAskStatus" style="display:none; margin-top:10px; font-size:12px; color:#777;"></div>
                             <div id="dashboardAiAnswer" style="display:none; margin-top:12px; background:#fff7f7; border:1px solid #fecaca; border-radius:12px; padding:14px;">
@@ -596,6 +615,7 @@
         };
     </script>
     <script src="{{ vasset('js/coordinator/dashboard.js') }}?v={{ time() }}"></script>
+    <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
     <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
     <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>

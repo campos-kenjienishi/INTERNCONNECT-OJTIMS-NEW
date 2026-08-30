@@ -347,16 +347,16 @@
                             <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
                         </div>
                         <div class="brand-copy">
-                            <div class="eyebrow">Polytechnic University of the Philippines - OJT Information Management System</div>
+                            <div class="eyebrow">Polytechnic University of the Philippines - Taguig Campus</div>
                             <div class="brand-title">Professor Analytics Report</div>
-                            <div class="brand-sub">{{ $data->full_name }}</div>
+                            <div class="brand-sub">PUP Taguig Campus</div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="report-meta">
                 <div class="report-meta-group">
-                    <div><span style="color:#6b7280;">Scope:</span> <strong>{{ $data->full_name }}</strong></div>
+                    <div><span style="color:#6b7280;">Professor:</span> <strong>{{ $data->full_name }}</strong></div>
                     <div><span style="color:#6b7280;">Students:</span> <strong>{{ $totalStudents }}</strong></div>
                     <div><span style="color:#6b7280;">Submitted:</span> <strong>{{ $submittedRequests }}</strong></div>
                     <div><span style="color:#6b7280;">Generated:</span> <strong>{{ now()->format('M d, Y h:i A') }}</strong></div>
@@ -500,9 +500,9 @@
                     <div class="footer-band">
                         <div class="system-line">
                             <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
-                            <span>Polytechnic University of the Philippines - InternConnect OJT IMS</span>
+                            <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                         </div>
-                        <small>Ref: ANA-RPT-{{ now()->year }}</small>
+                        <small>Ref: PROF-ANA-{{ now()->year }}</small>
                     </div>
                 </div>
             </div>

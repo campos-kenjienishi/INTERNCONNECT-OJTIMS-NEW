@@ -11,6 +11,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ vasset('css/professor_moa-responsive.css') }}">
@@ -61,8 +71,8 @@
         </a>
         <a href="{{ route('professor.requirementStatus.classes') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-check"></i></span>
-            <span class="nav-label">Req. Status</span>
-            <span class="tooltip-label">Req. Status</span>
+            <span class="nav-label">Requirement Status</span>
+            <span class="tooltip-label">Requirement Status</span>
         </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
@@ -138,7 +148,7 @@
                 <div class="filter-card-body">
                     <div class="filter-group">
                         <label class="filter-label"><i class="fa fa-calendar-alt"></i> School Year</label>
-                        <select class="filter-select" name="school_year" id="school_year" style="min-width:220px; margin-bottom:10px;">
+                        <select class="filter-select" name="school_year" id="school_year">
                             <option value="" {{ empty($selectedSchoolYear) ? 'selected' : '' }}>All School Years</option>
                             @foreach (($schoolYears ?? collect()) as $year)
                                 <option value="{{ $year }}" {{ (string) ($selectedSchoolYear ?? '') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
@@ -163,7 +173,7 @@
                     </div>
                     <div class="filter-group">
                         <label class="filter-label"><i class="fa fa-graduation-cap"></i> Course</label>
-                        <select class="filter-select" name="course" id="courseSelect" required style="min-width:220px;">
+                        <select class="filter-select" name="course" id="courseSelect" required>
                             @foreach ($courseAll as $c)
                                 <option value="{{ $c->course }}" {{ (string) ($selectedCourse ?? '') === (string) $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                             @endforeach
@@ -202,7 +212,7 @@
 
         <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-icon red"><i class="fa fa-file-contract"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-file-contract"></i></div>
                 <div>
                     <div class="stat-num">{{ $totalMOA }}</div>
                     <div class="stat-name">Total MOA</div>
@@ -216,14 +226,14 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon amber"><i class="fa fa-exclamation-circle"></i></div>
+                <div class="stat-icon red"><i class="fa fa-exclamation-circle"></i></div>
                 <div>
                     <div class="stat-num">{{ $expiredMOA }}</div>
                     <div class="stat-name">Expired</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-building"></i></div>
+                <div class="stat-icon purple"><i class="fa fa-building"></i></div>
                 <div>
                     <div class="stat-num">{{ $totalMOA }}</div>
                     <div class="stat-name">Partner Companies</div>
@@ -240,7 +250,7 @@
                         <p>Generated from the current MOA report data</p>
                     </div>
                     <div style="margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <button type="button" data-ai-insight-button data-ai-context="aiReportContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:var(--red); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                        <button type="button" data-ai-insight-button data-ai-context="aiReportContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                             <i class="fa fa-magic"></i> Generate AI Insight
                         </button>
                         <div style="display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:700;">
@@ -323,7 +333,7 @@
                         </div>
                         <div style="display:grid; gap:10px;">
                             <textarea id="aiQuestionInput" rows="3" maxlength="500" placeholder="Ask a question about this report..." style="width:100%; resize:vertical; min-height:86px; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; outline:none; line-height:1.6;"></textarea>
-                            <button type="button" id="askAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap;">
+                            <button type="button" id="askAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                                 <i class="fa fa-paper-plane"></i> Ask
                             </button>
                         </div>
@@ -523,7 +533,7 @@
             school_year: @json($selectedSchoolYear ?? null)
         },
         insight: @json($reportInsights ?? []),
-        campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Branch')),
+        campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Campus')),
         campusCollege: @json($campusCollege ?? config('campus.college', 'College of Engineering and Technology')),
         coordinatorName: @json($user->full_name ?? 'OJT Coordinator'),
         sendEmailUrl: @json(route('reportsExpired.send.email')),
@@ -532,6 +542,7 @@
     };
 </script>
 <script src="{{ vasset('js/professor/reports-expired.js') }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 @include('partials.password-setup-modal')

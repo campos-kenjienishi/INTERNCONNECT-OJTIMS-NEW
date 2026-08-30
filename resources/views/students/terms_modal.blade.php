@@ -148,9 +148,9 @@
     }
 
     .btn-terms-decline {
-        background: transparent;
-        color: #64748b;
-        border: 1px solid #cbd5e1;
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
         padding: 10px 22px;
         border-radius: 8px;
         font-weight: 600;
@@ -160,11 +160,14 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.28);
     }
 
     .btn-terms-decline:hover {
-        background: #f1f5f9;
-        color: #334155;
+        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.38);
     }
 
     .btn-terms-continue {
@@ -187,17 +190,17 @@
     }
 
     .btn-terms-continue.tc-unlocked {
-        background: linear-gradient(135deg, #800000, #b30000) !important;
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
         color: #ffffff !important;
         cursor: pointer !important;
         opacity: 1 !important;
-        box-shadow: 0 4px 14px rgba(128, 0, 0, 0.35) !important;
+        box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35) !important;
     }
 
     .btn-terms-continue.tc-unlocked:hover {
-        background: linear-gradient(135deg, #990000, #cc0000) !important;
+        background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(128, 0, 0, 0.45) !important;
+        box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45) !important;
     }
 
     /* Mobile Responsiveness */
@@ -288,7 +291,7 @@
         </div>
         <div class="terms-card-body">
             <p>
-                Welcome to <span class="terms-brand-name">InternConnect</span>. Before continuing to your dashboard, please review and accept our terms of service and data privacy guidelines.
+                Welcome to <span class="terms-brand-name">InternConnect - OJTIMS</span>. Before continuing to your dashboard, please review and accept our terms of service and data privacy guidelines.
             </p>
 
             <div class="terms-scroll-area">

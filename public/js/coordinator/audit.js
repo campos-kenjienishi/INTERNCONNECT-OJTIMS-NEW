@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Audit Logs Page Scripts
    Extracted from ojtCoordinator/audit.blade.php
    ========================================================================== */
@@ -48,6 +48,12 @@
                             "scrollX": true,
                             "autoWidth": false,
                             "dom": '<"audit-toolbar"lf>rtip',
+                            "initComplete": function() {
+                                $('#auditTableLoading').fadeOut(220, function() {
+                                    $(this).remove();
+                                });
+                                $('#auditTable').css('opacity', '1');
+                            }
                         });
 
                         const $toolbar = $('#auditTable_wrapper .audit-toolbar');

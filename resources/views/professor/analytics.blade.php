@@ -12,6 +12,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
 
     <link rel="stylesheet" href="{{ vasset('css/professor/analytics.css') }}">
 </head>
@@ -54,8 +63,8 @@
         </a>
         <a href="{{ route('professor.requirementStatus.classes') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-check"></i></span>
-            <span class="nav-label">Req. Status</span>
-            <span class="tooltip-label">Req. Status</span>
+            <span class="nav-label">Requirement Status</span>
+            <span class="tooltip-label">Requirement Status</span>
         </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item active">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
@@ -295,7 +304,7 @@
                             : ($analyticsAiSource === 'openai' ? 'OpenAI' : 'Internal Insight');
                     @endphp
                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-left:auto;">
-                        <button type="button" data-ai-insight-button data-ai-context="analyticsAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:#dc2626; color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                        <button type="button" data-ai-insight-button data-ai-context="analyticsAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                             <i class="fa fa-magic"></i> Generate AI Insight
                         </button>
                         <span style="display:inline-flex; align-items:center; gap:7px; border:1px solid #fecaca; background:#fff5f5; color:#b91c1c; border-radius:999px; padding:8px 13px; font-size:12px; font-weight:800;">
@@ -381,7 +390,7 @@
                         </div>
                         <div style="display:grid; gap:10px;">
                             <textarea id="analyticsAiQuestionInput" rows="3" maxlength="500" placeholder="Ask a question about this analytics dashboard..." style="width:100%; resize:vertical; min-height:86px; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; outline:none; line-height:1.6;"></textarea>
-                            <button type="button" id="analyticsAskAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap;">
+                            <button type="button" id="analyticsAskAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                                 <i class="fa fa-paper-plane"></i> Ask
                             </button>
                         </div>
@@ -416,147 +425,163 @@
 @endphp
 
 <div id="print-area-wrapper">
-    <div class="analytics-print">
-        <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); color:#fff;">
-            <div style="height:4px; background:rgba(255,255,255,.16);"></div>
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 22px; flex-wrap:wrap;">
-                <div style="display:flex; align-items:center; gap:14px; min-width:0;">
-                    <div style="width:50px; height:50px; border-radius:10px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:36px; height:36px; object-fit:contain;">
-                    </div>
-                    <div style="min-width:0;">
-                        <div style="font-size:6.5px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,.6); margin-bottom:3px;">Polytechnic University of the Philippines - OJT Information Management System</div>
-                        <div style="font-size:15px; font-weight:800; line-height:1.15;">Professor Analytics Report</div>
-                        <div style="font-size:8.5px; color:rgba(255,255,255,.68); margin-top:3px;">{{ $data->full_name }} | Professor Portal</div>
-                    </div>
+    <div class="analytics-print" style="font-family:'Poppins',Arial,sans-serif; background:#fff; color:#111827;">
+        <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
+            <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
+            <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
+                <div style="width:50px; height:50px; background:rgba(255,255,255,0.18); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.25);">
+                    <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);" alt="PUP">
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines - Taguig Campus</div>
+                    <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Professor Analytics Report</div>
+                    <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">PUP Taguig Campus</div>
+                </div>
+            </div>
+            <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
+        </div>
+
+        <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+            <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                    <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                    <span style="color:#6b7280;">Professor:</span>
+                    <strong style="color:#111827;">{{ $data->full_name }}</strong>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                    <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                    <span style="color:#6b7280;">Students:</span>
+                    <strong style="color:#111827;">{{ $totalStudents }}</strong>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                    <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                    <span style="color:#6b7280;">Submitted:</span>
+                    <strong style="color:#111827;">{{ $submittedRequests }}</strong>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                    <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                    <span style="color:#6b7280;">Generated:</span>
+                    <strong style="color:#111827;">{{ now()->format('M d, Y h:i A') }}</strong>
+                </div>
+            </div>
+            <div style="font-size:8.5px; color:#9ca3af;">Analytics snapshot</div>
+        </div>
+
+        <div style="padding:14px 22px 0 22px;">
+            <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px;">
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                    <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Total Advisees</div>
+                    <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">{{ $totalStudents }}</div>
+                </div>
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                    <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Active Classes</div>
+                    <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">{{ $classrooms->count() }}</div>
+                </div>
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                    <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Submitted Evaluations</div>
+                    <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">{{ $submittedRequests }}</div>
+                </div>
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                    <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">File Categories</div>
+                    <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">{{ $templateCount }}</div>
                 </div>
             </div>
         </div>
 
-        <div style="padding:10px 22px; border-bottom:1px solid #e5e7eb; background:#f8f9fa; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-            <div style="display:flex; flex-wrap:wrap; gap:14px; font-size:9.5px; color:#374151;">
-                <div><span style="color:#6b7280;">Classes:</span> <strong>{{ $classrooms->count() }}</strong></div>
-                <div><span style="color:#6b7280;">Students:</span> <strong>{{ $totalStudents }}</strong></div>
-                <div><span style="color:#6b7280;">Approved:</span> <strong>{{ $approvedStudents }}</strong></div>
-                <div><span style="color:#6b7280;">File Categories:</span> <strong>{{ $templateCount }}</strong></div>
-            </div>
-            <div style="font-size:8.5px; color:#9ca3af;">Generated: {{ now()->format('M d, Y h:i A') }}</div>
-        </div>
-
-        <div style="padding:8px 22px 4px;">
-            <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Professor Snapshot</div>
-        </div>
-
-        <div style="padding:14px 22px 22px;">
-            <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; margin-bottom:16px;">
-                    <div style="border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:10px; padding:10px 12px;">
-                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $totalStudents }}</div>
-                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Total Advisees</div>
-                    </div>
-                    <div style="border:1px solid #e5e7eb; border-left:4px solid #2563eb; border-radius:10px; padding:10px 12px;">
-                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $classrooms->count() }}</div>
-                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Active Classes</div>
-                    </div>
-                    <div style="border:1px solid #e5e7eb; border-left:4px solid #16a34a; border-radius:10px; padding:10px 12px;">
-                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $approvedStudents }}</div>
-                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Approved Students</div>
-                    </div>
-                    <div style="border:1px solid #e5e7eb; border-left:4px solid #7c3aed; border-radius:10px; padding:10px 12px;">
-                        <div style="font-size:16px; font-weight:800; color:#111827;">{{ $templateCount }}</div>
-                        <div style="font-size:8px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">File Categories</div>
-                    </div>
+        <div style="padding:14px 22px 0 22px;">
+            <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px;">
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                    <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Student Standing</div>
+                    <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                        <thead>
+                            <tr style="background:#f9fafb;">
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th>
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($analyticsPrintStudentMetrics as $index => $metric)
+                                <tr style="background:{{ $index % 2 === 0 ? '#ffffff' : '#f9fafb' }};">
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#111827;">{{ $metric['label'] }}</td>
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#374151;">{{ $metric['count'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
 
-                <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; margin-bottom:14px;">
-                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
-                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Student Standing</div>
-                        <table style="width:100%; border-collapse:collapse; font-size:10px;">
-                            <thead>
-                                <tr style="background:#f9fafb;">
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th>
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th>
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                    <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Class Overview</div>
+                    <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                        <thead>
+                            <tr style="background:#f9fafb;">
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Class</th>
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th>
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Submitted</th>
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Completion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($classAnalytics as $index => $room)
+                                <tr style="background:{{ $index % 2 === 0 ? '#ffffff' : '#f9fafb' }};">
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#111827;">{{ $room['label'] }}</td>
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#374151;">{{ $room['total_students'] }}</td>
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#374151;">{{ $room['submitted'] }}</td>
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#991b1b; font-weight:700;">{{ $room['completion'] }}%</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($analyticsPrintStudentMetrics as $metric)
-                                    <tr>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['label'] }}</td>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['count'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
-                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Class Overview</div>
-                        <table style="width:100%; border-collapse:collapse; font-size:10px;">
-                            <thead>
-                                <tr style="background:#f9fafb;">
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Class</th>
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th>
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Submitted</th>
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Completion</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($classAnalytics as $room)
-                                    <tr>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['label'] }}</td>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['total_students'] }}</td>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['submitted'] }}</td>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $room['completion'] }}%</td>
-                                    </tr>
-                                @empty
-                                    <tr><td colspan="4" style="padding:8px; border:1px solid #e5e7eb; text-align:center;">No classes found.</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px;">
-                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
-                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Requirement Review</div>
-                        <table style="width:100%; border-collapse:collapse; font-size:10px;">
-                            <thead>
-                                <tr style="background:#f9fafb;">
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th>
-                                    <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($analyticsPrintFileMetrics as $metric)
-                                    <tr>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['label'] }}</td>
-                                        <td style="padding:7px 8px; border:1px solid #e5e7eb;">{{ $metric['count'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px;">
-                        <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px;">Analytics Insight</div>
-                        <p style="font-size:11px; line-height:1.7; color:#374151; margin-bottom:10px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
-                        <div style="font-size:10px; color:#6b7280; line-height:1.6;">This report focuses on the current adviser snapshot, student standing, class overview, and file requirements.</div>
-                    </div>
-                </div>
-
-                <div style="margin-top:16px; border-top:1px dashed #d1d5db; padding-top:14px;">
-                    <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
-                        <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px;">Disclaimer</div>
-                        <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.</div>
-                    </div>
-                    <div style="margin-top:10px; background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:13px; height:13px; object-fit:contain; opacity:.7;">
-                            <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">Polytechnic University of the Philippines - InternConnect OJT IMS</span>
-                        </div>
-                        <div style="font-size:8px; color:rgba(255,255,255,.5);">Ref: ANA-RPT-{{ now()->year }}</div>
-                    </div>
+                            @empty
+                                <tr><td colspan="4" style="padding:8px; border:1px solid #e5e7eb; text-align:center;">No classes found.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+
+        <div style="padding:14px 22px 0 22px;">
+            <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px;">
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                    <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Requirement Review</div>
+                    <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                        <thead>
+                            <tr style="background:#f9fafb;">
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th>
+                                <th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($analyticsPrintFileMetrics as $index => $metric)
+                                <tr style="background:{{ $index % 2 === 0 ? '#ffffff' : '#f9fafb' }};">
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#111827;">{{ $metric['label'] }}</td>
+                                    <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#374151;">{{ $metric['count'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                    <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Analytics Insight</div>
+                    <div style="font-size:11px; color:#374151; line-height:1.7;">{{ $analyticsInsights['summary'] ?? 'This printed report focuses on the current adviser snapshot, student standing, class overview, and file requirements.' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding:18px 22px 12px 22px;">
+            <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+                <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                    <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px;">Disclaimer</div>
+                    <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;">
+                <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:13px; height:13px; object-fit:contain; opacity:.7; filter:brightness(2);">
+                <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+            </div>
+            <div style="font-size:8px; color:rgba(255,255,255,.5);">Ref: PROF-ANA-{{ now()->year }}</div>
         </div>
     </div>
 </div>
@@ -603,6 +628,7 @@
     };
 </script>
 <script src="{{ vasset('js/professor/analytics.js') }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 @include('partials.password-setup-modal')

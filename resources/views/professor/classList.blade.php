@@ -12,6 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ vasset('css/professor_classList-responsive.css') }}">
 
     <link rel="stylesheet" href="{{ vasset('css/professor/class-list.css') }}">
@@ -60,8 +70,8 @@
         </a>
         <a href="{{ route('professor.requirementStatus.classes') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-clipboard-check"></i></span>
-            <span class="nav-label">Req. Status</span>
-            <span class="tooltip-label">Req. Status</span>
+            <span class="nav-label">Requirement Status</span>
+            <span class="tooltip-label">Requirement Status</span>
         </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
@@ -124,7 +134,7 @@
         <!-- Page Header -->
         <div class="page-header">
             <div>
-                <h1>Class <span>List</span></h1>
+                <h1>{{ $course->room }} <span>Class List</span></h1>
                 <div class="breadcrumb">
                     <a href="{{ url('/professor/home') }}">
                         <i class="fa fa-home"></i> Dashboard
@@ -132,7 +142,7 @@
                     <i class="fa fa-chevron-right"></i>
                     <a href="{{ url('/professor/class') }}">Class</a>
                     <i class="fa fa-chevron-right"></i>
-                    <span>Student List</span>
+                    <span>{{ $course->room }}</span>
                 </div>
             </div>
             <a class="btn-back"
@@ -152,15 +162,6 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fa fa-graduation-cap"></i></div>
-                <div>
-                    <div class="stat-num">
-                        {{ count(collect($studentData)->pluck('student.course')->unique()) }}
-                    </div>
-                    <div class="stat-name">Courses</div>
-                </div>
-            </div>
-            <div class="stat-card">
                 <div class="stat-icon blue"><i class="fa fa-layer-group"></i></div>
                 <div>
                     <div class="stat-num">
@@ -170,10 +171,12 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon green"><i class="fa fa-briefcase"></i></div>
+                <div class="stat-icon green"><i class="fa fa-calendar-alt"></i></div>
                 <div>
-                    <div class="stat-num">OJT</div>
-                    <div class="stat-name">Program</div>
+                    <div class="stat-num" style="font-size:18px;">
+                        {{ $course->school_year_start && $course->school_year_end ? $course->school_year_start . ' - ' . $course->school_year_end : 'N/A' }}
+                    </div>
+                    <div class="stat-name">School Year</div>
                 </div>
             </div>
         </div>
@@ -200,7 +203,6 @@
                     <thead>
                         <tr>
                             <th>Student Name</th>
-                            <th>Course</th>
                             <th>Year &amp; Section</th>
                             <th>School Year</th>
                             <th>Personal Info</th>
@@ -219,14 +221,6 @@
                                     </div>
                                     <span class="student-name-text">{{ $item['student']->full_name }}</span>
                                 </div>
-                            </td>
-
-                            <!-- Course -->
-                            <td>
-                                <span class="course-badge">
-                                    <i class="fa fa-graduation-cap" style="font-size:10px;"></i>
-                                    {{ $item['student']->course }}
-                                </span>
                             </td>
 
                             <!-- Year & Section -->
@@ -495,6 +489,7 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="{{ vasset('js/professor/class-list.js') }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 @include('partials.password-setup-modal')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>

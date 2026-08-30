@@ -400,7 +400,7 @@
             <div class="footer-band">
                 <div class="left">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP">
-                    <span>Polytechnic University of the Philippines - InternConnect OJT IMS</span>
+                    <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                 </div>
                 <div class="right">Ref: EVL-RPT-{{ now()->year }}</div>
             </div>

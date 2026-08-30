@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Reports Expired MOA Styles
    Extracted from ojtCoordinator/reportsExpired.blade.php
    ========================================================================== */
@@ -79,18 +79,7 @@
             pointer-events: none; opacity: 0; transition: opacity 0.2s;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999;
         }
-        .sidebar.collapsed .nav-item:hover .tooltip-label { opacity: 1; }
-        .nav-sub { padding: 4px 0 4px 52px; border-left: 3px solid transparent; }
-        .nav-sub-item {
-            display: block; padding: 7px 16px;
-            color: rgba(255,255,255,0.45); text-decoration: none;
-            font-size: 12.5px; font-weight: 500;
-            border-left: 2px solid transparent;
-            transition: all 0.2s; border-radius: 0 6px 6px 0; white-space: nowrap;
-        }
-        .nav-sub-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .nav-sub-item.active { color: #fca5a5; border-left-color: #fca5a5; background: rgba(239,68,68,0.08); }
-        .sidebar.collapsed .nav-sub { display: none; }
+        /* Submenus styled via dashboard-global.css */
         .sidebar-footer { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
 
         /* =============== MAIN =============== */
@@ -230,11 +219,12 @@
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
         .dataTables_filter input { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 6px 12px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; outline: none !important; }
         .dataTables_filter input:focus { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important; }
-        .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 4px 8px !important; font-family: 'Poppins', sans-serif !important; }
+        .dataTables_length select { border: 1px solid #e5e5e5 !important; border-radius: 8px !important; padding: 5px 10px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; }
+        .status-filter-wrapper { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; font-size: 13px; margin: 0; white-space: nowrap; }
         .custom-status-filter {
             background: #fff; border: 1px solid #e5e5e5; border-radius: 8px;
-            padding: 4px 8px; font-family: 'Poppins', sans-serif;
-            outline: none; color: #333; margin-left: 5px;
+            padding: 5px 10px; font-family: 'Poppins', sans-serif;
+            outline: none; color: #333; margin: 0; font-size: 13px;
         }
         .dataTables_paginate .paginate_button { border-radius: 6px !important; font-family: 'Poppins', sans-serif !important; font-size: 13px !important; }
         .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
@@ -485,6 +475,21 @@ body.dark-mode .table-card-body table.dataTable tbody tr:hover td:first-child {
     .table-card-body .dataTables_wrapper {
         padding: 12px 0;
         overflow: visible !important;
+    }
+
+    .table-card-body .dataTables_filter,
+    .table-card-body .dataTables_length,
+    .table-card-body .dataTables_info,
+    .table-card-body .dataTables_paginate {
+        padding: 0 16px !important;
+    }
+
+    .table-card-body .dataTables_length {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 10px 14px !important;
+        margin-bottom: 12px !important;
     }
 
     .table-card-body {

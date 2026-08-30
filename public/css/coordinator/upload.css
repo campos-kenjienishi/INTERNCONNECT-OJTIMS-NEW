@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Upload Page Styles
    Extracted from ojtCoordinator/upload.blade.php
    ========================================================================== */
@@ -359,34 +359,36 @@
         .btn-download {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 14px; border-radius: 8px;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none; color: #fff;
             font-family: 'Poppins', sans-serif; font-size: 12px;
             font-weight: 600; cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
             text-decoration: none;
         }
 
         .btn-download:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
             color: #fff; text-decoration: none;
         }
 
         .btn-view {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 14px; border-radius: 8px;
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             border: none; color: #fff;
             font-family: 'Poppins', sans-serif; font-size: 12px;
             font-weight: 600; cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(5,150,105,0.2);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
             text-decoration: none;
         }
 
         .btn-view:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: #fff; text-decoration: none;
         }
 

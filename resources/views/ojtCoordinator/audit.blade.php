@@ -10,6 +10,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ vasset('css/coor_audit-responsive.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/coordinator/audit.css') }}?v={{ time() }}">
 </head>
@@ -70,11 +81,21 @@
             <span class="nav-label">MOA</span>
             <span class="tooltip-label">MOA</span>
         </a>
-        <a href="{{ url('/reports') }}" class="nav-item">
-            <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
-            <span class="nav-label">Reports</span>
-            <span class="tooltip-label">Reports</span>
-        </a>
+        <div class="nav-group-reports">
+            <a href="{{ url('/reports') }}" class="nav-item nav-item-reports">
+                <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
+                <span class="nav-label">Reports</span>
+                <span class="tooltip-label">Reports</span>
+            </a>
+            <div class="nav-sub">
+                <a href="{{ url('/reports') }}" class="nav-sub-item">
+                    <i class="fa fa-user-graduate"></i> Student OJT Info
+                </a>
+                <a href="{{ url('/reportsExpired') }}" class="nav-sub-item">
+                    <i class="fa fa-file-contract"></i> MOA
+                </a>
+            </div>
+        </div>
         <a href="{{ url('/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
             <span class="nav-label">Analytics</span>
@@ -238,7 +259,48 @@
                         </select>
                     </div>
                 </div>
-                <table id="auditTable" class="display" style="width:100%">
+                <div class="audit-table-wrapper" style="position: relative; min-height: 280px;">
+                    <!-- Loading Skeleton State -->
+                    <div id="auditTableLoading" class="audit-table-loader">
+                        <div class="audit-skeleton-header">
+                            <div class="skeleton-pill w-title"></div>
+                            <div class="skeleton-pill w-filter"></div>
+                        </div>
+                        <div class="audit-skeleton-row">
+                            <div class="skeleton-pill w-date"></div>
+                            <div class="skeleton-pill w-badge"></div>
+                            <div class="skeleton-pill w-name"></div>
+                            <div class="skeleton-pill w-role"></div>
+                            <div class="skeleton-pill w-module"></div>
+                            <div class="skeleton-pill w-btn"></div>
+                        </div>
+                        <div class="audit-skeleton-row">
+                            <div class="skeleton-pill w-date"></div>
+                            <div class="skeleton-pill w-badge"></div>
+                            <div class="skeleton-pill w-name"></div>
+                            <div class="skeleton-pill w-role"></div>
+                            <div class="skeleton-pill w-module"></div>
+                            <div class="skeleton-pill w-btn"></div>
+                        </div>
+                        <div class="audit-skeleton-row">
+                            <div class="skeleton-pill w-date"></div>
+                            <div class="skeleton-pill w-badge"></div>
+                            <div class="skeleton-pill w-name"></div>
+                            <div class="skeleton-pill w-role"></div>
+                            <div class="skeleton-pill w-module"></div>
+                            <div class="skeleton-pill w-btn"></div>
+                        </div>
+                        <div class="audit-skeleton-row">
+                            <div class="skeleton-pill w-date"></div>
+                            <div class="skeleton-pill w-badge"></div>
+                            <div class="skeleton-pill w-name"></div>
+                            <div class="skeleton-pill w-role"></div>
+                            <div class="skeleton-pill w-module"></div>
+                            <div class="skeleton-pill w-btn"></div>
+                        </div>
+                    </div>
+
+                    <table id="auditTable" class="display" style="width:100%; opacity: 0; transition: opacity 0.3s ease;">
                     <thead>
                         <tr>
                             <th>Date / Time</th>
@@ -337,6 +399,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
                 @endif
 
             </div>
@@ -402,6 +465,7 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="{{ vasset('js/coordinator/audit.js') }}?v={{ time() }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

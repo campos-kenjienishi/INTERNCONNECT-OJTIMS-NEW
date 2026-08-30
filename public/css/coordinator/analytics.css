@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Analytics Page Styles
    Extracted from ojtCoordinator/analytics.blade.php
    ========================================================================== */
@@ -95,20 +95,23 @@
 
         .sidebar-user:hover { background: rgba(255,255,255,0.05); }
 
-        .sidebar-avatar {
+        .sidebar-avatar,
+        .user-avatar {
             width: 38px;
             height: 38px;
             border-radius: 50%;
             overflow: hidden;
-            background: rgba(239,68,68,0.25);
-            border: 1.5px solid rgba(239,68,68,0.4);
-            display: grid;
-            place-items: center;
-            color: #fecaca;
+            background: rgba(254, 215, 0, 0.16) !important;
+            border: 1.5px solid rgba(254, 215, 0, 0.45) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FED700 !important;
             flex-shrink: 0;
         }
 
-        .sidebar-avatar img {
+        .sidebar-avatar img,
+        .user-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;

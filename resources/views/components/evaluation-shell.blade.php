@@ -36,7 +36,7 @@
         $sidebarLinks = [
             ['url' => url('/professor/home'), 'icon' => 'fa-home', 'label' => 'Dashboard', 'pattern' => 'professor/home*'],
             ['url' => url('/professor/class'), 'icon' => 'fa-clipboard', 'label' => 'Class', 'pattern' => 'professor/class*'],
-            ['url' => route('professor.requirementStatus.classes'), 'icon' => 'fa-clipboard-check', 'label' => 'Req. Status', 'pattern' => 'professor/requirement-status*'],
+            ['url' => route('professor.requirementStatus.classes'), 'icon' => 'fa-clipboard-check', 'label' => 'Requirement Status', 'pattern' => 'professor/requirement-status*'],
             ['url' => url('/professor/analytics'), 'icon' => 'fa-chart-line', 'label' => 'Analytics', 'pattern' => 'professor/analytics*'],
             ['url' => url('/reportsExpiredProf'), 'icon' => 'fa-file-contract', 'label' => 'MOA', 'pattern' => 'reportsExpiredProf*'],
             ['url' => url('/professor/maintain'), 'icon' => 'fa-cogs', 'label' => 'Maintenance', 'pattern' => 'professor/maintain*'],
@@ -214,11 +214,11 @@
         <span class="divider">|</span>
         <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
         <span class="divider">|</span>
-        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
     </div>
 </footer>
 </div>
 
     <script src="{{ vasset('js/components/evaluation-shell.js') }}"></script>
+    <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 </body>
 </html>

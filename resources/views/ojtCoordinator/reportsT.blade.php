@@ -11,9 +11,16 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/reports-table.css') }}?v={{ time() }}">
 </head>
@@ -79,17 +86,20 @@
             <span class="tooltip-label">MOA</span>
         </a>
 
-        <div class="nav-item" style="cursor:default; pointer-events:none;">
-            <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
-            <span class="nav-label">Reports</span>
-        </div>
-        <div class="nav-sub">
-            <a href="{{ url('/reports') }}" class="nav-sub-item active">
-                <i class="fa fa-user-graduate" style="margin-right:6px; font-size:11px;"></i> Student OJT Info
+        <div class="nav-group-reports active">
+            <a href="{{ url('/reports') }}" class="nav-item nav-item-reports active" style="cursor:pointer;">
+                <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
+                <span class="nav-label">Reports</span>
+                <span class="tooltip-label">Reports</span>
             </a>
-            <a href="{{ url('/reportsExpired') }}" class="nav-sub-item">
-                <i class="fa fa-file-contract" style="margin-right:6px; font-size:11px;"></i> MOA
-            </a>
+            <div class="nav-sub">
+                <a href="{{ url('/reports') }}" class="nav-sub-item active">
+                    <i class="fa fa-user-graduate"></i> Student OJT Info
+                </a>
+                <a href="{{ url('/reportsExpired') }}" class="nav-sub-item">
+                    <i class="fa fa-file-contract"></i> MOA
+                </a>
+            </div>
         </div>
 
         <a href="{{ url('/analytics') }}" class="nav-item">
@@ -186,7 +196,7 @@
                         <p>Generated from the current OJT report data</p>
                     </div>
                     <div style="margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <button type="button" data-ai-insight-button data-ai-context="studentAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:var(--red); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                        <button type="button" data-ai-insight-button data-ai-context="studentAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                             <i class="fa fa-magic"></i> Generate AI Insight
                         </button>
                         <div style="display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:700;">
@@ -195,13 +205,13 @@
                         </div>
                     </div>
                 </div>
-                <div data-ai-result-panel class="panel-card-body" style="display:none;">
+                <div data-ai-result-panel class="filter-card-body" style="display:none;">
                     @if(($reportInsights['source'] ?? '') === 'fallback')
                         <div data-ai-notice style="display:flex; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;">
                             <i class="fa fa-exclamation-triangle" style="margin-top:2px;"></i>
                             <div>
                                 <strong>Gemini is temporarily unavailable.</strong>
-                                <span data-ai-notice-text>{{ $reportInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes, or later if the daily free-tier quota was reached.' }}</span>
+                                <span data-ai-notice-text>{{ $reportInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes if this is a short rate limit; if the daily free-tier limit was reached, AI answers may resume after the quota resets.' }}</span>
                             </div>
                         </div>
                     @endif
@@ -241,21 +251,21 @@
                         $studentCompanyCount = $studentRecordsWithOjt->pluck('ojt.company_name')->filter()->unique()->count();
                         $studentMissingOjt = $studentReportRecords->count() - $studentRecordsWithOjt->count();
                         $studentPromptSuggestions = [
-                            ['label' => 'Priorities', 'question' => 'What should we prioritize first in this student OJT report?'],
-                            ['label' => 'Coverage', 'question' => 'How strong is the placement coverage in this OJT report?'],
-                            ['label' => 'Executive summary', 'question' => 'Write a short executive summary for this student OJT report.'],
+                            ['label' => 'Priorities', 'question' => 'What should we prioritize first based on this student OJT report?'],
+                            ['label' => 'Risk', 'question' => 'What risk level does this report show and which student groups need attention?'],
+                            ['label' => 'Executive summary', 'question' => 'Write a short executive summary for this student report.'],
                         ];
 
-                        if ($studentMissingOjt > 0) {
-                            $studentPromptSuggestions[] = ['label' => 'Missing OJT', 'question' => 'What should we do about the student records missing OJT details?'];
+                        if (($completedStudents ?? 0) < ($totalStudents ?? 0)) {
+                            $studentPromptSuggestions[] = ['label' => 'Completion plan', 'question' => 'How can we help the remaining students finish their required hours faster?'];
                         }
 
-                        if ($studentCompanyCount > 0) {
-                            $studentPromptSuggestions[] = ['label' => 'Companies', 'question' => 'What does the company placement distribution suggest from this report?'];
+                        if (($activeStudents ?? 0) > 0) {
+                            $studentPromptSuggestions[] = ['label' => 'Active monitoring', 'question' => 'What should the coordinator monitor this week for active interns?'];
                         }
                     @endphp
                     <div style="margin-top:18px; border-top:1px solid #f0f0f0; padding-top:16px;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
                             <div>
                                 <div style="font-size:13px; font-weight:800; color:#1f2937;">Ask AI about this report</div>
                                 <div style="font-size:12px; color:#888; margin-top:2px;">Click a suggested prompt to ask instantly, or type your own question and press Ask.</div>
@@ -271,7 +281,7 @@
                         </div>
                         <div style="display:grid; gap:10px;">
                             <textarea id="studentAiQuestionInput" rows="3" maxlength="500" placeholder="Ask a question about this student OJT report..." style="width:100%; resize:vertical; min-height:86px; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; outline:none; line-height:1.6;"></textarea>
-                            <button type="button" id="studentAskAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap;">
+                            <button type="button" id="studentAskAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                                 <i class="fa fa-paper-plane"></i> Ask
                             </button>
                         </div>
@@ -483,6 +493,7 @@
     };
 </script>
 <script src="{{ vasset('js/coordinator/reports-table.js') }}?v={{ time() }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

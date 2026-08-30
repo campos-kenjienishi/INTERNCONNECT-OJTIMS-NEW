@@ -1,4 +1,5 @@
 /* Requirement Status Classes Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root { --red:#dc2626; --sidebar-w:260px; --sidebar-w-collapsed:70px; --topbar-h:64px; }
@@ -13,11 +14,11 @@
         .sidebar-brand { padding:22px 18px; border-bottom:1px solid rgba(255,255,255,.08); }
         .sidebar-brand img { width:36px; height:36px; object-fit:contain; }
         .sidebar-brand-name { color:#fff; font-size:16px; font-weight:800; line-height:1; white-space:nowrap; }
-        .sidebar-brand-name span { color:#fca5a5; }
+        .sidebar-brand-name span { color:#FED700 !important; }
         .sidebar-brand-sub { color:rgba(255,255,255,.45); font-size:9px; text-transform:uppercase; letter-spacing:1.4px; margin-top:3px; white-space:nowrap; }
         .sidebar-user { padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.08); }
         .sidebar.collapsed .sidebar-brand-text,.sidebar.collapsed .user-info,.sidebar.collapsed .nav-label { opacity:0; width:0; overflow:hidden; }
-        .user-avatar { width:38px; height:38px; border-radius:50%; background:rgba(239,68,68,.25); border:1.5px solid rgba(239,68,68,.4); color:#fca5a5; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+        .user-avatar { width:38px; height:38px; border-radius:50%; background:rgba(254, 215, 0, 0.16) !important; border:1.5px solid rgba(254, 215, 0, 0.45) !important; color:#FED700 !important; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
         .user-avatar img { width:100%; height:100%; object-fit:cover; }
         .user-name { color:#fff; font-size:13px; font-weight:600; display:block; white-space:nowrap; }
         .user-role { color:rgba(255,255,255,.4); font-size:10px; text-transform:uppercase; letter-spacing:1px; white-space:nowrap; }
@@ -68,7 +69,8 @@
         .mini-stat { border:1px solid #eee; border-radius:8px; padding:10px; background:#fafafa; }
         .mini-stat strong { display:block; font-size:18px; line-height:1; }
         .mini-stat span { display:block; color:#777; font-size:10.5px; margin-top:3px; text-transform:uppercase; }
-        .btn-report { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border-radius:8px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; text-decoration:none; font-size:13px; font-weight:700; }
+        .btn-report { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border-radius:8px; background:linear-gradient(135deg,#2563eb,#1d4ed8) !important; color:#fff !important; text-decoration:none; font-size:13px; font-weight:700; box-shadow:0 4px 14px rgba(37,99,235,0.25); transition:all .25s ease; }
+        .btn-report:hover { background:linear-gradient(135deg,#1d4ed8,#1e40af) !important; box-shadow:0 6px 20px rgba(37,99,235,0.35); transform:translateY(-2px); color:#fff !important; }
         .empty-state { text-align:center; padding:36px; color:#888; background:#fff; border-radius:8px; border:1px dashed #ddd; }
         .pagination-wrap { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:18px; }
         .pagination-meta { color:#777; font-size:12px; font-weight:600; }

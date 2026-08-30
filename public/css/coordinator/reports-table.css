@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Reports Table Styles
    Extracted from ojtCoordinator/reportsT.blade.php
    ========================================================================== */
@@ -79,18 +79,7 @@
             pointer-events: none; opacity: 0; transition: opacity 0.2s;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999;
         }
-        .sidebar.collapsed .nav-item:hover .tooltip-label { opacity: 1; }
-        .nav-sub { padding: 4px 0 4px 52px; border-left: 3px solid transparent; }
-        .nav-sub-item {
-            display: block; padding: 7px 16px;
-            color: rgba(255,255,255,0.45); text-decoration: none;
-            font-size: 12.5px; font-weight: 500;
-            border-left: 2px solid transparent;
-            transition: all 0.2s; border-radius: 0 6px 6px 0; white-space: nowrap;
-        }
-        .nav-sub-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .nav-sub-item.active { color: #fca5a5; border-left-color: #fca5a5; background: rgba(239,68,68,0.08); }
-        .sidebar.collapsed .nav-sub { display: none; }
+        /* Submenus styled via dashboard-global.css */
         .sidebar-footer { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
 
         /* =============== MAIN =============== */

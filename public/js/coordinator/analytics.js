@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Analytics Page Scripts
    Extracted from ojtCoordinator/analytics.blade.php
    ========================================================================== */
@@ -342,7 +342,7 @@
                     <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
                         <div style="display:flex; align-items:center; gap:6px;">
                             <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);" alt="PUP">
-                            <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">Polytechnic University of the Philippines - InternConnect OJT IMS</span>
+                            <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–${now.getFullYear()} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                         </div>
                         <div style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: COORD-ANA-${now.getFullYear()}</div>
                     </div>

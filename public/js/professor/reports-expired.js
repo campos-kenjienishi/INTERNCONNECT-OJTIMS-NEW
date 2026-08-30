@@ -137,7 +137,7 @@
 
         // Add the custom Status Filter right next to "Show entries"
         $('.dataTables_length').append(
-            '<label style="margin-left: 20px; font-weight: 500;">Filter Status: ' +
+            '<label class="status-filter-wrapper">Filter Status: ' +
             '<select id="statusFilter" class="custom-status-filter">' +
             '<option value="">All MOAs</option>' +
             '<option value="Active">Active</option>' +
@@ -172,7 +172,7 @@
         const semester = document.getElementById('semester') ? document.getElementById('semester').value : '';
         const course   = document.getElementById('courseSelect') ? document.getElementById('courseSelect').value : '—';
 
-        const campusName    = window.professorMoaConfig?.campusName || 'PUP Taguig Branch';
+        const campusName    = window.professorMoaConfig?.campusName || 'PUP Taguig Campus';
         const campusCollege = window.professorMoaConfig?.campusCollege || 'College of Engineering and Technology';
 
         let rowsHTML = '';
@@ -212,12 +212,12 @@
             rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
                 <td style="padding:7px 6px; font-size:9px; font-weight:700; color:#6b7280; text-align:center; vertical-align:top; border-right:1px solid #e5e7eb;">${rowNum}</td>
-                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${companyName}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word;">${natureOfBusiness}</td>
+                <td style="padding:7px 6px; font-size:9.5px; font-weight:700; color:#111827; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word; text-align:center;">${companyName}</td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; border-right:1px solid #e5e7eb; word-break:break-word; text-align:center;">${natureOfBusiness}</td>
                 <td style="padding:7px 6px; font-size:8.5px; color:#ca8a04; font-weight:600; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${validityOfMoa}</td>
                 <td style="padding:7px 6px; font-size:8.5px; color:#374151; vertical-align:top; border-right:1px solid #e5e7eb; text-align:center; white-space:nowrap;">${dateNotarized}</td>
                 <td style="padding:7px 6px; vertical-align:top; text-align:center; border-right:1px solid #e5e7eb;">${statusBadge}</td>
-                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top;"></td>
+                <td style="padding:7px 6px; font-size:8.5px; color:#4b5563; vertical-align:top; text-align:center;"></td>
             </tr>`;
         }
 
@@ -232,7 +232,7 @@
                         <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);">
                     </div>
                     <div style="flex:1;">
-                        <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines — OJT Information Management System</div>
+                        <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines - Taguig Campus</div>
                         <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">OJT MOA MONITORING FORM</div>
                         <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">${campusName}</div>
                     </div>
@@ -295,12 +295,12 @@
                     <thead>
                         <tr style="background:#7f0000;">
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">NO.</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">COMPANY NAME</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-right:1px solid rgba(255,255,255,0.15);">NATURE OF BUSINESS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">COMPANY NAME</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">NATURE OF BUSINESS</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">VALIDITY OF MOA</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">DATE NOTARIZED</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15);">STATUS</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:left;">REMARKS</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center;">REMARKS</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -313,8 +313,8 @@
             <div style="padding:22px 22px 10px 22px; font-size:11px;">
                 <div style="width:40%;">
                     <div style="color:#4b5563; font-weight:600; text-transform:uppercase; font-size:9.5px; letter-spacing:0.5px;">Submitted by:</div>
-                    <div style="font-weight:800; color:#111827; margin-top:8px; font-size:11.5px;">${window.professorMoaConfig?.coordinatorName || 'OJT Coordinator'}</div>
-                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">OJT Coordinator</div>
+                    <div style="font-weight:800; color:#111827; margin-top:8px; font-size:11.5px;">${window.professorMoaConfig?.coordinatorName || 'OJT Subject Professor'}</div>
+                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">OJT Subject Professor</div>
                 </div>
             </div>
 
@@ -334,9 +334,9 @@
             <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
                 <div style="display:flex; align-items:center; gap:6px;">
                     <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);">
-                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–2026 <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                    <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–${now.getFullYear()} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — Taguig Campus</span>
                 </div>
-                <span style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: MOA-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
+                <span style="font-size:8px; color:rgba(255,255,255,0.5);">InternConnect - OJTIMS &nbsp;|&nbsp; Ref: MOA-RPT-${now.getFullYear()} &nbsp;|&nbsp; Page ${pageNum} of ${pageCount}</span>
             </div>
 
         </div>`;

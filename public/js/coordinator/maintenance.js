@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Maintenance Page Scripts
    Extracted from ojtCoordinator/maintenance.blade.php
    ========================================================================== */
@@ -62,7 +62,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, remove it!',
+                confirmButtonText: 'Yes, Remove',
                 cancelButtonText: 'Cancel',
             }).then((result) => {
                 if (result.isConfirmed) {

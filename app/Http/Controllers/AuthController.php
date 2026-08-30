@@ -1390,9 +1390,9 @@ class AuthController extends Controller
             Session::forget('termsAccepted');
             Session::forget('show_password_setup');
             Cache::forget('active_session_id:' . $id);
-            return redirect('/');
+            return redirect()->route('login.gateway');
         }
-        return redirect('/');
+        return redirect()->route('login.gateway');
     }
 
     public function professorTab()

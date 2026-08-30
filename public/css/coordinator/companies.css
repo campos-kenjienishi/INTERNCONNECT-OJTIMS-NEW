@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Companies Page Styles
    Extracted from ojtCoordinator/companies.blade.php
    ========================================================================== */
@@ -422,9 +422,10 @@
         }
 
         .btn-view {
-            border-color: #e0e7ff; color: #4f46e5; background: #fff;
+            border: none; color: #fff; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
         }
-        .btn-view:hover { background: #eef2ff; color: #4f46e5; }
+        .btn-view:hover { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
 
         .btn-edit {
             border-color: #dbeafe; color: #2563eb; background: #fff;
@@ -432,12 +433,12 @@
         .btn-edit:hover { background: #eff6ff; color: #2563eb; }
 
         .btn-download {
-            border-color: #bfdbfe;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #fff;
-            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
+            box-shadow: 0 2px 6px rgba(16,185,129,0.2);
         }
-        .btn-download:hover { box-shadow: 0 4px 10px rgba(37,99,235,0.3); color: #fff; }
+        .btn-download:hover { box-shadow: 0 4px 10px rgba(16,185,129,0.3); background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #fff; }
 
         .btn-send {
             border-color: #d1fae5; color: #059669; background: #fff;
@@ -445,9 +446,10 @@
         .btn-send:hover { background: #ecfdf5; color: #059669; }
 
         .btn-print {
-            border-color: #fef3c7; color: #d97706; background: #fff;
+            border: none; color: #fff; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
         }
-        .btn-print:hover { background: #fffbeb; color: #d97706; }
+        .btn-print:hover { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
 
         .btn-remove {
             border-color: #fecaca; color: #dc2626; background: #fff;

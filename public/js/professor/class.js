@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Professor Classroom & Students Scripts
    Extracted from professor/class.blade.php
    ========================================================================== */
@@ -165,12 +165,12 @@
             document.body.appendChild(datalist);
         }
 
-        function buildTimeInput(name, selectedValue) {
+        function buildTimeInput(name, selectedValue, placeholder) {
             return '<input class="modal-field-select schedule-time-input" ' +
                 'type="text" ' +
                 'name="' + name + '" ' +
                 'value="' + (selectedValue || '') + '" ' +
-                'placeholder="HH:MM" ' +
+                'placeholder="' + (placeholder || 'HH:MM') + '" ' +
                 'inputmode="numeric" ' +
                 'list="scheduleTimeSuggestions" ' +
                 'pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" ' +
@@ -208,8 +208,8 @@
                     const existing = scheduleMap[day] && scheduleMap[day][i - 1] ? scheduleMap[day][i - 1] : { start_time: '', end_time: '' };
 
                     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">';
-                    html += buildTimeInput(startName, existing.start_time || '');
-                    html += buildTimeInput(endName, existing.end_time || '');
+                    html += buildTimeInput(startName, existing.start_time || '', 'Start Time (HH:MM)');
+                    html += buildTimeInput(endName, existing.end_time || '', 'End Time (HH:MM)');
                     html += '</div>';
                 }
 
@@ -248,6 +248,15 @@
             if (roomId) {
                 renderEditRoomScheduleInputs(roomId);
             }
+        });
+
+        $(document).on('change', '.school-year-select', function () {
+            const selectedOpt = $(this).find('option:selected');
+            const startYear = selectedOpt.data('start') || '';
+            const endYear = selectedOpt.data('end') || '';
+            const form = $(this).closest('form');
+            form.find('input[name="school_year_start"]').val(startYear);
+            form.find('input[name="school_year_end"]').val(endYear);
         });
 
         $(document).on('input change', '.schedule-time-input', function () {

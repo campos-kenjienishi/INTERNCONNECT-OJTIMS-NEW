@@ -316,150 +316,161 @@
     }
 
     function buildAnalyticsPrintHTML() {
-        const classRows = analyticsPrintData.classAnalytics.map(room => `
-                <tr>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${escapeHtml(room.label)}</td>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${room.total_students ?? 0}</td>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${room.submitted ?? 0}</td>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${room.completion ?? 0}%</td>
-                </tr>
-            `).join('');
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const cfg = window.professorAnalyticsConfig || {};
 
-        const requestRows = analyticsPrintData.requestAnalytics.map(metric => `
-                <tr>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${escapeHtml(metric.label)}</td>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${metric.count ?? 0}</td>
-                </tr>
-            `).join('');
+        const classRows = (cfg.classAnalytics || []).map((room, index) => `
+            <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#111827;">${escapeHtml(room.label)}</td>
+                <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#374151;">${room.total_students ?? 0}</td>
+                <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#374151;">${room.submitted ?? 0}</td>
+                <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#991b1b; font-weight:700;">${room.completion ?? 0}%</td>
+            </tr>
+        `).join('');
 
-        const fileRows = analyticsPrintData.fileMetrics.map(metric => `
-                <tr>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${escapeHtml(metric.label)}</td>
-                    <td style="padding:7px 8px; border:1px solid #e5e7eb;">${metric.count ?? 0}</td>
-                </tr>
-            `).join('');
+        const studentRows = `
+            <tr style="background:#ffffff;"><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">Approved students</td><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${cfg.approvedStudents || 0}</td></tr>
+            <tr style="background:#f9fafb;"><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">Pending students</td><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${cfg.pendingApprovals || 0}</td></tr>
+            <tr style="background:#ffffff;"><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">Denied students</td><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${cfg.deniedStudents || 0}</td></tr>
+            <tr style="background:#f9fafb;"><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#111827;">Inactive students</td><td style="padding:8px 10px;border:1px solid #e5e7eb;font-size:10px;color:#374151;">${cfg.inactiveStudents || 0}</td></tr>
+        `;
+
+        const fileRows = (cfg.fileMetrics || []).map((metric, index) => `
+            <tr style="background:${index % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#111827;">${escapeHtml(metric.label)}</td>
+                <td style="padding:8px 10px; border:1px solid #e5e7eb; font-size:10px; color:#374151;">${metric.count ?? 0}</td>
+            </tr>
+        `).join('');
 
         return `
-                <div class="analytics-print" style="font-family:Poppins,Arial,sans-serif;color:#111827;">
-                    <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;">
-                        <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%);color:#fff;padding:18px 22px;">
-                            <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.7);font-weight:700;">Polytechnic University of the Philippines - OJT Information Management System</div>
-                            <div style="font-size:22px;font-weight:800;line-height:1.15;margin-top:4px;">${escapeHtml(analyticsPrintData.title)}</div>
-                            <div style="font-size:11px;color:rgba(255,255,255,.82);margin-top:4px;">${escapeHtml(analyticsPrintData.subtitle)}</div>
+            <div style="font-family:'Poppins',Arial,sans-serif; background:#fff; color:#111827;">
+                <div style="background:linear-gradient(135deg,#7f0000 0%,#991b1b 55%,#dc2626 100%); padding:0;">
+                    <div style="background:rgba(255,255,255,0.12); height:4px;"></div>
+                    <div style="padding:16px 22px; display:flex; align-items:center; gap:14px;">
+                        <div style="width:50px; height:50px; background:rgba(255,255,255,0.18); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.25);">
+                            <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);" alt="PUP">
                         </div>
-                        <div style="padding:14px 22px;border-bottom:1px solid #e5e7eb;background:#f9fafb;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;">
-                            <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:#374151;line-height:1.6;">
-                                <div><span style="color:#6b7280;">Scope:</span> <strong>${escapeHtml(analyticsPrintData.subtitle)}</strong></div>
-                                <div><span style="color:#6b7280;">Students:</span> <strong>${analyticsPrintData.totalStudents}</strong></div>
-                                <div><span style="color:#6b7280;">Submitted:</span> <strong>${analyticsPrintData.submittedRequests}</strong></div>
-                                <div><span style="color:#6b7280;">Generated:</span> <strong>${escapeHtml(analyticsPrintData.generatedAt)}</strong></div>
-                            </div>
-                            <div style="font-size:10px;color:#9ca3af;">Analytics snapshot</div>
+                        <div style="flex:1;">
+                            <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines - Taguig Campus</div>
+                            <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Professor Analytics Report</div>
+                            <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">PUP Taguig Campus</div>
                         </div>
-                        <div style="padding:18px 22px 22px;">
-                            <div style="border:1px solid #e5e7eb;border-left:4px solid #dc2626;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
-                                <div style="font-size:12px;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Report Summary</div>
-                                <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;">
-                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.totalStudents}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">Total Advisees</div></div>
-                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.classCount}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">Active Classes</div></div>
-                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.submittedRequests}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">Submitted Evaluations</div></div>
-                                    <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:#111827;">${analyticsPrintData.templateCount}</div><div style="font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">File Categories</div></div>
-                                </div>
-                            </div>
-                            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;">
-                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
-                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Student Standing</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10px;">
-                                        <thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Status</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Count</th></tr></thead>
-                                        <tbody>
-                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Approved students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">${cfg.approvedStudents || 0}</td></tr>
-                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Pending students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">${cfg.pendingApprovals || 0}</td></tr>
-                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Denied students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">${cfg.deniedStudents || 0}</td></tr>
-                                            <tr><td style="padding:7px 8px;border:1px solid #e5e7eb;">Inactive students</td><td style="padding:7px 8px;border:1px solid #e5e7eb;">${cfg.inactiveStudents || 0}</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
-                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Class Overview</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10px;">
-                                        <thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Class</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Students</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Submitted</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Completion</th></tr></thead>
-                                        <tbody>${classRows || '<tr><td colspan="4" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No classes found.</td></tr>'}</tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">
-                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
-                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Requirement Review</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10px;">
-                                        <thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Status</th><th style="text-align:left;padding:7px 8px;border:1px solid #e5e7eb;">Count</th></tr></thead>
-                                        <tbody>${fileRows}</tbody>
-                                    </table>
-                                </div>
-                                <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;page-break-inside:avoid;">
-                                    <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:10px;border-left:3px solid #dc2626;padding-left:8px;">Analytics Insight</div>
-                                    <div style="font-size:11px;line-height:1.7;color:#374151;margin-bottom:10px;">${escapeHtml(analyticsPrintData.summary)}</div>
-                                    <div style="font-size:10px;color:#6b7280;line-height:1.6;">This printed report focuses on the current adviser snapshot, student standing, class overview, and file requirements.</div>
-                                </div>
-                            </div>
-                            <div style="margin-top:16px;border-top:1px dashed #d1d5db;padding-top:14px;">
-                                <div style="background:#f8fafc;border:1px solid #e5e7eb;border-left:4px solid #dc2626;border-radius:8px;padding:12px 14px;">
-                                    <div style="font-size:9px;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;">Disclaimer</div>
-                                    <div style="font-size:8.5px;color:#4b5563;line-height:1.6;">This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.</div>
-                                </div>
-                                <div style="margin-top:10px;background:#7f0000;padding:8px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-                                    <div style="display:flex;align-items:center;gap:6px;">
-                                        <img src="/images/final-puptg_logo-ojtims_nbg.png" alt="PUP" style="width:13px;height:13px;object-fit:contain;opacity:.7;">
-                                        <span style="font-size:8px;color:rgba(255,255,255,.75);font-weight:500;">Polytechnic University of the Philippines - InternConnect OJT IMS</span>
-                                    </div>
-                                    <div style="font-size:8px;color:rgba(255,255,255,.5);">Ref: ANA-RPT-${new Date().getFullYear()}</div>
-                                </div>
-                            </div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
+                </div>
+
+                <div style="background:#f8f9fa; border-bottom:1.5px solid #e5e7eb; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                            <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                            <span style="color:#6b7280;">Professor:</span>
+                            <strong style="color:#111827;">${escapeHtml(cfg.subtitle || '')}</strong>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                            <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                            <span style="color:#6b7280;">Students:</span>
+                            <strong style="color:#111827;">${escapeHtml(cfg.totalStudents ?? 0)}</strong>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                            <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                            <span style="color:#6b7280;">Submitted:</span>
+                            <strong style="color:#111827;">${escapeHtml(cfg.submittedRequests ?? 0)}</strong>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
+                            <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block;"></span>
+                            <span style="color:#6b7280;">Generated:</span>
+                            <strong style="color:#111827;">${dateStr} ${timeStr}</strong>
+                        </div>
+                    </div>
+                    <div style="font-size:8.5px; color:#9ca3af;">Analytics snapshot</div>
+                </div>
+
+                <div style="padding:14px 22px 0 22px;">
+                    <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px;">
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Total Advisees</div>
+                            <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(cfg.totalStudents ?? 0)}</div>
+                        </div>
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Active Classes</div>
+                            <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(cfg.classCount ?? 0)}</div>
+                        </div>
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">Submitted Evaluations</div>
+                            <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(cfg.submittedRequests ?? 0)}</div>
+                        </div>
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+                            <div style="font-size:9px; color:#6b7280; text-transform:uppercase; letter-spacing:.4px;">File Categories</div>
+                            <div style="font-size:18px; font-weight:800; color:#111827; margin-top:5px;">${escapeHtml(cfg.templateCount ?? 0)}</div>
                         </div>
                     </div>
                 </div>
-            `;
+
+                <div style="padding:14px 22px 0 22px;">
+                    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;">
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                            <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Student Standing</div>
+                            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th></tr></thead>
+                                <tbody>${studentRows}</tbody>
+                            </table>
+                        </div>
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                            <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Class Overview</div>
+                            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Class</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Submitted</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Completion</th></tr></thead>
+                                <tbody>${classRows || '<tr><td colspan="4" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No classes found.</td></tr>'}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding:14px 22px 0 22px;">
+                    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;">
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                            <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Requirement Review</div>
+                            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Status</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Count</th></tr></thead>
+                                <tbody>${fileRows || '<tr><td colspan="2" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No file data found.</td></tr>'}</tbody>
+                            </table>
+                        </div>
+                        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
+                            <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Analytics Insight</div>
+                            <div style="font-size:11px; color:#374151; line-height:1.7;">${escapeHtml(cfg.summary || 'This printed report focuses on the current adviser snapshot, student standing, class overview, and file requirements.')}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding:18px 22px 12px 22px;">
+                    <div style="border-top:1px dashed #d1d5db; padding-top:16px;">
+                        <div style="background:#f8fafc; border:1px solid #e5e7eb; border-left:4px solid #dc2626; border-radius:8px; padding:12px 14px;">
+                            <div style="font-size:9px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px;">Disclaimer</div>
+                            <div style="font-size:8.5px; color:#4b5563; line-height:1.6;">This report was generated by the InternConnect OJT Information Management System and does not require a physical or handwritten signature.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);" alt="PUP">
+                        <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–${now.getFullYear()} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                    </div>
+                    <div style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: PROF-ANA-${now.getFullYear()}</div>
+                </div>
+            </div>
+        `;
     }
 
-    const analyticsPrintUrl = (window.professorAnalyticsConfig?.printUrl || '/professor/analytics/print');
-
     document.getElementById('printBtn')?.addEventListener('click', function () {
-        const frame = document.createElement('iframe');
-        frame.style.position = 'fixed';
-        frame.style.right = '0';
-        frame.style.bottom = '0';
-        frame.style.width = '0';
-        frame.style.height = '0';
-        frame.style.border = '0';
-        frame.style.opacity = '0';
-        frame.setAttribute('aria-hidden', 'true');
-        frame.src = analyticsPrintUrl;
-
-        let cleanedUp = false;
-        const cleanup = function () {
-            if (cleanedUp) {
-                return;
-            }
-            cleanedUp = true;
-            window.removeEventListener('afterprint', cleanup);
-            if (frame.parentNode) {
-                frame.parentNode.removeChild(frame);
-            }
-        };
-
-        frame.onload = function () {
-            setTimeout(function () {
-                if (frame.contentWindow) {
-                    frame.contentWindow.focus();
-                    frame.contentWindow.print();
-                    window.addEventListener('afterprint', cleanup, { once: true });
-                    setTimeout(cleanup, 1500);
-                } else {
-                    cleanup();
-                }
-            }, 150);
-        };
-
-        document.body.appendChild(frame);
+        const wrapper = document.getElementById('print-area-wrapper');
+        if (!wrapper) return;
+        wrapper.innerHTML = buildAnalyticsPrintHTML();
+        window.print();
+        setTimeout(function () {
+            wrapper.innerHTML = '';
+        }, 1000);
     });
 
     document.addEventListener('keydown', (e) => {

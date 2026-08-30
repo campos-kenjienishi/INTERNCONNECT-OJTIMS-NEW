@@ -587,7 +587,7 @@
                 align-items: center;
                 gap: 6px;
                 padding: 8px 16px;
-                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                 border: none;
                 border-radius: 8px;
                 color: #ffffff !important;
@@ -597,12 +597,13 @@
                 cursor: pointer;
                 text-decoration: none;
                 transition: all 0.25s;
-                box-shadow: 0 3px 10px rgba(37,99,235,0.2);
+                box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);
             }
 
             .btn-download:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 18px rgba(37,99,235,0.3);
+                box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+                background: linear-gradient(135deg, #059669 0%, #047857 100%);
                 color: #ffffff !important;
                 text-decoration: none;
             }
@@ -614,7 +615,7 @@
                 align-items: center;
                 gap: 6px;
                 padding: 8px 16px;
-                background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
                 border: none;
                 border-radius: 8px;
                 color: #ffffff !important;
@@ -624,12 +625,13 @@
                 cursor: pointer;
                 text-decoration: none;
                 transition: all 0.25s;
-                box-shadow: 0 3px 10px rgba(5,150,105,0.2);
+                box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
             }
 
             .btn-view:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 18px rgba(5,150,105,0.3);
+                box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                 color: #ffffff !important;
                 text-decoration: none;
             }

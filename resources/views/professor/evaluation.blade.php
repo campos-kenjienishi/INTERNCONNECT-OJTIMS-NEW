@@ -38,7 +38,7 @@
             </div>
             <div class="card-body-shell">
                 <div class="panel-note">
-                    Template changes will create a new version so older submissions remain tied to the template they used.
+                    <strong>NOTE:</strong> Template changes will create a new version, so older submissions will remain tied to the template version they used.
                 </div>
 
                 <form method="POST" action="{{ route('professor.evaluation.template.update', $template->id) }}">
@@ -59,7 +59,7 @@
 
                     <div class="section-gap" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
                         <div>
-                            <div class="rating-section" style="margin-bottom:6px;">Question Blocks</div>
+                            <div class="rating-section" style="margin-bottom:6px; font-weight:700; font-size:15px; color:var(--text-primary);"><strong>Question Blocks</strong></div>
                             <div class="form-hint" style="margin:0;">Add or remove rating questions. Existing submitted evaluations keep their original template version.</div>
                         </div>
                         <button type="button" class="btn-eval btn-eval-primary" id="addQuestionBlockBtn">
@@ -67,7 +67,7 @@
                         </button>
                     </div>
 
-                    <div id="questionBlockNotice" class="panel-note" style="display:none; margin-bottom:14px; border-left-color:var(--danger); background:rgba(185, 28, 28, 0.08); color:var(--text-primary);">
+                    <div id="questionBlockNotice" class="panel-note" style="display:none; margin-bottom:14px;">
                         Question block added.
                     </div>
 
@@ -129,9 +129,9 @@
 
                     @if($fixedItems->isNotEmpty())
                         <div class="section-gap" style="margin-top:28px;">
-                            <div class="rating-section" style="margin-bottom:10px;">Fixed Text Items</div>
+                            <div class="rating-section" style="margin-bottom:10px; font-weight:700; font-size:15px; color:var(--text-primary);"><strong>Fixed Text Items</strong></div>
                             <div class="panel-note" style="margin-bottom:12px;">
-                                These text items are kept with the template and are not part of the add/remove question blocks yet.
+                                <strong>NOTE:</strong> These text items are kept with the template and are not part of the add/remove question blocks yet.
                             </div>
                             @foreach($fixedItems as $item)
                                 <div class="summary-card" style="margin-bottom:10px;">

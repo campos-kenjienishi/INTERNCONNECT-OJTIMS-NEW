@@ -659,9 +659,17 @@ body.dark-mode .topbar {
 
 html.dark-mode .topbar-badge,
 body.dark-mode .topbar-badge {
-    background: rgba(220, 38, 38, 0.15);
-    border-color: rgba(220, 38, 38, 0.3);
-    color: #ff6b6b;
+    background: linear-gradient(180deg, #3d0a0f 0%, #200407 100%) !important;
+    border: 1.5px solid #FED700 !important;
+    color: #FED700 !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark-mode .topbar-badge i,
+body.dark-mode .topbar-badge i {
+    background: rgba(0, 0, 0, 0.45) !important;
+    color: #FED700 !important;
+    border: 1px solid rgba(254, 215, 0, 0.4) !important;
 }
 
 html.dark-mode .sidebar-overlay.active,

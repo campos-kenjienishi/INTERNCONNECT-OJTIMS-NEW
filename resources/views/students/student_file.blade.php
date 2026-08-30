@@ -194,7 +194,7 @@
                     <table id="fileTable" class="display" style="width:100%">
                         <thead>
                             <tr>
-                                <th>File Name</th>
+                                <th>Template Name</th>
                                 <th>File</th>
                                 <th>Date Uploaded</th>
                                 <th>Uploaded By</th>
@@ -222,7 +222,7 @@
                                             <i class="fa {{ $icon }}"></i>
                                         </div>
                                         <div style="min-width:0;">
-                                            <div class="file-name-text">{{ $file->title ?? $file->file }}</div>
+                                            <div class="file-name-text">{{ $file->name ?? $file->file }}</div>
                                             <span class="file-ext">{{ strtoupper($ext) }}</span>
                                         </div>
                                     </div>
@@ -234,15 +234,15 @@
                                     <span style="font-size:12.5px; color:#555;">{{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}</span>
                                 </td>
                                 <td>
-                                    <span style="font-size:12.5px; color:#555;">{{ $file->uploadedBy ?? '-' }}</span>
+                                    <span style="font-size:12.5px; color:#555;">{{ $file->uploader_name ?? $file->uploadedBy ?? '-' }}</span>
                                 </td>
                                 <td>
                                     <div class="file-actions" style="display:flex; gap:8px; align-items:center;">
                                         @if(in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'txt', 'html', 'htm']))
                                         <button type="button"
                                                 class="btn-preview-file"
-                                                data-file-url="{{ asset('uploads/' . $file->file) }}"
-                                                data-file-name="{{ $file->title ?? $file->file }}"
+                                                data-file-url="{{ asset('assets/' . $file->file) }}"
+                                                data-file-name="{{ $file->name ?? $file->file }}"
                                                 data-download-url="{{ url('/download', $file->file) }}"
                                                 style="display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px; background:#fff; border:1.5px solid #d1d5db; color:#374151; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
                                             <i class="fa fa-eye"></i> View

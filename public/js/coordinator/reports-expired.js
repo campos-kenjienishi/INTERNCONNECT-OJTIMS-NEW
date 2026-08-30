@@ -157,7 +157,7 @@ $(document).ready(function () {
     });
 
     $('.dataTables_length').append(
-        '<label style="margin-left: 20px; font-weight: 500;">Filter Status: ' +
+        '<label class="status-filter-wrapper">Filter Status: ' +
         '<select id="statusFilter" class="custom-status-filter">' +
         '<option value="">All MOA</option>' +
         '<option value="Active">Active MOA</option>' +

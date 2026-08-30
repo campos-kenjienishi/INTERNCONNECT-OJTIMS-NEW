@@ -208,16 +208,16 @@
         .btn-add-category {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 11px 22px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
             border: none; border-radius: 10px; color: #fff;
             font-family: 'Poppins', sans-serif; font-size: 14px;
             font-weight: 600; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.25);
+            box-shadow: 0 4px 16px rgba(22,163,74,0.25);
         }
 
         .btn-add-category:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(220,38,38,0.35);
+            box-shadow: 0 8px 24px rgba(22,163,74,0.35);
             color: #fff;
         }
 
@@ -296,8 +296,8 @@
             white-space: nowrap;
         }
 
-        .status-approved { background: #dcfce7; color: #16a34a; }
-        .status-pending { background: #fef9c3; color: #ca8a04; }
+        .status-approved { background: #fef9c3; color: #ca8a04; }
+        .status-pending { background: #dcfce7; color: #16a34a; }
 
         /* DataTables */
         .table-card-body { padding: 0; }

@@ -348,41 +348,26 @@
         }
 
         /* Action buttons */
-        .btn-view-info {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 12px;
-            background: #fff; border: 1.5px solid #e8e8e8;
-            border-radius: 8px; color: #555;
-            font-family: 'Poppins', sans-serif; font-size: 12px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-
-        .btn-view-info:hover { border-color: #a78bfa; color: #7c3aed; background: #f5f3ff; }
-
-        .btn-view-ojt {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 12px;
-            background: #fff; border: 1.5px solid #e8e8e8;
-            border-radius: 8px; color: #555;
-            font-family: 'Poppins', sans-serif; font-size: 12px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-
-        .btn-view-ojt:hover { border-color: #6ee7b7; color: #059669; background: #ecfdf5; }
-
+        .btn-view-info,
+        .btn-view-ojt,
         .btn-view-req {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 12px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 8px; color: #fff;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none; border-radius: 8px; color: #fff !important;
             font-family: 'Poppins', sans-serif; font-size: 12px;
-            font-weight: 600; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 3px 10px rgba(220,38,38,0.2);
+            font-weight: 600; cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 3px 10px rgba(37, 99, 235, 0.2);
+            text-decoration: none !important;
         }
 
+        .btn-view-info:hover,
+        .btn-view-ojt:hover,
         .btn-view-req:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff !important;
         }
 
         /* =============== MODALS =============== */

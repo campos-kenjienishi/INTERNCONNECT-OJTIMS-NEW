@@ -9,6 +9,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ vasset('css/professor/requirement-status.css') }}">
 </head>
 
@@ -88,8 +98,8 @@
         </a>
         <a href="{{ route('professor.requirementStatus.classes') }}" class="nav-item active">
             <span class="nav-icon"><i class="fa fa-clipboard-check"></i></span>
-            <span class="nav-label">Req. Status</span>
-            <span class="tooltip-label">Req. Status</span>
+            <span class="nav-label">Requirement Status</span>
+            <span class="tooltip-label">Requirement Status</span>
         </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
@@ -148,26 +158,35 @@
             <div>
                 <h1>Requirement <span>Status</span></h1>
                 <p>{{ $course->course }} | {{ $course->room }} | {{ $course->school_year_start && $course->school_year_end ? $course->school_year_start . ' - ' . $course->school_year_end : 'School year not set' }}</p>
+                <div class="breadcrumb">
+                    <a href="{{ url('/professor/home') }}"><i class="fa fa-home"></i> Dashboard</a>
+                    <i class="fa fa-chevron-right"></i>
+                    <a href="{{ route('professor.requirementStatus.classes') }}">Classes</a>
+                    <i class="fa fa-chevron-right"></i>
+                    <span>Requirement Status</span>
+                </div>
             </div>
             <div class="toolbar">
-                <a href="{{ route('professor.requirementStatus.classes') }}" class="btn-tool"><i class="fa fa-arrow-left"></i> Classes</a>
+                <a href="{{ route('professor.requirementStatus.classes') }}" class="btn-back">
+                    <i class="fa fa-arrow-left"></i> Classes
+                </a>
                 <button type="button" class="btn-tool primary" id="printReportBtn"><i class="fa fa-print"></i> Print</button>
             </div>
         </div>
 
         <div class="view-tabs">
-            <a href="{{ route('professor.requirementStatus', $course->id) }}" class="view-tab {{ $activeView === 'overview' ? 'active' : '' }}"><i class="fa fa-table"></i> Overview</a>
-            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'approved']) }}" class="view-tab {{ $activeView === 'approved' ? 'active' : '' }}"><i class="fa fa-check-circle"></i> Approved</a>
-            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'pending']) }}" class="view-tab {{ $activeView === 'pending' ? 'active' : '' }}"><i class="fa fa-clock"></i> Pending</a>
-            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'denied']) }}" class="view-tab {{ $activeView === 'denied' ? 'active' : '' }}"><i class="fa fa-times-circle"></i> Denied</a>
-            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'missing']) }}" class="view-tab {{ $activeView === 'missing' ? 'active' : '' }}"><i class="fa fa-exclamation-circle"></i> Missing</a>
+            <a href="{{ route('professor.requirementStatus', $course->id) }}" class="view-tab tab-overview {{ $activeView === 'overview' ? 'active' : '' }}"><i class="fa fa-table"></i> Overview</a>
+            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'approved']) }}" class="view-tab tab-approved {{ $activeView === 'approved' ? 'active' : '' }}"><i class="fa fa-check-circle"></i> Approved</a>
+            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'pending']) }}" class="view-tab tab-pending {{ $activeView === 'pending' ? 'active' : '' }}"><i class="fa fa-clock"></i> Pending</a>
+            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'denied']) }}" class="view-tab tab-denied {{ $activeView === 'denied' ? 'active' : '' }}"><i class="fa fa-times-circle"></i> Denied</a>
+            <a href="{{ route('professor.requirementStatus', ['roomId' => $course->id, 'view' => 'missing']) }}" class="view-tab tab-missing {{ $activeView === 'missing' ? 'active' : '' }}"><i class="fa fa-exclamation-circle"></i> Missing</a>
         </div>
 
         <div class="summary-grid">
-            <div class="summary-card"><div class="summary-num">{{ $totalStudents }}</div><div class="summary-label">Students</div></div>
-            <div class="summary-card"><div class="summary-num">{{ $categoryCount }}</div><div class="summary-label">Required Categories</div></div>
-            <div class="summary-card"><div class="summary-num">{{ $completeStudents }}</div><div class="summary-label">Complete Students</div></div>
-            <div class="summary-card"><div class="summary-num">{{ $averageCompletion }}%</div><div class="summary-label">Average Completion</div></div>
+            <div class="summary-card"><div class="summary-num color-blue">{{ $totalStudents }}</div><div class="summary-label">Students</div></div>
+            <div class="summary-card"><div class="summary-num color-purple">{{ $categoryCount }}</div><div class="summary-label">Required Categories</div></div>
+            <div class="summary-card"><div class="summary-num color-green">{{ $completeStudents }}</div><div class="summary-label">Complete Students</div></div>
+            <div class="summary-card"><div class="summary-num color-amber">{{ $averageCompletion }}%</div><div class="summary-label">Average Completion</div></div>
         </div>
 
         @if(!empty($requirementInsights))
@@ -189,7 +208,7 @@
                             : ($requirementAiSource === 'openai' ? 'OpenAI' : 'Internal Insight');
                     @endphp
                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <button type="button" data-ai-insight-button data-ai-context="requirementAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:var(--red); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                        <button type="button" data-ai-insight-button data-ai-context="requirementAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                             <i class="fa fa-magic"></i> Generate AI Insight
                         </button>
                         <div style="display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:7px 12px; font-size:12px; font-weight:800;">
@@ -278,7 +297,7 @@
                         </div>
                         <div style="display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px; align-items:start;">
                             <textarea id="requirementAiQuestionInput" rows="3" placeholder="Ask about missing requirements, pending reviews, denied files, completion, or next actions..." style="width:100%; min-height:82px; border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; resize:vertical;"></textarea>
-                            <button type="button" id="requirementAskAiBtn" style="height:44px; border:none; border-radius:12px; padding:0 18px; background:var(--red); color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px;"><i class="fa fa-paper-plane"></i> Ask</button>
+                            <button type="button" id="requirementAskAiBtn" style="height:44px; border:none; border-radius:12px; padding:0 18px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 3px 10px rgba(16,185,129,0.25);"><i class="fa fa-paper-plane"></i> Ask</button>
                         </div>
                         <div id="requirementAiAskStatus" style="display:none; margin-top:10px; font-size:12px; color:#777;"></div>
                         <div id="requirementAiAnswer" style="display:none; margin-top:12px; background:#fff7f7; border:1px solid #fecaca; border-radius:12px; padding:14px;">
@@ -319,6 +338,12 @@
                 </div>
             </div>
             <div class="table-wrap">
+                <div class="table-loading-overlay" id="tableLoadingOverlay">
+                    <div class="table-spinner-wrap">
+                        <div class="table-spinner"></div>
+                        <span>Loading requirement data...</span>
+                    </div>
+                </div>
                 <table>
                     <colgroup>
                         <col style="width:24%;">
@@ -393,7 +418,7 @@
                                             <div class="requirement-grid">
                                                 @forelse($status['missing'] as $item)
                                                     <div class="requirement-item missing">
-                                                        <i class="fa fa-times"></i>
+                                                        <i class="fa fa-exclamation-circle"></i>
                                                         <span>{{ $item }}</span>
                                                     </div>
                                                 @empty
@@ -439,7 +464,7 @@
                                     <td>
                                         @php
                                             $focusedType = $activeView === 'approved' ? 'passed' : $activeView;
-                                            $focusedIcon = $activeView === 'approved' ? 'check' : ($activeView === 'pending' ? 'clock' : 'times');
+                                            $focusedIcon = $activeView === 'approved' ? 'check' : ($activeView === 'pending' ? 'clock' : ($activeView === 'missing' ? 'exclamation-circle' : 'times'));
                                             $focusedButtonClass = $activeView === 'approved' ? 'submitted' : $activeView;
                                         @endphp
                                         <button type="button"
@@ -457,7 +482,9 @@
                                                     <div class="requirement-item {{ $activeView === 'missing' ? 'missing' : ($activeView === 'approved' ? 'passed' : ($activeView === 'denied' ? 'denied' : 'pending')) }}">
                                                         @if($activeView === 'approved')
                                                             <i class="fa fa-check"></i>
-                                                        @elseif($activeView === 'missing' || $activeView === 'denied')
+                                                        @elseif($activeView === 'missing')
+                                                            <i class="fa fa-exclamation-circle"></i>
+                                                        @elseif($activeView === 'denied')
                                                             <i class="fa fa-times"></i>
                                                         @else
                                                             <i class="fa fa-clock"></i>
@@ -469,7 +496,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="metric-pill {{ $activeView === 'missing' || $activeView === 'denied' ? 'warn' : 'good' }}">
+                                        <div class="metric-pill {{ $activeView }}">
                                             <strong>{{ $status[$activeView]->count() }}</strong>
                                             <span>{{ $activeView }}</span>
                                         </div>
@@ -546,7 +573,6 @@
 <div id="print-area-wrapper"></div>
 
 <script>
-<script>
     window.requirementReportData = {
         activeView: @json($activeView),
         course: @json($course->course),
@@ -587,6 +613,7 @@
     window.csrfToken = @json(csrf_token());
 </script>
 <script src="{{ vasset('js/professor/requirement-status.js') }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 @include('partials.password-setup-modal')

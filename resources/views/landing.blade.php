@@ -50,7 +50,7 @@
 
         <div class="hero-text">
             <h1 class="hero-title">Intern<span>Connect</span>:</h1>
-            <h2 class="hero-subtitle">On-the-Job (OJT) Training<br>Information Management System</h2>
+            <h2 class="hero-subtitle">On-the-Job Training (OJT)<br>Information Management System</h2>
             <p class="hero-copy">
                 A centralized and secure platform for OJT management, including MOA management, OJT requirements tracking, and company evaluations for PUP&ndash;Taguig Campus.
             </p>

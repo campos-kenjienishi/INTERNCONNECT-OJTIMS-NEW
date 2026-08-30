@@ -1,4 +1,4 @@
-﻿/* Requirement Category Scripts */
+/* Requirement Category Scripts */
 
     // Sidebar toggle
     const sidebar     = document.getElementById('sidebar');
@@ -52,7 +52,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: '<i class="fa fa-trash"></i> Yes, remove it',
+                confirmButtonText: '<i class="fa fa-trash"></i> Yes, Remove',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {

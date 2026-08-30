@@ -11,7 +11,16 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script>
+        (function(){
+            try {
+                if (localStorage.getItem('internconnect_sidebar_collapsed') === 'true' && window.innerWidth > 900) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch(e){}
+        })();
+    </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/reports-expired.css') }}?v={{ time() }}">
 </head>
@@ -78,17 +87,20 @@
             <span class="tooltip-label">MOA</span>
         </a>
 
-        <div class="nav-item" style="cursor:default; pointer-events:none;">
-            <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
-            <span class="nav-label">Reports</span>
-        </div>
-        <div class="nav-sub">
-            <a href="{{ url('/reports') }}" class="nav-sub-item">
-                <i class="fa fa-user-graduate" style="margin-right:6px; font-size:11px;"></i> Student OJT Info
+        <div class="nav-group-reports active">
+            <a href="{{ url('/reportsExpired') }}" class="nav-item nav-item-reports active" style="cursor:pointer;">
+                <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>
+                <span class="nav-label">Reports</span>
+                <span class="tooltip-label">Reports</span>
             </a>
-            <a href="{{ url('/reportsExpired') }}" class="nav-sub-item active">
-                <i class="fa fa-file-contract" style="margin-right:6px; font-size:11px;"></i> MOA
-            </a>
+            <div class="nav-sub">
+                <a href="{{ url('/reports') }}" class="nav-sub-item">
+                    <i class="fa fa-user-graduate"></i> Student OJT Info
+                </a>
+                <a href="{{ url('/reportsExpired') }}" class="nav-sub-item active">
+                    <i class="fa fa-file-contract"></i> MOA
+                </a>
+            </div>
         </div>
 
         <a href="{{ url('/analytics') }}" class="nav-item">
@@ -200,7 +212,7 @@
                         <p>Generated from the current MOA report data</p>
                     </div>
                     <div style="margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <button type="button" data-ai-insight-button data-ai-context="aiReportContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:var(--red); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                        <button type="button" data-ai-insight-button data-ai-context="aiReportContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                             <i class="fa fa-magic"></i> Generate AI Insight
                         </button>
                         <div style="display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:700;">
@@ -283,7 +295,7 @@
                         </div>
                         <div style="display:grid; gap:10px;">
                             <textarea id="aiQuestionInput" rows="3" maxlength="500" placeholder="Ask a question about this report..." style="width:100%; resize:vertical; min-height:86px; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; outline:none; line-height:1.6;"></textarea>
-                            <button type="button" id="askAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap;">
+                            <button type="button" id="askAiBtn" style="justify-self:end; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:11px 18px; font-size:13px; font-weight:800; white-space:nowrap; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
                                 <i class="fa fa-paper-plane"></i> Ask
                             </button>
                         </div>
@@ -521,6 +533,7 @@
     };
 </script>
 <script src="{{ vasset('js/coordinator/reports-expired.js') }}?v={{ time() }}"></script>
+<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

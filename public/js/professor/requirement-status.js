@@ -1,4 +1,4 @@
-﻿/* Requirement Status Tracking Scripts */
+/* Requirement Status Tracking Scripts */
 
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
@@ -171,17 +171,30 @@
     }
 
     function buildRequirementPrintHTML() {
-        const report = requirementReportData;
-        const title = report.activeView === 'overview'
+        const report = window.requirementReportData || {
+            activeView: 'overview',
+            course: '',
+            room: '',
+            schoolYear: '',
+            totalStudents: 0,
+            categoryCount: 0,
+            completeStudents: 0,
+            averageCompletion: 0,
+            generatedAt: '',
+            rows: []
+        };
+        const activeView = report.activeView || 'overview';
+        const title = activeView === 'overview'
             ? 'Student Requirement Status Report'
-            : `${report.activeView.charAt(0).toUpperCase() + report.activeView.slice(1)} Requirement Report`;
-        const sectionLabel = report.activeView === 'overview'
+            : `${activeView.charAt(0).toUpperCase() + activeView.slice(1)} Requirement Report`;
+        const sectionLabel = activeView === 'overview'
             ? 'Student Requirement Matrix'
-            : `${report.activeView.charAt(0).toUpperCase() + report.activeView.slice(1)} Requirements`;
+            : `${activeView.charAt(0).toUpperCase() + activeView.slice(1)} Requirements`;
 
         let rowsHTML = '';
+        const rows = Array.isArray(report.rows) ? report.rows : [];
 
-        report.rows.forEach(function (row, index) {
+        rows.forEach(function (row, index) {
             const rowBg = index % 2 === 0 ? '#ffffff' : '#f9fafb';
 
             if (report.activeView === 'overview') {
@@ -303,7 +316,7 @@
                     <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between;">
                         <div style="display:flex; align-items:center; gap:6px;">
                             <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:.7; filter:brightness(2);">
-                            <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">Polytechnic University of the Philippines - InternConnect OJT IMS</span>
+                            <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">© 1998–${new Date().getFullYear()} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
                         </div>
                         <span style="font-size:8px; color:rgba(255,255,255,.5);">Ref: REQ-STATUS-${new Date().getFullYear()}</span>
                     </div>
@@ -311,13 +324,22 @@
             </div>`;
     }
 
-    document.getElementById('printReportBtn').addEventListener('click', function () {
-        document.getElementById('print-area-wrapper').innerHTML = buildRequirementPrintHTML();
-        window.print();
-        setTimeout(function () {
-            document.getElementById('print-area-wrapper').innerHTML = '';
-        }, 1000);
-    });
+    const printReportBtnEl = document.getElementById('printReportBtn');
+    if (printReportBtnEl) {
+        printReportBtnEl.addEventListener('click', function () {
+            let printWrapper = document.getElementById('print-area-wrapper');
+            if (!printWrapper) {
+                printWrapper = document.createElement('div');
+                printWrapper.id = 'print-area-wrapper';
+                document.body.appendChild(printWrapper);
+            }
+            printWrapper.innerHTML = buildRequirementPrintHTML();
+            window.print();
+            setTimeout(function () {
+                printWrapper.innerHTML = '';
+            }, 1000);
+        });
+    }
 
     const requirementModal = document.getElementById('requirementListModal');
     const requirementModalTitle = document.getElementById('requirementListTitle');
@@ -333,7 +355,7 @@
             return 'fa-clock';
         }
         if (type === 'missing') {
-            return 'fa-times';
+            return 'fa-exclamation-circle';
         }
         if (type === 'denied') {
             return 'fa-times';
@@ -408,3 +430,49 @@
             closeRequirementModal();
         }
     });
+
+    // Table Loading Controller
+    const tableLoadingOverlay = document.getElementById('tableLoadingOverlay');
+    function showTableLoading(message) {
+        if (tableLoadingOverlay) {
+            if (message) {
+                const label = tableLoadingOverlay.querySelector('span');
+                if (label) label.textContent = message;
+            }
+            tableLoadingOverlay.classList.add('active');
+        }
+    }
+
+    function hideTableLoading() {
+        if (tableLoadingOverlay) {
+            tableLoadingOverlay.classList.remove('active');
+        }
+    }
+
+    document.querySelectorAll('.view-tabs .view-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            if (!this.classList.contains('active')) {
+                showTableLoading('Switching view...');
+            }
+        });
+    });
+
+    const perPageSelectEl = document.getElementById('perPageSelect');
+    if (perPageSelectEl) {
+        perPageSelectEl.addEventListener('change', function () {
+            showTableLoading('Updating page size...');
+        });
+    }
+
+    document.querySelectorAll('.matrix-pagination a.page-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            if (!this.classList.contains('disabled') && !this.classList.contains('active')) {
+                showTableLoading('Loading students...');
+            }
+        });
+    });
+
+    window.addEventListener('pageshow', function () {
+        hideTableLoading();
+    });
+
