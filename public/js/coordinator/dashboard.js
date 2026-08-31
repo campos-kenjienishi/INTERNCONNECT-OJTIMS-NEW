@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Dashboard Scripts
    Extracted from ojtCoordinator/dashboard.blade.php
    ========================================================================== */
@@ -422,8 +422,10 @@
             btn.addEventListener('click', function () {
                 const input = document.getElementById('dashboardAiQuestionInput');
                 const question = btn.getAttribute('data-question') || '';
-                if (input) input.value = question;
-                askDashboardAi(question);
+                if (input) {
+                    input.value = question;
+                    input.focus();
+                }
             });
         });
 

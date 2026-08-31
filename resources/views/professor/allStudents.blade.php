@@ -183,7 +183,7 @@
                     <div class="header-icon"><i class="fa fa-users"></i></div>
                     <div>
                         <h2>Student List</h2>
-                        <p>All enrolled OJT students and their subject codes</p>
+                        <p>All enrolled OJT students and their school years</p>
                     </div>
                 </div>
                 <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
@@ -209,11 +209,24 @@
                             <th>Student Name</th>
                             <th>Course</th>
                             <th>Year & Section</th>
-                            <th>Subject Code</th>
+                            <th>School Year</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($studentData as $data)
+                        @php
+                            $syDisplay = $data['school_year'] ?? '—';
+                            if ($syDisplay === '—' && isset($data['student'])) {
+                                $stInfo = $data['student']->studentInfo;
+                                $sStart = $stInfo->school_year_start ?? $data['student']->school_year_start ?? '';
+                                $sEnd = $stInfo->school_year_end ?? $data['student']->school_year_end ?? '';
+                                if (!empty($sStart) && !empty($sEnd)) {
+                                    $syDisplay = $sStart . ' - ' . $sEnd;
+                                } elseif (!empty($sStart)) {
+                                    $syDisplay = $sStart;
+                                }
+                            }
+                        @endphp
                         <tr>
                             <td>
                                 <div class="student-cell">
@@ -238,15 +251,13 @@
                                 </span>
                             </td>
                             <td>
-                                @if(isset($data['subjects']))
-                                    @foreach($data['subjects'] as $subject)
-                                        <span class="subject-badge">
-                                            <i class="fa fa-book" style="font-size:10px;"></i>
-                                            {{ $subject['subject_code'] }}
-                                        </span>
-                                    @endforeach
+                                @if(!empty($syDisplay) && $syDisplay !== '—')
+                                    <span class="school-year-badge">
+                                        <i class="fa fa-calendar-alt" style="font-size:10px;"></i>
+                                        {{ $syDisplay }}
+                                    </span>
                                 @else
-                                    <span style="color:#bbb; font-size:13px;">No subjects</span>
+                                    <span style="color:#bbb; font-size:13px;">—</span>
                                 @endif
                             </td>
                         </tr>

@@ -110,7 +110,7 @@ class FileController extends Controller
         $data->save();
 
         AuditLogger::log(
-            'upload',
+            'Upload Templates',
             'File Upload',
             'Uploaded a new file: ' . $data->name,
             $user->id ?? null,
@@ -173,7 +173,7 @@ class FileController extends Controller
     
         $data->delete();
         AuditLogger::log(
-            'upload',
+            'Upload Templates',
             'File Delete',
             'Deleted file: ' . $data->name,
             $user->id ?? null,
@@ -223,7 +223,7 @@ class FileController extends Controller
         $file->delete();
 
         AuditLogger::log(
-            'upload',
+            'Upload Templates',
             'File Delete',
             'Professor removed room template: ' . $oldValues['name'],
             $user->id,

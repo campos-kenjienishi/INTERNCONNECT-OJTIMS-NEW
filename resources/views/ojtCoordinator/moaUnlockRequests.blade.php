@@ -200,7 +200,7 @@
                             <tr>
                                 <td>
                                     <div style="font-weight:700; color:#1a1a1a;" class="company-name-text">{{ $req->student->full_name ?? 'N/A' }}</div>
-                                    <div style="font-size:12px; color:#888;">{{ $req->student->studentNum ?? '' }} &bull; {{ $req->student->course ?? '' }}</div>
+                                    <div style="font-size:12px; color:#888;">{{ $req->student->studentNum ?? '' }} • {{ $req->student->course ?? '' }}</div>
                                 </td>
                                 <td>
                                     @if(!empty($req->company))
@@ -234,7 +234,7 @@
                                     <button type="button" 
                                         class="btn-view-reason"
                                         data-student-name="{{ e($req->student->full_name ?? 'Student') }}"
-                                        data-student-info="{{ e(($req->student->studentNum ?? '') . ' &bull; ' . ($req->student->course ?? '')) }}"
+                                        data-student-info="{{ e(($req->student->studentNum ?? '') . ' • ' . ($req->student->course ?? '')) }}"
                                         data-company-name="{{ e($req->company->company_name ?? 'N/A') }}"
                                         data-reason="{{ e($req->reason) }}"
                                         data-date="{{ $req->created_at ? $req->created_at->format('M d, Y g:i A') : '' }}"

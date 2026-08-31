@@ -90,40 +90,223 @@ img {
         padding: 0 40px;
     }
 }
-/* ══════════════════════════════════════════
+/* ═══════════════════════/* ══════════════════════════════════════════
    MOA MODAL — RESPONSIVE FIXES
 ══════════════════════════════════════════ */
 
 /* Modal sizing & scroll container */
-#addMoaModal .modal-dialog {
+#addMoaModal .modal-dialog,
+#editMoaModal .modal-dialog {
     width: 100%;
-    max-width: 720px;
+    max-width: 760px;
     margin: 1.75rem auto;
 }
 
-#addMoaModal .modal-content {
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
+#addMoaModal .modal-content,
+#editMoaModal .modal-content {
+    border-radius: 16px;
+    overflow: hidden;
 }
 
-#addMoaModal .modal-body {
+#addMoaModal form,
+#editMoaModal form {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+#addMoaModal .modal-body,
+#editMoaModal .modal-body {
     overflow-y: auto;
-    flex: 1 1 auto;
-    max-height: calc(90vh - 130px); /* header + footer height */
+    max-height: calc(88vh - 130px);
     -webkit-overflow-scrolling: touch;
+    padding: 20px 24px 16px;
+}
+
+#addMoaModal .file-upload-zone,
+#editMoaModal .file-upload-zone {
+    margin-bottom: 0 !important;
+}
+
+#addMoaModal .modal-footer,
+#editMoaModal .modal-footer {
+    padding: 14px 24px;
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
 }
 
 /* Custom scrollbar styling for the modal body */
-#addMoaModal .modal-body::-webkit-scrollbar {
+#addMoaModal .modal-body::-webkit-scrollbar,
+#editMoaModal .modal-body::-webkit-scrollbar {
     width: 6px;
 }
-#addMoaModal .modal-body::-webkit-scrollbar-thumb {
+#addMoaModal .modal-body::-webkit-scrollbar-thumb,
+#editMoaModal .modal-body::-webkit-scrollbar-thumb {
     background: rgba(220, 38, 38, 0.3);
     border-radius: 10px;
 }
-#addMoaModal .modal-body::-webkit-scrollbar-track {
+#addMoaModal .modal-body::-webkit-scrollbar-track,
+#editMoaModal .modal-body::-webkit-scrollbar-track {
     background: transparent;
+}
+
+/* Existing MOA Section */
+.existing-moa-wrapper {
+    margin-bottom: 20px;
+    padding: 16px;
+    border: 1px solid #fde2e2;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fffefe 0%, #fff7f7 100%);
+}
+
+.existing-moa-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.existing-moa-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #fee2e2;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.existing-moa-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.existing-moa-desc {
+    font-size: 12.5px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.existing-moa-list {
+    margin-top: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+    display: grid;
+    gap: 10px;
+}
+
+.existing-moa-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid #f1d5d5;
+    border-radius: 12px;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.existing-moa-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.existing-moa-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #111827;
+    word-break: break-word;
+}
+
+.existing-moa-addr {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+    word-break: break-word;
+}
+
+.existing-moa-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.existing-moa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.existing-moa-badge.year {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.existing-moa-badge.course {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.existing-moa-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    min-width: 140px;
+    flex-shrink: 0;
+}
+
+.existing-moa-buttons button {
+    justify-content: center;
+    padding-inline: 14px;
+    white-space: nowrap;
+    height: 36px;
+    font-size: 12px;
+}
+
+.existing-moa-empty {
+    padding: 14px;
+    border: 1px dashed #f3b3b3;
+    border-radius: 12px;
+    color: #6b7280;
+    font-size: 12.5px;
+    background: #fff;
+}
+
+/* Dark mode for Existing MOA */
+body.dark-mode .existing-moa-wrapper {
+    background: linear-gradient(180deg, #1f1f1f 0%, #171717 100%) !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+}
+body.dark-mode .existing-moa-title {
+    color: #f3f4f6 !important;
+}
+body.dark-mode .existing-moa-desc {
+    color: #9ca3af !important;
+}
+body.dark-mode .existing-moa-card {
+    background: #262626 !important;
+    border-color: #3f3f46 !important;
+}
+body.dark-mode .existing-moa-name {
+    color: #f3f4f6 !important;
+}
+body.dark-mode .existing-moa-addr {
+    color: #9ca3af !important;
+}
+body.dark-mode .existing-moa-empty {
+    background: #262626 !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+    color: #9ca3af !important;
 }
 
 /* Two-column form grid */
@@ -133,7 +316,7 @@ img {
     gap: 0 20px;
 }
 
-/* School year row — always keep inputs from collapsing into nothing */
+/* School year row */
 .school-year-row {
     display: flex;
     align-items: center;
@@ -141,6 +324,7 @@ img {
     margin-bottom: 16px;
 }
 
+.school-year-row select,
 .school-year-row input {
     flex: 1 1 0;
     min-width: 0;
@@ -151,10 +335,11 @@ img {
 }
 
 /* ══════════════════════════════════════════
-   TABLET — single column, full width fields
+   TABLET (≤768px)
 ══════════════════════════════════════════ */
 @media (max-width: 768px) {
-    #addMoaModal .modal-dialog {
+    #addMoaModal .modal-dialog,
+    #editMoaModal .modal-dialog {
         max-width: 92%;
         margin: 1rem auto;
     }
@@ -166,98 +351,157 @@ img {
 }
 
 /* ══════════════════════════════════════════
-   MOBILE — full-screen modal, comfortable scroll
+   MOBILE (≤600px) — Compact, fully responsive
 ══════════════════════════════════════════ */
-@media (max-width: 576px) {
-    #addMoaModal .modal-dialog {
-        max-width: 100%;
-        width: 100%;
-        height: 100%;
-        margin: 0;
+@media (max-width: 600px) {
+    #addMoaModal .modal-dialog,
+    #editMoaModal .modal-dialog {
+        max-width: calc(100% - 16px) !important;
+        width: calc(100% - 16px) !important;
+        margin: 8px auto !important;
     }
 
-    #addMoaModal .modal-content {
-        height: 100%;
-        max-height: 100vh;
-        border-radius: 0;
+    #addMoaModal .modal-content,
+    #editMoaModal .modal-content {
+        max-height: calc(100vh - 16px) !important;
+        border-radius: 16px !important;
+        overflow: hidden;
     }
 
-    #addMoaModal .modal-body {
-        max-height: calc(100vh - 120px);
-        padding: 18px 16px;
+    #addMoaModal .modal-body,
+    #editMoaModal .modal-body {
+        max-height: calc(100vh - 140px) !important;
+        padding: 14px 12px !important;
     }
 
-    #addMoaModal .modal-header {
-        padding: 16px 18px;
+    #addMoaModal .modal-header,
+    #editMoaModal .modal-header {
+        padding: 12px 16px !important;
     }
 
-    #addMoaModal .modal-title {
-        font-size: 14px;
+    #addMoaModal .modal-footer,
+    #editMoaModal .modal-footer {
+        padding: 10px 14px !important;
+        gap: 8px !important;
     }
 
-    #addMoaModal .modal-footer {
-        padding: 12px 16px;
-        flex-wrap: wrap;
+    .existing-moa-wrapper {
+        padding: 12px 10px !important;
+        margin-bottom: 14px !important;
+        border-radius: 12px !important;
     }
 
-    #addMoaModal .modal-footer button {
-        flex: 1;
-        justify-content: center;
+    .existing-moa-head {
+        gap: 10px !important;
+        margin-bottom: 10px !important;
     }
 
+    .existing-moa-icon {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 14px !important;
+    }
+
+    .existing-moa-title {
+        font-size: 14px !important;
+    }
+
+    .existing-moa-desc {
+        font-size: 11.5px !important;
+        line-height: 1.45 !important;
+    }
+
+    .existing-moa-card {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 10px 12px !important;
+    }
+
+    .existing-moa-buttons {
+        flex-direction: row !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        gap: 8px !important;
+    }
+
+    .existing-moa-buttons button {
+        flex: 1 !important;
+        font-size: 11.5px !important;
+        padding: 6px 8px !important;
+        height: 36px !important;
+        white-space: nowrap !important;
+    }
+
+    .existing-moa-badges {
+        margin-top: 6px !important;
+        gap: 4px !important;
+    }
+
+    .existing-moa-badge {
+        font-size: 10.5px !important;
+        padding: 2px 7px !important;
+    }
+
+    /* Form Fields on Mobile */
     .moa-form-grid {
-        grid-template-columns: 1fr;
-        gap: 0;
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
     }
 
     .modal-field-label {
-        font-size: 12.5px;
-        margin-bottom: 5px;
-    }
-
-    .modal-field-label span:last-child {
-        font-size: 11px;
-        display: block;
-        margin-top: 2px;
+        font-size: 12px !important;
+        margin-bottom: 4px !important;
+        margin-top: 10px !important;
     }
 
     .modal-field-input {
-        padding: 10px 12px;
-        font-size: 13px;
-        margin-bottom: 14px;
+        padding: 8px 12px !important;
+        font-size: 12.5px !important;
+        height: 38px !important;
+        margin-bottom: 0 !important;
     }
 
-    /* School Year row — stack on very small screens */
     .school-year-row {
-        gap: 6px;
-    }
-
-    .school-year-row input {
-        font-size: 12.5px;
-        padding: 10px 8px;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin-bottom: 0 !important;
     }
 
     .school-year-row .sep {
-        font-size: 14px;
+        display: inline-block !important;
+        font-size: 14px !important;
+        color: #999 !important;
     }
 
-    /* File upload zone */
+    .school-year-row select,
+    .school-year-row input {
+        flex: 1 !important;
+        min-width: 0 !important;
+        height: 38px !important;
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+    }
+
     .file-upload-zone {
-        padding: 18px 12px;
+        padding: 14px 10px !important;
+        border-radius: 12px !important;
+    }
+
+    .file-upload-zone .upload-icon {
+        font-size: 26px !important;
+        margin-bottom: 6px !important;
     }
 
     .file-upload-zone p {
-        font-size: 12.5px;
+        font-size: 12px !important;
+        margin-bottom: 2px !important;
     }
 
     .file-upload-zone span {
-        font-size: 11px;
-    }
-
-    /* Reminder card */
-    .modal-body > div > div[style*="background: #fff5f5"] {
-        padding: 10px 12px;
-        margin-top: 4px;
+        font-size: 10.5px !important;
     }
 }
 
@@ -276,159 +520,54 @@ img {
 }
 
 /* ══════════════════════════════════════════
-   VOICE INPUT MIC BUTTON FIX
-   Keeps mic button inside input fields on mobile
+   VOICE INPUT MIC BUTTON STYLES
 ══════════════════════════════════════════ */
-
-/* Wrapper that voice-input.js creates around each input */
-.voice-input-wrapper {
+.voice-mic-host {
     position: relative;
-    display: flex;
-    align-items: center;
+    display: block;
     width: 100%;
     margin-bottom: 16px;
 }
 
-/* The input inside the wrapper — shrink so mic doesn't overlap text */
-.voice-input-wrapper .modal-field-input,
-.voice-input-wrapper input {
-    width: 100%;
-    padding-right: 42px; /* space for mic button */
-    margin-bottom: 0;    /* wrapper handles spacing now */
+.voice-mic-host > input,
+.voice-mic-host > textarea {
+    margin-bottom: 0 !important;
+    padding-right: 44px !important;
 }
 
-/* The mic button itself */
-.voice-input-wrapper .mic-btn,
-.voice-input-wrapper [class*="mic"],
-.voice-input-wrapper button[type="button"] {
+.voice-mic-button {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #aaa;
-    font-size: 14px;
-    flex-shrink: 0;
-    z-index: 5;
-}
-
-.voice-input-wrapper .mic-btn:hover,
-.voice-input-wrapper [class*="mic"]:hover {
-    color: #dc2626;
-}
-
-/* School year row — mic buttons inside year inputs */
-.school-year-row .voice-input-wrapper {
-    flex: 1;
-    min-width: 0;
-    margin-bottom: 0;
-}
-
-.school-year-row .voice-input-wrapper input {
-    width: 100%;
-}
-
-/* Date input — mic button shouldn't clash with date picker icon */
-input[type="date"].modal-field-input {
-    padding-right: 42px;
-}
-
-/* If mic button is a direct sibling of the input (not wrapped) */
-.modal-body .modal-field-input + button,
-.modal-body input + button[title*="voice"],
-.modal-body input + button[title*="mic"] {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-/* Make label + input containers relative so absolute positioning works */
-.modal-body > div,
-.modal-body .moa-form-grid > div {
-    position: relative;
+    z-index: 3;
 }
 /* ══════════════════════════════════════════
-   SCHOOL YEAR ROW — mobile stack fix
+   SCHOOL YEAR ROW
 ══════════════════════════════════════════ */
-
-/* Stack vertically on mobile by default */
 .school-year-row {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 16px;
     width: 100%;
 }
 
-/* Hide the dash separator on mobile */
 .school-year-row .sep {
-    display: none;
+    display: inline-block;
+    flex-shrink: 0;
+    font-size: 16px;
+    color: #888;
+    font-weight: 600;
 }
 
-/* Each input takes full width */
+.school-year-row select,
 .school-year-row input {
-    width: 100%;
+    flex: 1 1 0;
     min-width: 0;
-    flex: none;
-    background: #fafafa;
-    border: 1.5px solid #e8e8e8;
-    border-radius: 10px;
-    color: #1a1a1a;
-    font-family: 'Poppins', sans-serif;
-    font-size: 13px;
-    padding: 11px 42px 11px 14px; /* right padding for mic button */
-    outline: none;
-    transition: all 0.25s;
-    box-sizing: border-box;
-}
-
-.school-year-row input:focus {
-    border-color: var(--red);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.07);
-}
-
-/* Wrapper that voice-input.js injects — full width on mobile */
-.school-year-row .voice-input-wrapper {
     width: 100%;
-    flex: none;
-    margin-bottom: 0;
-}
-
-/* Tablet and above — restore side-by-side layout */
-@media (min-width: 577px) {
-    .school-year-row {
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .school-year-row .sep {
-        display: inline;
-        flex-shrink: 0;
-        font-size: 16px;
-        color: #aaa;
-        font-weight: 600;
-    }
-
-    .school-year-row input {
-        flex: 1 1 0;
-        width: auto;
-    }
-
-    .school-year-row .voice-input-wrapper {
-        flex: 1 1 0;
-        width: auto;
-    }
+    margin-bottom: 0 !important;
 }
 
 /* ══════════════════════════════════════════

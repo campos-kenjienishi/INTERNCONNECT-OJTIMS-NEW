@@ -335,7 +335,9 @@
                                 </div>
                             </div>
                             <div style="display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px; align-items:start;">
-                                <textarea id="dashboardAiQuestionInput" rows="3" placeholder="Ask about pending approvals, files, placements, MOAs, or next actions..." style="width:100%; min-height:82px; border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; font-family:'Poppins',sans-serif; font-size:13px; resize:vertical;"></textarea>
+                                <div class="voice-mic-host" style="position:relative; width:100%;">
+                                    <textarea id="dashboardAiQuestionInput" rows="3" placeholder="Ask about pending approvals, files, placements, MOAs, or next actions..." style="width:100%; min-height:82px; border:1px solid #e5e7eb; border-radius:12px; padding:12px 44px 12px 14px; font-family:'Poppins',sans-serif; font-size:13px; resize:vertical;"></textarea>
+                                </div>
                                 <button type="button" id="dashboardAskAiBtn" style="height:44px; border:none; border-radius:12px; padding:0 18px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 3px 10px rgba(16,185,129,0.25);"><i class="fa fa-paper-plane"></i> Ask</button>
                             </div>
                             <div id="dashboardAiAskStatus" style="display:none; margin-top:10px; font-size:12px; color:#777;"></div>

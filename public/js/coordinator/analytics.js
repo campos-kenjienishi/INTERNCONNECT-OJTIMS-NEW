@@ -83,8 +83,10 @@
             btn.addEventListener('click', function () {
                 const input = document.getElementById('analyticsAiQuestionInput');
                 const question = btn.getAttribute('data-question') || '';
-                if (input) input.value = question;
-                askAnalyticsAi(question);
+                if (input) {
+                    input.value = question;
+                    input.focus();
+                }
             });
         });
 

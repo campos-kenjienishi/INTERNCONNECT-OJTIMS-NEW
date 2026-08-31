@@ -441,6 +441,8 @@
         @if($canNotify)
             <form class="notifyForm d-inline"
                   action="{{ url('/notify', $data['ojt']->studentNum) }}"
+                  data-student-name="{{ $data['student']->full_name }}"
+                  data-student-num="{{ $data['student']->studentNum }}"
                   method="POST">
                 @csrf
                 <button type="submit" class="btn-action action-icon-btn notify" title="Notify Student" aria-label="Notify Student">

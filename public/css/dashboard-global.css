@@ -442,108 +442,61 @@
     font-weight: 800 !important;
 }
 
-/* --- COLLAPSED SIDEBAR FLOATING FLYOUT MENU (BODY-PORTALED) --- */
+/* --- COLLAPSED SIDEBAR: Push sub-items into the exact same column as the main reports icon --- */
 .sidebar.collapsed .nav-sub,
 html.sidebar-is-collapsed .sidebar .nav-sub {
-    display: none !important;
-}
-
-.sidebar-collapsed-flyout {
-    position: fixed !important;
-    z-index: 9999999 !important;
-    min-width: 205px !important;
-    background: linear-gradient(165deg, #1c0000 0%, #400000 100%) !important;
-    border: 1.5px solid #FED700 !important;
-    border-radius: 14px !important;
-    padding: 10px 8px !important;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 22px rgba(254, 215, 0, 0.25) !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transform: translateX(4px) scale(0.97) !important;
-    transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.15s !important;
     display: flex !important;
-    flex-direction: column !important;
-}
-
-/* Invisible hit bridge between sidebar and flyout to prevent losing hover */
-.sidebar-collapsed-flyout::after {
-    content: '' !important;
-    position: absolute !important;
-    top: -10px !important;
-    bottom: -10px !important;
-    left: -20px !important;
-    width: 25px !important;
-    background: transparent !important;
-}
-
-.sidebar-collapsed-flyout.visible {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    transform: translateX(0) scale(1) !important;
-}
-
-.sidebar-collapsed-flyout .flyout-header {
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    letter-spacing: 1.2px !important;
-    text-transform: uppercase !important;
-    color: #FED700 !important;
-    padding: 4px 10px 8px 10px !important;
-    margin-bottom: 6px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-    display: flex !important;
+    position: static !important;
+    margin: 4px 0 6px 0 !important;
+    padding: 0 !important;
+    border-left: none !important;
+    width: 100% !important;
     align-items: center !important;
-    gap: 8px !important;
-}
-
-.sidebar-collapsed-flyout .flyout-header i {
-    font-size: 13px !important;
-    color: #FED700 !important;
-}
-
-.sidebar-collapsed-flyout .flyout-links {
-    display: flex !important;
-    flex-direction: column !important;
     gap: 4px !important;
 }
 
-.sidebar-collapsed-flyout .nav-sub-item {
+.sidebar.collapsed .nav-sub-item,
+html.sidebar-is-collapsed .sidebar .nav-sub-item {
+    width: 44px !important;
+    height: 44px !important;
+    margin: 2px auto !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0 !important;
+    font-size: 0 !important;
+    transform: none !important;
+}
+
+.sidebar.collapsed .nav-sub-item:hover,
+html.sidebar-is-collapsed .sidebar .nav-sub-item:hover {
+    transform: none !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.sidebar.collapsed .nav-sub-item i,
+html.sidebar-is-collapsed .sidebar .nav-sub-item i {
+    font-size: 16px !important;
+    width: 100% !important;
+    height: 100% !important;
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    padding: 9px 12px !important;
-    border-radius: 10px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    color: rgba(255, 255, 255, 0.82) !important;
-    text-decoration: none !important;
-    transition: all 0.2s ease !important;
-    white-space: nowrap !important;
+    justify-content: center !important;
+    margin: 0 !important;
 }
 
-.sidebar-collapsed-flyout .nav-sub-item i {
-    font-size: 13px !important;
-    width: 16px !important;
-    text-align: center !important;
-    color: rgba(254, 215, 0, 0.85) !important;
-}
-
-.sidebar-collapsed-flyout .nav-sub-item:hover {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    transform: translateX(3px) !important;
-}
-
-.sidebar-collapsed-flyout .nav-sub-item.active {
+.sidebar.collapsed .nav-sub-item.active,
+html.sidebar-is-collapsed .sidebar .nav-sub-item.active {
     background: linear-gradient(180deg, #FED700 0%, #f7ca00 100%) !important;
     color: #2d1c00 !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 14px rgba(254, 215, 0, 0.35) !important;
+    box-shadow: 0 4px 14px rgba(254, 215, 0, 0.3) !important;
+    border: none !important;
+    transform: none !important;
 }
 
-.sidebar-collapsed-flyout .nav-sub-item.active i {
+.sidebar.collapsed .nav-sub-item.active i,
+html.sidebar-is-collapsed .sidebar .nav-sub-item.active i {
     color: #2d1c00 !important;
 }
 
@@ -1767,7 +1720,7 @@ html.dark-mode .topbar-badge i {
 .btn-modal-submit,
 .btn-join,
 .btn-agree,
-button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger):not(.btn-outline-secondary):not(.btn-close):not(.btn-view):not(.btn-secondary):not(.btn-danger-custom):not(.btn-login):not(.btn-register):not(.btn-auth):not(.btn-reset):not(.btn-forgot):not(.btn-proceed):not(.btn-create-account):not(.btn-submit-reg):not(.btn-eval):not(.btn-eval-primary):not(.btn-eval-amber):not(.btn-eval-danger):not(.btn-eval-blue):not(.btn-eval-purple):not(.btn-eval-emerald):not(.btn-eval-slate):not(#sendEvaluationButton):not(.btn-delete):not(.btn-delete-announcement):not(.btn-remove):not(.remove-button):not(.delete-button):not(.btn-action-delete):not(.icon-action-btn):not(.btn-remove-room):not(.btn-archive):not(.btn-edit):not(.btn-edit-announcement):not(.edit-button):not(.btnView1):not(.btnRemove) {
+button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger):not(.btn-outline-secondary):not(.btn-close):not(.btn-view):not(.btn-secondary):not(.btn-danger-custom):not(.btn-login):not(.btn-register):not(.btn-auth):not(.btn-reset):not(.btn-forgot):not(.btn-proceed):not(.btn-create-account):not(.btn-submit-reg):not(.btn-eval):not(.btn-eval-primary):not(.btn-eval-amber):not(.btn-eval-danger):not(.btn-eval-blue):not(.btn-eval-purple):not(.btn-eval-emerald):not(.btn-eval-slate):not(#sendEvaluationButton):not(.btn-delete):not(.btn-delete-announcement):not(.btn-remove):not(.remove-button):not(.delete-button):not(.btn-action-delete):not(.icon-action-btn):not(.btn-remove-room):not(.btn-archive):not(.btn-edit):not(.btn-edit-announcement):not(.edit-button):not(.btnView1):not(.btnRemove):not(.btn-deny) {
     background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
     color: #ffffff !important;
     border: none !important;
@@ -1788,7 +1741,7 @@ button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger)
 .btn-modal-submit:hover,
 .btn-join:hover,
 .btn-agree:hover,
-button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger):not(.btn-outline-secondary):not(.btn-close):not(.btn-view):not(.btn-secondary):not(.btn-danger-custom):not(.btn-login):not(.btn-register):not(.btn-auth):not(.btn-reset):not(.btn-forgot):not(.btn-proceed):not(.btn-create-account):not(.btn-submit-reg):not(.btn-eval):not(.btn-eval-primary):not(.btn-eval-amber):not(.btn-eval-danger):not(.btn-eval-blue):not(.btn-eval-purple):not(.btn-eval-emerald):not(.btn-eval-slate):not(#sendEvaluationButton):not(.btn-delete):not(.btn-delete-announcement):not(.btn-remove):not(.remove-button):not(.delete-button):not(.btn-action-delete):not(.icon-action-btn):not(.btn-remove-room):not(.btn-archive):not(.btn-edit):not(.btn-edit-announcement):not(.edit-button):not(.btnView1):not(.btnRemove):hover {
+button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger):not(.btn-outline-secondary):not(.btn-close):not(.btn-view):not(.btn-secondary):not(.btn-danger-custom):not(.btn-login):not(.btn-register):not(.btn-auth):not(.btn-reset):not(.btn-forgot):not(.btn-proceed):not(.btn-create-account):not(.btn-submit-reg):not(.btn-eval):not(.btn-eval-primary):not(.btn-eval-amber):not(.btn-eval-danger):not(.btn-eval-blue):not(.btn-eval-purple):not(.btn-eval-emerald):not(.btn-eval-slate):not(#sendEvaluationButton):not(.btn-delete):not(.btn-delete-announcement):not(.btn-remove):not(.remove-button):not(.delete-button):not(.btn-action-delete):not(.icon-action-btn):not(.btn-remove-room):not(.btn-archive):not(.btn-edit):not(.btn-edit-announcement):not(.edit-button):not(.btnView1):not(.btnRemove):not(.btn-deny):hover {
     background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
     box-shadow: 0 6px 20px rgba(22, 163, 74, 0.38) !important;
     transform: translateY(-2px);
@@ -1814,14 +1767,14 @@ button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger)
 }
 
 /* RED BUTTONS: Delete / Remove (Pill text buttons) */
-.btn-delete:not(.icon-action-btn),
+.btn-delete:not(.icon-action-btn):not(.btn-action-icon),
 .btn-delete-announcement,
-.btn-remove:not(.icon-action-btn),
-.remove-button:not(.icon-action-btn),
-.delete-button:not(.icon-action-btn),
-.btnRemove:not(.icon-action-btn),
-.btn-action-delete:not(.icon-action-btn),
-.btn-remove-room:not(.icon-action-btn) {
+.btn-remove:not(.icon-action-btn):not(.btn-action-icon),
+.remove-button:not(.icon-action-btn):not(.btn-action-icon),
+.delete-button:not(.icon-action-btn):not(.btn-action-icon),
+.btnRemove:not(.icon-action-btn):not(.btn-action-icon),
+.btn-action-delete:not(.icon-action-btn):not(.btn-action-icon),
+.btn-remove-room:not(.icon-action-btn):not(.btn-action-icon) {
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
@@ -1839,14 +1792,14 @@ button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger)
     box-shadow: none !important;
 }
 
-.btn-delete:not(.icon-action-btn):hover,
+.btn-delete:not(.icon-action-btn):not(.btn-action-icon):hover,
 .btn-delete-announcement:hover,
-.btn-remove:not(.icon-action-btn):hover,
-.remove-button:not(.icon-action-btn):hover,
-.delete-button:not(.icon-action-btn):hover,
-.btnRemove:not(.icon-action-btn):hover,
-.btn-action-delete:not(.icon-action-btn):hover,
-.btn-remove-room:not(.icon-action-btn):hover {
+.btn-remove:not(.icon-action-btn):not(.btn-action-icon):hover,
+.remove-button:not(.icon-action-btn):not(.btn-action-icon):hover,
+.delete-button:not(.icon-action-btn):not(.btn-action-icon):hover,
+.btnRemove:not(.icon-action-btn):not(.btn-action-icon):hover,
+.btn-action-delete:not(.icon-action-btn):not(.btn-action-icon):hover,
+.btn-remove-room:not(.icon-action-btn):not(.btn-action-icon):hover {
     background: #fee2e2 !important;
     border-color: #fca5a5 !important;
     color: #b91c1c !important;
@@ -1855,12 +1808,12 @@ button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger)
 }
 
 /* YELLOW / AMBER BUTTONS: Edit & Requirements */
-.btn-edit:not(.icon-action-btn),
+.btn-edit:not(.icon-action-btn):not(.btn-action-icon),
 .btn-edit-announcement,
-.edit-button:not(.icon-action-btn),
-.btnView1:not(.icon-action-btn),
-.btn-open-edit:not(.icon-action-btn),
-.btn-action-edit:not(.icon-action-btn) {
+.edit-button:not(.icon-action-btn):not(.btn-action-icon),
+.btnView1:not(.icon-action-btn):not(.btn-action-icon),
+.btn-open-edit:not(.icon-action-btn):not(.btn-action-icon),
+.btn-action-edit:not(.icon-action-btn):not(.btn-action-icon) {
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
@@ -1907,12 +1860,12 @@ button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger)
     transform: translateY(0) !important;
 }
 
-.btn-edit:not(.icon-action-btn):hover,
+.btn-edit:not(.icon-action-btn):not(.btn-action-icon):hover,
 .btn-edit-announcement:hover,
-.edit-button:not(.icon-action-btn):hover,
-.btnView1:not(.icon-action-btn):hover,
-.btn-open-edit:not(.icon-action-btn):hover,
-.btn-action-edit:not(.icon-action-btn):hover {
+.edit-button:not(.icon-action-btn):not(.btn-action-icon):hover,
+.btnView1:not(.icon-action-btn):not(.btn-action-icon):hover,
+.btn-open-edit:not(.icon-action-btn):not(.btn-action-icon):hover,
+.btn-action-edit:not(.icon-action-btn):not(.btn-action-icon):hover {
     background: #fef3c7 !important;
     border-color: #fcd34d !important;
     color: #b45309 !important;
@@ -1921,35 +1874,35 @@ button[type="submit"]:not(.btn-danger):not(.btn-cancel):not(.btn-outline-danger)
 }
 
 /* DARK MODE: Delete & Edit buttons */
-body.dark-mode .btn-delete:not(.icon-action-btn),
+body.dark-mode .btn-delete:not(.icon-action-btn):not(.btn-action-icon),
 body.dark-mode .btn-delete-announcement,
-body.dark-mode .btn-remove:not(.icon-action-btn),
-body.dark-mode .remove-button:not(.icon-action-btn),
-body.dark-mode .delete-button:not(.icon-action-btn),
-body.dark-mode .btnRemove:not(.icon-action-btn),
-body.dark-mode .btn-action-delete:not(.icon-action-btn),
-body.dark-mode .btn-remove-room:not(.icon-action-btn) {
+body.dark-mode .btn-remove:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .remove-button:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .delete-button:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .btnRemove:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .btn-action-delete:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .btn-remove-room:not(.icon-action-btn):not(.btn-action-icon) {
     background: rgba(220, 38, 38, 0.12) !important;
     border-color: rgba(239, 68, 68, 0.3) !important;
     color: #fca5a5 !important;
 }
 
-body.dark-mode .btn-delete:not(.icon-action-btn):hover,
+body.dark-mode .btn-delete:not(.icon-action-btn):not(.btn-action-icon):hover,
 body.dark-mode .btn-delete-announcement:hover,
-body.dark-mode .btn-remove:not(.icon-action-btn):hover,
-body.dark-mode .remove-button:not(.icon-action-btn):hover,
-body.dark-mode .delete-button:not(.icon-action-btn):hover,
-body.dark-mode .btnRemove:not(.icon-action-btn):hover {
+body.dark-mode .btn-remove:not(.icon-action-btn):not(.btn-action-icon):hover,
+body.dark-mode .remove-button:not(.icon-action-btn):not(.btn-action-icon):hover,
+body.dark-mode .delete-button:not(.icon-action-btn):not(.btn-action-icon):hover,
+body.dark-mode .btnRemove:not(.icon-action-btn):not(.btn-action-icon):hover {
     background: rgba(220, 38, 38, 0.25) !important;
     color: #fecaca !important;
 }
 
-body.dark-mode .btn-edit:not(.icon-action-btn),
+body.dark-mode .btn-edit:not(.icon-action-btn):not(.btn-action-icon),
 body.dark-mode .btn-edit-announcement,
-body.dark-mode .edit-button:not(.icon-action-btn),
-body.dark-mode .btnView1:not(.icon-action-btn),
-body.dark-mode .btn-open-edit:not(.icon-action-btn),
-body.dark-mode .btn-action-edit:not(.icon-action-btn) {
+body.dark-mode .edit-button:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .btnView1:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .btn-open-edit:not(.icon-action-btn):not(.btn-action-icon),
+body.dark-mode .btn-action-edit:not(.icon-action-btn):not(.btn-action-icon) {
     background: rgba(245, 158, 11, 0.12) !important;
     border-color: rgba(251, 191, 36, 0.3) !important;
     color: #fde047 !important;
@@ -1962,12 +1915,12 @@ html.dark-mode .btn-view-req {
     color: #ffffff !important;
 }
 
-body.dark-mode .btn-edit:not(.icon-action-btn):hover,
+body.dark-mode .btn-edit:not(.icon-action-btn):not(.btn-action-icon):hover,
 body.dark-mode .btn-edit-announcement:hover,
-body.dark-mode .edit-button:not(.icon-action-btn):hover,
-body.dark-mode .btnView1:not(.icon-action-btn):hover,
-body.dark-mode .btn-open-edit:not(.icon-action-btn):hover,
-body.dark-mode .btn-action-edit:not(.icon-action-btn):hover {
+body.dark-mode .edit-button:not(.icon-action-btn):not(.btn-action-icon):hover,
+body.dark-mode .btnView1:not(.icon-action-btn):not(.btn-action-icon):hover,
+body.dark-mode .btn-open-edit:not(.icon-action-btn):not(.btn-action-icon):hover,
+body.dark-mode .btn-action-edit:not(.icon-action-btn):not(.btn-action-icon):hover {
     background: rgba(245, 158, 11, 0.25) !important;
     color: #fef08a !important;
 }
@@ -2536,4 +2489,346 @@ body.dark-mode .pagination .page-item.disabled .page-link {
         width: 100% !important;
     }
 }
+
+/* ==========================================================================
+   GLOBAL AI INSIGHT RESPONSIVE STYLES
+   Ensures AI Insight cards, buttons, prompt suggestions, and Q&A boxes
+   are seamlessly responsive on mobile devices and small viewports.
+   ========================================================================== */
+
+[data-ai-insight-card],
+.ai-insight-card-wrapper {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+[data-ai-insight-card] h2,
+[data-ai-insight-card] .panel-head h2,
+[data-ai-insight-card] .panel-card-header h2 {
+    word-break: break-word !important;
+}
+
+[data-ai-result-panel],
+#evaluationInsightPanel {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+[data-ai-summary],
+#dashboardAiAnswerText,
+#studentAiAnswerText,
+#moaAiAnswerText,
+#analyticsAiAnswerText,
+#evaluationAiSummary {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Prompt suggestions container wrap */
+.dashboard-ai-quick-question,
+.student-ai-quick-question,
+.moa-ai-quick-question,
+.analytics-ai-quick-question,
+.ai-quick-prompt-btn {
+    white-space: normal !important;
+    text-align: left !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+    transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+
+.dashboard-ai-quick-question:active,
+.student-ai-quick-question:active,
+.moa-ai-quick-question:active,
+.analytics-ai-quick-question:active {
+    transform: scale(0.97) !important;
+}
+
+@media (max-width: 900px) {
+    [data-ai-insight-card] .panel-card-header,
+    [data-ai-insight-card] header.panel-head,
+    [data-ai-insight-card] .panel-head,
+    [data-ai-insight-card] > div:first-child:not([data-ai-result-panel]) {
+        padding: 14px 16px !important;
+        gap: 12px !important;
+    }
+
+    [data-ai-result-panel],
+    #evaluationInsightPanel {
+        padding: 16px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    [data-ai-insight-card] .panel-card-header,
+    [data-ai-insight-card] header.panel-head,
+    [data-ai-insight-card] .panel-head,
+    [data-ai-insight-card] > div:first-child:not([data-ai-result-panel]) {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    [data-ai-insight-card] .panel-card-header > div:last-child,
+    [data-ai-insight-card] header.panel-head > div:last-child,
+    [data-ai-insight-card] .panel-head > div:last-child,
+    [data-ai-insight-card] > div:first-child > div:last-child {
+        margin-left: 0 !important;
+        width: 100% !important;
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    [data-ai-insight-button],
+    #generateEvaluationInsightBtn {
+        flex: 1 1 auto !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    [data-ai-result-panel] > div[style*="grid"],
+    #evaluationAiResult > div[style*="grid"] {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Ask AI form & suggestions */
+    [data-ai-result-panel] div[style*="grid-template-columns:minmax(0, 1fr) auto"],
+    [data-ai-result-panel] div[style*="grid-template-columns: minmax(0, 1fr) auto"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    [data-ai-result-panel] div[style*="grid-template-columns:minmax(0, 1fr) auto"] > button:not(.voice-mic-button),
+    [data-ai-result-panel] div[style*="grid-template-columns: minmax(0, 1fr) auto"] > button:not(.voice-mic-button),
+    #dashboardAskAiBtn,
+    #studentAskAiBtn,
+    #moaAskAiBtn,
+    #analyticsAskAiBtn {
+        width: 100% !important;
+        justify-content: center !important;
+        height: 44px !important;
+        justify-self: stretch !important;
+    }
+}
+
+@media (max-width: 480px) {
+    [data-ai-insight-card] .panel-card-header,
+    [data-ai-insight-card] header.panel-head,
+    [data-ai-insight-card] .panel-head,
+    [data-ai-insight-card] > div:first-child:not([data-ai-result-panel]) {
+        padding: 12px 14px !important;
+    }
+
+    [data-ai-result-panel],
+    #evaluationInsightPanel {
+        padding: 12px 14px !important;
+    }
+
+    [data-ai-insight-card] h2 {
+        font-size: 15px !important;
+    }
+
+    [data-ai-insight-button],
+    #generateEvaluationInsightBtn {
+        width: 100% !important;
+        font-size: 11.5px !important;
+        padding: 8px 12px !important;
+    }
+
+    [data-ai-badge] {
+        font-size: 11px !important;
+    }
+
+    .dashboard-ai-quick-question,
+    .student-ai-quick-question,
+    .moa-ai-quick-question,
+    .analytics-ai-quick-question {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        border-radius: 7px !important;
+    }
+
+    [data-ai-summary] {
+        font-size: 13.5px !important;
+    }
+}
+
+/* Voice input mic button dimensions & textarea positioning */
+.voice-mic-button {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    flex: 0 0 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+[data-ai-insight-card] .voice-mic-button,
+#dashboardAiQuestionInput ~ .voice-mic-button,
+#studentAiQuestionInput ~ .voice-mic-button,
+#analyticsAiQuestionInput ~ .voice-mic-button,
+#aiQuestionInput ~ .voice-mic-button,
+#requirementAiQuestionInput ~ .voice-mic-button,
+.voice-mic-host > textarea ~ .voice-mic-button,
+textarea ~ .voice-mic-button,
+textarea + .voice-mic-button {
+    position: absolute !important;
+    top: 10px !important;
+    bottom: auto !important;
+    right: 12px !important;
+    left: auto !important;
+    width: 32px !important;
+    height: 32px !important;
+    margin: 0 !important;
+    transform: none !important;
+    z-index: 5 !important;
+}
+
+[data-ai-insight-card] .voice-mic-button:hover,
+#dashboardAiQuestionInput ~ .voice-mic-button:hover,
+#studentAiQuestionInput ~ .voice-mic-button:hover,
+#analyticsAiQuestionInput ~ .voice-mic-button:hover,
+#aiQuestionInput ~ .voice-mic-button:hover,
+#requirementAiQuestionInput ~ .voice-mic-button:hover,
+.voice-mic-host > textarea ~ .voice-mic-button:hover,
+textarea ~ .voice-mic-button:hover,
+textarea + .voice-mic-button:hover {
+    position: absolute !important;
+    top: 10px !important;
+    bottom: auto !important;
+    right: 12px !important;
+    left: auto !important;
+    width: 32px !important;
+    height: 32px !important;
+    margin: 0 !important;
+    transform: scale(1.12) !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL DATATABLES & TABLE CUSTOM SCROLLBAR
+   Replaces native browser grey/arrow scrollbars with clean modern bars
+   ========================================================================== */
+.dataTables_scrollBody,
+.dataTables_wrapper .dataTables_scrollBody,
+.table-scroll,
+.table-card-body,
+.table-responsive {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar,
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar,
+.table-scroll::-webkit-scrollbar,
+.table-card-body::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar {
+    height: 6px !important;
+    width: 6px !important;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-track,
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-track,
+.table-scroll::-webkit-scrollbar-track,
+.table-card-body::-webkit-scrollbar-track,
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent !important;
+    border-radius: 999px !important;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-thumb,
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-thumb,
+.table-scroll::-webkit-scrollbar-thumb,
+.table-card-body::-webkit-scrollbar-thumb,
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 999px !important;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-thumb:hover,
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-thumb:hover,
+.table-scroll::-webkit-scrollbar-thumb:hover,
+.table-card-body::-webkit-scrollbar-thumb:hover,
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-button,
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-button,
+.table-scroll::-webkit-scrollbar-button,
+.table-card-body::-webkit-scrollbar-button,
+.table-responsive::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+body.dark-mode .dataTables_scrollBody,
+body.dark-mode .dataTables_wrapper .dataTables_scrollBody,
+body.dark-mode .table-scroll,
+body.dark-mode .table-card-body,
+body.dark-mode .table-responsive {
+    scrollbar-color: #4b5563 transparent;
+}
+
+body.dark-mode .dataTables_scrollBody::-webkit-scrollbar-thumb,
+body.dark-mode .dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-thumb,
+body.dark-mode .table-scroll::-webkit-scrollbar-thumb,
+body.dark-mode .table-card-body::-webkit-scrollbar-thumb,
+body.dark-mode .table-responsive::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+}
+
+body.dark-mode .dataTables_scrollBody::-webkit-scrollbar-thumb:hover,
+body.dark-mode .dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-thumb:hover,
+body.dark-mode .table-scroll::-webkit-scrollbar-thumb:hover,
+body.dark-mode .table-card-body::-webkit-scrollbar-thumb:hover,
+body.dark-mode .table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #6b7280 !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL DATATABLES BOTTOM CONTROLS CLEARANCE
+   ========================================================================== */
+.dataTables_wrapper::after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+.dataTables_wrapper .dataTables_info {
+    padding-top: 16px !important;
+    padding-bottom: 8px !important;
+    color: #6b7280 !important;
+    font-size: 13px !important;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    padding-top: 16px !important;
+    padding-bottom: 8px !important;
+}
+
+.table-card,
+.panel-card,
+.dashboard-card {
+    padding-bottom: 6px;
+}
+
+body.dark-mode .dataTables_wrapper .dataTables_info {
+    color: #9ca3af !important;
+}
+
+
+
 

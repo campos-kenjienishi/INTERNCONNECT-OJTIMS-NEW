@@ -215,9 +215,9 @@
                         <p>All partner companies with MOA agreements</p>
                     </div>
                 </div>
-                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                    <form action="{{ url('/MOA') }}" method="GET" style="display:flex; align-items:center; gap:8px;">
-                        <select name="school_year" class="field-select" style="min-width:170px; height:36px; font-size:12px;">
+                <div class="companies-header-toolbar">
+                    <form action="{{ url('/MOA') }}" method="GET" class="companies-filter-form">
+                        <select name="school_year" class="company-toolbar-select">
                             <option value="">All School Years</option>
                             @foreach ($schoolYears as $schoolYear)
                                 <option value="{{ $schoolYear }}" {{ ($selectedSchoolYear ?? '') === $schoolYear ? 'selected' : '' }}>
@@ -225,7 +225,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <select name="course" class="field-select" style="min-width:220px; height:36px; font-size:12px;">
+                        <select name="course" class="company-toolbar-select company-toolbar-select-course">
                             <option value="">All Courses</option>
                             @foreach ($course as $courseItem)
                                 <option value="{{ $courseItem->course }}" {{ ($selectedCourse ?? '') === $courseItem->course ? 'selected' : '' }}>
@@ -233,11 +233,11 @@
                                 </option>
                             @endforeach
                         </select>
-                        <button type="submit" class="btn-modal-submit" style="height:36px; padding:0 14px; font-size:12px;">
+                        <button type="submit" class="btn-company-filter">
                             Filter
                         </button>
                         @if (!empty($selectedCourse) || !empty($selectedSchoolYear))
-                            <a href="{{ url('/MOA') }}" class="btn-modal-close" style="height:36px; padding:0 14px; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                            <a href="{{ url('/MOA') }}" class="btn-company-clear">
                                 Clear
                             </a>
                         @endif

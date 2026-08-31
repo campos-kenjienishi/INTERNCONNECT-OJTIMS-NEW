@@ -326,7 +326,7 @@
                                      @if($isOwner && (empty($isLocked) || $companyHasEditUnlock))
                                         <button type="button"
                                             class="btn-action"
-                                            style="background:#eff6ff; border-color:#bfdbfe; color:#2563eb;"
+                                            style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; border: none; box-shadow: 0 2px 6px rgba(37,99,235,0.28);"
                                             data-update-url="{{ route('student.moa.update', $company->id) }}"
                                             data-company-name="{{ e($company->company_name) }}"
                                             data-company-address="{{ e($company->company_address) }}"
@@ -343,11 +343,11 @@
                                     @endif
                                     @if(!empty($isLocked))
                                         @if(!empty($unlockRequest) && $unlockRequest->status === 'pending')
-                                            <button type="button" class="btn-action" disabled style="border:1.5px solid #fcd34d; color:#b45309; background:#fffbeb; cursor:not-allowed; opacity:0.9;" title="Your unlock request is pending coordinator approval.">
+                                            <button type="button" class="btn-action" disabled style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; border: none; cursor: not-allowed; opacity: 0.9; box-shadow: 0 2px 6px rgba(245,158,11,0.28);" title="Your unlock request is pending coordinator approval.">
                                                 <i class="fa fa-clock me-1"></i> Unlock Request Pending
                                             </button>
                                         @else
-                                            <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
+                                            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; border: none; box-shadow: 0 2px 6px rgba(220,38,38,0.28);"
                                                 onclick="openUnlockRequestModal('{{ $isOwner ? 'edit' : 'unlink' }}', {{ $isOwner ? 'true' : 'false' }})">
                                                 <i class="fa fa-key me-1"></i> {{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}
                                             </button>
@@ -382,7 +382,7 @@
                                              </script>
                                         @endif
                                     @else
-                                        <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
+                                        <button type="button" class="btn-action" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; border: none; box-shadow: 0 2px 6px rgba(220,38,38,0.28);"
                                             onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}', {{ $isOwner ? 'true' : 'false' }})">
                                             <i class="fa fa-trash"></i> {{ $isOwner ? 'Remove' : 'Unlink' }}
                                         </button>
@@ -462,14 +462,14 @@
                 @csrf
                 <div class="modal-body">
 
-                    <div style="margin-bottom: 20px; padding: 16px; border: 1px solid #fde2e2; border-radius: 14px; background: linear-gradient(180deg, #fffefe 0%, #fff7f7 100%);">
-                        <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom: 12px;">
-                            <div style="width:42px; height:42px; border-radius:12px; background:#fee2e2; color:var(--red); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <div class="existing-moa-wrapper">
+                        <div class="existing-moa-head">
+                            <div class="existing-moa-icon">
                                 <i class="fa fa-link"></i>
                             </div>
                             <div>
-                                <div style="font-size:16px; font-weight:800; color:#111827;">Use Existing MOA First</div>
-                                <div style="font-size:12.5px; color:#6b7280; line-height:1.6;">
+                                <div class="existing-moa-title">Use Existing MOA First</div>
+                                <div class="existing-moa-desc">
                                     Search the company name below. If the notarized MOA is already in the system, you can link it to your account instead of uploading a duplicate file.
                                 </div>
                             </div>
@@ -477,42 +477,40 @@
 
                         <input type="text" id="existingMoaSearch" class="modal-field-input" placeholder="Search company name...">
 
-                        <div id="existingMoaList" style="margin-top: 12px; max-height: 220px; overflow-y: auto; display: grid; gap: 10px;">
+                        <div id="existingMoaList" class="existing-moa-list">
                             @forelse ($availableLinkableCompanies as $linkableCompany)
                                 <div class="existing-moa-item" data-company-name="{{ strtolower($linkableCompany->company_name) }}">
-                                    <div style="display:flex; justify-content:space-between; gap:14px; align-items:center; padding:14px; border:1px solid #f1d5d5; border-radius:12px; background:#fff;">
-                                        <div style="min-width:0;">
-                                            <div style="font-size:14px; font-weight:800; color:#111827;">{{ $linkableCompany->company_name }}</div>
-                                            <div style="font-size:12px; color:#6b7280; margin-top:4px;">{{ $linkableCompany->company_address }}</div>
-                                            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
-                                                <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; background:#fef3c7; color:#92400e; font-size:11px; font-weight:700;">
+                                    <div class="existing-moa-card">
+                                        <div class="existing-moa-content">
+                                            <div class="existing-moa-name">{{ $linkableCompany->company_name }}</div>
+                                            <div class="existing-moa-addr">{{ $linkableCompany->company_address }}</div>
+                                            <div class="existing-moa-badges">
+                                                <span class="existing-moa-badge year">
                                                     <i class="fa fa-calendar-alt"></i> {{ $linkableCompany->school_year }}
                                                 </span>
                                                 @if(!empty($linkableCompany->course))
-                                                    <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; background:#eff6ff; color:#1d4ed8; font-size:11px; font-weight:700;">
+                                                    <span class="existing-moa-badge course">
                                                         <i class="fa fa-graduation-cap"></i> {{ $linkableCompany->course }}
                                                     </span>
                                                 @endif
                                             </div>
                                         </div>
-                                        <div style="display:flex; flex-direction:column; gap:8px; align-items:stretch; min-width: 150px;">
+                                        <div class="existing-moa-buttons">
                                             <button type="button"
                                                 class="btn-modal-close view-btn"
-                                                data-url="{{ asset('assets/' . $linkableCompany->file) }}"
-                                                style="justify-content:center; padding-inline: 16px; white-space: nowrap;">
+                                                data-url="{{ asset('assets/' . $linkableCompany->file) }}">
                                                 <i class="fa fa-eye me-1"></i> View MOA
                                             </button>
                                             <button type="button"
                                                 class="btn-modal-submit existing-moa-link-btn"
-                                                data-company-id="{{ $linkableCompany->id }}"
-                                                style="justify-content:center; padding-inline: 16px; white-space: nowrap;">
+                                                data-company-id="{{ $linkableCompany->id }}">
                                                 <i class="fa fa-link me-1"></i> Use This MOA
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             @empty
-                                <div id="existingMoaEmptyState" style="padding:14px; border:1px dashed #f3b3b3; border-radius:12px; color:#6b7280; font-size:12.5px; background:#fff;">
+                                <div id="existingMoaEmptyState" class="existing-moa-empty">
                                     No existing MOA is available to link right now. You can continue with a new upload below.
                                 </div>
                             @endforelse
@@ -534,7 +532,7 @@
                     <!-- Two-column grid -->
                     <div class="moa-form-grid">
 
-                        <!-- LEFT COLUMN (4 fields) -->
+                        <!-- LEFT COLUMN (5 fields) -->
                         <div>
                             <label class="modal-field-label">
                                 <i class="fa fa-building"></i> Company Name
@@ -559,20 +557,20 @@
                             </label>
                             <input class="modal-field-input" type="text" name="companyNo"
                                 placeholder="e.g. 09XX-XXX-XXXX or N/A">
-                        </div>
 
-                        <!-- RIGHT COLUMN (3 fields) -->
-                        <div>
                             <label class="modal-field-label">
                                 <i class="fa fa-envelope"></i> Company Email
                             </label>
                             <input class="modal-field-input" type="text" name="company_email"
                                 placeholder="e.g. info@company.com" required>
+                        </div>
 
+                        <!-- RIGHT COLUMN (4 fields) -->
+                        <div>
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-calendar-alt"></i> School Year</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Select the current school year, example: <strong>2025-2026</strong>.
+                                    Example: <strong>2025-2026</strong>.
                                 </span>
                             </label>
                             <div class="school-year-row">
@@ -589,18 +587,18 @@
                                 </select>
                             </div>
 
-                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Select the date when the MOA was notarized.
+                                    When MOA was notarized.
                                 </span>
                             </label>
                             <input class="modal-field-input" type="date" name="date_notarized">
 
-                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Select the MOA expiry date.
+                                    MOA expiry date.
                                 </span>
                             </label>
                             <input class="modal-field-input" type="date" name="valid_until" required>
@@ -611,16 +609,14 @@
                                 border: 1px solid #fecaca;
                                 border-left: 3px solid var(--red);
                                 border-radius: 10px;
-                                padding: 12px 14px;
-                                margin-top: 6px;
+                                padding: 10px 12px;
+                                margin-top: 4px;
                             ">
-                                <div style="font-size: 12px; font-weight: 700; color: var(--red); margin-bottom: 5px;">
+                                <div style="font-size: 11.5px; font-weight: 700; color: var(--red); margin-bottom: 3px;">
                                     <i class="fa fa-info-circle"></i> Reminder
                                 </div>
-                                <div style="font-size: 11.5px; color: #777; line-height: 1.6;">
-                                    Ensure your MOA is properly <strong>notarized</strong> before submitting.
-                                    Accepted format: <strong>PDF only</strong>.
-                                    Max file size: <strong>30 MB</strong>.
+                                <div style="font-size: 11px; color: #666; line-height: 1.5;">
+                                    Ensure MOA is properly <strong>notarized</strong>. Accepted: <strong>PDF only (max 30 MB)</strong>.
                                 </div>
                             </div>
                         </div>
@@ -628,13 +624,13 @@
                     </div>
 
                     <!-- DIVIDER -->
-                    <div style="height: 1px; background: #f0f0f0; margin: 20px 0;"></div>
+                    <div style="height: 1px; background: #f0f0f0; margin: 16px 0 14px;"></div>
 
                     <!-- MOA DOCUMENT — full width below -->
-                    <label class="modal-field-label">
+                    <label class="modal-field-label" style="margin-bottom: 6px;">
                         <i class="fa fa-paperclip"></i> MOA Document
                     </label>
-                    <div class="file-upload-zone" id="moaDropZone">
+                    <div class="file-upload-zone" id="moaDropZone" style="margin-bottom: 0;">
                         <input type="file" name="file" id="moaFileInput" data-max-size-mb="30" accept=".pdf,application/pdf" required>
                         <i class="fa fa-cloud-upload-alt upload-icon"></i>
                         <p id="moaFileLabel">Click or drag your notarized MOA file here</p>
@@ -673,6 +669,7 @@
                 @method('PUT')
                 <div class="modal-body">
                     <div class="moa-form-grid">
+                        <!-- LEFT COLUMN (5 fields) -->
                         <div>
                             <label class="modal-field-label">
                                 <i class="fa fa-building"></i> Company Name
@@ -693,18 +690,19 @@
                                 <i class="fa fa-phone"></i> Company Number
                             </label>
                             <input class="modal-field-input" type="text" name="companyNo" id="editCompanyNo" placeholder="e.g. 09XX-XXX-XXXX or N/A">
-                        </div>
 
-                        <div>
                             <label class="modal-field-label">
                                 <i class="fa fa-envelope"></i> Company Email
                             </label>
                             <input class="modal-field-input" type="text" name="company_email" id="editCompanyEmail" required>
+                        </div>
 
+                        <!-- RIGHT COLUMN (4 fields) -->
+                        <div>
                             <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-calendar-alt"></i> School Year</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Select the current school year, example: <strong>2025-2026</strong>.
+                                    Example: <strong>2025-2026</strong>.
                                 </span>
                             </label>
                             <div class="school-year-row">
@@ -713,22 +711,22 @@
                                         <option value="{{ $year }}">{{ $year }}</option>
                                     @endforeach
                                 </select>
-                                <span class="sep">-</span>
+                                <span class="sep">–</span>
                                 <select name="school_year_end" id="editSchoolYearEnd" class="modal-field-input" required></select>
                             </div>
 
-                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-calendar-check"></i> Date Notarized</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Select the date when the MOA was notarized.
+                                    When MOA was notarized.
                                 </span>
                             </label>
                             <input class="modal-field-input" type="date" name="date_notarized" id="editDateNotarized">
 
-                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top: 14px;">
+                            <label class="modal-field-label" style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
                                 <span><i class="fa fa-hourglass-end"></i> Validity Period</span>
                                 <span style="font-size: 11.5px; color: #777; font-weight: 400;">
-                                    Select the MOA expiry date.
+                                    MOA expiry date.
                                 </span>
                             </label>
                             <input class="modal-field-input" type="date" name="valid_until" id="editValidUntil" required>
@@ -738,25 +736,25 @@
                                 border: 1px solid #bfdbfe;
                                 border-left: 3px solid #2563eb;
                                 border-radius: 10px;
-                                padding: 12px 14px;
-                                margin-top: 6px;
+                                padding: 10px 12px;
+                                margin-top: 4px;
                             ">
-                                <div style="font-size: 12px; font-weight: 700; color: #2563eb; margin-bottom: 5px;">
+                                <div style="font-size: 11.5px; font-weight: 700; color: #2563eb; margin-bottom: 3px;">
                                     <i class="fa fa-info-circle"></i> Optional PDF Replacement
                                 </div>
-                                <div style="font-size: 11.5px; color: #555; line-height: 1.6;" id="editMoaCurrentFile">
-                                    Leave the file empty if you only need to update the company details.
+                                <div style="font-size: 11px; color: #555; line-height: 1.5;" id="editMoaCurrentFile">
+                                    Leave file empty to update company details only.
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="height: 1px; background: #f0f0f0; margin: 20px 0;"></div>
+                    <div style="height: 1px; background: #f0f0f0; margin: 16px 0 14px;"></div>
 
-                    <label class="modal-field-label">
+                    <label class="modal-field-label" style="margin-bottom: 6px;">
                         <i class="fa fa-paperclip"></i> Replace MOA Document
                     </label>
-                    <div class="file-upload-zone" id="editMoaDropZone">
+                    <div class="file-upload-zone" id="editMoaDropZone" style="margin-bottom: 0;">
                         <input type="file" name="file" id="editMoaFileInput" data-max-size-mb="30" accept=".pdf,application/pdf">
                         <i class="fa fa-cloud-upload-alt upload-icon"></i>
                         <p id="editMoaFileLabel">Leave empty to keep the current notarized MOA PDF</p>

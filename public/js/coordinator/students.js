@@ -108,10 +108,12 @@
             });
         });
 
-        // Notify form
+        // Notify form with confirmation modal
         $(document).on('submit', '.notifyForm', function (e) {
             e.preventDefault();
             const form = $(this);
+            const studentName = form.data('student-name') || 'this student';
+            const studentNum = form.data('student-num') || '';
             const btn = form.find('button[type="submit"]');
             const originalHtml = btn.html();
             const toastDelay = 2600;
@@ -123,38 +125,74 @@
                 timerProgressBar: true
             });
 
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Sending...');
-            $.ajax({
-                type: 'POST',
-                url: form.attr('action'),
-                data: form.serialize(),
-                dataType: 'json',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                },
-                success: function (response) {
-                    btn.prop('disabled', false).html(originalHtml);
-                    Toast.fire({
-                        icon: 'success',
-                        title: (response && response.message) ? response.message : 'Notification sent successfully.'
+            Swal.fire({
+                title: 'Send Reminder Notification?',
+                html: '<div style="text-align:center; margin: 10px 0 16px;">' +
+                          '<div style="font-size:15px; font-weight:700; color:#111827;">' + $('<div>').text(studentName).html() + '</div>' +
+                          (studentNum ? '<div style="font-size:12.5px; color:#6b7280; margin-top:2px;">Student #' + $('<div>').text(studentNum).html() + '</div>' : '') +
+                      '</div>' +
+                      '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; text-align:left; font-size:12.5px; color:#166534; line-height:1.5;">' +
+                          '<i class="fa fa-bell me-1" style="color:#16a34a;"></i> This will send an automated reminder notification to the student regarding their OJT requirements and progress.' +
+                      '</div>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="fa fa-paper-plane me-1"></i> Yes, Send Notification',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+                    
+                    Swal.fire({
+                        title: 'Sending Notification...',
+                        html: '<div style="margin: 15px 0;">' +
+                                  '<div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">' +
+                                      '<span class="visually-hidden">Sending...</span>' +
+                                  '</div>' +
+                              '</div>' +
+                              '<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">' +
+                                  '<i class="fa fa-envelope text-success me-1"></i> Sending email reminder. Please wait...</strong>' +
+                              '</div>',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false
                     });
-                    setTimeout(function () {
-                        location.reload();
-                    }, toastDelay + 150);
-                },
-                error: function (xhr) {
-                    btn.prop('disabled', false).html(originalHtml);
-                    const rawResponse = (xhr.responseText || '').trim();
-                    const isHtmlResponse = rawResponse.startsWith('<!DOCTYPE html') || rawResponse.startsWith('<html');
-                    const message = xhr.responseJSON && xhr.responseJSON.message
-                        ? xhr.responseJSON.message
-                        : isHtmlResponse
-                            ? 'Notification could not be sent because the mail server returned an error.'
-                            : (rawResponse || 'Failed to send notification. Please try again.');
-                    Toast.fire({
-                        icon: 'error',
-                        title: message
+
+                    $.ajax({
+                        type: 'POST',
+                        url: form.attr('action'),
+                        data: form.serialize(),
+                        dataType: 'json',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        success: function (response) {
+                            btn.prop('disabled', false).html(originalHtml);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Notification Sent!',
+                                text: (response && response.message) ? response.message : 'Notification sent successfully to ' + studentName + '.',
+                                confirmButtonColor: '#16a34a'
+                            });
+                        },
+                        error: function (xhr) {
+                            btn.prop('disabled', false).html(originalHtml);
+                            const rawResponse = (xhr.responseText || '').trim();
+                            const isHtmlResponse = rawResponse.startsWith('<!DOCTYPE html') || rawResponse.startsWith('<html');
+                            const message = xhr.responseJSON && xhr.responseJSON.message
+                                ? xhr.responseJSON.message
+                                : isHtmlResponse
+                                    ? 'Notification could not be sent because the mail server returned an error.'
+                                    : (rawResponse || 'Failed to send notification. Please try again.');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Notification Failed',
+                                text: message,
+                                confirmButtonColor: '#dc2626'
+                            });
+                        }
                     });
                 }
             });

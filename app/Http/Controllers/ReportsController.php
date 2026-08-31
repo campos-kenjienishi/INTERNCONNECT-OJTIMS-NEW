@@ -403,7 +403,7 @@ public function reportsExpired()
         }
         $companies = $this->annotateNatureOfBusiness($companies);
 
-        $campusName = config('campus.name', 'PUP Taguig Branch');
+        $campusName = config('campus.name', 'PUP Taguig Campus');
 
         $reportInsights = $this->buildMoaReportInsights($companies, $course->first()->course ?? null);
 
@@ -450,7 +450,7 @@ public function reportsExpired()
     $companies = $this->annotateNatureOfBusiness($companies);
     $companyNames = $companies->pluck('company_name')->toArray();
 
-    $campusName = config('campus.name', 'PUP Taguig Branch');
+    $campusName = config('campus.name', 'PUP Taguig Campus');
 
     // Retrieve students under the specified companies using where and get
     $students = Student::whereHas('companies', function ($query) use ($companyNames) {
@@ -609,7 +609,7 @@ public function reportsExpiredProf()
         $companies = $this->annotateMoaFileStatus($companies);
         $companies = $this->annotateNatureOfBusiness($companies);
 
-        $campusName = config('campus.name', 'PUP Taguig Branch');
+        $campusName = config('campus.name', 'PUP Taguig Campus');
 
         return view('professor.expiredMOAReports', compact('companies', 'user', 'stu', 'courseAll', 'schoolYears', 'selectedCourse', 'selectedSchoolYear', 'reportInsights', 'campusName'));
     }
@@ -659,7 +659,7 @@ public function reportsExpiredProf()
     $companies = $this->annotateMoaFileStatus($companies);
     $companies = $this->annotateNatureOfBusiness($companies);
 
-    $campusName = config('campus.name', 'PUP Taguig Branch');
+    $campusName = config('campus.name', 'PUP Taguig Campus');
 
     $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
 

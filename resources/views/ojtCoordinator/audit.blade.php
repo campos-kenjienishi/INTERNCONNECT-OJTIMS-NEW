@@ -214,7 +214,7 @@
                         <select id="actionFilter" class="audit-filter-select">
                             <option value="">All Actions</option>
                             @foreach($logs->pluck('action')->filter()->map(fn ($action) => strtolower(trim($action)))->unique()->sort()->values() as $actionOption)
-                                <option value="{{ $actionOption }}">{{ ucfirst($actionOption) }}</option>
+                                <option value="{{ $actionOption }}">{{ ucwords($actionOption) }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -223,7 +223,15 @@
                         <select id="roleFilter" class="audit-filter-select">
                             <option value="">All Roles</option>
                             @foreach($logs->pluck('user_role')->filter()->map(fn ($role) => strtolower(trim($role)))->unique()->sort()->values() as $roleOption)
-                                <option value="{{ $roleOption }}">{{ ucfirst($roleOption) }}</option>
+                                @php
+                                    $displayRole = match(strtolower($roleOption)) {
+                                        'ojt coordinator', 'coordinator' => 'OJT Coordinator',
+                                        'professor' => 'Professor',
+                                        'student' => 'Student',
+                                        default => ucwords($roleOption),
+                                    };
+                                @endphp
+                                <option value="{{ $roleOption }}">{{ $displayRole }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -300,7 +308,7 @@
                         </div>
                     </div>
 
-                    <table id="auditTable" class="display" style="width:100%; opacity: 0; transition: opacity 0.3s ease;">
+                    <table id="auditTable" class="display" style="width:100%;">
                     <thead>
                         <tr>
                             <th>Date / Time</th>
@@ -329,27 +337,81 @@
                             </td>
                             <td>
                                 @php
-                                    $action = strtolower($log->action);
+                                    $action = strtolower(trim((string) $log->action));
                                     $actionClass = match($action) {
-                                        'create'  => 'action-create',
-                                        'update'  => 'action-update',
-                                        'delete'  => 'action-delete',
-                                        'approve' => 'action-approve',
-                                        'deny'    => 'action-deny',
-                                        default   => 'action-default',
+                                        // Green actions
+                                        'create'                                                         => 'action-create',
+                                        'upload'                                                         => 'action-upload',
+                                        'file upload'                                                    => 'action-file-upload',
+                                        'generate'                                                       => 'action-generate',
+                                        'join'                                                           => 'action-join',
+                                        'login', 'login success'                                         => 'action-login',
+                                        'submit'                                                         => 'action-submit',
+                                        'sync'                                                           => 'action-sync',
+                                        'approve'                                                        => 'action-approve',
+                                        'unarchive', 'restore'                                           => 'action-unarchive',
+                                        
+                                        // Yellow / Amber actions
+                                        'update', 'edit', 'modify'                                       => 'action-update',
+                                        'archive'                                                        => 'action-archive',
+                                        'request unlock'                                                 => 'action-request-unlock',
+                                        'change_password'                                                => 'action-change-password',
+                                        'coordinator toggle in-house ojt', 'student toggle in-house ojt' => 'action-toggle',
+
+                                        // Red actions
+                                        'delete', 'remove', 'destroy'                                    => 'action-delete',
+                                        'file delete'                                                    => 'action-file-delete',
+                                        'leave'                                                          => 'action-leave',
+                                        'deny', 'reject'                                                 => 'action-deny',
+                                        'logout'                                                         => 'action-logout',
+                                        'login failure'                                                  => 'action-login-failure',
+
+                                        // Blue actions
+                                        'view'                                                           => 'action-view',
+                                        'download'                                                       => 'action-download',
+                                        'export'                                                         => 'action-export',
+                                        'notify', 'send', 'send email'                                   => 'action-send',
+                                        'link'                                                           => 'action-link',
+                                        'transfer ownership', 'transfer role'                            => 'action-transfer',
+
+                                        default                                                          => 'action-default',
                                     };
+
                                     $actionIcon = match($action) {
-                                        'create'  => 'fa-plus-circle',
-                                        'update'  => 'fa-edit',
-                                        'delete'  => 'fa-trash',
-                                        'approve' => 'fa-check-circle',
-                                        'deny'    => 'fa-times-circle',
-                                        default   => 'fa-circle',
+                                        'create'                                                         => 'fa-plus-circle',
+                                        'upload', 'file upload'                                          => 'fa-file-upload',
+                                        'generate'                                                       => 'fa-file-alt',
+                                        'join'                                                           => 'fa-user-plus',
+                                        'login', 'login success'                                         => 'fa-sign-in-alt',
+                                        'submit'                                                         => 'fa-paper-plane',
+                                        'sync'                                                           => 'fa-sync-alt',
+                                        'approve'                                                        => 'fa-check-circle',
+                                        'unarchive', 'restore'                                           => 'fa-box-open',
+
+                                        'update', 'edit', 'modify', 'coordinator toggle in-house ojt', 'student toggle in-house ojt' => 'fa-edit',
+                                        'archive'                                                        => 'fa-archive',
+                                        'request unlock'                                                 => 'fa-unlock-alt',
+                                        'change_password'                                                => 'fa-key',
+
+                                        'delete', 'remove', 'destroy', 'file delete'                     => 'fa-trash',
+                                        'leave'                                                          => 'fa-sign-out-alt',
+                                        'deny', 'reject'                                                 => 'fa-times-circle',
+                                        'logout'                                                         => 'fa-sign-out-alt',
+                                        'login failure'                                                  => 'fa-ban',
+
+                                        'view'                                                           => 'fa-eye',
+                                        'download'                                                       => 'fa-download',
+                                        'export'                                                         => 'fa-file-export',
+                                        'notify', 'send', 'send email'                                   => 'fa-envelope',
+                                        'link'                                                           => 'fa-link',
+                                        'transfer ownership', 'transfer role'                            => 'fa-exchange-alt',
+
+                                        default                                                          => 'fa-circle',
                                     };
                                 @endphp
                                 <span class="action-badge {{ $actionClass }}">
                                     <i class="fa {{ $actionIcon }}"></i>
-                                    {{ ucfirst($log->action) }}
+                                    {{ ucwords($log->action) }}
                                 </span>
                             </td>
                             <td class="audit-name-cell">
@@ -369,25 +431,49 @@
                                         'professor' => 'role-professor',
                                         default => '',
                                     };
+                                    $roleDisplay = match($role) {
+                                        'ojt coordinator', 'coordinator' => 'OJT Coordinator',
+                                        'professor' => 'Professor',
+                                        'student' => 'Student',
+                                        default => ucwords($log->user_role ?: 'Unknown'),
+                                    };
+                                    $roleIcon = match($role) {
+                                        'student' => 'fa-user-graduate',
+                                        'ojt coordinator', 'coordinator' => 'fa-user-shield',
+                                        'professor' => 'fa-chalkboard-teacher',
+                                        default => 'fa-user',
+                                    };
                                 @endphp
                                 <span class="role-badge {{ $roleClass }}">
-                                    <i class="fa fa-user-shield"></i>
-                                    {{ $log->user_role ?: 'Unknown' }}
+                                    <i class="fa {{ $roleIcon }}"></i>
+                                    {{ $roleDisplay }}
                                 </span>
                             </td>
                             <td>
+                                @php
+                                    $rawModule = trim((string) ($log->module ?? ''));
+                                    $displayModule = match(strtolower($rawModule)) {
+                                        'upload' => 'Upload Templates',
+                                        'filecategory' => 'File Category',
+                                        'passdocu' => 'Document Requirements',
+                                        'classroom', 'class room' => 'Classroom',
+                                        'auth' => 'Authentication',
+                                        'idp uuid sync' => 'IdP Sync',
+                                        default => ucwords($rawModule),
+                                    };
+                                @endphp
                                 <span class="module-badge">
                                     <i class="fa fa-tag"></i>
-                                    {{ $log->module }}
+                                    {{ $displayModule }}
                                 </span>
                             </td>
                             <td class="audit-desc-cell">
                                 <button
                                     type="button"
                                     class="btn-view-desc"
-                                    data-action="{{ ucfirst($log->action) }}"
-                                    data-role="{{ $log->user_role ?: 'Unknown' }}"
-                                    data-module="{{ $log->module }}"
+                                    data-action="{{ ucwords($log->action) }}"
+                                    data-role="{{ $roleDisplay }}"
+                                    data-module="{{ $displayModule }}"
                                     data-datetime="{{ \Carbon\Carbon::parse($log->created_at)->format('M d, Y h:i A') }}"
                                     data-description="{{ $log->description }}"
                                 >

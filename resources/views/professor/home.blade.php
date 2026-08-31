@@ -207,12 +207,12 @@
             </a>
         </div>
 
-        <!-- Students by Class/Section -->
+        <!-- Students by Class -->
         <div class="table-card" style="margin-top:32px;">
             <div class="table-card-header">
                 <h2>
                     <div class="header-icon"><i class="fa fa-users"></i></div>
-                    Students by Class/Section
+                    Students by Class
                 </h2>
                 <div style="display:flex; gap:12px; align-items:center;">
                     <select id="courseFilter" style="border-radius:8px;padding:6px 12px;font-size:13px;">
@@ -241,7 +241,7 @@
                             <th>Student Name</th>
                             <th>Email</th>
                             <th>Course</th>
-                            <th>Class/Section</th>
+                            <th>Class</th>
                         </tr>
                     </thead>
                     <tbody>

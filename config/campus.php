@@ -13,6 +13,6 @@ return [
     |
     */
 
-    'name' => env('CAMPUS_NAME', 'PUP Taguig Branch'),
+    'name' => env('CAMPUS_NAME', 'PUP Taguig Campus'),
 
 ];

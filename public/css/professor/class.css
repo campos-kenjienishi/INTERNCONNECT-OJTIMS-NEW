@@ -1071,16 +1071,45 @@
     .btn-remove:hover { box-shadow: 0 6px 18px var(--btn-remove-glow) !important; color: #ffffff !important; }
     .btn-remove i { color: #ffffff !important; }
 
+        #fileTable th:nth-child(6),
+        #fileTable td:nth-child(6),
+        #fileTable th:nth-child(7),
+        #fileTable td:nth-child(7) {
+            width: 88px !important;
+            min-width: 80px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #fileTable th:nth-child(8),
+        #fileTable td:nth-child(8) {
+            width: 105px !important;
+            min-width: 95px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+
         #fileTable th:nth-child(9),
-        #fileTable td:nth-child(9),
+        #fileTable td:nth-child(9) {
+            width: 85px !important;
+            min-width: 78px !important;
+            max-width: 95px !important;
+            text-align: center;
+            white-space: nowrap;
+            padding-left: 6px !important;
+            padding-right: 6px !important;
+        }
+
         #fileTable th:nth-child(10),
         #fileTable td:nth-child(10),
         #fileTable th:last-child,
         #fileTable td:last-child {
-            width: 140px !important;
-            min-width: 140px !important;
+            width: 110px !important;
+            min-width: 105px !important;
             text-align: center;
             white-space: nowrap;
+            padding-left: 6px !important;
+            padding-right: 6px !important;
         }
 
         .darkmode-toggle {

@@ -134,8 +134,10 @@
         btn.addEventListener('click', function () {
             const input = document.getElementById('requirementAiQuestionInput');
             const question = btn.getAttribute('data-question') || '';
-            if (input) input.value = question;
-            askRequirementAi(question);
+            if (input) {
+                input.value = question;
+                input.focus();
+            }
         });
     });
 

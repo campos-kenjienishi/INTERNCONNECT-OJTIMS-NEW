@@ -52,7 +52,7 @@
                                 $('#auditTableLoading').fadeOut(220, function() {
                                     $(this).remove();
                                 });
-                                $('#auditTable').css('opacity', '1');
+                                $('#auditTable, .dataTables_scrollHead table, .dataTables_scroll').css('opacity', '1');
                             }
                         });
 

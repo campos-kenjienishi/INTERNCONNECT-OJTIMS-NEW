@@ -1094,6 +1094,7 @@ public function allStudents()
 
     $selectedCourse = request('course');
     $students = User::where('role', 0)
+        ->with('studentInfo')
         ->whereHas('studentInfo', function ($query) use ($user, $selectedCourse) {
             $query->where('adviser_name', $user->full_name);
             if ($selectedCourse) {
@@ -1107,7 +1108,6 @@ public function allStudents()
     // Initialize subject data array outside the loop
     $subjectData = [];
     $course = Courses::all();
-
 
     foreach ($students as $student) {
         $ojt = OJTInformation::where('studentNum', $student->studentNum)->first();
@@ -1130,12 +1130,18 @@ public function allStudents()
                 ];
             }
         }
+
+        $studentInfo = $student->studentInfo;
+        $syStart = $studentInfo->school_year_start ?? $student->school_year_start ?? '';
+        $syEnd = $studentInfo->school_year_end ?? $student->school_year_end ?? '';
+        $schoolYear = (!empty($syStart) && !empty($syEnd)) ? ($syStart . ' - ' . $syEnd) : ($syStart ?: ($syEnd ?: '—'));
     
-        // Add the student and associated OJT and subject data to the data array
+        // Add the student and associated OJT, school year, and subject data to the data array
         $studentData[] = [
             'student' => $student,
             'ojt' => $ojt,
-            'subjects' => $subjectData, // Include subject data here
+            'school_year' => $schoolYear,
+            'subjects' => $subjectData,
         ];
     }
 

@@ -83,8 +83,10 @@ document.querySelectorAll('.student-ai-quick-question').forEach(function (btn) {
     btn.addEventListener('click', function () {
         const input = document.getElementById('studentAiQuestionInput');
         const question = btn.getAttribute('data-question') || '';
-        if (input) input.value = question;
-        askStudentAi(question);
+        if (input) {
+            input.value = question;
+            input.focus();
+        }
     });
 });
 
@@ -171,7 +173,8 @@ function buildPrintHTML() {
     const rawSemester = semesterEl ? (semesterEl.value || (semesterEl.selectedIndex >= 0 ? semesterEl.options[semesterEl.selectedIndex].text : '')) : '';
     const semester = rawSemester || window.__reportsConfig?.semester || window.reportConfig?.semester || '1st Semester';
 
-    const campusName = window.__reportsConfig?.campusName || window.reportConfig?.campusName || 'PUP Taguig Campus';
+    const rawCampus = window.__reportsConfig?.campusName || window.reportConfig?.campusName || 'PUP Taguig Campus';
+    const campusName = rawCampus.replace(/\bBranch\b/gi, 'Campus');
     const coordinatorName = window.__reportsConfig?.coordinatorName || window.reportConfig?.coordinatorName || 'OJT Coordinator';
 
     let rowsHTML = '';

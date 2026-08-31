@@ -550,12 +550,128 @@
             text-transform: capitalize;
         }
 
-        .action-create  { background: #dcfce7; color: #16a34a; }
-        .action-update  { background: #fef9c3; color: #b45309; }
-        .action-delete  { background: #fee2e2; color: var(--red); }
-        .action-approve { background: #dcfce7; color: #16a34a; }
-        .action-deny    { background: #fee2e2; color: var(--red); }
-        .action-default { background: #f3f4f6; color: #6b7280; }
+        /* Green Actions (Create, Upload, Generate, Join, Login, Submit, Sync, Approve, Restore/Unarchive) */
+        .action-create,
+        .action-upload,
+        .action-file-upload,
+        .action-generate,
+        .action-join,
+        .action-login,
+        .action-login-success,
+        .action-submit,
+        .action-sync,
+        .action-approve,
+        .action-restore,
+        .action-unarchive {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        /* Yellow/Amber Actions (Update, Edit, Modify, Archive, Request Unlock, Toggle) */
+        .action-update,
+        .action-modify,
+        .action-archive,
+        .action-edit,
+        .action-request-unlock,
+        .action-change-password,
+        .action-toggle {
+            background: #fef9c3;
+            color: #b45309;
+        }
+
+        /* Red Actions (Delete, File Delete, Remove, Destroy, Leave, Deny, Reject, Logout, Login Failure) */
+        .action-delete,
+        .action-file-delete,
+        .action-remove,
+        .action-destroy,
+        .action-leave,
+        .action-deny,
+        .action-reject,
+        .action-logout,
+        .action-login-failure {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        /* Blue Actions (View, Download, Export, Notify, Send, Send Email, Link, Transfer) */
+        .action-view,
+        .action-download,
+        .action-export,
+        .action-notify,
+        .action-send,
+        .action-send-email,
+        .action-link,
+        .action-transfer,
+        .action-transfer-ownership,
+        .action-transfer-role {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .action-default {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        /* Dark Mode Action Badges */
+        body.dark-mode .action-create,
+        body.dark-mode .action-upload,
+        body.dark-mode .action-file-upload,
+        body.dark-mode .action-generate,
+        body.dark-mode .action-join,
+        body.dark-mode .action-login,
+        body.dark-mode .action-login-success,
+        body.dark-mode .action-submit,
+        body.dark-mode .action-sync,
+        body.dark-mode .action-approve,
+        body.dark-mode .action-restore,
+        body.dark-mode .action-unarchive {
+            background: rgba(22, 163, 74, 0.2);
+            color: #4ade80;
+        }
+
+        body.dark-mode .action-update,
+        body.dark-mode .action-modify,
+        body.dark-mode .action-archive,
+        body.dark-mode .action-edit,
+        body.dark-mode .action-request-unlock,
+        body.dark-mode .action-change-password,
+        body.dark-mode .action-toggle {
+            background: rgba(202, 138, 4, 0.2);
+            color: #facc15;
+        }
+
+        body.dark-mode .action-delete,
+        body.dark-mode .action-file-delete,
+        body.dark-mode .action-remove,
+        body.dark-mode .action-destroy,
+        body.dark-mode .action-leave,
+        body.dark-mode .action-deny,
+        body.dark-mode .action-reject,
+        body.dark-mode .action-logout,
+        body.dark-mode .action-login-failure {
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+        }
+
+        body.dark-mode .action-view,
+        body.dark-mode .action-download,
+        body.dark-mode .action-export,
+        body.dark-mode .action-notify,
+        body.dark-mode .action-send,
+        body.dark-mode .action-send-email,
+        body.dark-mode .action-link,
+        body.dark-mode .action-transfer,
+        body.dark-mode .action-transfer-ownership,
+        body.dark-mode .action-transfer-role {
+            background: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
+        }
+
+        body.dark-mode .action-default {
+            background: #262626;
+            color: #9ca3af;
+        }
 
         /* Module badge */
         .module-badge {
@@ -566,9 +682,15 @@
             border-radius: 8px;
             font-size: 11.5px;
             font-weight: 600;
-            background: #fff5f5;
-            color: var(--red);
-            border: 1px solid #fecaca;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        body.dark-mode .module-badge {
+            background: rgba(71, 85, 105, 0.3);
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.25);
         }
 
         .role-badge {
@@ -585,18 +707,39 @@
         }
 
         .role-student {
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
         }
 
         .role-coordinator {
-            background: #fee2e2;
-            color: var(--red);
+            background: #ede9fe;
+            color: #6b21a8;
+            border: 1px solid #ddd6fe;
         }
 
         .role-professor {
-            background: #ede9fe;
-            color: #7c3aed;
+            background: #e0f2fe;
+            color: #0284c7;
+            border: 1px solid #bae6fd;
+        }
+
+        body.dark-mode .role-student {
+            background: rgba(217, 119, 6, 0.25);
+            color: #facc15;
+            border-color: rgba(250, 204, 21, 0.3);
+        }
+
+        body.dark-mode .role-coordinator {
+            background: rgba(107, 33, 168, 0.25);
+            color: #c084fc;
+            border-color: rgba(192, 132, 252, 0.3);
+        }
+
+        body.dark-mode .role-professor {
+            background: rgba(2, 132, 199, 0.25);
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.3);
         }
 
         /* Name cell */

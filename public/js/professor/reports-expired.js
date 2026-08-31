@@ -87,8 +87,10 @@
         btn.addEventListener('click', function () {
             const input = document.getElementById('aiQuestionInput');
             const question = btn.getAttribute('data-question') || '';
-            if (input) input.value = question;
-            askReportAi(question);
+            if (input) {
+                input.value = question;
+                input.focus();
+            }
         });
     });
 
@@ -172,7 +174,8 @@
         const semester = document.getElementById('semester') ? document.getElementById('semester').value : '';
         const course   = document.getElementById('courseSelect') ? document.getElementById('courseSelect').value : '—';
 
-        const campusName    = window.professorMoaConfig?.campusName || 'PUP Taguig Campus';
+        const rawCampusName = window.professorMoaConfig?.campusName || 'PUP Taguig Campus';
+        const campusName    = rawCampusName.replace(/\bBranch\b/gi, 'Campus');
         const campusCollege = window.professorMoaConfig?.campusCollege || 'College of Engineering and Technology';
 
         let rowsHTML = '';

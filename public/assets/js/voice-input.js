@@ -27,7 +27,7 @@
             ".voice-mic-host{position:relative;display:block;width:100%;}",
             "label .voice-mic-host, .dataTables_filter .voice-mic-host{display:inline-flex !important;width:auto !important;vertical-align:middle;}",
             ".voice-mic-host > input," +
-                ".voice-mic-host > textarea{padding-right:44px !important;}",
+                ".voice-mic-host > textarea{padding-right:44px !important;margin-bottom:0 !important;}",
             "input[type='search']::-webkit-search-cancel-button, input[type='search']::-webkit-search-decoration{display:none !important; -webkit-appearance:none !important;}",
             "input::-ms-clear, input::-ms-reveal{display:none !important; width:0 !important; height:0 !important;}",
             "." + BUTTON_CLASS + "{" +
@@ -40,7 +40,10 @@
             "." + BUTTON_CLASS + ":hover{color:#f87171;filter:drop-shadow(0 0 6px rgba(239,68,68,0.7));transform:translateY(-50%) scale(1.15);background:rgba(239,68,68,0.12);}",
             "." + BUTTON_CLASS + "." + ACTIVE_CLASS + "{" +
                 "background:#ef4444 !important;color:#ffffff !important;border-radius:50% !important;border:none !important;box-shadow:0 0 12px rgba(239,68,68,0.6) !important;}",
-            "textarea + ." + BUTTON_CLASS + "{top:10px;transform:none;}"
+            "textarea + ." + BUTTON_CLASS + ", .voice-mic-host > textarea ~ ." + BUTTON_CLASS + ", textarea ~ ." + BUTTON_CLASS + ", [data-ai-insight-card] ." + BUTTON_CLASS + "{" +
+                "position:absolute !important;top:10px !important;bottom:auto !important;right:12px !important;left:auto !important;margin:0 !important;transform:none !important;z-index:5 !important;}",
+            "textarea + ." + BUTTON_CLASS + ":hover, .voice-mic-host > textarea ~ ." + BUTTON_CLASS + ":hover, textarea ~ ." + BUTTON_CLASS + ":hover, [data-ai-insight-card] ." + BUTTON_CLASS + ":hover{" +
+                "position:absolute !important;top:10px !important;bottom:auto !important;right:12px !important;left:auto !important;margin:0 !important;transform:scale(1.12) !important;}"
         ].join("");
 
         document.head.appendChild(style);
@@ -317,6 +320,10 @@
         } else if (!host.classList.contains("voice-mic-host")) {
             var wrapper = document.createElement("div");
             wrapper.className = "voice-mic-host";
+            var computedMb = window.getComputedStyle(field).marginBottom;
+            if (computedMb && computedMb !== "0px") {
+                wrapper.style.marginBottom = computedMb;
+            }
             host.insertBefore(wrapper, field);
             wrapper.appendChild(field);
             host = wrapper;

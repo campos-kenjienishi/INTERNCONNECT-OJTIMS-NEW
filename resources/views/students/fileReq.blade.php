@@ -202,23 +202,43 @@
             </div>
         </div>
 
+        @php
+            $submittedBasicCount = $submittedBasicNames->count();
+            $totalBasicCount = $basicCategories->count();
+            $allBasicDone = $totalBasicCount > 0 && $missingBasicCategories->isEmpty();
+
+            if ($allBasicDone) {
+                $basicIconColor = 'green';
+                $basicBadgeClass = 'status-approved';
+                $basicStatusText = 'Completed';
+            } elseif ($submittedBasicCount === 0) {
+                $basicIconColor = 'red';
+                $basicBadgeClass = 'status-denied';
+                $basicStatusText = 'Not Started';
+            } else {
+                $basicIconColor = 'amber';
+                $basicBadgeClass = 'status-pending';
+                $basicStatusText = 'In Progress';
+            }
+        @endphp
+
         <div class="stats-row" style="margin-top:-6px;">
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-unlock-alt"></i></div>
+                <div class="stat-icon {{ $basicIconColor }}"><i class="fa fa-unlock-alt"></i></div>
                 <div>
-                    <div class="stat-num">{{ $submittedBasicNames->count() }}/{{ $basicCategories->count() }}</div>
+                    <div class="stat-num">{{ $submittedBasicCount }}/{{ $totalBasicCount }}</div>
                     <div class="stat-name">Basic Requirements Submitted</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon {{ $hasSubmittedNotarizedMoa ? 'green' : 'amber' }}"><i class="fa fa-file-contract"></i></div>
+                <div class="stat-icon {{ $hasSubmittedNotarizedMoa ? 'green' : 'red' }}"><i class="fa fa-file-contract"></i></div>
                 <div>
                     <div class="stat-num">{{ $hasSubmittedNotarizedMoa ? 'Yes' : 'No' }}</div>
                     <div class="stat-name">Notarized MOA Submitted</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon {{ $otherRequirementsUnlocked ? 'green' : 'gray' }}"><i class="fa fa-layer-group"></i></div>
+                <div class="stat-icon {{ $otherRequirementsUnlocked ? 'green' : 'red' }}"><i class="fa fa-layer-group"></i></div>
                 <div>
                     <div class="stat-num">{{ $otherRequirementsUnlocked ? 'Unlocked' : 'Locked' }}</div>
                     <div class="stat-name">Other Requirements</div>
@@ -254,11 +274,11 @@
                         <div class="phase-summary-stats">
                             <div class="phase-summary-stat">
                                 <div class="phase-summary-stat-label">Submitted</div>
-                                <div class="phase-summary-stat-value">{{ $submittedBasicNames->count() }}/{{ $basicCategories->count() }}</div>
+                                <div class="phase-summary-stat-value">{{ $submittedBasicCount }}/{{ $totalBasicCount }}</div>
                             </div>
                             <div class="phase-summary-stat">
                                 <div class="phase-summary-stat-label">Status</div>
-                                <div class="phase-summary-stat-value">{{ $missingBasicCategories->isEmpty() ? 'Completed' : 'In Progress' }}</div>
+                                <div class="phase-summary-stat-value">{{ $basicStatusText }}</div>
                             </div>
                         </div>
 
@@ -273,7 +293,7 @@
                         <div class="phase-panel-header">
                             <div class="phase-panel-title-row">
                                 <div class="phase-panel-title">Other Requirements</div>
-                                <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-pending' }} phase-header-badge">
+                                <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-denied' }} phase-header-badge">
                                     <i class="fa {{ $otherRequirementsUnlocked ? 'fa-unlock' : 'fa-lock' }}"></i>
                                     {{ $otherRequirementsUnlocked ? 'Unlocked' : 'Locked' }}
                                 </span>
@@ -309,20 +329,20 @@
 
                         <div class="phase-progress-list">
                             <div class="phase-progress-item">
-                                <span>Basic requirements completed</span>
-                                <span class="status-badge {{ $missingBasicCategories->isEmpty() ? 'status-approved' : 'status-pending' }}">
-                                    {{ $submittedBasicNames->count() }}/{{ $basicCategories->count() ?: 0 }}
+                                <span>Basic Requirements Completed</span>
+                                <span class="status-badge {{ $basicBadgeClass }}">
+                                    {{ $submittedBasicCount }}/{{ $totalBasicCount ?: 0 }}
                                 </span>
                             </div>
                             <div class="phase-progress-item">
-                                <span>Notarized MOA submitted</span>
-                                <span class="status-badge {{ $hasSubmittedNotarizedMoa ? 'status-approved' : 'status-pending' }}">
+                                <span>Notarized MOA Submitted</span>
+                                <span class="status-badge {{ $hasSubmittedNotarizedMoa ? 'status-approved' : 'status-denied' }}">
                                     {{ $hasSubmittedNotarizedMoa ? 'Yes' : 'No' }}
                                 </span>
                             </div>
                             <div class="phase-progress-item">
-                                <span>Other requirements access</span>
-                                <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-pending' }}">
+                                <span>Other Requirements Access</span>
+                                <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-denied' }}">
                                     {{ $otherRequirementsUnlocked ? 'Unlocked' : 'Locked' }}
                                 </span>
                             </div>
@@ -668,7 +688,7 @@
                                 <i class="fa {{ $isSubmittedBasic ? 'fa-check-circle' : 'fa-file-alt' }}" style="color:{{ $isSubmittedBasic ? '#16a34a' : '#64748b' }};"></i>
                                 <span>{{ $category->fileName }}</span>
                             </div>
-                            <span class="status-badge {{ $isSubmittedBasic ? 'status-approved' : 'status-default' }}">
+                            <span class="status-badge {{ $isSubmittedBasic ? 'status-approved' : 'status-pending' }}">
                                 {{ $isSubmittedBasic ? 'Submitted' : 'Pending' }}
                             </span>
                         </div>
@@ -706,7 +726,7 @@
                                 <i class="fa fa-file-alt" style="color:#64748b;"></i>
                                 <span>{{ $category->fileName }}</span>
                             </div>
-                            <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-default' }}">
+                            <span class="status-badge {{ $otherRequirementsUnlocked ? 'status-approved' : 'status-denied' }}">
                                 {{ $otherRequirementsUnlocked ? 'Available' : 'Locked' }}
                             </span>
                         </div>

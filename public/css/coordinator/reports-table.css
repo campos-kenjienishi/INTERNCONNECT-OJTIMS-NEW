@@ -185,7 +185,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 13px;
         }
-        .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; min-width: 1000px; }
+        .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
         .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap; }
         .table-card-body table.dataTable tbody td { padding: 11px 12px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
@@ -348,34 +348,54 @@
 
             @page { size: A4 landscape; margin: 5mm; }
         }
-        /* ── Remove padding from wrapper so sticky left:0 is flush ── */
+/* ── DataTables layout and spacing ── */
 .table-card-body .dataTables_wrapper {
-    padding: 16px 0 16px 0; /* remove left/right padding */
+    padding: 16px 0 24px 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
 }
 
-/* ── DataTables controls keep their padding ── */
-.table-card-body .dataTables_filter,
-.table-card-body .dataTables_length,
-.table-card-body .dataTables_info,
+.table-card-body .dataTables_length {
+    padding: 0 22px 14px 22px !important;
+    order: 1;
+}
+
+.table-card-body .dataTables_filter {
+    padding: 0 22px 14px 22px !important;
+    order: 2;
+    margin-left: auto;
+}
+
+.table-card-body .dataTables_scroll,
+.table-card-body .table-scroll,
+.table-card-body table.dataTable {
+    width: 100% !important;
+    order: 3;
+}
+
+.table-card-body .dataTables_info {
+    padding: 18px 22px 0 22px !important;
+    margin: 0 !important;
+    order: 4;
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    float: none !important;
+}
+
 .table-card-body .dataTables_paginate {
-    padding: 0 22px;
+    padding: 18px 22px 0 22px !important;
+    margin: 0 0 0 auto !important;
+    order: 5;
+    float: none !important;
 }
 
 /* ── Scroll container ── */
 .table-card-body {
     position: relative;
-}
-
-.table-card-body .table-scroll {
-    width: 100%;
-}
-
-.table-card-body .dataTables_length,
-.table-card-body .dataTables_filter,
-.table-card-body .dataTables_info,
-.table-card-body .dataTables_paginate {
-    width: auto;
-    max-width: 100%;
+    padding-bottom: 8px !important;
 }
 
 .table-card-body .dataTables_scroll {
