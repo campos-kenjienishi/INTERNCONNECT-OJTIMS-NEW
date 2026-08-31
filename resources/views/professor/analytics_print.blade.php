@@ -500,9 +500,9 @@
                     <div class="footer-band">
                         <div class="system-line">
                             <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
-                            <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                            <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — Taguig Campus</span>
                         </div>
-                        <small>Ref: PROF-ANA-{{ now()->year }}</small>
+                        <small>InternConnect - OJTIMS &nbsp;|&nbsp; Ref: PROF-ANA-{{ now()->year }}</small>
                     </div>
                 </div>
             </div>

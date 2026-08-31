@@ -171,14 +171,14 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-university"></i></div>
+                <div class="stat-icon green"><i class="fa fa-university"></i></div>
                 <div>
                     <div class="stat-num">Active</div>
                     <div class="stat-name">System Status</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon green"><i class="fa fa-check-circle"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-check-circle"></i></div>
                 <div>
                     <div class="stat-num">{{ $totalCourses }}</div>
                     <div class="stat-name">Available Courses</div>

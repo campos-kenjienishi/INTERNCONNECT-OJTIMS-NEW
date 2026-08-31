@@ -166,12 +166,13 @@
                     <i class="fa fa-user-shield"></i>
                     <span>Transfer Coordinator Role</span>
                 </button>
-                <button type="button" id="btnSyncFlss" class="btn-sync-flss" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);">
+                <button type="button" id="btnSyncFlss" class="btn-sync-flss" style="background: linear-gradient(135deg, #0d9488 0%, #059669 100%); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);">
                     <i class="fa fa-sync-alt" id="flssSyncIcon"></i>
                     <span>Sync Faculty from FLSS</span>
                 </button>
-                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addProfessorModal">
-                    <i class="fa fa-plus"></i> Add New Professor
+                <button type="button" class="btn-add btn-manual-account" data-bs-toggle="modal" data-bs-target="#addProfessorModal" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);">
+                    <i class="fa fa-user-plus"></i>
+                    <span>Manual Account Creation</span>
                 </button>
             </div>
         </div>
@@ -354,7 +355,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fa fa-user-plus"></i> Add New Professor
+                    <i class="fa fa-user-plus"></i> Manual Account Creation
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -433,7 +434,7 @@
                         <i class="fa fa-times me-1"></i> Close
                     </button>
                     <button type="submit" class="btn-modal-submit">
-                        <i class="fa fa-save me-1"></i> Add Professor
+                        <i class="fa fa-user-plus me-1"></i> Create Professor Account
                     </button>
                 </div>
             </form>
@@ -502,25 +503,6 @@
             </form>
         </div>
     </div>
-</div>
-    <footer class="dashboard-footer">
-    <div class="footer-left">
-        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" class="footer-logo" alt="PUP">
-        <span class="footer-copy">
-            &copy; 1998&ndash;2026 <span>Polytechnic University of the Philippines</span>
-        </span>
-    </div>
-    <div class="footer-links">
-        <a href="https://www.pup.edu.ph/" target="_blank">
-            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
-            PUP Website
-        </a>
-        <span class="divider">|</span>
-        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
-        <span class="divider">|</span>
-        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
-    </div>
-</footer>
 </div>
 
 <!-- Scripts -->

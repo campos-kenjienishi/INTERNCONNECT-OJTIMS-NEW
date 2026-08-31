@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -174,7 +173,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-file-alt"></i></div>
+                <div class="stat-icon amber"><i class="fa fa-file-alt"></i></div>
                 <div>
                     <div class="stat-num" style="font-size: 16px;">DOC, PDF, XLS</div>
                     <div class="stat-name">Accepted Formats</div>
@@ -188,7 +187,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon amber"><i class="fa fa-download"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-download"></i></div>
                 <div>
                     <div class="stat-num">{{ $totalFiles }}</div>
                     <div class="stat-name">Available Downloads</div>
@@ -378,7 +377,7 @@
             <div class="modal-body" style="padding:0; background:#f8fafc;">
                 <div style="padding:12px 18px; border-bottom:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                        <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:600; flex-shrink:0;">
+                        <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; font-size:12px; font-weight:600; flex-shrink:0;">
                             <i class="fa fa-eye"></i> Preview
                         </span>
                         <span id="filePreviewSubTitle" style="font-size:13px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
@@ -403,6 +402,7 @@
         csrfToken: @json(csrf_token())
     };
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ vasset('js/coordinator/upload.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>

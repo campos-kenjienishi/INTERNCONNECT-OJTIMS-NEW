@@ -448,8 +448,8 @@
 
                                                     <label class="modal-field-label"><i class="fa fa-calendar-alt"></i> Semester</label>
                                                     <select name="semester" class="modal-field-select" required>
-                                                        <option value="1st Sem" {{ ($room->semester ?? '') == '1st Sem' ? 'selected' : '' }}>1st Sem</option>
-                                                        <option value="2nd Sem" {{ ($room->semester ?? '') == '2nd Sem' ? 'selected' : '' }}>2nd Sem</option>
+                                                        <option value="1st Semester" {{ ($room->semester ?? '') == '1st Semester' ? 'selected' : '' }}>1st Semester</option>
+                                                        <option value="2nd Semester" {{ ($room->semester ?? '') == '2nd Semester' ? 'selected' : '' }}>2nd Semester</option>
                                                         <option value="Summer" {{ ($room->semester ?? '') == 'Summer' ? 'selected' : '' }}>Summer</option>
                                                     </select>
 
@@ -700,8 +700,8 @@
                     </label>
                     <select name="semester" class="modal-field-select" required>
                         <option value="">Select semester</option>
-                        <option value="1st Sem">1st Sem</option>
-                        <option value="2nd Sem">2nd Sem</option>
+                        <option value="1st Sem">1st Semester</option>
+                        <option value="2nd Sem">2nd Semester</option>
                         <option value="Summer">Summer</option>
                     </select>
 

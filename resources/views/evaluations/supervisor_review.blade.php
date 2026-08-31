@@ -70,12 +70,12 @@
                             <input type="hidden" name="rating_{{ $item->id }}" value="{{ $validated['rating_' . $item->id] ?? '' }}">
                         @endif
                     @endforeach
-                    <button type="submit" class="btn-eval btn-eval-primary">
+                    <button type="submit" class="btn-eval btn-eval-emerald btn-eval-lg">
                         <i class="fa fa-paper-plane"></i> Confirm and Submit
                     </button>
                 </form>
 
-                <a href="{{ route('evaluation.form.show', ['token' => $requestRow->token]) }}" class="btn-eval btn-eval-outline">
+                <a href="{{ route('evaluation.form.show', ['token' => $requestRow->token]) }}" class="btn-eval btn-eval-amber">
                     <i class="fa fa-edit"></i> Go Back and Edit
                 </a>
             </div>

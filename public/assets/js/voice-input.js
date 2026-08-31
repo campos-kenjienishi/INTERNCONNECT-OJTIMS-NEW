@@ -28,6 +28,8 @@
             "label .voice-mic-host, .dataTables_filter .voice-mic-host{display:inline-flex !important;width:auto !important;vertical-align:middle;}",
             ".voice-mic-host > input," +
                 ".voice-mic-host > textarea{padding-right:44px !important;}",
+            "input[type='search']::-webkit-search-cancel-button, input[type='search']::-webkit-search-decoration{display:none !important; -webkit-appearance:none !important;}",
+            "input::-ms-clear, input::-ms-reveal{display:none !important; width:0 !important; height:0 !important;}",
             "." + BUTTON_CLASS + "{" +
                 "position:absolute;right:12px;top:50%;transform:translateY(-50%);" +
                 "width:32px;height:32px;aspect-ratio:1/1;border:none;border-radius:50%;" +

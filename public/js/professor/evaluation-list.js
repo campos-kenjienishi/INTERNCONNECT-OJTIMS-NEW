@@ -1,4 +1,4 @@
-﻿/* Professor Evaluation List Scripts */
+/* Professor Evaluation List Scripts */
 
     (function () {
         if (typeof window.jQuery === 'undefined' || typeof jQuery.fn.DataTable === 'undefined' || !document.getElementById('studentStatusTable')) {
@@ -7,7 +7,7 @@
 
         const studentStatusTable = $('#studentStatusTable').DataTable({
             dom: 't<"history-bottom"ip>',
-            order: [[2, 'asc']],
+            order: [[4, 'desc']],
             pageLength: 10,
             lengthMenu: [[10, 25, 50], [10, 25, 50]],
             autoWidth: false,

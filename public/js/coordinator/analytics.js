@@ -221,9 +221,9 @@
                                 <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:36px; height:36px; object-fit:contain; filter:brightness(1.4);" alt="PUP">
                             </div>
                             <div style="flex:1;">
-                                <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines - OJT Information Management System</div>
+                                <div style="font-size:6.5px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:2px; margin-bottom:3px;">Polytechnic University of the Philippines - Taguig Campus</div>
                                 <div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.3px; line-height:1.15;">Coordinator Analytics Report</div>
-                                <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">Taguig Branch Campus | College of Engineering and Technology</div>
+                                <div style="font-size:8.5px; color:rgba(255,255,255,0.6); margin-top:3px;">PUP Taguig Campus</div>
                             </div>
                         </div>
                         <div style="background:rgba(0,0,0,0.15); height:3px;"></div>
@@ -342,9 +342,9 @@
                     <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
                         <div style="display:flex; align-items:center; gap:6px;">
                             <img src="/images/final-puptg_logo-ojtims_nbg.png" style="width:13px; height:13px; object-fit:contain; opacity:0.7; filter:brightness(2);" alt="PUP">
-                            <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–${now.getFullYear()} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                            <span style="font-size:8px; color:rgba(255,255,255,0.75); font-weight:500;">© 1998–${now.getFullYear()} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — Taguig Campus</span>
                         </div>
-                        <div style="font-size:8px; color:rgba(255,255,255,0.5);">Ref: COORD-ANA-${now.getFullYear()}</div>
+                        <div style="font-size:8px; color:rgba(255,255,255,0.65);">InternConnect - OJTIMS &nbsp;|&nbsp; Ref: COORD-ANA-${now.getFullYear()}</div>
                     </div>
                 </div>
             `;

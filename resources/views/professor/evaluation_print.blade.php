@@ -324,10 +324,10 @@
                         <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
                     </div>
                     <div class="brand-copy">
-                        <div class="eyebrow">Polytechnic University of the Philippines - OJT Information Management System</div>
+                        <div class="eyebrow">Polytechnic University of the Philippines - Taguig Campus</div>
                         <div class="brand-title">Evaluation Monitoring Report</div>
                         <div class="brand-sub">
-                            {{ $selectedClass ? $selectedClass->room : 'Selected Class' }} | College of Engineering and Technology
+                            {{ $selectedClass ? $selectedClass->room : 'Selected Class' }} | PUP Taguig Campus
                         </div>
                     </div>
                 </div>
@@ -400,9 +400,9 @@
             <div class="footer-band">
                 <div class="left">
                     <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP">
-                    <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                    <span>© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — Taguig Campus</span>
                 </div>
-                <div class="right">Ref: EVL-RPT-{{ now()->year }}</div>
+                <div class="right">InternConnect - OJTIMS &nbsp;|&nbsp; Ref: EVL-RPT-{{ now()->year }}</div>
             </div>
         </div>
     </div>

@@ -579,9 +579,9 @@
         <div style="background:#7f0000; padding:8px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:6px;">
                 <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="PUP" style="width:13px; height:13px; object-fit:contain; opacity:.7; filter:brightness(2);">
-                <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — InternConnect OJT IMS</span>
+                <span style="font-size:8px; color:rgba(255,255,255,.75); font-weight:500;">© 1998–{{ now()->year }} <strong style="color:#fca5a5;">Polytechnic University of the Philippines</strong> — Taguig Campus</span>
             </div>
-            <div style="font-size:8px; color:rgba(255,255,255,.5);">Ref: PROF-ANA-{{ now()->year }}</div>
+            <div style="font-size:8px; color:rgba(255,255,255,.65);">InternConnect - OJTIMS &nbsp;|&nbsp; Ref: PROF-ANA-{{ now()->year }}</div>
         </div>
     </div>
 </div>

@@ -40,6 +40,10 @@
     .card-shell .card-body-shell { padding: 16px !important; }
     .card-shell .card-body-shell.tight { padding: 0 !important; }
 
+    /* Rating Guide on tablet */
+    .rating-guide-card { padding: 16px 18px !important; }
+    .rating-guide-scale { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important; gap: 8px !important; }
+
     /* Form */
     .form-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
     .form-control-shell { font-size: 16px !important; } /* prevents iOS zoom */
@@ -85,6 +89,12 @@
 @media (max-width: 640px) {
     .topbar { padding: 0 12px !important; }
 
+    .topbar-divider { display: none !important; }
+    .main-content.public-mode .topbar .topbar-title { display: none !important; }
+    .topbar-public-brand img { width: 34px !important; height: 34px !important; }
+    .topbar-public-brand-text .topbar-brand-name { font-size: 14px !important; }
+    .topbar-public-brand-text .topbar-brand-sub { font-size: 8px !important; }
+
     /* Keep "Student Portal" badge as clean pill */
     .topbar-badge {
         padding: 5px 12px !important;
@@ -93,6 +103,39 @@
         gap: 6px !important;
         display: inline-flex !important;
         align-items: center !important;
+    }
+
+    /* Rating Guide on mobile */
+    .rating-guide-card { padding: 14px !important; }
+    .rating-guide-header { flex-direction: column !important; gap: 8px !important; }
+    .rating-guide-icon { width: 32px !important; height: 32px !important; font-size: 15px !important; }
+    .rating-guide-title { font-size: 14px !important; }
+    .rating-guide-desc { font-size: 12px !important; }
+    .rating-guide-scale { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+
+    /* Rating Rows on mobile */
+    .rating-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        padding: 14px 16px !important;
+    }
+
+    .rating-col-scale {
+        width: 100% !important;
+    }
+
+    .rating-scale-options {
+        display: flex !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 6px !important;
+    }
+
+    .rating-circle-disc {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 13.5px !important;
     }
 
     /* Evaluation Table Controls */
@@ -180,7 +223,8 @@
         justify-content: space-between !important;
         gap: 10px !important;
         flex-wrap: wrap !important;
-        padding: 0 14px 14px !important;
+        margin-top: 10px !important;
+        padding: 14px 16px !important;
         width: 100% !important;
     }
 
@@ -330,24 +374,12 @@
 }
 
 /* ─────────────────────────────────────────────
-   2XL — 1536px and above (large desktops / TVs)
+   2XL — 1536px and above (large desktops)
+   Maintains consistent fluid layout and proportional sizing
 ───────────────────────────────────────────── */
 @media (min-width: 1536px) {
     .page-content {
-        max-width: 1400px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
-
-    .page-header h1 { font-size: 28px !important; }
-
-    .card-shell .card-header-shell h2 { font-size: 18px !important; }
-
-    .table-shell thead th,
-    .table-shell tbody td {
-        font-size: 14.5px !important;
-        padding: 16px 18px !important;
-    }
-
-    .btn-eval { font-size: 15px !important; padding: 12px 20px !important; }
 }

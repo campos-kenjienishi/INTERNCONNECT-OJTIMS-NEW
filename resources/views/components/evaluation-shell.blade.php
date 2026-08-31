@@ -68,8 +68,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    @if($isAuthenticatedShell)
+        <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+        <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    @endif
     <link rel="stylesheet" href="{{ vasset('css/student_evaluation-responsive.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
     <script>
@@ -142,12 +144,22 @@
                 <button class="darkmode-toggle" id="darkmodeToggle" type="button" title="Toggle Dark Mode">
                     <i class="fa fa-moon" id="darkmodeIcon"></i>
                 </button>
+                <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
+            @else
+                <div class="topbar-public-brand">
+                    <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" alt="InternConnect">
+                    <div class="topbar-public-brand-text">
+                        <span class="topbar-brand-name">Intern<span class="brand-accent">Connect</span></span>
+                        <span class="topbar-brand-sub">OJTIMS</span>
+                    </div>
+                </div>
+                <div class="topbar-divider"></div>
+                <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
             @endif
-            <span class="topbar-title">On-the-Job Training <span>Information Management System</span></span>
         </div>
         <div class="topbar-right">
             <div class="topbar-badge">
-                <i class="fa {{ $role === 'student' ? 'fa-graduation-cap' : ($role === 'professor' ? 'fa-chalkboard-teacher' : 'fa-star-half-alt') }}"></i>
+                <i class="fa {{ $role === 'student' ? 'fa-graduation-cap' : ($role === 'professor' ? 'fa-chalkboard-teacher' : ($role === 'coordinator' ? 'fa-user-tie' : 'fa-clipboard-check')) }}"></i>
                 {{ $role === 'student' ? 'Student Portal' : ($role === 'professor' ? 'Professor Portal' : ($role === 'coordinator' ? 'Coordinator Portal' : 'Evaluation Portal')) }}
             </div>
         </div>

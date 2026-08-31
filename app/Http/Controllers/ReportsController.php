@@ -206,8 +206,9 @@ class ReportsController extends Controller
             ->values();
 
         $reportInsights = $this->buildStudentReportInsights($studentData, null);
+        $selectedSemester = '1st Semester';
     
-        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears'))
+        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSemester'))
             ->with('selectedSchoolYear', null);
 
     }
@@ -217,6 +218,7 @@ class ReportsController extends Controller
     public function generateReport(Request $request)
     {
         $selectedSchoolYear = trim((string) $request->input('school_year'));
+        $selectedSemester = trim((string) $request->input('semester', '1st Semester')) ?: '1st Semester';
         $coursed = $request->input('course');
         $course = Courses::all();
 
@@ -310,7 +312,7 @@ class ReportsController extends Controller
         );
     
         // Pass the course variable to the view
-            return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSchoolYear'));
+            return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSchoolYear', 'selectedSemester'));
     }
 
 

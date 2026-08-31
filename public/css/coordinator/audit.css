@@ -551,7 +551,7 @@
         }
 
         .action-create  { background: #dcfce7; color: #16a34a; }
-        .action-update  { background: #dbeafe; color: #2563eb; }
+        .action-update  { background: #fef9c3; color: #b45309; }
         .action-delete  { background: #fee2e2; color: var(--red); }
         .action-approve { background: #dcfce7; color: #16a34a; }
         .action-deny    { background: #fee2e2; color: var(--red); }

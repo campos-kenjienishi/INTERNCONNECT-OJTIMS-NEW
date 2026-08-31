@@ -3,14 +3,29 @@
    Extracted from professor/class.blade.php
    ========================================================================== */
                     $(document).ready(function () {
-                        $('#fileTable').DataTable({
+                        const fileTable = $('#fileTable').DataTable({
                             scrollX: true,
-                            autoWidth: false
+                            autoWidth: false,
+                            columnDefs: [
+                                { width: '200px', targets: 0 },
+                                { width: '150px', targets: 1 },
+                                { width: '90px', targets: 2 },
+                                { width: '110px', targets: 3 },
+                                { width: '140px', targets: 4 },
+                                { width: '120px', targets: 5 },
+                                { width: '110px', targets: 6 },
+                                { width: '110px', targets: 7 },
+                                { width: '110px', targets: 8 },
+                                { width: '140px', targets: 9 }
+                            ]
                         });
 
                         const profAnnouncementTable = $('#profAnnouncementTable').DataTable({
                             pageLength: 5,
                             lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                            scrollX: true,
+                            scrollCollapse: true,
+                            autoWidth: false,
                             order: [[2, 'desc']],
                             columnDefs: [
                                 { orderable: false, targets: 3 }
@@ -22,6 +37,16 @@
 
                         $('#profAnnouncementSort').on('change', function () {
                             profAnnouncementTable.order([2, this.value]).draw();
+                        });
+
+                        setTimeout(function() {
+                            fileTable.columns.adjust().draw(false);
+                            profAnnouncementTable.columns.adjust().draw(false);
+                        }, 150);
+
+                        $(window).on('resize', function () {
+                            fileTable.columns.adjust();
+                            profAnnouncementTable.columns.adjust();
                         });
                     });
                 

@@ -235,7 +235,7 @@
                                 <td><span class="badge-like success">{{ $room->submitted_count ?? 0 }}</span></td>
                                 <td><span class="badge-like warning">{{ $room->pending_count ?? 0 }}</span></td>
                                 <td>
-                                    <a href="{{ route('professor.evaluation.class', ['classId' => $room->id]) }}" class="btn-eval btn-eval-outline">
+                                    <a href="{{ route('professor.evaluation.class', ['classId' => $room->id]) }}" class="btn-eval btn-eval-blue">
                                         <i class="fa fa-list"></i> Show List
                                     </a>
                                 </td>

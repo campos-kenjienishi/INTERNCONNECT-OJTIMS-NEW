@@ -165,14 +165,14 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa fa-building"></i></div>
+                <div class="stat-icon green"><i class="fa fa-building"></i></div>
                 <div>
                     <div class="stat-num">{{ collect($studentData)->pluck('ojt.company_name')->unique()->count() }}</div>
                     <div class="stat-name">Companies</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon green"><i class="fa fa-chart-bar"></i></div>
+                <div class="stat-icon blue"><i class="fa fa-chart-bar"></i></div>
                 <div>
                     <div class="stat-num">OJT</div>
                     <div class="stat-name">Report Type</div>
@@ -331,6 +331,14 @@
                             </select>
                         </div>
                         <div class="field-group">
+                            <label class="field-label"><i class="fa fa-calendar-check"></i> Semester</label>
+                            <select class="field-select" id="semester" name="semester">
+                                <option value="1st Semester" {{ ($selectedSemester ?? request('semester') ?? '1st Semester') === '1st Semester' ? 'selected' : '' }}>1st Semester</option>
+                                <option value="2nd Semester" {{ ($selectedSemester ?? request('semester')) === '2nd Semester' ? 'selected' : '' }}>2nd Semester</option>
+                                <option value="Summer Term" {{ ($selectedSemester ?? request('semester')) === 'Summer Term' ? 'selected' : '' }}>Summer Term</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
                             <label class="field-label" style="opacity:0;">Action</label>
                             <button type="submit" class="btn-generate">
                                 <i class="fa fa-file-alt"></i> Generate
@@ -486,11 +494,21 @@
         askUrl: @json(route('reports.ai.ask')),
         csrfToken: @json(csrf_token())
     };
+@php
+    $coordinatorFullName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+    if (!$coordinatorFullName) {
+        $coordinatorFullName = $user->full_name ?? (auth()->user() ? trim(auth()->user()->first_name . ' ' . auth()->user()->last_name) : 'OJT Coordinator');
+    }
+@endphp
     window.reportAiContext = window.studentAiContext;
-    window.reportConfig = {
-        campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Branch')),
-        coordinatorName: @json($user->full_name ?? 'OJT Coordinator')
+    window.__reportsConfig = {
+        campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Campus')),
+        coordinatorName: @json($coordinatorFullName ?: 'OJT Coordinator'),
+        schoolYear: @json($selectedSchoolYear ?? request('school_year') ?? ''),
+        course: @json(request('course') ?? ''),
+        semester: @json($selectedSemester ?? request('semester') ?? '1st Semester')
     };
+    window.reportConfig = window.__reportsConfig;
 </script>
 <script src="{{ vasset('js/coordinator/reports-table.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>

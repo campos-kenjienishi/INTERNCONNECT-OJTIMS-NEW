@@ -40,7 +40,7 @@
                                 <td>{{ optional($row->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
                                 <td>
                                     @if($row->status === 'submitted' && $row->evaluation)
-                                        <a href="{{ route('professor.evaluation.show', ['requestId' => $row->id]) }}" class="btn-eval btn-eval-outline">
+                                        <a href="{{ route('professor.evaluation.show', ['requestId' => $row->id]) }}" class="btn-eval btn-eval-blue">
                                             <i class="fa fa-eye"></i> View
                                         </a>
                                     @else

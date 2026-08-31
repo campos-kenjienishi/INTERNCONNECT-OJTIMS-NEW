@@ -168,16 +168,33 @@
         .breadcrumb a:hover { text-decoration: underline; }
         .breadcrumb i { font-size: 10px; }
 
-        .btn-add {
+        .btn-add,
+        .btn-add-company {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 11px 22px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 10px; color: #fff;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+            border: none; border-radius: 10px; color: #fff !important;
             font-family: 'Poppins', sans-serif; font-size: 14px;
             font-weight: 600; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.25);
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.28) !important;
         }
-        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(220,38,38,0.35); }
+        .btn-add:hover,
+        .btn-add-company:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.38) !important;
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+        }
+
+        .btn-unlock-requests {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.28) !important;
+            color: #fff !important;
+        }
+        .btn-unlock-requests:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.38) !important;
+            color: #fff !important;
+        }
 
         /* Stats */
         .stats-row {
@@ -286,11 +303,27 @@
 
         /* Student list pills */
         .student-pill {
-            display: inline-flex; align-items: center;
-            background: #f0fdf4; color: #16a34a;
-            border-radius: 20px; padding: 2px 9px;
-            font-size: 11px; font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            padding: 2.5px 9px;
+            font-size: 11px;
+            font-weight: 600;
             margin: 2px 2px 0 0;
+            letter-spacing: 0.2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .student-pill:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+            color: #1e293b;
         }
 
         .course-pill {
@@ -422,39 +455,43 @@
         }
 
         .btn-view {
-            border: none; color: #fff; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
+            border: none !important; color: #fff !important; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.25) !important;
         }
-        .btn-view:hover { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+        .btn-view:hover { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(37,99,235,0.38) !important; }
 
         .btn-edit {
-            border-color: #dbeafe; color: #2563eb; background: #fff;
+            border: none !important; color: #fff !important; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            box-shadow: 0 2px 6px rgba(245,158,11,0.25) !important;
         }
-        .btn-edit:hover { background: #eff6ff; color: #2563eb; }
+        .btn-edit:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(245,158,11,0.38) !important; }
 
         .btn-download {
-            border: none;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #fff;
-            box-shadow: 0 2px 6px rgba(16,185,129,0.2);
+            border: none !important;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+            color: #fff !important;
+            box-shadow: 0 2px 6px rgba(22,163,74,0.25) !important;
         }
-        .btn-download:hover { box-shadow: 0 4px 10px rgba(16,185,129,0.3); background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #fff; }
+        .btn-download:hover { box-shadow: 0 4px 10px rgba(22,163,74,0.38) !important; background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important; color: #fff !important; }
 
         .btn-send {
-            border-color: #d1fae5; color: #059669; background: #fff;
+            border: none !important;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+            color: #fff !important;
+            box-shadow: 0 2px 6px rgba(22,163,74,0.25) !important;
         }
-        .btn-send:hover { background: #ecfdf5; color: #059669; }
+        .btn-send:hover { background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(22,163,74,0.38) !important; }
 
         .btn-print {
-            border: none; color: #fff; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
+            border: none !important; color: #fff !important; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.25) !important;
         }
-        .btn-print:hover { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+        .btn-print:hover { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(37,99,235,0.38) !important; }
 
         .btn-remove {
-            border-color: #fecaca; color: #dc2626; background: #fff;
+            border: 1.5px solid #fecaca !important; color: #dc2626 !important; background: #fff !important;
         }
-        .btn-remove:hover { background: #fef2f2; color: #dc2626; }
+        .btn-remove:hover { background: #fee2e2 !important; color: #b91c1c !important; }
 
         /* =============== MODAL =============== */
         .modal-content {
@@ -511,6 +548,33 @@
             font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
         .btn-modal-close:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
+
+        .btn-modal-cancel-red {
+            padding: 9px 20px;
+            background: #fff !important;
+            border: 1.5px solid #fecaca !important;
+            border-radius: 8px !important;
+            color: #dc2626 !important;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-modal-cancel-red:hover {
+            background: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #b91c1c !important;
+        }
+        body.dark-mode .btn-modal-cancel-red {
+            background: rgba(220, 38, 38, 0.12) !important;
+            border-color: rgba(220, 38, 38, 0.4) !important;
+            color: #fca5a5 !important;
+        }
+        body.dark-mode .btn-modal-cancel-red:hover {
+            background: rgba(220, 38, 38, 0.22) !important;
+            color: #fecaca !important;
+        }
         .btn-modal-submit {
             padding: 9px 24px;
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
@@ -633,12 +697,12 @@ body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
 body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
 
 /* Action buttons in dark mode */
-body.dark-mode .btn-view { background: transparent; border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
-body.dark-mode .btn-view:hover { background: rgba(99,102,241,0.15); }
-body.dark-mode .btn-send { background: transparent; border-color: rgba(5,150,105,0.4); color: #6ee7b7; }
-body.dark-mode .btn-send:hover { background: rgba(5,150,105,0.15); }
-body.dark-mode .btn-print { background: transparent; border-color: rgba(217,119,6,0.4); color: #fcd34d; }
-body.dark-mode .btn-print:hover { background: rgba(217,119,6,0.15); }
+body.dark-mode .btn-view { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important; color: #fff !important; border: none !important; }
+body.dark-mode .btn-edit { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; color: #fff !important; border: none !important; }
+body.dark-mode .btn-download { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important; color: #fff !important; border: none !important; }
+body.dark-mode .btn-send { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important; color: #fff !important; border: none !important; }
+body.dark-mode .btn-print { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important; color: #fff !important; border: none !important; }
+body.dark-mode .btn-remove { border: 1.5px solid rgba(220,38,38,0.4) !important; background: rgba(220,38,38,0.12) !important; color: #fca5a5 !important; }
 
 /* Modal dark mode */
 body.dark-mode .modal-content { background: #2a2a2a; }
@@ -655,7 +719,17 @@ body.dark-mode #send-company-name { color: #fff !important; }
 body.dark-mode .count-badge { background: rgba(220,38,38,0.2); color: #ff6b6b; }
 
 /* Student pills */
-body.dark-mode .student-pill { background: rgba(22,163,74,0.15); color: #6ee7b7; }
+body.dark-mode .student-pill {
+    background: rgba(71, 85, 105, 0.25) !important;
+    border-color: rgba(148, 163, 184, 0.25) !important;
+    color: #cbd5e1 !important;
+    box-shadow: none !important;
+}
+body.dark-mode .student-pill:hover {
+    background: rgba(71, 85, 105, 0.4) !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(148, 163, 184, 0.4) !important;
+}
 
 /* Status badge */
 body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7; }

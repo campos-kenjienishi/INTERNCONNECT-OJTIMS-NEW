@@ -184,16 +184,17 @@
         .btn-upload {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 11px 22px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border: none; border-radius: 10px; color: #fff;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+            border: none; border-radius: 10px; color: #fff !important;
             font-family: 'Poppins', sans-serif; font-size: 14px;
             font-weight: 600; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 16px rgba(220,38,38,0.25);
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.25) !important;
         }
 
         .btn-upload:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(220,38,38,0.35);
+            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.35) !important;
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
         }
 
         /* Stats row */
@@ -394,6 +395,11 @@
 
         #filePreviewModal {
             z-index: 1070 !important;
+        }
+
+        #filePreviewModal .modal-header {
+            background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%) !important;
+            padding: 16px 20px;
         }
 
         .btn-remove {

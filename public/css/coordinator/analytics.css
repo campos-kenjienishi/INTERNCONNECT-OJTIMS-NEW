@@ -290,25 +290,25 @@
             align-items: center;
             gap: 8px;
             padding: 10px 15px;
-            border: 1px solid #fecaca;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: #fff;
             border-radius: 10px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.16);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
             transition: transform .2s, box-shadow .2s, filter .2s;
         }
 
         .analytics-print-btn:hover {
             transform: translateY(-1px);
-            filter: brightness(1.03);
-            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.22);
+            filter: brightness(1.05);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
         }
 
         .analytics-print-btn:focus-visible {
-            outline: 3px solid rgba(220,38,38,.18);
+            outline: 3px solid rgba(37, 99, 235, .25);
             outline-offset: 2px;
         }
 

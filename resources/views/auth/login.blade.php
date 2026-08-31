@@ -64,7 +64,7 @@
                         </div>
                         <span><span class="portal-badge-highlight">FACULTY &amp; STAFF</span> PORTAL</span>
                     </div>
-                    <p>Sign in using your Faculty or Coordinator account</p>
+                    <p>Sign in using your Faculty or Coordinator Account</p>
                 @else
                     <div class="portal-badge">
                         <div class="portal-badge-icon-wrap">
@@ -72,7 +72,7 @@
                         </div>
                         <span><span class="portal-badge-highlight">STUDENT</span> PORTAL</span>
                     </div>
-                    <p>Sign in using your Student account</p>
+                    <p>Sign in using your Student Account</p>
                 @endif
             </div>
 

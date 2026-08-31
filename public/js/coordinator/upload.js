@@ -71,7 +71,6 @@ $(document).ready(function () {
         document.body.removeChild(link);
     });
 
-    // Remove button with SweetAlert confirmation
     $(document).on('click', '.remove-button', function () {
         const fileId = $(this).data('file-id');
         Swal.fire({
@@ -85,12 +84,15 @@ $(document).ready(function () {
             cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) {
+                const csrfToken = (window.coordinatorConfig && window.coordinatorConfig.csrfToken)
+                    || $('meta[name="csrf-token"]').attr('content')
+                    || '';
                 $.ajax({
                     type: 'POST',
                     url: '/remove/' + fileId,
-                    data: { _token: (window.coordinatorConfig && window.coordinatorConfig.csrfToken) || (meta[name = "csrf-token"].attr('content') || '') },
+                    data: { _token: csrfToken },
                     success: function () { location.reload(); },
-                    error: function () { console.error('Remove failed.'); }
+                    error: function (xhr) { console.error('Remove failed.', xhr.responseText); }
                 });
             }
         });

@@ -18,7 +18,7 @@
         <div class="card-header-shell">
             <h2><span class="header-icon"><i class="fa fa-tools"></i></span> Class Tools</h2>
             <div class="stacked-actions">
-                <button type="button" class="btn-eval btn-eval-outline" id="openEvalPrintModalBtn">
+                <button type="button" class="btn-eval btn-eval-blue" id="openEvalPrintModalBtn">
                     <i class="fa fa-print"></i> Print Report
                 </button>
             </div>
@@ -93,15 +93,15 @@
                                     @endif
                                 </td>
                                 <td>{{ optional($latest)->supervisor_email ?: '-' }}</td>
-                                <td>{{ optional(optional($latest)->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
+                                <td data-order="{{ optional(optional($latest)->submitted_at)->timestamp ?: 0 }}">{{ optional(optional($latest)->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
                                 <td>
-                                    <a href="{{ route('professor.evaluation.history', ['studentId' => $student->id]) }}" class="btn-eval btn-eval-outline">
+                                    <a href="{{ route('professor.evaluation.history', ['studentId' => $student->id]) }}" class="btn-eval btn-eval-purple">
                                         <i class="fa fa-history"></i> View History
                                     </a>
                                 </td>
                                 <td>
                                     @if($latest && $latest->status === 'submitted' && $latest->evaluation)
-                                        <a href="{{ route('professor.evaluation.show', ['requestId' => $latest->id]) }}" class="btn-eval btn-eval-outline">
+                                        <a href="{{ route('professor.evaluation.show', ['requestId' => $latest->id]) }}" class="btn-eval btn-eval-blue">
                                             <i class="fa fa-eye"></i> View
                                         </a>
                                     @else

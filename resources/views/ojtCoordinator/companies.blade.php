@@ -152,10 +152,10 @@
                 </div>
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <a href="{{ route('coordinator.moa.unlockRequests') }}" class="btn-add" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); text-decoration: none;">
+                <a href="{{ route('coordinator.moa.unlockRequests') }}" class="btn-add btn-unlock-requests" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff !important; text-decoration: none; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.28);">
                     <i class="fa fa-key"></i> Unlock Requests
                 </a>
-                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
+                <button class="btn-add btn-add-company" data-bs-toggle="modal" data-bs-target="#addCompanyModal" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #fff !important; box-shadow: 0 4px 16px rgba(22, 163, 74, 0.28);">
                     <i class="fa fa-plus"></i> Add New Company
                 </button>
             </div>
@@ -234,11 +234,11 @@
                             @endforeach
                         </select>
                         <button type="submit" class="btn-modal-submit" style="height:36px; padding:0 14px; font-size:12px;">
-                            <i class="fa fa-filter"></i> Filter
+                            Filter
                         </button>
                         @if (!empty($selectedCourse) || !empty($selectedSchoolYear))
                             <a href="{{ url('/MOA') }}" class="btn-modal-close" style="height:36px; padding:0 14px; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
-                                <i class="fa fa-times"></i> Clear
+                                Clear
                             </a>
                         @endif
                     </form>
@@ -907,7 +907,7 @@
             </div>
             <div class="modal-footer">
                 <div style="margin-right:auto; font-size:12px; color:#6b7280;">Choose one or more students, then click Apply.</div>
-                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                <button type="button" class="btn-modal-close btn-modal-cancel-red" data-bs-dismiss="modal">
                     <i class="fa fa-times me-1"></i> Cancel
                 </button>
                 <button type="button" class="btn-modal-submit" id="assignStudentsApply">
@@ -949,8 +949,8 @@
                     <input type="hidden" id="send-company-name-input" name="company_name" value="">
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
-                        <i class="fa fa-times me-1"></i> Close
+                    <button class="btn-modal-close btn-modal-cancel-red" type="button" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i> Cancel
                     </button>
                     <button type="submit" class="btn-modal-submit">
                         <i class="fa fa-paper-plane me-1"></i> Send

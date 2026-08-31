@@ -272,14 +272,19 @@ class EvaluationController extends Controller
         $studentIds = $students->pluck('id')->all();
         $requestsByStudent = OjtEvaluationRequest::with(['evaluation'])
             ->whereIn('student_id', $studentIds)
-            ->latest('id')
+            ->orderByRaw('submitted_at IS NULL, submitted_at DESC, id DESC')
             ->get()
             ->groupBy('student_id');
+
+        $students = $students->sortByDesc(function ($student) use ($requestsByStudent) {
+            $latest = ($requestsByStudent[$student->id] ?? collect())->first();
+            return $latest && $latest->submitted_at ? $latest->submitted_at->timestamp : ($latest ? $latest->id : 0);
+        })->values();
 
         return view('professor.evaluation_list', [
             'data' => $data,
             'classroom' => $classroom,
-            'students' => $students->values(),
+            'students' => $students,
             'studentsTotal' => $students->count(),
             'requestsByStudent' => $requestsByStudent,
         ]);
@@ -872,9 +877,14 @@ class EvaluationController extends Controller
         $studentIds = $students->pluck('id')->all();
         $requestsByStudent = OjtEvaluationRequest::with(['evaluation'])
             ->whereIn('student_id', $studentIds)
-            ->latest('id')
+            ->orderByRaw('submitted_at IS NULL, submitted_at DESC, id DESC')
             ->get()
             ->groupBy('student_id');
+
+        $students = $students->sortByDesc(function ($student) use ($requestsByStudent) {
+            $latest = ($requestsByStudent[$student->id] ?? collect())->first();
+            return $latest && $latest->submitted_at ? $latest->submitted_at->timestamp : ($latest ? $latest->id : 0);
+        })->values();
         $selectedClass = !empty($selectedClassId)
             ? $classrooms->firstWhere('id', $selectedClassId)
             : null;

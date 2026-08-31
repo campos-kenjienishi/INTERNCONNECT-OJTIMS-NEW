@@ -168,12 +168,9 @@
                     <i class="fa fa-graduation-cap" id="guisisSyncIcon"></i>
                     <span>Sync GuiSIS</span>
                 </button>
-                <a href="{{ route('coordinator.studentRequirements') }}" class="btn" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color: #ffffff !important; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; text-decoration: none !important; box-shadow: 0 4px 14px rgba(127,0,0,0.3); display: inline-flex; align-items: center; gap: 8px;">
+                <a href="{{ route('coordinator.studentRequirements') }}" class="btn btn-req-matrix" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff !important; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; text-decoration: none !important; box-shadow: 0 4px 14px rgba(245,158,11,0.3); display: inline-flex; align-items: center; gap: 8px;">
                     <i class="fa fa-folder-open"></i> Student Requirements Matrix
                 </a>
-                <button class="btn-back" onclick="window.location.href='{{ url('/dashboard') }}'">
-                    <i class="fa fa-arrow-left"></i> Back to Dashboard
-                </button>
             </div>
         </div>
 

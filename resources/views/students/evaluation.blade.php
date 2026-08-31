@@ -115,71 +115,73 @@
                     </div>
                 </div>
             </div>
-            <table id="historyTable" class="display table-shell" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Supervisor Email</th>
-                        <th>Supervisor Name</th>
-                        <th>Status</th>
-                        <th>Sent</th>
-                        <th>Submitted</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($requests as $row)
+            <div class="table-wrap history-datatable-wrap">
+                <table id="historyTable" class="display table-shell" style="width:100%">
+                    <thead>
                         <tr>
-                            <td>{{ $row->supervisor_email }}</td>
-                            <td>{{ $row->supervisor_name ?: '-' }}</td>
-                            <td>
-                                <span class="badge-like {{ $row->status === 'submitted' ? 'success' : ($row->status === 'expired' ? 'secondary' : ($row->status === 'cancelled' ? 'dark' : 'warning')) }}">
-                                    {{ strtoupper($row->status) }}
-                                </span>
-                            </td>
-                            <td data-order="{{ optional($row->emailed_at)->timestamp ?? 0 }}">{{ optional($row->emailed_at)->format('M d, Y h:i A') ?: '-' }}</td>
-                            <td data-order="{{ optional($row->submitted_at)->timestamp ?? 0 }}">{{ optional($row->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
-                            <td>
-                                <div class="stacked-actions">
-                                    @if($row->status === 'submitted' && $row->evaluation)
-                                        @if(!empty($row->evaluation->released_to_student_at))
-                                            <a href="{{ route('student.evaluation.show', ['requestId' => $row->id]) }}" class="btn-eval btn-eval-outline">
-                                                <i class="fa fa-eye"></i> View
-                                            </a>
-                                        @else
-                                            <div class="permission-bubble-wrap" tabindex="0">
-                                                <span class="btn-eval btn-eval-outline is-disabled" aria-disabled="true">
-                                                    <i class="fa fa-lock"></i> Locked
-                                                </span>
-                                                <div class="field-bubble-shell">
-                                                    The professor has not released this evaluation for student viewing yet.
-                                                </div>
-                                            </div>
-                                        @endif
-                                    @else
-                                        @if($row->status !== 'cancelled')
-                                            <form action="{{ route('student.evaluation.resend', ['requestId' => $row->id]) }}" method="POST" class="no-print">
-                                                @csrf
-                                                <button type="submit" class="btn-eval btn-eval-outline">
-                                                    <i class="fa fa-redo"></i> Resend
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        @if(!in_array($row->status, ['submitted', 'cancelled']))
-                                            <form action="{{ route('student.evaluation.cancel', ['requestId' => $row->id]) }}" method="POST" class="no-print cancel-evaluation-form" data-supervisor-email="{{ $row->supervisor_email }}">
-                                                @csrf
-                                                <button type="submit" class="btn-eval btn-eval-danger">
-                                                    <i class="fa fa-ban"></i> Cancel
-                                                </button>
-                                            </form>
-                                        @endif
-                                    @endif
-                                </div>
-                            </td>
+                            <th>Supervisor Email</th>
+                            <th>Supervisor Name</th>
+                            <th>Status</th>
+                            <th>Sent</th>
+                            <th>Submitted</th>
+                            <th>Action</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($requests as $row)
+                            <tr>
+                                <td>{{ $row->supervisor_email }}</td>
+                                <td>{{ $row->supervisor_name ?: '-' }}</td>
+                                <td>
+                                    <span class="badge-like {{ $row->status === 'submitted' ? 'success' : ($row->status === 'expired' ? 'secondary' : ($row->status === 'cancelled' ? 'dark' : 'warning')) }}">
+                                        {{ strtoupper($row->status) }}
+                                    </span>
+                                </td>
+                                <td data-order="{{ optional($row->emailed_at)->timestamp ?? 0 }}">{{ optional($row->emailed_at)->format('M d, Y h:i A') ?: '-' }}</td>
+                                <td data-order="{{ optional($row->submitted_at)->timestamp ?? 0 }}">{{ optional($row->submitted_at)->format('M d, Y h:i A') ?: '-' }}</td>
+                                <td>
+                                    <div class="stacked-actions">
+                                        @if($row->status === 'submitted' && $row->evaluation)
+                                            @if(!empty($row->evaluation->released_to_student_at))
+                                                <a href="{{ route('student.evaluation.show', ['requestId' => $row->id]) }}" class="btn-eval btn-eval-blue">
+                                                    <i class="fa fa-eye"></i> View
+                                                </a>
+                                            @else
+                                                <div class="permission-bubble-wrap" tabindex="0">
+                                                    <span class="btn-eval btn-eval-slate is-disabled" aria-disabled="true" style="opacity:0.75; cursor:not-allowed;">
+                                                        <i class="fa fa-lock"></i> Locked
+                                                    </span>
+                                                    <div class="field-bubble-shell">
+                                                        The professor has not released this evaluation for student viewing yet.
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @else
+                                            @if($row->status !== 'cancelled')
+                                                <form action="{{ route('student.evaluation.resend', ['requestId' => $row->id]) }}" method="POST" class="no-print">
+                                                    @csrf
+                                                    <button type="submit" class="btn-eval btn-eval-amber">
+                                                        <i class="fa fa-redo"></i> Resend
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            @if(!in_array($row->status, ['submitted', 'cancelled']))
+                                                <form action="{{ route('student.evaluation.cancel', ['requestId' => $row->id]) }}" method="POST" class="no-print cancel-evaluation-form" data-supervisor-email="{{ $row->supervisor_email }}">
+                                                    @csrf
+                                                    <button type="submit" class="btn-eval btn-eval-danger">
+                                                        <i class="fa fa-ban"></i> Cancel
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

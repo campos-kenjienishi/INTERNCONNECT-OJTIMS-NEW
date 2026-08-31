@@ -2,24 +2,6 @@
    TABLE HORIZONTAL SCROLL ONLY
 ══════════════════════════════════════════ */
 
-.table-card-body {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.table-card-body .dataTables_wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    min-width: 0;
-}
-
-.table-card-body table.dataTable,
-#fileTable {
-    min-width: 900px;
-    width: 100% !important;
-}
-
-/* Keep DataTables controls anchored; only the table body scrolls sideways */
 .table-card {
     overflow: hidden;
 }
@@ -32,6 +14,19 @@
 .table-card-body .dataTables_wrapper {
     overflow: visible !important;
     min-width: 0;
+    width: 100%;
+}
+
+.table-card-body table.dataTable,
+#fileTable {
+    min-width: 900px;
+    width: 100% !important;
+}
+
+#profAnnouncementTable,
+.announcement-manage-table {
+    min-width: 780px;
+    width: 100% !important;
 }
 
 .table-card-body .dataTables_scroll {
@@ -46,4 +41,9 @@
     overflow-x: auto !important;
     overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+}
+
+.announcement-table-wrap {
+    width: 100%;
 }

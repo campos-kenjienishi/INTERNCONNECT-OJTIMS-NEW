@@ -154,7 +154,7 @@
         .panel-card-header h2 { font-size: 15px; font-weight: 700; color: #1a1a1a; }
         .panel-card-header p  { font-size: 12px; color: #888; margin-top: 2px; }
         .panel-card-body { padding: 22px; }
-        .filter-grid { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto; gap: 16px; align-items: end; }
+        .filter-grid { display: grid; grid-template-columns: minmax(130px, 0.75fr) minmax(260px, 2.2fr) minmax(130px, 0.75fr) auto; gap: 14px; align-items: end; }
         .field-group { display: flex; flex-direction: column; gap: 5px; }
         .field-label { font-size: 12px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 5px; }
         .field-label i { color: var(--red); font-size: 11px; }

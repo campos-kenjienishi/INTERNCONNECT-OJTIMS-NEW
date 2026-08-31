@@ -525,12 +525,18 @@
         askUrl: @json(route('reports.ai.ask')),
         csrfToken: @json(csrf_token())
     };
-    window.reportAiContext = window.aiReportContext;
+@php
+    $coordinatorFullName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+    if (!$coordinatorFullName) {
+        $coordinatorFullName = $user->full_name ?? (auth()->user() ? trim(auth()->user()->first_name . ' ' . auth()->user()->last_name) : 'OJT Coordinator');
+    }
+@endphp
     window.reportConfig = {
-        campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Branch')),
+        campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Campus')),
         campusCollege: @json($campusCollege ?? config('campus.college', 'College of Engineering and Technology')),
-        coordinatorName: @json($user->full_name ?? 'OJT Coordinator')
+        coordinatorName: @json($coordinatorFullName ?: 'OJT Coordinator')
     };
+    window.__reportsConfig = window.reportConfig;
 </script>
 <script src="{{ vasset('js/coordinator/reports-expired.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>

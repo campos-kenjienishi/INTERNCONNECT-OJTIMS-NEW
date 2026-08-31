@@ -50,35 +50,88 @@
                         </div>
                     </div>
 
-                    <div class="section-gap rating-list">
-                        <div class="flash-alert info" style="margin:0 0 14px 0;">
-                            Rating guide: <strong>1 = lowest</strong>, <strong>5 = highest</strong>.
+                    <div class="rating-guide-card section-gap">
+                        <div class="rating-guide-header">
+                            <div class="rating-guide-icon">
+                                <i class="fa fa-info-circle"></i>
+                            </div>
+                            <div class="rating-guide-content">
+                                <h3 class="rating-guide-title">Evaluation Instructions &amp; Rating Scale Guide</h3>
+                                <p class="rating-guide-desc">
+                                    Please evaluate the student intern objectively based on their actual performance, attendance, and professional conduct during their internship. Select a rating from <strong>1 to 5</strong> for each criterion below.
+                                </p>
+                            </div>
                         </div>
+                        <div class="rating-guide-scale">
+                            <div class="rating-scale-item">
+                                <span class="rating-scale-num scale-1">1</span>
+                                <div class="rating-scale-text">
+                                    <strong>Poor</strong>
+                                    <span>Unsatisfactory</span>
+                                </div>
+                            </div>
+                            <div class="rating-scale-item">
+                                <span class="rating-scale-num scale-2">2</span>
+                                <div class="rating-scale-text">
+                                    <strong>Fair</strong>
+                                    <span>Below Average</span>
+                                </div>
+                            </div>
+                            <div class="rating-scale-item">
+                                <span class="rating-scale-num scale-3">3</span>
+                                <div class="rating-scale-text">
+                                    <strong>Satisfactory</strong>
+                                    <span>Competent</span>
+                                </div>
+                            </div>
+                            <div class="rating-scale-item">
+                                <span class="rating-scale-num scale-4">4</span>
+                                <div class="rating-scale-text">
+                                    <strong>Very Satisfactory</strong>
+                                    <span>Above Average</span>
+                                </div>
+                            </div>
+                            <div class="rating-scale-item">
+                                <span class="rating-scale-num scale-5">5</span>
+                                <div class="rating-scale-text">
+                                    <strong>Outstanding</strong>
+                                    <span>Exceptional</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-gap rating-list">
                         @php $currentSection = null; @endphp
                         @foreach($requestRow->template->items as $item)
                             @if($item->section !== $currentSection)
                                 @php $currentSection = $item->section; @endphp
                                 @if($currentSection)
-                                    <div class="summary-card">
-                                        <div class="label">{{ $currentSection }}</div>
+                                    <div class="summary-card" style="margin-top: 10px;">
+                                        <div class="label" style="font-weight: 700; color: var(--text-primary);">{{ $currentSection }}</div>
                                     </div>
                                 @endif
                             @endif
 
                             @if($item->input_type === 'rating')
                                 <div class="rating-row">
-                                    <div>
-                                        <div class="rating-section">Question</div>
-                                        <div class="rating-label">{{ $item->label }} {{ $item->is_required ? '*' : '' }}</div>
+                                    <div class="rating-col-info">
+                                        <div class="rating-section-pill">Criterion</div>
+                                        <div class="rating-label">{{ $item->label }} @if($item->is_required)<span class="req-star" style="color:#dc2626;">*</span>@endif</div>
                                     </div>
-                                    <div class="muted-text">Rate the student based on this criterion.</div>
-                                    <div>
-                                        <select name="rating_{{ $item->id }}" class="form-select-shell rating-select" {{ $item->is_required ? 'required' : '' }}>
-                                            <option value="">Select score</option>
+                                    <div class="rating-col-scale">
+                                        <div class="rating-scale-options" role="radiogroup" aria-label="{{ $item->label }}">
                                             @for($score = 1; $score <= 5; $score++)
-                                                <option value="{{ $score }}" {{ old('rating_' . $item->id) == $score ? 'selected' : '' }}>{{ $score }}</option>
+                                                <label class="rating-circle-opt" title="Score {{ $score }} out of 5">
+                                                    <input type="radio" 
+                                                           name="rating_{{ $item->id }}" 
+                                                           value="{{ $score }}" 
+                                                           {{ (string)old('rating_' . $item->id) === (string)$score ? 'checked' : '' }}
+                                                           {{ $item->is_required ? 'required' : '' }}>
+                                                    <span class="rating-circle-disc">{{ $score }}</span>
+                                                </label>
                                             @endfor
-                                        </select>
+                                        </div>
                                     </div>
                                 </div>
                             @else
@@ -100,7 +153,7 @@
                     </div>
 
                     <div class="section-gap stacked-actions">
-                        <button type="submit" class="btn-eval btn-eval-primary">
+                        <button type="submit" class="btn-eval btn-eval-emerald btn-eval-lg">
                             <i class="fa fa-check-circle"></i> Review Evaluation
                         </button>
                     </div>
