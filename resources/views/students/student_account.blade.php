@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/sync-alerts.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
@@ -460,7 +461,8 @@
         syncGuidanceUrl: @json(route('student.syncGuidance'))
     };
 </script>
-    <script src="{{ vasset('js/student/account.js') }}"></script>
+    <script src="{{ vasset('js/components/sync-alerts.js') }}?v={{ time() }}"></script>
+    <script src="{{ vasset('js/student/account.js') }}?v={{ time() }}"></script>
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

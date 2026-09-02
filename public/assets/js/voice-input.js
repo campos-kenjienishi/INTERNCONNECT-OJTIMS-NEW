@@ -1,7 +1,223 @@
 (function injectVoiceInputGuide() {
-    // Mic guide floating button disabled per design requirements
-    return;
+    function createSpeedDialWidget() {
+        if (document.getElementById("icFloatingSpeedDial")) {
+            return;
+        }
+
+        var wrapper = document.createElement("div");
+        wrapper.className = "ic-speed-dial";
+        wrapper.id = "icFloatingSpeedDial";
+        wrapper.innerHTML = [
+            '<div class="ic-speed-dial-menu" id="icSpeedDialMenu">',
+            '    <button type="button" class="ic-speed-dial-item" id="icBtnAccessibility" title="Toggle Accessibility Tools">',
+            '        <span class="ic-item-emblem"><i class="fas fa-universal-access"></i></span>',
+            '        <span class="ic-item-label">Accessibility</span>',
+            '    </button>',
+            '    <button type="button" class="ic-speed-dial-item" id="icBtnVoiceGuide" title="Voice Input & Commands Guide">',
+            '        <span class="ic-item-emblem"><i class="fas fa-microphone-alt"></i></span>',
+            '        <span class="ic-item-label">Voice Guide</span>',
+            '    </button>',
+            '</div>',
+            '<button type="button" class="ic-speed-dial-trigger" id="icSpeedDialTrigger" aria-label="Quick Tools Menu" title="Quick Tools">',
+            '    <span class="ic-trigger-icon"><i class="fas fa-plus"></i></span>',
+            '</button>'
+        ].join("");
+
+        document.body.appendChild(wrapper);
+
+        // Inject Voice Guide Modal
+        if (!document.getElementById("voiceInputGuideModal")) {
+            var modalEl = document.createElement("div");
+            modalEl.className = "voice-guide-modal";
+            modalEl.id = "voiceInputGuideModal";
+            modalEl.style.display = "none";
+            modalEl.innerHTML = [
+                '<div class="voice-guide-backdrop" id="voiceGuideBackdrop"></div>',
+                '<div class="voice-guide-modal-dialog">',
+                '    <div class="voice-guide-modal-content">',
+                '        <div class="voice-guide-modal-header">',
+                '            <div class="voice-guide-header-left">',
+                '                <div class="voice-guide-header-icon">',
+                '                    <i class="fas fa-microphone-alt"></i>',
+                '                </div>',
+                '                <div>',
+                '                    <h4 class="voice-guide-modal-title">Voice Input & Command Guide</h4>',
+                '                    <p class="voice-guide-modal-sub">Speak naturally to dictate text and control input fields</p>',
+                '                </div>',
+                '            </div>',
+                '            <button type="button" class="voice-guide-close" id="btnCloseVoiceGuideModal" aria-label="Close">',
+                '                <i class="fas fa-times"></i>',
+                '            </button>',
+                '        </div>',
+                '        <div class="voice-guide-modal-body">',
+                '            <div class="voice-guide-section">',
+                '                <div class="voice-guide-section-title"><i class="fas fa-play-circle text-danger me-1"></i> How To Use</div>',
+                '                <div class="voice-steps-grid">',
+                '                    <div class="voice-step-card">',
+                '                        <div class="voice-step-num">1</div>',
+                '                        <div class="voice-step-text">Click the red microphone icon <i class="fa fa-microphone text-danger"></i> on any text input or textarea.</div>',
+                '                    </div>',
+                '                    <div class="voice-step-card">',
+                '                        <div class="voice-step-num">2</div>',
+                '                        <div class="voice-step-text">Speak clearly into your microphone. Spoken symbols & punctuations are auto-formatted.</div>',
+                '                    </div>',
+                '                    <div class="voice-step-card">',
+                '                        <div class="voice-step-num">3</div>',
+                '                        <div class="voice-step-text">Click the microphone icon again or say <em>"stop listening"</em> to finish.</div>',
+                '                    </div>',
+                '                </div>',
+                '            </div>',
+                '            <div class="voice-guide-section">',
+                '                <div class="voice-guide-section-title"><i class="fas fa-keyboard text-warning me-1"></i> Spoken Punctuations & Symbols</div>',
+                '                <div class="voice-cmd-grid">',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"at sign"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">@</span></div>',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"dot" / "period"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">.</span></div>',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"comma"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">,</span></div>',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"hyphen" / "dash"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">-</span></div>',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"underscore"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">_</span></div>',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"slash"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">/</span></div>',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"question mark"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">?</span></div>',
+                '                    <div class="voice-cmd-tile"><span class="cmd-speech">"new line"</span> <i class="fas fa-arrow-right cmd-arrow"></i> <span class="cmd-res">&#8629; (Enter)</span></div>',
+                '                </div>',
+                '            </div>',
+                '            <div class="voice-guide-section">',
+                '                <div class="voice-guide-section-title"><i class="fas fa-bolt text-primary me-1"></i> Voice Control Shortcuts</div>',
+                '                <div class="voice-shortcuts-row">',
+                '                    <div class="voice-shortcut-pill"><i class="fas fa-eraser text-danger me-1"></i> <strong>"clear field"</strong> &mdash; Erases entire field content</div>',
+                '                    <div class="voice-shortcut-pill"><i class="fas fa-backspace text-warning me-1"></i> <strong>"delete word"</strong> &mdash; Removes the last word</div>',
+                '                    <div class="voice-shortcut-pill"><i class="fas fa-i-cursor text-info me-1"></i> <strong>"select all"</strong> &mdash; Selects all text in field</div>',
+                '                    <div class="voice-shortcut-pill"><i class="fas fa-stop-circle text-secondary me-1"></i> <strong>"stop listening"</strong> &mdash; Turns off microphone</div>',
+                '                </div>',
+                '            </div>',
+                '            <div class="voice-guide-section voice-sandbox-box">',
+                '                <div class="voice-guide-section-title"><i class="fas fa-flask text-success me-1"></i> Live Sandbox (Try Speaking Here)</div>',
+                '                <div class="voice-sandbox-input-wrap">',
+                '                    <input type="text" class="voice-sandbox-field" placeholder="Click the mic button and test voice dictation..." data-voice-mic="true">',
+                '                </div>',
+                '            </div>',
+                '        </div>',
+                '        <div class="voice-guide-modal-footer">',
+                '            <button type="button" class="btn-voice-guide-close" id="btnGotItVoiceGuide">',
+                '                <i class="fas fa-check me-1"></i> Got It',
+                '            </button>',
+                '        </div>',
+                '    </div>',
+                '</div>'
+            ].join("");
+
+            document.body.appendChild(modalEl);
+        }
+
+        // Event bindings for Speed Dial & Modal
+        var trigger = document.getElementById("icSpeedDialTrigger");
+        var speedDial = document.getElementById("icFloatingSpeedDial");
+        var btnAccess = document.getElementById("icBtnAccessibility");
+        var btnVoiceGuide = document.getElementById("icBtnVoiceGuide");
+        var guideModal = document.getElementById("voiceInputGuideModal");
+        var btnCloseModal = document.getElementById("btnCloseVoiceGuideModal");
+        var btnGotIt = document.getElementById("btnGotItVoiceGuide");
+        var backdrop = document.getElementById("voiceGuideBackdrop");
+
+        if (trigger && speedDial) {
+            trigger.addEventListener("click", function (e) {
+                e.stopPropagation();
+                speedDial.classList.toggle("open");
+            });
+        }
+
+        function closeSpeedDial() {
+            if (speedDial) {
+                speedDial.classList.remove("open");
+            }
+        }
+
+        function openVoiceGuide() {
+            closeSpeedDial();
+            if (guideModal) {
+                guideModal.style.display = "flex";
+            }
+        }
+
+        function closeVoiceGuide() {
+            if (guideModal) {
+                guideModal.style.display = "none";
+            }
+        }
+
+        function toggleAccessibility() {
+            closeSpeedDial();
+            // Try triggering Sienna button
+            var siennaBtn = document.querySelector(".asw-menu-btn, .asw-btn, [data-asw-btn], .sienna-accessibility-btn");
+            if (siennaBtn) {
+                siennaBtn.click();
+                return;
+            }
+            if (window.sienna && typeof window.sienna.toggle === "function") {
+                window.sienna.toggle();
+                return;
+            }
+            // Load dynamically if script not loaded yet
+            if (!document.querySelector('script[src*="sienna-accessibility"]')) {
+                var s = document.createElement("script");
+                s.src = "https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js";
+                s.setAttribute("data-asw-position", "bottom-right");
+                s.onload = function () {
+                    setTimeout(function () {
+                        var btn = document.querySelector(".asw-menu-btn, .asw-btn, [data-asw-btn]");
+                        if (btn) btn.click();
+                    }, 350);
+                };
+                document.body.appendChild(s);
+            }
+        }
+
+        if (btnVoiceGuide) {
+            btnVoiceGuide.addEventListener("click", function (e) {
+                e.stopPropagation();
+                openVoiceGuide();
+            });
+        }
+
+        if (btnAccess) {
+            btnAccess.addEventListener("click", function (e) {
+                e.stopPropagation();
+                toggleAccessibility();
+            });
+        }
+
+        if (btnCloseModal) {
+            btnCloseModal.addEventListener("click", closeVoiceGuide);
+        }
+
+        if (btnGotIt) {
+            btnGotIt.addEventListener("click", closeVoiceGuide);
+        }
+
+        if (backdrop) {
+            backdrop.addEventListener("click", closeVoiceGuide);
+        }
+
+        document.addEventListener("click", function (e) {
+            if (speedDial && !speedDial.contains(e.target)) {
+                closeSpeedDial();
+            }
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+                closeSpeedDial();
+                closeVoiceGuide();
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", createSpeedDialWidget);
+    } else {
+        createSpeedDialWidget();
+    }
 })();
+
 (function () {
     "use strict";
 
@@ -52,6 +268,10 @@
     function isEligibleField(field) {
         if (!field || field.dataset.voiceMicSkip === "true") {
             return false;
+        }
+
+        if (field.classList.contains("voice-sandbox-field") || field.dataset.voiceMic === "true") {
+            return true;
         }
 
         if (field.closest(".swal2-container, .swal2-popup, #voiceInputGuideModal")) {

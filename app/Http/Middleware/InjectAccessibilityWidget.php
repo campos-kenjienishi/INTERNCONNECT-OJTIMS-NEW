@@ -12,9 +12,6 @@ class InjectAccessibilityWidget
      */
     public function handle(Request $request, Closure $next)
     {
-        return $next($request);
-    }
-
         $response = $next($request);
 
         $contentType = (string) $response->headers->get('Content-Type', '');

@@ -1028,15 +1028,29 @@ public function ojt_edit(Request $request,$studentNum)
                 $user->id
             );
 
+            $syncedFields = [];
+            if (!empty($user->full_name)) { $syncedFields['Full Name'] = $user->full_name; }
+            if (!empty($student->studentNum)) { $syncedFields['Student Number'] = $student->studentNum; }
+            if (!empty($student->course)) { $syncedFields['Program / Course'] = $student->course; }
+            if (!empty($student->year_and_section)) { $syncedFields['Year & Section'] = $student->year_and_section; }
+            if (!empty($student->contact_number)) { $syncedFields['Contact Number'] = $student->contact_number; }
+            if (!empty($student->date_of_birth)) { $syncedFields['Date of Birth'] = $student->date_of_birth; }
+            if (!empty($student->address)) { $syncedFields['Home Address'] = $student->address; }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Profile details successfully synced from Guidance System (GuiSIS)!',
                 'data' => [
                     'studentNum' => $student->studentNum,
+                    'full_name' => $user->full_name,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
                     'course' => $student->course,
                     'year_and_section' => $student->year_and_section,
                     'contact_number' => $student->contact_number,
+                    'date_of_birth' => $student->date_of_birth,
                     'address' => $student->address,
+                    'synced_fields' => $syncedFields,
                 ]
             ]);
         } catch (\Throwable $e) {

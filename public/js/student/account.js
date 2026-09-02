@@ -609,38 +609,36 @@
             profileForm.submit();
         });
 
+        var alertHelper = window.SyncAlert || {
+            confirm: function(o) { return Swal.fire({ title: o.title, text: o.subtitle, icon: 'question', showCancelButton: true, showDenyButton: false }); },
+            loading: function(o) { return Swal.fire({ title: o.title, text: o.subtitle, allowOutsideClick: false, showConfirmButton: false, showDenyButton: false }); },
+            success: function(o) { return Swal.fire({ title: o.title, icon: 'success', showDenyButton: false }); },
+            error: function(o) { return Swal.fire({ title: o.title, text: o.message, icon: 'error', showDenyButton: false }); },
+            notice: function(o) { return Swal.fire({ title: o.title, text: o.message, icon: 'warning', showDenyButton: false }); }
+        };
+
         // Sync from GuiSIS Handler
         $('#btnSyncGuidance').on('click', function(e) {
             e.preventDefault();
 
-            Swal.fire({
-                title: 'Sync from Guidance System (GuiSIS)?',
-                html: 'This will automatically fetch your latest academic and demographic details from GuiSIS:<br><br>' +
-                      '<ul style="text-align:left; font-size:13px; color:#4b5563; padding-left:20px;">' +
-                      '<li>Student Number, Course/Program, and Year &amp; Section.</li>' +
-                      '<li>Birthdate, Contact Number, and Home Address.</li>' +
-                      '</ul>',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#16a34a',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, Sync My Details'
+            alertHelper.confirm({
+                system: 'guisis',
+                title: 'Sync Profile from GuiSIS?',
+                subtitle: 'Automatically fetch your verified academic & demographic details from Guidance.',
+                bullets: [
+                    'Updates Student Number, Course/Program, and Year & Section',
+                    'Synchronizes Birthdate, Contact Number, and Home Address',
+                    'Keeps your student internship profile 100% verified and up-to-date'
+                ],
+                note: 'Safe Operation: Your existing application files and submissions remain safe.',
+                confirmBtnText: 'Yes, Sync My Profile'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
+                    alertHelper.loading({
+                        system: 'guisis',
                         title: 'Connecting to GuiSIS...',
-                        html:
-                            '<div style="margin: 15px 0;">' +
-                                '<div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">' +
-                                    '<span class="visually-hidden">Syncing...</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">' +
-                                '<i class="fas fa-graduation-cap text-success me-1"></i> Pulling your profile from GuiSIS. Please wait...</strong>' +
-                            '</div>',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false
+                        subtitle: 'Fetching your official student record from GuiSIS...',
+                        cautionText: 'Please keep this tab open while your profile details are updating.'
                     });
 
                     $.ajaxSetup({
@@ -657,20 +655,40 @@
                         },
                         success: function(res) {
                             if (res.success) {
-                                Swal.fire({
-                                    title: 'Sync Complete!',
-                                    text: res.message || 'Your profile details were successfully updated from GuiSIS.',
-                                    icon: 'success',
-                                    confirmButtonColor: '#16a34a'
+                                var d = res.data || {};
+                                var syncedList = [];
+
+                                if (d.full_name) syncedList.push({ label: 'Full Name', value: d.full_name, icon: 'fa-user' });
+                                if (d.studentNum) syncedList.push({ label: 'Student Number', value: d.studentNum, icon: 'fa-id-card' });
+                                if (d.course) syncedList.push({ label: 'Program / Course', value: d.course, icon: 'fa-graduation-cap' });
+                                if (d.year_and_section) syncedList.push({ label: 'Year & Section', value: d.year_and_section, icon: 'fa-layer-group' });
+                                if (d.contact_number) syncedList.push({ label: 'Contact Number', value: d.contact_number, icon: 'fa-phone' });
+                                if (d.date_of_birth) syncedList.push({ label: 'Date of Birth', value: d.date_of_birth, icon: 'fa-calendar-alt' });
+                                if (d.address) syncedList.push({ label: 'Home Address', value: d.address, icon: 'fa-map-marker-alt' });
+
+                                if (syncedList.length === 0 && d.synced_fields) {
+                                    syncedList = d.synced_fields;
+                                }
+
+                                alertHelper.success({
+                                    system: 'guisis',
+                                    title: 'Profile Synced!',
+                                    subtitle: res.message || 'Your verified student details were synchronized from GuiSIS.',
+                                    stats: [
+                                        { label: 'Fields Synced', value: syncedList.length || 1, delta: true, colorClass: 'text-success', iconType: 'success', icon: 'fa-check-circle' },
+                                        { label: 'Data Source', value: 'GuiSIS', colorClass: 'text-primary', iconType: 'primary', icon: 'fa-university' }
+                                    ],
+                                    syncedDetails: syncedList,
+                                    detailsTitle: 'Information Synced from Guidance',
+                                    confirmBtnText: 'Done & Refresh'
                                 }).then(() => {
                                     location.reload();
                                 });
                             } else {
-                                Swal.fire({
+                                alertHelper.notice({
+                                    system: 'guisis',
                                     title: 'Sync Notice',
-                                    text: res.message || 'Unable to sync profile details.',
-                                    icon: 'info',
-                                    confirmButtonColor: '#16a34a'
+                                    message: res.message || 'Unable to sync profile details from Guidance System.'
                                 });
                             }
                         },
@@ -678,7 +696,10 @@
                             var errMsg = (xhr.responseJSON && xhr.responseJSON.message)
                                 ? xhr.responseJSON.message
                                 : 'Error connecting to Guidance System (GuiSIS). Please try again.';
-                            Swal.fire('GuiSIS Sync Failed', errMsg, 'error');
+                            alertHelper.error({
+                                title: 'GuiSIS Sync Failed',
+                                message: errMsg
+                            });
                         }
                     });
                 }

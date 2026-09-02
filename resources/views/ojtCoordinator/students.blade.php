@@ -26,6 +26,7 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/students.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/sync-alerts.css') }}?v={{ time() }}">
 </head>
 
 <body>
@@ -669,6 +670,7 @@
         csrfToken: @json(csrf_token())
     };
 </script>
+<script src="{{ vasset('js/components/sync-alerts.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/coordinator/students.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>

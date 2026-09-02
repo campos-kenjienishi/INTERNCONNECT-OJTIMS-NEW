@@ -198,39 +198,36 @@
             });
         });
 
+        var alertHelper = window.SyncAlert || {
+            confirm: function(o) { return Swal.fire({ title: o.title, text: o.subtitle, icon: 'question', showCancelButton: true, showDenyButton: false }); },
+            loading: function(o) { return Swal.fire({ title: o.title, text: o.subtitle, allowOutsideClick: false, showConfirmButton: false, showDenyButton: false }); },
+            success: function(o) { return Swal.fire({ title: o.title, icon: 'success', showDenyButton: false }); },
+            error: function(o) { return Swal.fire({ title: o.title, text: o.message, icon: 'error', showDenyButton: false }); },
+            notice: function(o) { return Swal.fire({ title: o.title, text: o.message, icon: 'warning', showDenyButton: false }); }
+        };
+
         // --- 1. Sync IDP UUIDs Handler ---
         $('#btnSyncIdp').on('click', function(e) {
             e.preventDefault();
 
-            Swal.fire({
+            alertHelper.confirm({
+                system: 'idp',
                 title: 'Sync Student UUIDs from IDP?',
-                html: 'This will cross-reference existing students in your database with the Identity Provider:<br><br>' +
-                      '<ul style="text-align:left; font-size:13px; color:#4b5563; padding-left:20px;">' +
-                      '<li>Backfills missing <strong>IDP UUIDs</strong> on student accounts.</li>' +
-                      '<li>Synchronizes official name fields from IDP.</li>' +
-                      '</ul>' +
-                      '<div style="font-size:12.5px; color:#6b7280; margin-top:8px;"><strong>Note:</strong> Only updates existing local accounts.</div>',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#4f46e5',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, Sync IDP UUIDs'
+                subtitle: 'Cross-reference student accounts with campus Identity Provider directory.',
+                bullets: [
+                    'Backfills missing IDP UUID identifiers for students',
+                    'Synchronizes official student names & authentication fields',
+                    'Preserves all local progress, requirements, and submissions'
+                ],
+                note: 'Safe Operation: Only existing local student records are matched.',
+                confirmBtnText: 'Yes, Sync IDP UUIDs'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Connecting to Identity Provider...',
-                        html:
-                            '<div style="margin: 15px 0;">' +
-                                '<div class="spinner-border text-primary" role="status" style="width: 2.5rem; height: 2.5rem;">' +
-                                    '<span class="visually-hidden">Syncing...</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">' +
-                                '<i class="fas fa-lock text-primary me-1"></i> Linking student UUIDs from IDP. Please wait...</strong>' +
-                            '</div>',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false
+                    alertHelper.loading({
+                        system: 'idp',
+                        title: 'Connecting to IDP...',
+                        subtitle: 'Querying Identity Provider directory & linking student UUIDs...',
+                        cautionText: 'Please keep this tab open while IDP synchronization is in progress.'
                     });
 
                     window.onbeforeunload = function() {
@@ -240,22 +237,26 @@
                     $.ajax({
                         url: (window.studentsConfig && window.studentsConfig.syncUsersIdpUrl) || '/coordinator/sync-users-idp',
                         type: 'POST',
-                        headers: { 'X-CSRF-TOKEN': (window.studentsConfig && window.studentsConfig.csrfToken) || (meta[name="csrf-token"].attr('content') || '') },
+                        headers: { 'X-CSRF-TOKEN': (window.studentsConfig && window.studentsConfig.csrfToken) || ($('meta[name="csrf-token"]').attr('content') || '') },
                         timeout: 120000,
                         success: function(res) {
                             window.onbeforeunload = null;
                             var s = res.summary || {};
-                            Swal.fire({
+                            var notInIdp = s.not_in_idp || 0;
+
+                            var stats = [
+                                { label: 'Total Students', value: s.total_students || 0, colorClass: 'text-primary', iconType: 'primary', icon: 'fa-users' },
+                                { label: 'Newly Linked', value: s.idp_linked || 0, delta: true, colorClass: 'text-success', iconType: 'success', icon: 'fa-link' },
+                                { label: 'Already Linked', value: s.already_linked || 0, colorClass: 'text-info', iconType: 'info', icon: 'fa-check-circle' },
+                                { label: 'Not in IDP', value: notInIdp, colorClass: notInIdp ? 'text-warning' : 'text-secondary', iconType: notInIdp ? 'warning' : 'neutral', icon: 'fa-exclamation-triangle' }
+                            ];
+
+                            alertHelper.success({
+                                system: 'idp',
                                 title: 'IDP UUID Sync Complete!',
-                                html:
-                                    '<div style="text-align:left; margin: 10px 0; font-size: 14px;">' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-users text-primary me-2"></i>Total Students:</span><strong>' + (s.total_students || 0) + '</strong></div>' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-link text-success me-2"></i>Newly Linked UUIDs:</span><strong style="color:#10b981;">+' + (s.idp_linked || 0) + '</strong></div>' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-check-circle text-info me-2"></i>Already Linked:</span><strong>' + (s.already_linked || 0) + '</strong></div>' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0;"><span><i class="fas fa-exclamation-triangle text-warning me-2"></i>Not Found in IDP:</span><strong>' + (s.not_in_idp || 0) + '</strong></div>' +
-                                    '</div>',
-                                icon: 'success',
-                                confirmButtonColor: '#4f46e5'
+                                subtitle: 'Student IDP identifiers have been cross-referenced and linked.',
+                                stats: stats,
+                                confirmBtnText: 'Done & Refresh'
                             }).then(() => {
                                 location.reload();
                             });
@@ -265,7 +266,10 @@
                             var errMsg = (xhr.responseJSON && xhr.responseJSON.message)
                                 ? xhr.responseJSON.message
                                 : 'Failed to sync IDP records. Please try again.';
-                            Swal.fire('IDP Sync Failed', errMsg, 'error');
+                            alertHelper.error({
+                                title: 'IDP Sync Failed',
+                                message: errMsg
+                            });
                         }
                     });
                 }
@@ -276,34 +280,24 @@
         $('#btnSyncGuisis').on('click', function(e) {
             e.preventDefault();
 
-            Swal.fire({
+            alertHelper.confirm({
+                system: 'guisis',
                 title: 'Sync from GuiSIS (Guidance)?',
-                html: 'This will update academic & demographic records for existing students from GuiSIS:<br><br>' +
-                      '<ul style="text-align:left; font-size:13px; color:#4b5563; padding-left:20px;">' +
-                      '<li>Updates Student Number, Program, and Year &amp; Section.</li>' +
-                      '<li>Synchronizes Birthdate, Contact #, and Address.</li>' +
-                      '</ul>',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#0d9488',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, Sync GuiSIS'
+                subtitle: 'Update academic and demographic records for existing students from GuiSIS.',
+                bullets: [
+                    'Updates Student Numbers, Program/Course, and Year & Section',
+                    'Synchronizes Birthdates, Contact Numbers, and Home Addresses',
+                    'Maintains full synchronization with Guidance Counselor database'
+                ],
+                note: 'Safe Operation: Existing student accounts are updated without data loss.',
+                confirmBtnText: 'Yes, Sync GuiSIS'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
+                    alertHelper.loading({
+                        system: 'guisis',
                         title: 'Connecting to GuiSIS...',
-                        html:
-                            '<div style="margin: 15px 0;">' +
-                                '<div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">' +
-                                    '<span class="visually-hidden">Syncing...</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">' +
-                                '<i class="fas fa-graduation-cap text-success me-1"></i> Pulling profiles from GuiSIS. Please wait...</strong>' +
-                            '</div>',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false
+                        subtitle: 'Pulling latest student records and demographics from GuiSIS...',
+                        cautionText: 'Please keep this tab open while GuiSIS synchronization is running.'
                     });
 
                     window.onbeforeunload = function() {
@@ -313,22 +307,26 @@
                     $.ajax({
                         url: (window.studentsConfig && window.studentsConfig.syncUsersGuisisUrl) || '/coordinator/sync-users-guisis',
                         type: 'POST',
-                        headers: { 'X-CSRF-TOKEN': (window.studentsConfig && window.studentsConfig.csrfToken) || (meta[name="csrf-token"].attr('content') || '') },
+                        headers: { 'X-CSRF-TOKEN': (window.studentsConfig && window.studentsConfig.csrfToken) || ($('meta[name="csrf-token"]').attr('content') || '') },
                         timeout: 120000,
                         success: function(res) {
                             window.onbeforeunload = null;
                             var s = res.summary || {};
-                            Swal.fire({
+                            var notFound = s.guisis_not_found || 0;
+
+                            var stats = [
+                                { label: 'Total Students', value: s.total_students || 0, colorClass: 'text-primary', iconType: 'primary', icon: 'fa-users' },
+                                { label: 'Profiles Synced', value: s.guisis_synced || 0, colorClass: 'text-success', iconType: 'success', icon: 'fa-user-graduate' },
+                                { label: 'GuiSIS Pool', value: s.guisis_total_pool || 0, colorClass: 'text-info', iconType: 'info', icon: 'fa-database' },
+                                { label: 'Not in GuiSIS', value: notFound, colorClass: notFound ? 'text-warning' : 'text-secondary', iconType: notFound ? 'warning' : 'neutral', icon: 'fa-exclamation-triangle' }
+                            ];
+
+                            alertHelper.success({
+                                system: 'guisis',
                                 title: 'GuiSIS Sync Complete!',
-                                html:
-                                    '<div style="text-align:left; margin: 10px 0; font-size: 14px;">' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-users text-primary me-2"></i>Total Students:</span><strong>' + (s.total_students || 0) + '</strong></div>' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-user-graduate text-success me-2"></i>Profiles Synced:</span><strong style="color:#059669;">' + (s.guisis_synced || 0) + '</strong></div>' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-database text-info me-2"></i>GuiSIS Pool:</span><strong>' + (s.guisis_total_pool || 0) + '</strong></div>' +
-                                    '<div style="display:flex; justify-content:space-between; padding: 6px 0;"><span><i class="fas fa-exclamation-triangle text-warning me-2"></i>Not in GuiSIS:</span><strong>' + (s.guisis_not_found || 0) + '</strong></div>' +
-                                    '</div>',
-                                icon: 'success',
-                                confirmButtonColor: '#0d9488'
+                                subtitle: 'Student profiles have been updated from the Guidance System.',
+                                stats: stats,
+                                confirmBtnText: 'Done & Refresh'
                             }).then(() => {
                                 location.reload();
                             });
@@ -338,7 +336,10 @@
                             var errMsg = (xhr.responseJSON && xhr.responseJSON.message)
                                 ? xhr.responseJSON.message
                                 : 'Failed to sync GuiSIS records. Please try again.';
-                            Swal.fire('GuiSIS Sync Failed', errMsg, 'error');
+                            alertHelper.error({
+                                title: 'GuiSIS Sync Failed',
+                                message: errMsg
+                            });
                         }
                     });
                 }

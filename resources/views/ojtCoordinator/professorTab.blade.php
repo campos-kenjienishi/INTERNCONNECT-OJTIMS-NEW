@@ -28,6 +28,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     <link rel="stylesheet" href="{{ vasset('css/coordinator/professors.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/sync-alerts.css') }}?v={{ time() }}">
 </head>
 
 <body>
@@ -632,6 +633,7 @@
         csrfToken: @json(csrf_token())
     };
 </script>
+<script src="{{ vasset('js/components/sync-alerts.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/coordinator/professors.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>

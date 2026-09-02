@@ -1,0 +1,551 @@
+/* ============================================================
+   INTERNCONNECT QUICK TOOLS FLOATING SPEED DIAL (FAB)
+   ============================================================ */
+
+/* Hide native sienna floating button so only our FAB is shown */
+.asw-menu-btn,
+.asw-btn,
+[data-asw-btn],
+.sienna-accessibility-btn {
+    display: none !important;
+}
+
+/* Speed Dial Container */
+.ic-speed-dial {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Hide floating speed dial when SweetAlert or modals are open */
+body.swal2-shown .ic-speed-dial,
+body.modal-open .ic-speed-dial {
+    display: none !important;
+}
+
+/* Menu Stack */
+.ic-speed-dial-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(16px) scale(0.95);
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.25s;
+    margin-bottom: 2px;
+}
+
+.ic-speed-dial.open .ic-speed-dial-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* Speed Dial Pill Item */
+.ic-speed-dial-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 18px 6px 6px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #5c0606 0%, #750808 100%);
+    color: #ffffff;
+    border: 1.5px solid rgba(254, 215, 0, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.ic-speed-dial-item:hover {
+    transform: translateX(-4px);
+    background: linear-gradient(135deg, #700808 0%, #900c0c 100%);
+    border-color: #FED700;
+    box-shadow: 0 8px 25px rgba(100, 0, 0, 0.4), 0 0 12px rgba(254, 215, 0, 0.3);
+    color: #FED700;
+}
+
+.ic-speed-dial-item:active {
+    transform: translateX(-2px) scale(0.98);
+}
+
+.ic-item-emblem {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(254, 215, 0, 0.18);
+    color: #FED700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.ic-speed-dial-item:hover .ic-item-emblem {
+    background: #FED700;
+    color: #5c0606;
+    transform: scale(1.06);
+}
+
+.ic-item-label {
+    font-size: 13.5px;
+    letter-spacing: 0.2px;
+}
+
+/* Main Trigger Floating Plus Button */
+.ic-speed-dial-trigger {
+    pointer-events: auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #5c0606 0%, #800000 100%);
+    color: #FED700;
+    border: 2px solid rgba(254, 215, 0, 0.4);
+    box-shadow: 0 6px 24px rgba(92, 6, 6, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+}
+
+.ic-speed-dial-trigger:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 30px rgba(92, 6, 6, 0.55), 0 0 16px rgba(254, 215, 0, 0.35);
+    border-color: #FED700;
+}
+
+.ic-trigger-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ic-speed-dial.open .ic-speed-dial-trigger {
+    background: #3b0000;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.ic-speed-dial.open .ic-trigger-icon {
+    transform: rotate(135deg);
+    color: #ffffff;
+}
+
+/* ============================================================
+   STYLIZED VOICE INPUT GUIDE MODAL
+   ============================================================ */
+.voice-guide-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.voice-guide-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: icFadeIn 0.2s ease;
+}
+
+.voice-guide-modal-dialog {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: icScaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.voice-guide-modal-content {
+    background: #ffffff;
+    border-radius: 22px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(226, 232, 240, 0.8);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.voice-guide-modal-header {
+    background: linear-gradient(135deg, #1a0000 0%, #4a0000 50%, #7f0000 100%);
+    color: #ffffff;
+    padding: 20px 24px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #FED700;
+}
+
+.voice-guide-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.voice-guide-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(254, 215, 0, 0.15);
+    color: #FED700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border: 1.5px solid rgba(254, 215, 0, 0.35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    flex-shrink: 0;
+}
+
+.voice-guide-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff !important;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.voice-guide-modal-sub {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 2px 0 0 0;
+}
+
+.voice-guide-close {
+    background: rgba(255, 255, 255, 0.12);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.voice-guide-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.08);
+}
+
+.voice-guide-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #f8fafc;
+}
+
+.voice-guide-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px 16px;
+}
+
+.voice-guide-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Steps Grid */
+.voice-steps-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.voice-step-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12.5px;
+    color: #334155;
+    line-height: 1.45;
+}
+
+.voice-step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.12);
+    color: #dc2626;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* Commands Grid */
+.voice-cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.voice-cmd-tile {
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.cmd-speech {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.cmd-arrow {
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+.cmd-res {
+    font-weight: 700;
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+/* Shortcuts Row */
+.voice-shortcuts-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.voice-shortcut-pill {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: #334155;
+}
+
+.voice-shortcut-pill strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Sandbox Box */
+.voice-sandbox-box {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(5, 150, 105, 0.02) 100%);
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+.voice-sandbox-input-wrap {
+    position: relative;
+}
+
+.voice-sandbox-field {
+    width: 100%;
+    padding: 10px 42px 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    font-size: 13px;
+    font-family: inherit;
+    box-sizing: border-box;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+
+.voice-sandbox-field:focus {
+    border-color: #059669;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+
+/* Modal Footer */
+.voice-guide-modal-footer {
+    padding: 14px 24px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-voice-guide-close {
+    background: linear-gradient(135deg, #5c0606 0%, #800000 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-voice-guide-close:hover {
+    background: linear-gradient(135deg, #700808 0%, #950000 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(92, 6, 6, 0.3);
+}
+
+/* ============================================================
+   DARK MODE COMPATIBILITY
+   ============================================================ */
+html.dark-mode .voice-guide-modal-content,
+body.dark-mode .voice-guide-modal-content {
+    background: #18181b;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+html.dark-mode .voice-guide-modal-body,
+body.dark-mode .voice-guide-modal-body {
+    background: #18181b;
+}
+
+html.dark-mode .voice-guide-section,
+body.dark-mode .voice-guide-section {
+    background: #27272a;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark-mode .voice-guide-section-title,
+body.dark-mode .voice-guide-section-title {
+    color: #a1a1aa;
+}
+
+html.dark-mode .voice-step-card,
+body.dark-mode .voice-step-card {
+    color: #e4e4e7;
+}
+
+html.dark-mode .voice-cmd-tile,
+body.dark-mode .voice-cmd-tile {
+    background: #3f3f46;
+}
+
+html.dark-mode .cmd-speech,
+body.dark-mode .cmd-speech {
+    color: #f4f4f5;
+}
+
+html.dark-mode .voice-shortcut-pill,
+body.dark-mode .voice-shortcut-pill {
+    background: #27272a;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #d4d4d8;
+}
+
+html.dark-mode .voice-shortcut-pill strong,
+body.dark-mode .voice-shortcut-pill strong {
+    color: #ffffff;
+}
+
+html.dark-mode .voice-sandbox-field,
+body.dark-mode .voice-sandbox-field {
+    background: #27272a;
+    border-color: #3f3f46;
+    color: #ffffff;
+}
+
+html.dark-mode .voice-guide-modal-footer,
+body.dark-mode .voice-guide-modal-footer {
+    background: #27272a;
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   MOBILE RESPONSIVENESS
+   ============================================================ */
+@media (max-width: 600px) {
+    .ic-speed-dial {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .ic-speed-dial-trigger {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+
+    .ic-speed-dial-item {
+        padding: 5px 14px 5px 5px;
+        font-size: 12.5px;
+        gap: 8px;
+    }
+
+    .ic-item-emblem {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .voice-guide-modal-dialog {
+        max-width: 95vw;
+    }
+
+    .voice-guide-modal-header {
+        padding: 16px 18px 14px;
+    }
+
+    .voice-guide-modal-body {
+        padding: 16px 16px;
+        gap: 12px;
+    }
+
+    .voice-cmd-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes icFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes icScaleIn {
+    from { opacity: 0; transform: scale(0.93); }
+    to { opacity: 1; transform: scale(1); }
+}

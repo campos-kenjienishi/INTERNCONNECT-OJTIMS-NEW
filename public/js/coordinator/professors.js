@@ -542,34 +542,36 @@ $(document).ready(function () {
         var $btn = $(this);
         var $icon = $('#flssSyncIcon');
 
-        Swal.fire({
+        var alertHelper = window.SyncAlert || {
+            confirm: function(o) { return Swal.fire({ title: o.title, text: o.subtitle, icon: 'question', showCancelButton: true, showDenyButton: false }); },
+            loading: function(o) { return Swal.fire({ title: o.title, text: o.subtitle, allowOutsideClick: false, showConfirmButton: false, showDenyButton: false }); },
+            success: function(o) { return Swal.fire({ title: o.title, icon: 'success', showDenyButton: false }); },
+            error: function(o) { return Swal.fire({ title: o.title, text: o.message, icon: 'error', showDenyButton: false }); },
+            notice: function(o) { return Swal.fire({ title: o.title, text: o.message, icon: 'warning', showDenyButton: false }); }
+        };
+
+        alertHelper.confirm({
+            system: 'flss',
             title: 'Sync Faculty from FLSS?',
-            text: 'This will fetch faculty records from the Faculty Loading System, update existing accounts, and create new professor accounts.',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#16a34a',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Sync Now'
+            subtitle: 'Pull latest faculty and professor records from the Faculty Loading System.',
+            bullets: [
+                'Imports newly appointed faculty & instructors',
+                'Updates departmental assignments & contact details',
+                'Preserves all existing class records & student evaluations'
+            ],
+            note: 'Safe Operation: Existing accounts are updated without loss of data.',
+            confirmBtnText: 'Yes, Sync Faculty'
         }).then((result) => {
             if (result.isConfirmed) {
                 $btn.prop('disabled', true);
                 $icon.addClass('fa-spin');
 
-                // Show Syncing Loading Alert asking user not to navigate away
-                Swal.fire({
+                // Show modern animated loading alert
+                alertHelper.loading({
+                    system: 'flss',
                     title: 'Syncing Faculty Data...',
-                    html: '<div class="py-3">' +
-                        '<div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">' +
-                        '<span class="visually-hidden">Syncing...</span>' +
-                        '</div>' +
-                        '<p class="font-weight-bold text-dark mb-2" style="font-size: 15px;">Connecting to FLSS Production API...</p>' +
-                        '<div class="alert alert-warning text-start mx-auto mb-0" style="max-width: 420px; font-size: 13px; border-radius: 10px;">' +
-                        '<i class="fas fa-exclamation-triangle text-warning me-1"></i> <strong>Please do not refresh, close this window, or navigate to another page while syncing is in progress.</strong>' +
-                        '</div>' +
-                        '</div>',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false
+                    subtitle: 'Connecting to FLSS Production API & processing records...',
+                    cautionText: 'Please do not refresh, close this window, or navigate away while synchronization is in progress.'
                 });
 
                 // Prevent accidental page unload during sync
@@ -581,7 +583,7 @@ $(document).ready(function () {
                     url: (window.professorsConfig && window.professorsConfig.syncFacultyUrl) || '/coordinator/sync-faculty',
                     type: "POST",
                     data: {
-                        _token: (window.professorsConfig && window.professorsConfig.csrfToken) || (meta[name = "csrf-token"].attr('content') || '')
+                        _token: (window.professorsConfig && window.professorsConfig.csrfToken) || ($('meta[name="csrf-token"]').attr('content') || '')
                     },
                     success: function (res) {
                         window.onbeforeunload = null;
@@ -591,38 +593,38 @@ $(document).ready(function () {
                         if (res.success) {
                             var s = res.summary || {};
                             var hasMissing = Boolean(res.has_missing && res.missing_accounts && res.missing_accounts.length > 0);
-                            var summaryHtml =
-                                '<div style="text-align:left; margin: 12px 0; font-size: 14px;">' +
-                                '<div style="display:flex; justify-content:space-between; padding: 7px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-user-plus text-success me-2"></i>Newly Created:</span><strong style="color:#10b981;">+' + (s.created || 0) + '</strong></div>' +
-                                '<div style="display:flex; justify-content:space-between; padding: 7px 0; border-bottom: 1px solid #f3f4f6;"><span><i class="fas fa-user-check text-primary me-2"></i>Updated Accounts:</span><strong style="color:#3b82f6;">' + (s.updated || 0) + '</strong></div>' +
-                                '<div style="display:flex; justify-content:space-between; padding: 7px 0;' + (hasMissing ? ' border-bottom: 1px solid #f3f4f6;' : '') + '"><span><i class="fas fa-forward text-secondary me-2"></i>Skipped / Unchanged:</span><strong>' + (s.skipped || 0) + '</strong></div>' +
-                                (hasMissing
-                                    ? '<div style="display:flex; justify-content:space-between; padding: 7px 0;"><span><i class="fas fa-exclamation-triangle text-warning me-2"></i>Not Found in FLSS:</span><strong style="color:#f59e0b;">' + (res.missing_accounts.length) + '</strong></div>'
-                                    : '') +
-                                '</div>';
+                            var missingCount = (res.missing_accounts || []).length;
 
-                            if (hasMissing) {
-                                Swal.fire({
-                                    title: 'FLSS Sync Complete!',
-                                    html: summaryHtml,
-                                    icon: 'info',
-                                    confirmButtonColor: '#16a34a',
-                                    confirmButtonText: 'Review Missing Accounts'
-                                }).then(function () {
+                            var stats = [
+                                { label: 'Newly Created', value: s.created || 0, delta: true, colorClass: 'text-success', iconType: 'success', icon: 'fa-user-plus' },
+                                { label: 'Updated Profiles', value: s.updated || 0, colorClass: 'text-primary', iconType: 'primary', icon: 'fa-user-check' },
+                                { label: 'Unchanged / Skipped', value: s.skipped || 0, colorClass: 'text-secondary', iconType: 'neutral', icon: 'fa-forward' },
+                                { label: 'Not in FLSS', value: missingCount, colorClass: hasMissing ? 'text-warning' : 'text-secondary', iconType: hasMissing ? 'warning' : 'neutral', icon: 'fa-exclamation-triangle' }
+                            ];
+
+                            alertHelper.success({
+                                system: 'flss',
+                                title: 'FLSS Sync Complete!',
+                                subtitle: 'Faculty records have been successfully synchronized with FLSS.',
+                                stats: stats,
+                                missingNotice: hasMissing ? {
+                                    count: missingCount,
+                                    text: 'Local faculty accounts not found in FLSS. Review and manage them.'
+                                } : null,
+                                confirmBtnText: hasMissing ? 'Review Missing Faculty' : 'Done & Refresh'
+                            }).then(function () {
+                                if (hasMissing) {
                                     openPruneMissingFacultyModal(res.missing_accounts);
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'FLSS Sync Complete!',
-                                    html: summaryHtml,
-                                    icon: 'success',
-                                    confirmButtonColor: '#16a34a'
-                                }).then(function () {
+                                } else {
                                     location.reload();
-                                });
-                            }
+                                }
+                            });
                         } else {
-                            Swal.fire('Sync Notice', res.message || 'Unable to sync faculty.', 'warning');
+                            alertHelper.notice({
+                                system: 'flss',
+                                title: 'Sync Notice',
+                                message: res.message || 'Unable to sync faculty records from FLSS.'
+                            });
                         }
                     },
                     error: function (err) {
@@ -630,7 +632,10 @@ $(document).ready(function () {
                         $btn.prop('disabled', false);
                         $icon.removeClass('fa-spin');
                         var errMsg = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : 'Error communicating with FLSS system.';
-                        Swal.fire('Sync Failed', errMsg, 'error');
+                        alertHelper.error({
+                            title: 'FLSS Sync Failed',
+                            message: errMsg
+                        });
                     }
                 });
             }
