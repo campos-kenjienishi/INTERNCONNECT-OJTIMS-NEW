@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Student Requirements Page Scripts
    Extracted from ojtCoordinator/studentRequirements.blade.php
    ========================================================================== */
@@ -17,7 +17,8 @@
         document.getElementById('pdfPreviewIframe').src = url;
         document.getElementById('pdfDownloadLink').href = downloadUrl || url;
 
-        const modal = new bootstrap.Modal(document.getElementById('pdfPreviewModal'));
+        var modalEl = document.getElementById('pdfPreviewModal');
+        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         modal.show();
     }
 
@@ -50,10 +51,10 @@
                 } else if (info.submitted || info.file_id) {
                     badgeHtml = '<span class="req-badge req-approved"><i class="fa fa-check-circle me-1"></i> Uploaded</span>';
                     actionHtml = `
-                        <button type="button" onclick="openPdfPreviewModal('/coordinator/requirements/view/${info.file_id}', '${catName.replace(/'/g, "\\'")}', '/coordinator/requirements/download/${info.file_id}')" class="btn-action view-personal">
+                        <button type="button" onclick="openPdfPreviewModal('/coordinator/requirements/view/${info.file_id}', '${catName.replace(/'/g, "\\'")}', '/coordinator/requirements/download/${info.file_id}')" class="ic-matrix-action-btn view">
                             <i class="fa fa-eye"></i> View PDF
                         </button>
-                        <a href="/coordinator/requirements/download/${info.file_id}" class="btn-action view-personal" style="background:#f1f5f9; border-color:#cbd5e1; color:#475569; text-decoration:none;">
+                        <a href="/coordinator/requirements/download/${info.file_id}" class="ic-matrix-action-btn download">
                             <i class="fa fa-download"></i> Download
                         </a>
                     `;
@@ -63,16 +64,16 @@
                 }
 
                 listContainer.innerHTML += `
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                        <div>
-                            <div style="font-size: 14px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                    <div class="ic-matrix-file-row">
+                        <div class="ic-matrix-file-info">
+                            <div class="ic-matrix-file-name">
                                 <i class="fa fa-file-pdf" style="color: #dc2626; font-size: 16px;"></i> ${catName}
                             </div>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                            <div class="ic-matrix-file-sub">
                                 ${info.file_name ? info.file_name : 'No file attached'}
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="ic-matrix-file-actions">
                             ${badgeHtml}
                             ${actionHtml}
                         </div>
@@ -81,7 +82,8 @@
             });
         }
 
-        const modal = new bootstrap.Modal(document.getElementById('studentFilesModal'));
+        var folderModalEl = document.getElementById('studentFilesModal');
+        var modal = bootstrap.Modal.getInstance(folderModalEl) || new bootstrap.Modal(folderModalEl);
         modal.show();
     }
 

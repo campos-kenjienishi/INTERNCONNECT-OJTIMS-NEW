@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
     <script>
         (function(){
@@ -418,29 +420,29 @@
 </div>
 
 <!-- =============== STUDENT FOLDER MODAL =============== -->
-<div class="modal fade" id="studentFilesModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="studentFilesModal" tabindex="-1" aria-labelledby="modalFolderName" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden;">
-            <div class="modal-header" style="background: linear-gradient(135deg, #1a0000 0%, #7f0000 100%); color: white; padding: 20px 24px; border: none;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fca5a5;">
+        <div class="modal-content ic-matrix-modal-content">
+            <div class="modal-header ic-matrix-modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="ic-matrix-modal-icon">
                         <i class="fa fa-folder-open"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title" id="modalFolderName" style="font-weight: 800; font-size: 18px; margin: 0; color: #ffffff;">
+                        <h5 class="modal-title" id="modalFolderName">
                             Student Requirements
                         </h5>
-                        <div id="modalFolderSub" style="font-size: 12.5px; color: rgba(255,255,255,0.75); margin-top: 2px;">
+                        <div id="modalFolderSub" class="ic-matrix-modal-sub">
                             Detailed repository of submitted basic requirements
                         </div>
                     </div>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="padding: 24px; max-height: 70vh; overflow-y: auto;">
-                <div id="modalFilesList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            <div class="modal-body ic-matrix-modal-body">
+                <div id="modalFilesList" class="ic-matrix-files-list"></div>
             </div>
-            <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 24px;">
+            <div class="modal-footer ic-matrix-modal-footer">
                 <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -448,25 +450,25 @@
 </div>
 
 <!-- =============== PDF PREVIEW MODAL =============== -->
-<div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 90vw;">
-        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 25px 50px rgba(0,0,0,0.3); overflow: hidden; height: 88vh; display: flex; flex-direction: column;">
-            <div class="modal-header" style="background: linear-gradient(135deg, #7f0000 0%, #991b1b 100%); color: white; padding: 16px 24px; border: none; flex-shrink: 0;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <i class="fa fa-file-pdf" style="font-size: 22px; color: #fca5a5;"></i>
-                    <h5 class="modal-title" id="pdfPreviewTitle" style="font-weight: 700; font-size: 16px; margin: 0; color: #ffffff;">
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-labelledby="pdfPreviewTitle" aria-hidden="true" style="z-index: 10070;">
+    <div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 950px; width: 92vw;">
+        <div class="modal-content ic-pdf-modal-content">
+            <div class="modal-header ic-pdf-modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa fa-file-pdf ic-pdf-header-icon"></i>
+                    <h5 class="modal-title" id="pdfPreviewTitle">
                         Document Preview
                     </h5>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <a id="pdfDownloadLink" href="#" class="btn-action view-personal" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; text-decoration: none;">
-                        <i class="fa fa-download"></i> Download
+                <div class="d-flex align-items-center gap-2">
+                    <a id="pdfDownloadLink" href="#" target="_blank" class="ic-btn-pdf-download">
+                        <i class="fa fa-download me-1"></i> Download
                     </a>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
             </div>
-            <div class="modal-body" style="padding: 0; flex: 1; background: #525659;">
-                <iframe id="pdfPreviewIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+            <div class="modal-body ic-pdf-modal-body">
+                <iframe id="pdfPreviewIframe" src="" class="ic-pdf-iframe"></iframe>
             </div>
         </div>
     </div>
