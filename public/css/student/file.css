@@ -33,6 +33,7 @@
                 transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
                 overflow: hidden;
                 box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+                border-right: 4px solid #FED700;
             }
 
             .sidebar.collapsed { width: var(--sidebar-w-collapsed); }
@@ -160,14 +161,19 @@
             /* =============== MAIN =============== */
             .main-content {
                 margin-left: var(--sidebar-w);
-                transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
+                width: calc(100% - var(--sidebar-w));
+                max-width: none !important;
+                transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s cubic-bezier(0.4,0,0.2,1);
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
                 min-width: 0;
             }
 
-            .main-content.expanded { margin-left: var(--sidebar-w-collapsed); }
+            .main-content.expanded {
+                margin-left: var(--sidebar-w-collapsed);
+                width: calc(100% - var(--sidebar-w-collapsed));
+            }
 
             .topbar {
                 height: var(--topbar-h);
@@ -256,7 +262,14 @@
             }
 
             /* =============== PAGE =============== */
-            .page-content { padding: 28px; flex: 1; min-width: 0; }
+            .page-content {
+                padding: 28px;
+                flex: 1;
+                width: 100%;
+                max-width: none !important;
+                margin: 0 !important;
+                min-width: 0;
+            }
 
             .page-header {
                 display: flex;
@@ -278,9 +291,11 @@
             /* Stats row */
             .stats-row {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                gap: 16px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 18px;
                 margin-bottom: 24px;
+                width: 100%;
+                max-width: 100%;
             }
 
             .stat-card {
@@ -324,12 +339,16 @@
 
             /* Table card */
             .table-card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    border: 1px solid rgba(0,0,0,0.04);
-    overflow: visible; /* IMPORTANT */
-}
+                background: #fff;
+                border-radius: 16px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+                border: 1px solid rgba(0,0,0,0.04);
+                overflow: hidden;
+                margin-bottom: 22px;
+                width: 100%;
+                max-width: none !important;
+                min-width: 0;
+            }
 
             .table-card-header {
                 display: flex;
@@ -377,41 +396,60 @@
             }
 
             /* DataTables overrides */
-            .table-card-body { padding: 0; }
+            .table-card-body {
+                padding: 24px !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
 
             .table-card-body .dataTables_wrapper {
-                padding: 16px 22px;
+                padding: 0 !important;
+                margin: 0 !important;
                 font-family: 'Poppins', sans-serif;
                 font-size: 13.5px;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .table-card-body table.dataTable {
                 width: 100% !important;
-                border-collapse: collapse;
+                max-width: 100% !important;
+                border-collapse: collapse !important;
+                margin: 18px 0 20px 0 !important;
+                box-sizing: border-box !important;
             }
 
             .table-card-body table.dataTable thead th {
-                background: #fafafa;
-                color: #555;
-                font-size: 11.5px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                padding: 10px 14px;
-                border-bottom: 1px solid #f0f0f0;
-                border-top: none;
+                background: #fafafa !important;
+                color: #475569 !important;
+                font-size: 11.5px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.5px !important;
+                padding: 14px 16px !important;
+                border-bottom: 1px solid #e5e7eb !important;
+                border-top: none !important;
+                vertical-align: middle !important;
             }
 
             .table-card-body table.dataTable tbody td {
-                padding: 14px 14px;
-                color: #333;
-                border-bottom: 1px solid #f9f9f9;
-                font-size: 13.5px;
-                vertical-align: middle;
+                padding: 18px 16px !important;
+                color: #1e293b !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                font-size: 13.5px !important;
+                vertical-align: middle !important;
             }
 
-            .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
-            .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
+            .table-card-body table.dataTable tbody tr:hover td {
+                background: #fff5f5 !important;
+            }
+
+            .table-card-body table.dataTable tbody tr:last-child td {
+                border-bottom: 1px solid #f1f5f9 !important;
+            }
 
             .dataTables_filter input {
                 border: 1px solid #e5e5e5 !important;
@@ -459,11 +497,12 @@
             .file-name-cell {
                 display: flex;
                 align-items: center;
-                gap: 12px;
+                gap: 14px;
             }
 
             .file-icon-wrap {
-                width: 38px; height: 38px;
+                width: 40px;
+                height: 40px;
                 border-radius: 10px;
                 background: #fee2e2;
                 display: flex;
@@ -478,12 +517,13 @@
                 font-weight: 600;
                 color: #1a1a1a;
                 font-size: 13.5px;
+                line-height: 1.4;
             }
 
             .file-ext {
                 font-size: 11px;
                 color: #888;
-                margin-top: 1px;
+                margin-top: 2px;
             }
 
             /* Uploader cell */
@@ -505,60 +545,95 @@
                 flex-shrink: 0;
             }
 
-            /* Download button */
-            .btn-download {
-                display: inline-flex;
+            /* Neutralize DataTables transparent gray sorting column background */
+            table.dataTable.display tbody tr > .sorting_1,
+            table.dataTable.display tbody tr > .sorting_2,
+            table.dataTable.display tbody tr > .sorting_3,
+            table.dataTable.order-column tbody tr > .sorting_1,
+            table.dataTable.order-column tbody tr > .sorting_2,
+            table.dataTable.order-column tbody tr > .sorting_3,
+            table.dataTable tbody tr td.sorting_1,
+            table.dataTable tbody tr td.sorting_2,
+            table.dataTable tbody tr td.sorting_3,
+            .table-card-body table.dataTable tbody tr td.sorting_1,
+            .table-card-body table.dataTable tbody tr td.sorting_2,
+            .table-card-body table.dataTable tbody tr td.sorting_3 {
+                background-color: transparent !important;
+                background: transparent !important;
+                box-shadow: none !important;
+            }
+
+            /* Action button group */
+            .action-btn-group {
+                display: flex;
                 align-items: center;
-                gap: 6px;
-                padding: 8px 16px;
-                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                border: none;
-                border-radius: 8px;
-                color: #ffffff !important;
-                font-family: 'Poppins', sans-serif;
-                font-size: 12.5px;
-                font-weight: 600;
-                cursor: pointer;
-                text-decoration: none;
-                transition: all 0.25s;
-                box-shadow: 0 3px 10px rgba(37,99,235,0.2);
+                justify-content: flex-end;
+                gap: 8px;
+                width: 100%;
+                flex-wrap: nowrap;
             }
 
-            .btn-download:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 18px rgba(37,99,235,0.3);
-                color: #ffffff !important;
-                text-decoration: none;
-            }
-
-            .btn-download:active { transform: translateY(0); }
-
+            /* View button (Mint Pill) */
             .btn-view {
                 display: inline-flex;
                 align-items: center;
                 gap: 6px;
-                padding: 8px 16px;
-                background: linear-gradient(135deg, #059669 0%, #047857 100%);
-                border: none;
+                padding: 7px 16px;
+                background: #ecfdf5;
+                border: 1px solid #a7f3d0;
                 border-radius: 8px;
-                color: #ffffff !important;
+                color: #059669 !important;
                 font-family: 'Poppins', sans-serif;
                 font-size: 12.5px;
                 font-weight: 600;
                 cursor: pointer;
                 text-decoration: none;
-                transition: all 0.25s;
-                box-shadow: 0 3px 10px rgba(5,150,105,0.2);
+                transition: all 0.2s ease;
             }
 
             .btn-view:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 18px rgba(5,150,105,0.3);
-                color: #ffffff !important;
+                background: #d1fae5;
+                border-color: #6ee7b7;
+                color: #047857 !important;
                 text-decoration: none;
+                transform: translateY(-1px);
             }
 
-            .btn-view:active { transform: translateY(0); }
+            .btn-view i {
+                color: #059669;
+                font-size: 13px;
+            }
+
+            /* Download button (Sky Pill) */
+            .btn-download {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 7px 16px;
+                background: #eff6ff;
+                border: 1px solid #bfdbfe;
+                border-radius: 8px;
+                color: #2563eb !important;
+                font-family: 'Poppins', sans-serif;
+                font-size: 12.5px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+
+            .btn-download:hover {
+                background: #dbeafe;
+                border-color: #93c5fd;
+                color: #1d4ed8 !important;
+                text-decoration: none;
+                transform: translateY(-1px);
+            }
+
+            .btn-download i {
+                color: #2563eb;
+                font-size: 13px;
+            }
 
             #filePreviewModal {
                 z-index: 1070 !important;
@@ -708,61 +783,53 @@
     gap: 6px;
     transition: background 0.3s, border-color 0.3s;
 }
-    #fileTable {
-    min-width: 1200px;
-}
-.dataTables_wrapper {
-    width: 100%;
-    overflow: visible;
+
+/* Mobile overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
 }
 
-.table-card {
-    overflow: hidden;
-}
-
-.table-card-body {
-    overflow: visible;
-}
-
-.table-card-body .dataTables_scroll {
-    width: 100%;
-}
-
-.table-card-body .dataTables_scrollBody {
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch;
-}
-#fileTable th,
-#fileTable td {
-    white-space: nowrap;
-}
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 20px;
-    color: rgba(255,255,255,0.55);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.25s;
-    position: relative;
-    white-space: nowrap;
-    border-left: 3px solid transparent;
-    margin: 6px 10px;      /* ito yung gumagawa ng "floating pill" gap sa gilid */
-    border-radius: 14px;   /* ito yung bumibilog sa corners */
-}
-
-.nav-item.active {
-    color: #3d2200;
-    background: linear-gradient(180deg, #f7dc7a 0%, #f5cf60 100%);
-    border-left-color: transparent;
-    box-shadow: inset 0 0 0 1px rgba(124, 84, 0, 0.12), 0 8px 20px rgba(245, 207, 96, 0.22);
-}
-.nav-item.active .nav-icon { color: #4a2e00; }
-.nav-item.active .nav-label { color: #3d2200; font-weight: 700; }
-.nav-item.active:hover {
-    background: linear-gradient(180deg, #f8de82 0%, #f5cf60 100%);
-    color: #3d2200;
+@media (max-width: 900px) {
+    .sidebar {
+        width: var(--sidebar-w) !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+    }
+    .sidebar.mobile-open {
+        transform: translateX(0) !important;
+    }
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .page-content {
+        padding: 18px 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .topbar {
+        padding: 0 16px !important;
+    }
+    .topbar-title {
+        display: none !important;
+    }
+    .stats-row {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 18px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .table-card {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 }

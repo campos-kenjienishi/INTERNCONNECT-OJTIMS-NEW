@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ vasset('css/coor_audit-responsive.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/coordinator/audit.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -402,7 +405,6 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="{{ vasset('js/coordinator/audit.js') }}?v={{ time() }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

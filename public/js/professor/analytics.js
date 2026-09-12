@@ -61,33 +61,122 @@
 
 
 (function () {
-    // Prepare data from Blade collection
-    // Chart instance
     let monthlyChart = null;
+    let donutChart = null;
+
+    function isDarkMode() {
+        return document.documentElement.classList.contains('dark-mode') || document.body.classList.contains('dark-mode');
+    }
+
+    function getChartThemeColors() {
+        const dark = isDarkMode();
+        return {
+            textColor: dark ? '#94a3b8' : '#64748b',
+            gridColor: dark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)',
+            tooltipBg: dark ? '#181b22' : '#ffffff',
+            tooltipText: dark ? '#f1f5f9' : '#1e293b',
+            tooltipBorder: dark ? '#2e3542' : '#e2e8f0',
+        };
+    }
+
+    function initOverviewDonutChart() {
+        const ctx = document.getElementById('overviewDonutChart');
+        if (!ctx) return;
+
+        const cfg = window.professorAnalyticsConfig || {};
+        const approved = Number(cfg.approvedStudents ?? 0);
+        const pending = Number(cfg.pendingApprovals ?? 0);
+        const denied = Number(cfg.deniedStudents ?? 0);
+        const inactive = Number(cfg.inactiveStudents ?? 0);
+
+        const total = approved + pending + denied + inactive;
+        const dataValues = total === 0 ? [0, 0, 0, 1] : [approved, pending, denied, inactive];
+        const colors = ['#22c55e', '#f59e0b', '#ef4444', '#3b82f6'];
+        const labels = ['Approved', 'Pending', 'Denied', 'Inactive'];
+
+        const theme = getChartThemeColors();
+
+        if (donutChart) {
+            donutChart.data.datasets[0].data = dataValues;
+            donutChart.data.datasets[0].borderColor = isDarkMode() ? '#1e222b' : '#ffffff';
+            donutChart.options.plugins.tooltip.backgroundColor = theme.tooltipBg;
+            donutChart.options.plugins.tooltip.titleColor = theme.tooltipText;
+            donutChart.options.plugins.tooltip.bodyColor = theme.tooltipText;
+            donutChart.options.plugins.tooltip.borderColor = theme.tooltipBorder;
+            donutChart.update();
+            return;
+        }
+
+        donutChart = new Chart(ctx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataValues,
+                    backgroundColor: colors,
+                    borderWidth: 3,
+                    borderColor: isDarkMode() ? '#1e222b' : '#ffffff',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: theme.tooltipBg,
+                        titleColor: theme.tooltipText,
+                        bodyColor: theme.tooltipText,
+                        borderColor: theme.tooltipBorder,
+                        borderWidth: 1,
+                        padding: 10,
+                        boxPadding: 4,
+                        usePointStyle: true,
+                        callbacks: {
+                            label: function (context) {
+                                const val = context.raw || 0;
+                                const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                return ` ${context.label}: ${val} students (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     function createOrUpdateChart(labels, sentData, submittedData) {
         const ctx = document.getElementById('monthlyActivityChart');
         if (!ctx) return;
 
+        const theme = getChartThemeColors();
         const datasets = [
             {
-                label: 'Evaluation Requests Sent',
+                label: 'Requests Sent',
                 data: sentData,
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37,99,235,0.08)',
-                tension: 0.3,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.12)',
+                tension: 0.35,
                 pointRadius: 4,
                 pointHoverRadius: 6,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
                 fill: true,
             },
             {
-                label: 'Evaluation Responses Submitted',
+                label: 'Submitted',
                 data: submittedData,
-                borderColor: '#16a34a',
-                backgroundColor: 'rgba(16,163,74,0.08)',
-                tension: 0.3,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                tension: 0.35,
                 pointRadius: 4,
                 pointHoverRadius: 6,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
                 fill: true,
             }
         ];
@@ -96,6 +185,13 @@
             monthlyChart.data.labels = labels;
             monthlyChart.data.datasets[0].data = sentData;
             monthlyChart.data.datasets[1].data = submittedData;
+            monthlyChart.options.scales.x.ticks.color = theme.textColor;
+            monthlyChart.options.scales.y.ticks.color = theme.textColor;
+            monthlyChart.options.scales.y.grid.color = theme.gridColor;
+            monthlyChart.options.plugins.tooltip.backgroundColor = theme.tooltipBg;
+            monthlyChart.options.plugins.tooltip.titleColor = theme.tooltipText;
+            monthlyChart.options.plugins.tooltip.bodyColor = theme.tooltipText;
+            monthlyChart.options.plugins.tooltip.borderColor = theme.tooltipBorder;
             monthlyChart.update();
             return;
         }
@@ -107,27 +203,59 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
-                scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
-                onClick: (evt, elems) => {
-                    if (elems.length > 0) {
-                        const idx = elems[0].index;
-                        const label = labels[idx];
-                        const [month, year] = label.split(' ');
-                        const monthNum = new Date(Date.parse(month + ' 1')).getMonth() + 1;
-                        window.drilldownYear = year;
-                        window.drilldownMonth = monthNum;
-                        openDrilldownModal(label, year, monthNum);
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: theme.tooltipBg,
+                        titleColor: theme.tooltipText,
+                        bodyColor: theme.tooltipText,
+                        borderColor: theme.tooltipBorder,
+                        borderWidth: 1,
+                        padding: 10,
+                        boxPadding: 4,
+                        usePointStyle: true
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: theme.textColor, font: { family: "'Poppins', sans-serif", size: 11 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: theme.gridColor },
+                        ticks: { color: theme.textColor, font: { family: "'Poppins', sans-serif", size: 11 }, precision: 0 }
                     }
                 }
             }
         });
     }
 
-    async function fetchMonthlyData(params = {}, opts = { showLoading: true }) {
-        const applyBtn = document.getElementById('applyFilters');
-        const spinner = applyBtn?.querySelector('.ic-spinner');
-        if (opts.showLoading && applyBtn) { applyBtn.disabled = true; if (spinner) spinner.style.display = 'inline-block'; }
+    // Dynamic dark mode observation
+    const themeObserver = new MutationObserver(function () {
+        if (monthlyChart) {
+            const theme = getChartThemeColors();
+            monthlyChart.options.scales.x.ticks.color = theme.textColor;
+            monthlyChart.options.scales.y.ticks.color = theme.textColor;
+            monthlyChart.options.scales.y.grid.color = theme.gridColor;
+            monthlyChart.options.plugins.tooltip.backgroundColor = theme.tooltipBg;
+            monthlyChart.options.plugins.tooltip.titleColor = theme.tooltipText;
+            monthlyChart.options.plugins.tooltip.bodyColor = theme.tooltipText;
+            monthlyChart.options.plugins.tooltip.borderColor = theme.tooltipBorder;
+            monthlyChart.update();
+        }
+        if (donutChart) {
+            initOverviewDonutChart();
+        }
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+
+    async function fetchMonthlyData(params = {}) {
+        const ctx = document.getElementById('monthlyActivityChart');
+        if (!ctx) return;
         const url = new URL(window.professorAnalyticsConfig?.dataUrl || '/professor/analytics/data', window.location.origin);
         Object.keys(params).forEach(k => { if (params[k] !== undefined && params[k] !== null && params[k] !== '') url.searchParams.set(k, params[k]); });
         try {
@@ -137,53 +265,18 @@
             createOrUpdateChart(json.labels || [], json.sent || [], json.submitted || []);
         } catch (e) {
             console.error('Monthly data load error', e);
-        } finally {
-            if (opts.showLoading && applyBtn) { applyBtn.disabled = false; if (spinner) spinner.style.display = 'none'; }
         }
     }
 
-    // controls
-    (function setupFilters() {
-        const classFilter = document.getElementById('classFilter');
-        const startInput = document.getElementById('startMonth');
-        const endInput = document.getElementById('endMonth');
-        const applyBtn = document.getElementById('applyFilters');
+    initOverviewDonutChart();
 
-        // restore from localStorage
-        try {
-            const stored = JSON.parse(localStorage.getItem('prof_analytics_filters') || 'null');
-            if (stored) {
-                if (stored.classId && classFilter) classFilter.value = stored.classId;
-                if (stored.start && startInput) startInput.value = stored.start;
-                if (stored.end && endInput) endInput.value = stored.end;
-            }
-        } catch (e) { }
+    const chartEl = document.getElementById('monthlyActivityChart');
+    if (chartEl) {
+        fetchMonthlyData({});
+    }
+})();
 
-        applyBtn?.addEventListener('click', function () {
-            const classId = classFilter?.value || '';
-            const startMonth = startInput?.value || '';
-            const endMonth = endInput?.value || '';
-            try { localStorage.setItem('prof_analytics_filters', JSON.stringify({ classId: classId, start: startMonth, end: endMonth })); } catch (e) { }
-            const start = startMonth ? startMonth + '-01' : '';
-            const end = endMonth ? endMonth + '-01' : '';
-            fetchMonthlyData({ class_id: classId, start: start ? start : undefined, end: end ? end : undefined }, { showLoading: true });
-        });
-    })();
-
-    // load initial data (use restored filters if any)
-    (function initLoad() {
-        try {
-            const stored = JSON.parse(localStorage.getItem('prof_analytics_filters') || 'null') || {};
-            const params = {};
-            if (stored.classId) params.class_id = stored.classId;
-            if (stored.start) params.start = stored.start + '-01';
-            if (stored.end) params.end = stored.end + '-01';
-            fetchMonthlyData(params, { showLoading: true });
-        } catch (e) {
-            fetchMonthlyData({}, { showLoading: true });
-        }
-    });
-
+(function () {
     function escapeHtml(text) {
         return String(text ?? '')
             .replace(/&/g, '&amp;')
@@ -460,6 +553,7 @@
         };
 
         document.body.appendChild(frame);
+        window.print();
     });
 
     document.addEventListener('keydown', (e) => {
@@ -560,7 +654,4 @@
     window.addEventListener('click', (e) => {
         if (e.target === drilldownModal) drilldownModal.style.display = 'none';
     });
-
-    // load initial data
-    fetchMonthlyData();
 })();

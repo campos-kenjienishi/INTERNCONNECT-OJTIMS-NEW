@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,11 +12,11 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/student_moa-responsive.css') }}">
 
     <link rel="stylesheet" href="{{ vasset('css/student/companies.css') }}">
-</head>
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -342,35 +343,6 @@
                                                 onclick="openUnlockRequestModal('{{ $isOwner ? 'edit' : 'unlink' }}', {{ $isOwner ? 'true' : 'false' }})">
                                                 <i class="fa fa-key me-1"></i> {{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}
                                             </button>
-                                             <script>
-                                                 function openUnlockRequestModal(type, isOwner) {
-                                                     const select = document.getElementById('modalRequestType');
-                                                     if (select) {
-                                                         const editOpt = select.querySelector('option[value="edit"]');
-                                                         const unlinkOpt = select.querySelector('option[value="unlink"]');
-                                                         const switchOpt = select.querySelector('option[value="switch_external"]');
-
-                                                         if (type === 'switch_external') {
-                                                             if (editOpt) editOpt.style.display = 'none';
-                                                             if (unlinkOpt) unlinkOpt.style.display = 'none';
-                                                             if (switchOpt) switchOpt.style.display = 'block';
-                                                             select.value = 'switch_external';
-                                                         } else if (isOwner === false) {
-                                                             if (editOpt) editOpt.style.display = 'none';
-                                                             if (unlinkOpt) unlinkOpt.style.display = 'block';
-                                                             if (switchOpt) switchOpt.style.display = 'none';
-                                                             select.value = 'unlink';
-                                                         } else {
-                                                             if (editOpt) editOpt.style.display = 'block';
-                                                             if (unlinkOpt) unlinkOpt.style.display = 'block';
-                                                             if (switchOpt) switchOpt.style.display = 'none';
-                                                             select.value = type || 'edit';
-                                                         }
-                                                     }
-                                                     const modal = new bootstrap.Modal(document.getElementById('requestUnlockModal'));
-                                                     modal.show();
-                                                 }
-                                             </script>
                                         @endif
                                     @else
                                         <button type="button" class="btn-action" style="border:1.5px solid #fecaca; color:#dc2626; background:#fff;"
@@ -387,16 +359,6 @@
                         @endforeach
                     </tbody>
                 </table>
-                <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                <script>
-                    $(document).ready(function () {
-                        $('#moaTable').DataTable({
-                            scrollX: true,
-                            autoWidth: false,
-                            order: [[0, 'asc']]
-                        });
-                    });
-                </script>
                 @endif
 
             </div>
@@ -822,330 +784,10 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const menuToggle = document.getElementById('menuToggle');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    function closeMobileSidebar() {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    }
-
-    function openMobileSidebar() {
-        sidebar.classList.add('mobile-open');
-        overlay.classList.add('active');
-    }
-
-    menuToggle.addEventListener('click', function (event) {
-        const isMobile = window.innerWidth <= 900;
-
-        if (isMobile) {
-            event.stopPropagation();
-
-            if (sidebar.classList.contains('mobile-open')) {
-                closeMobileSidebar();
-            } else {
-                openMobileSidebar();
-            }
-        } else {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-    });
-
-    overlay.addEventListener('click', closeMobileSidebar);
-
-    document.addEventListener('click', function (event) {
-        if (window.innerWidth > 900 || !sidebar.classList.contains('mobile-open')) {
-            return;
-        }
-
-        if (sidebar.contains(event.target) || menuToggle.contains(event.target)) {
-            return;
-        }
-
-        closeMobileSidebar();
-    });
-
-// ✅ ADD THIS (IMPORTANT FIX)
-    window.addEventListener('resize', function () {
-        if (window.innerWidth > 900) {
-            closeMobileSidebar();
-        }
-    });
-
-    function confirmStudentRemove(companyId, companyName, isOwner) {
-        const title = isOwner ? 'Remove MOA?' : 'Unlink MOA?';
-        const html = isOwner
-            ? 'This will remove your notarized MOA record for <strong>' + companyName + '</strong>.'
-            : 'This will unlink <strong>' + companyName + '</strong> from your account.';
-        const confirmText = isOwner ? 'Yes, remove it' : 'Yes, unlink it';
-
-        Swal.fire({
-            title: title,
-            html: html,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: confirmText,
-            cancelButtonText: 'Cancel',
-        }).then(function (result) {
-            if (result.isConfirmed) {
-                document.getElementById('student-remove-form-' + companyId).submit();
-            }
-        });
-    }
-
-    // PDF preview / print modal
-    function openPdfPreview(url) {
-        document.getElementById('viewIframe').src = url;
-        new bootstrap.Modal(document.getElementById('viewModal')).show();
-    }
-
-    function openVoucherModal(url) {
-        document.getElementById('voucherIframe').src = url;
-        new bootstrap.Modal(document.getElementById('voucherModal')).show();
-    }
-
-    function syncSchoolYearEnd(startId, endId, selectedEndYear = null) {
-        const startSelect = document.getElementById(startId);
-        const endSelect = document.getElementById(endId);
-
-        if (!startSelect || !endSelect || !startSelect.value) {
-            return;
-        }
-
-        const startYear = parseInt(startSelect.value, 10);
-
-        if (Number.isNaN(startYear)) {
-            return;
-        }
-
-        const endYear = selectedEndYear ? parseInt(selectedEndYear, 10) : startYear + 1;
-        endSelect.innerHTML = '';
-
-        const option = document.createElement('option');
-        option.value = String(endYear);
-        option.textContent = String(endYear);
-        option.selected = true;
-        endSelect.appendChild(option);
-        endSelect.value = String(endYear);
-    }
-
-    function openEditMoaModal(button) {
-        const form = document.getElementById('editMoaForm');
-        const schoolYear = (button.dataset.schoolYear || '').split('-');
-        const currentFile = button.dataset.fileName || '';
-
-        form.action = button.dataset.updateUrl;
-        document.getElementById('editCompanyName').value = button.dataset.companyName || '';
-        document.getElementById('editCompanyAddress').value = button.dataset.companyAddress || '';
-        document.getElementById('editCompanyRep').value = button.dataset.companyRep || '';
-        document.getElementById('editCompanyNo').value = button.dataset.companyNo || '';
-        document.getElementById('editCompanyEmail').value = button.dataset.companyEmail || '';
-        document.getElementById('editSchoolYearStart').value = schoolYear[0] || '';
-        syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd', schoolYear[1] || '');
-        document.getElementById('editDateNotarized').value = button.dataset.dateNotarized || '';
-        document.getElementById('editValidUntil').value = button.dataset.validUntil || '';
-        document.getElementById('editMoaFileInput').value = '';
-        document.getElementById('editMoaFileLabel').textContent = 'Leave empty to keep the current notarized MOA PDF';
-        document.getElementById('editMoaCurrentFile').textContent = currentFile
-            ? 'Current file: ' + currentFile + '. Leave the file empty if you only need to update the company details.'
-            : 'Leave the file empty if you only need to update the company details.';
-
-        new bootstrap.Modal(document.getElementById('editMoaModal')).show();
-    }
-
-    function printRegularPreview() {
-        document.getElementById('viewIframe').contentWindow.print();
-    }
-
-    function bindPdfInputValidation(inputId, labelId, emptyLabel) {
-        const input = document.getElementById(inputId);
-        if (!input) {
-            return;
-        }
-
-        input.addEventListener('change', function () {
-            const label = document.getElementById(labelId);
-            const file = this.files.length > 0 ? this.files[0] : null;
-
-            if (file && !file.name.toLowerCase().endsWith('.pdf')) {
-                this.value = '';
-                label.textContent = emptyLabel;
-                Swal.fire({
-                    icon: 'error',
-                    title: 'PDF only',
-                    text: 'Please upload the notarized MOA as a PDF file.',
-                    confirmButtonColor: '#d32f2f',
-                });
-                return;
-            }
-
-            label.textContent = file ? file.name : emptyLabel;
-        });
-    }
-
-    // Form validation
-    $(document).ready(function () {
-        function validateForm($form) {
-            let valid = true;
-            $form.find('input[required]').each(function () {
-                const errorId = $(this).attr('name') + '-error';
-                if ($(this).val() === '') {
-                    valid = false;
-                    $('#' + errorId).show();
-                } else {
-                    $('#' + errorId).hide();
-                }
-            });
-            return valid;
-        }
-
-        ['#studentMoaForm', '#editMoaForm'].forEach(function (selector) {
-            $(selector).on('submit', function (e) {
-                if (!validateForm($(this))) {
-                    e.preventDefault();
-                    return;
-                }
-
-                if (this.dataset.submitting === 'true') {
-                    e.preventDefault();
-                    return;
-                }
-
-                this.dataset.submitting = 'true';
-
-                const submitButton = this.querySelector('button[type="submit"]');
-                if (submitButton) {
-                    submitButton.disabled = true;
-                    submitButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Saving...';
-                }
-            });
-        });
-
-        bindPdfInputValidation('moaFileInput', 'moaFileLabel', 'Click or drag your notarized MOA file here');
-        bindPdfInputValidation('editMoaFileInput', 'editMoaFileLabel', 'Leave empty to keep the current notarized MOA PDF');
-
-        syncSchoolYearEnd('schoolYearStart', 'schoolYearEnd', @json($selectedCreateEndYear));
-        syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd');
-
-        $('#schoolYearStart').on('change', function () {
-            syncSchoolYearEnd('schoolYearStart', 'schoolYearEnd');
-        });
-
-        $('#editSchoolYearStart').on('change', function () {
-            syncSchoolYearEnd('editSchoolYearStart', 'editSchoolYearEnd');
-        });
-
-        const existingMoaSearch = document.getElementById('existingMoaSearch');
-        if (existingMoaSearch) {
-            existingMoaSearch.addEventListener('input', function () {
-                const query = this.value.trim().toLowerCase();
-                const items = Array.from(document.querySelectorAll('.existing-moa-item'));
-                let visibleCount = 0;
-
-                items.forEach(function (item) {
-                    const companyName = item.dataset.companyName || '';
-                    const matches = companyName.includes(query);
-                    item.style.display = matches ? '' : 'none';
-                    if (matches) {
-                        visibleCount += 1;
-                    }
-                });
-
-                const noResults = document.getElementById('existingMoaNoResults');
-                if (noResults) {
-                    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-                }
-            });
-        }
-
-        let pendingFormType = null;
-        let pendingCompanyId = null;
-
-        document.querySelectorAll('.existing-moa-link-btn').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const companyIdInput = document.getElementById('linkExistingMoaCompanyId');
-                const linkForm = document.getElementById('linkExistingMoaForm');
-                if (!companyIdInput || !linkForm) return;
-
-                pendingCompanyId = this.dataset.companyId || '';
-                companyIdInput.value = pendingCompanyId;
-
-                const item = this.closest('.existing-moa-item');
-                const companyName = item ? (item.querySelector('[style*="font-weight:800"]')?.innerText || 'this company') : 'this company';
-
-                document.getElementById('confirmCompanyNameText').innerText = companyName;
-                pendingFormType = 'link';
-
-                // Close addMoaModal if open
-                const addModalEl = document.getElementById('addMoaModal');
-                if (addModalEl) {
-                    const addModalInst = bootstrap.Modal.getInstance(addModalEl);
-                    if (addModalInst) addModalInst.hide();
-                }
-
-                const confirmModal = new bootstrap.Modal(document.getElementById('confirmMoaLockModal'));
-                confirmModal.show();
-            });
-        });
-
-        const studentMoaForm = document.getElementById('studentMoaForm');
-        if (studentMoaForm) {
-            studentMoaForm.addEventListener('submit', function (e) {
-                if (window.moaLockConfirmed) return;
-
-                e.preventDefault();
-                const companyNameInput = this.querySelector('input[name="company_name"]');
-                const compName = companyNameInput ? companyNameInput.value.trim() : 'this company';
-
-                document.getElementById('confirmCompanyNameText').innerText = compName || 'this company';
-                pendingFormType = 'create';
-
-                const addModalEl = document.getElementById('addMoaModal');
-                if (addModalEl) {
-                    const addModalInst = bootstrap.Modal.getInstance(addModalEl);
-                    if (addModalInst) addModalInst.hide();
-                }
-
-                const confirmModal = new bootstrap.Modal(document.getElementById('confirmMoaLockModal'));
-                confirmModal.show();
-            });
-        }
-
-        const btnConfirmLockSubmit = document.getElementById('btnConfirmLockSubmit');
-        if (btnConfirmLockSubmit) {
-            btnConfirmLockSubmit.addEventListener('click', function () {
-                this.disabled = true;
-                this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Processing...';
-
-                if (pendingFormType === 'link') {
-                    const linkForm = document.getElementById('linkExistingMoaForm');
-                    if (linkForm) linkForm.submit();
-                } else if (pendingFormType === 'create') {
-                    window.moaLockConfirmed = true;
-                    if (studentMoaForm) studentMoaForm.submit();
-                }
-            });
-        }
-    });
-
-    document.addEventListener('click', function(e) {
-    const btn = e.target.closest('.view-btn');
-    if (btn) {
-        const url = btn.getAttribute('data-url');
-        openPdfPreview(url);
-    }
-});
-
-@if(session('showVoucherModal'))
-    window.addEventListener('load', function () {
-        openVoucherModal(@json(session('showVoucherModal')));
-    });
-@endif
+    window.companiesConfig = {
+        selectedCreateEndYear: @json($selectedCreateEndYear ?? null),
+        showVoucherModal: @json(session('showVoucherModal'))
+    };
 </script>
 
 <!-- =============== CONFIRM MOA LOCK MODAL =============== -->
@@ -1257,12 +899,10 @@
         </div>
     </div>
 </div>
-
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 <script src="{{ vasset('js/mobile-utils.js') }}"></script>
 
-    <script src="{{ vasset('js/student/companies.js') }}"></script>
+    <script src="{{ vasset('js/student/companies.js') }}?v={{ time() }}" defer></script>
 </body>
 </html>

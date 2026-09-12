@@ -1726,7 +1726,38 @@ class AuthController extends Controller
             return $currentYear >= $startYear && $currentYear <= $startYear + 3;
         });
         $companyNames = $companies->pluck('company_name')->toArray();
-        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount', 'class'));
+
+        $classIds = $class->pluck('id')->all();
+
+        $adviseeStudents = User::with('studentInfo')
+            ->where('role', 0)
+            ->whereHas('studentInfo', function ($query) use ($classIds, $data) {
+                $query->whereIn('class_id', $classIds)
+                      ->orWhere(function ($legacy) use ($data) {
+                          $legacy->whereNull('class_id')
+                              ->where('adviser_name', $data->full_name);
+                      });
+            })
+            ->get();
+
+        $approvedStudents = $adviseeStudents->where('status', 1)->count();
+        $pendingApprovals = $adviseeStudents->where('status', 3)->count();
+        $deniedStudents = $adviseeStudents->where('status', 2)->count();
+        $inactiveStudents = $adviseeStudents->where('status', 0)->count();
+
+        $monthlyActivity = collect(range(5, 0))->map(function ($offset) use ($classIds) {
+            $month = Carbon::now()->subMonths($offset);
+            $start = $month->copy()->startOfMonth();
+            $end = $month->copy()->endOfMonth();
+
+            return [
+                'label' => $month->format('M Y'),
+                'submitted' => OjtEvaluationRequest::whereIn('class_id', $classIds)->whereBetween('submitted_at', [$start, $end])->count(),
+                'sent' => OjtEvaluationRequest::whereIn('class_id', $classIds)->whereBetween('emailed_at', [$start, $end])->count(),
+            ];
+        })->values();
+
+        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount', 'class', 'approvedStudents', 'pendingApprovals', 'deniedStudents', 'inactiveStudents', 'monthlyActivity'));
     }
 
     public function professorAnalytics()

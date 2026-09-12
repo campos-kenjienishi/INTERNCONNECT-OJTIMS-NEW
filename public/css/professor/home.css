@@ -1014,41 +1014,37 @@
         }
         /* Dashboard Footer */
 .dashboard-footer {
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
+    background: transparent !important;
+    border-top: none !important;
+    box-shadow: none !important;
     color: #888;
     text-align: center;
-    padding: 18px 28px;
-    font-size: 12.5px;
+    padding: 24px 20px 30px;
+    font-size: 12px;
     margin-top: auto;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.dashboard-footer .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
 }
 
 .dashboard-footer .footer-logo {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
-    opacity: 0.6;
+    opacity: 0.75;
 }
 
 .dashboard-footer .footer-copy {
-    font-size: 12.5px;
-    color: #aaa;
+    font-size: 12px;
+    color: #888;
     font-weight: 500;
 }
 
 .dashboard-footer .footer-copy span {
-    color: var(--red);
+    color: var(--red, #dc2626);
     font-weight: 600;
 }
 
@@ -1062,18 +1058,18 @@
     color: #888;
     text-decoration: none;
     font-weight: 500;
-    font-size: 12.5px;
+    font-size: 12px;
     transition: color 0.2s;
 }
 
 .dashboard-footer a:hover {
-    color: var(--red);
+    color: var(--red, #dc2626);
     text-decoration: none;
 }
 
 .dashboard-footer .divider {
-    color: #e5e5e5;
-    margin: 0 2px;
+    color: #cbd5e1;
+    margin: 0 4px;
 }
 
         /* =============== DARK MODE =============== */
@@ -1101,7 +1097,1021 @@
         body.dark-mode .dataTables_paginate .paginate_button:hover { background: rgba(220,38,38,0.2) !important; border-color: var(--red) !important; color: #ff6b6b !important; }
         body.dark-mode .dataTables_paginate .paginate_button.current { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; }
         body.dark-mode .dataTables_paginate .paginate_button.disabled { color: #777 !important; }
-        body.dark-mode .dashboard-footer { background: #2a2a2a; border-top: 1px solid #3a3a3a; color: #999; }
-        body.dark-mode .dashboard-footer a { color: #999; }
-        body.dark-mode .dashboard-footer a:hover { color: var(--red); }
-        body.dark-mode .dashboard-footer .divider { color: #555; }
+        body.dark-mode .dashboard-footer { background: transparent !important; border-top: none !important; color: #94a3b8 !important; }
+        body.dark-mode .dashboard-footer .footer-copy { color: #94a3b8 !important; }
+        body.dark-mode .dashboard-footer .footer-copy span { color: #ef4444 !important; }
+        body.dark-mode .dashboard-footer a { color: #94a3b8 !important; }
+        body.dark-mode .dashboard-footer a:hover { color: #ef4444 !important; }
+        body.dark-mode .dashboard-footer .divider { color: #475569 !important; }
+
+/* ==================== OVERALL SUMMARY CHARTS ==================== */
+.analytics-section-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--red, #dc2626);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.analytics-chart-section {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+    width: 100%;
+    min-width: 0;
+}
+
+.analytics-chart-card,
+.analytics-donut-card {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-head {
+    padding: 18px 22px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.panel-head h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.panel-head p {
+    font-size: 12.5px;
+    color: #888;
+    margin-top: 3px;
+}
+
+.panel-body {
+    padding: 20px 22px;
+}
+
+.analytics-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.analytics-chart-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.chart-badge-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.analytics-chart-legend {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.legend-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-sent { color: #3b82f6; }
+.legend-sent .legend-dot { background: #3b82f6; }
+.legend-submitted { color: #10b981; }
+.legend-submitted .legend-dot { background: #10b981; }
+
+.chart-canvas-wrapper {
+    position: relative;
+    height: 270px;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.donut-canvas-wrapper {
+    position: relative;
+    height: 180px;
+    width: 100%;
+    min-width: 0;
+}
+
+.donut-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.donut-stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: transform 0.2s ease;
+}
+
+.donut-stat-item:hover {
+    transform: translateY(-1px);
+}
+
+.donut-stat-item .stat-lbl {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+}
+
+.donut-stat-item .stat-lbl i {
+    font-size: 7px;
+}
+
+.donut-stat-item .stat-val {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.item-approved { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+.item-approved .stat-lbl i { color: #22c55e; }
+.item-pending { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+.item-pending .stat-lbl i { color: #f59e0b; }
+.item-denied { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+.item-denied .stat-lbl i { color: #ef4444; }
+.item-inactive { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+.item-inactive .stat-lbl i { color: #3b82f6; }
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .analytics-chart-section {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 16px !important;
+    }
+}
+@media (max-width: 768px) {
+    .analytics-chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .chart-canvas-wrapper {
+        height: 220px !important;
+    }
+    .donut-canvas-wrapper {
+        height: 160px !important;
+    }
+}
+@media (max-width: 480px) {
+    .donut-stat-grid {
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+    }
+}
+
+/* Dark Mode Overrides for Charts */
+body.dark-mode .analytics-chart-card,
+body.dark-mode .analytics-donut-card {
+    background: #1e222b !important;
+    border: 1px solid #2e3542 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25) !important;
+}
+
+body.dark-mode .panel-head {
+    background: #181b22 !important;
+    border-bottom: 1px solid #2e3542 !important;
+}
+
+body.dark-mode .panel-head h2 { color: #f1f5f9 !important; }
+body.dark-mode .panel-head p { color: #94a3b8 !important; }
+
+body.dark-mode .chart-badge-icon {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #f87171 !important;
+}
+
+body.dark-mode .item-approved {
+    background: rgba(34, 197, 94, 0.12) !important;
+    border-color: rgba(34, 197, 94, 0.25) !important;
+    color: #4ade80 !important;
+}
+
+body.dark-mode .item-pending {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+    color: #fcd34d !important;
+}
+
+body.dark-mode .item-denied {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.25) !important;
+    color: #fca5a5 !important;
+}
+
+body.dark-mode .item-inactive {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+    color: #93c5fd !important;
+}
+
+/* ==================== UNIQUE ACADEMIC CHRONO & CALENDAR HUB ==================== */
+.chrono-calendar-hub {
+    display: flex;
+    align-items: stretch;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    margin-top: 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.chrono-calendar-hub:hover {
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.07);
+}
+
+/* Left Pane: Time & Status */
+.chrono-station-pane {
+    flex: 1 1 45%;
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(145deg, #ffffff 0%, #fcfbfb 50%, #fef2f2 100%);
+    position: relative;
+}
+
+.chrono-pane-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.chrono-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chrono-tag-pill i {
+    color: #dc2626;
+    font-size: 12px;
+}
+
+.chrono-utc-tag {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 9.5px;
+    font-weight: 800;
+}
+
+.chrono-live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #059669;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+}
+
+.chrono-pulse-core {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: chronoPulse 1.8s infinite;
+}
+
+@keyframes chronoPulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.85); opacity: 0.4; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Digit Display with Moving Clock on Left */
+.chrono-digit-display {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 20px 0 16px 0;
+    flex-wrap: wrap;
+}
+
+.chrono-moving-clock-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.chrono-analog-clock {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.chrono-clock-mark {
+    position: absolute;
+    width: 1.5px;
+    height: 5px;
+    background: #94a3b8;
+    border-radius: 1px;
+    top: 4px;
+    left: calc(50% - 0.75px);
+    transform-origin: center 33px;
+}
+
+.chrono-clock-mark.major {
+    width: 2px;
+    height: 7px;
+    background: #dc2626;
+    left: calc(50% - 1px);
+}
+
+.chrono-hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    border-radius: 3px 3px 0 0;
+    transition: transform 0.2s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+}
+
+.chrono-hour-hand {
+    width: 3.5px;
+    height: 20px;
+    background: #1e293b;
+    margin-left: -1.75px;
+    z-index: 2;
+}
+
+.chrono-min-hand {
+    width: 2.5px;
+    height: 26px;
+    background: #475569;
+    margin-left: -1.25px;
+    z-index: 3;
+}
+
+.chrono-sec-hand {
+    width: 1.5px;
+    height: 30px;
+    background: #dc2626;
+    margin-left: -0.75px;
+    z-index: 4;
+    transition: transform 0.1s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+}
+
+.chrono-sec-hand::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: -1.25px;
+    width: 4px;
+    height: 6px;
+    background: #dc2626;
+    border-radius: 2px;
+}
+
+.chrono-clock-pivot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dc2626;
+    border: 2px solid #ffffff;
+    position: absolute;
+    z-index: 5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.chrono-digits-pod-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chrono-digit-pod {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 8px 14px;
+    min-width: 66px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.pod-val {
+    font-size: 32px;
+    font-weight: 800;
+    font-family: 'Poppins', monospace, sans-serif;
+    line-height: 1.05;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+}
+
+.pod-lbl {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+.chrono-digit-sep {
+    font-size: 26px;
+    font-weight: 800;
+    color: #dc2626;
+    margin: 0 -2px;
+    line-height: 1;
+    animation: blinkColon 1s step-start infinite;
+}
+
+@keyframes blinkColon {
+    50% { opacity: 0.3; }
+}
+
+.chrono-ampm-badge {
+    padding: 6px 10px;
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+    align-self: flex-start;
+    margin-top: 4px;
+    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+}
+
+/* Date Strip */
+.chrono-date-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(254, 242, 242, 0.6);
+    border: 1px solid #fecaca;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+}
+
+.chrono-date-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1);
+}
+
+.chrono-date-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.chrono-day-name {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #991b1b;
+    line-height: 1.2;
+}
+
+.chrono-full-date {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+/* Footer Greeting */
+.chrono-pane-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.chrono-greeting-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.chrono-greeting-icon {
+    font-size: 14px;
+    color: #f59e0b;
+}
+
+.chrono-greeting-user {
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.chrono-sync-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.chrono-sync-pill i {
+    color: #10b981;
+    font-size: 12px;
+}
+
+/* Vertical Divider */
+.chrono-hub-divider {
+    width: 1px;
+    background: #e2e8f0;
+    flex-shrink: 0;
+}
+
+/* Right Pane: Calendar */
+.chrono-calendar-pane {
+    flex: 1 1 55%;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ffffff;
+}
+
+.cal-pane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.cal-pane-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cal-header-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.cal-kicker-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    display: block;
+    line-height: 1.2;
+}
+
+.cal-current-month {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 2px 0 0 0;
+    letter-spacing: -0.2px;
+}
+
+.cal-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cal-nav-arrow-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s ease;
+}
+
+.cal-nav-arrow-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+    transform: translateY(-1px);
+}
+
+.cal-nav-today-btn {
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cal-nav-today-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+    transform: translateY(-1px);
+}
+
+.cal-grid-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.cal-grid-weekdays span {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 0;
+}
+
+.cal-grid-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.cal-day-cell {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.cal-day-cell:hover:not(.other-month) {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.cal-day-cell.other-month {
+    color: #cbd5e1;
+    font-weight: 400;
+    opacity: 0.6;
+    cursor: default;
+}
+
+.cal-day-cell.today {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800;
+    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.35);
+}
+
+.cal-day-cell.selected:not(.today) {
+    background: #fef2f2;
+    color: #dc2626;
+    font-weight: 700;
+    border: 1.5px solid #dc2626;
+}
+
+.cal-pane-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #e2e8f0;
+    flex-wrap: wrap;
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+.cal-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-circle {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.legend-today {
+    background: #dc2626;
+}
+
+.legend-selected {
+    background: #f87171;
+    border: 1px solid #dc2626;
+}
+
+/* ==================== DARK MODE FOR CHRONO CALENDAR HUB ==================== */
+body.dark-mode .chrono-calendar-hub {
+    background: #1e222b !important;
+    border-color: #2e3542 !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.dark-mode .chrono-station-pane {
+    background: linear-gradient(145deg, #181b22 0%, #1e222b 50%, #25181c 100%) !important;
+}
+
+body.dark-mode .chrono-tag-pill {
+    background: #282e3a !important;
+    border-color: #3b4252 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .chrono-live-chip {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    color: #34d399 !important;
+}
+
+body.dark-mode .chrono-analog-clock {
+    background: #14171f !important;
+    border-color: #2e3542 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .chrono-clock-mark {
+    background: #475569 !important;
+}
+
+body.dark-mode .chrono-clock-mark.major {
+    background: #ef4444 !important;
+}
+
+body.dark-mode .chrono-hour-hand {
+    background: #f1f5f9 !important;
+}
+
+body.dark-mode .chrono-min-hand {
+    background: #cbd5e1 !important;
+}
+
+body.dark-mode .chrono-sec-hand {
+    background: #ef4444 !important;
+}
+
+body.dark-mode .chrono-sec-hand::after {
+    background: #ef4444 !important;
+}
+
+body.dark-mode .chrono-clock-pivot {
+    background: #ef4444 !important;
+    border-color: #14171f !important;
+}
+
+body.dark-mode .chrono-digit-pod {
+    background: #12151c !important;
+    border-color: #2e3542 !important;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .pod-val {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .pod-lbl {
+    color: #64748b !important;
+}
+
+body.dark-mode .chrono-digit-sep {
+    color: #ef4444 !important;
+}
+
+body.dark-mode .chrono-date-strip {
+    background: rgba(220, 38, 38, 0.1) !important;
+    border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+body.dark-mode .chrono-date-icon-wrap {
+    background: #1e222b !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #f87171 !important;
+}
+
+body.dark-mode .chrono-day-name {
+    color: #fca5a5 !important;
+}
+
+body.dark-mode .chrono-full-date {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .chrono-pane-footer {
+    border-top-color: #2e3542 !important;
+}
+
+body.dark-mode .chrono-greeting-wrap {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .chrono-greeting-user {
+    color: #f87171 !important;
+}
+
+body.dark-mode .chrono-sync-pill {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .chrono-hub-divider {
+    background: #2e3542 !important;
+}
+
+body.dark-mode .chrono-calendar-pane {
+    background: #1e222b !important;
+}
+
+body.dark-mode .cal-header-icon-box {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #f87171 !important;
+}
+
+body.dark-mode .cal-kicker-label {
+    color: #64748b !important;
+}
+
+body.dark-mode .cal-current-month {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .cal-nav-arrow-btn,
+body.dark-mode .cal-nav-today-btn {
+    background: #282e3a !important;
+    border-color: #3b4252 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .cal-nav-arrow-btn:hover,
+body.dark-mode .cal-nav-today-btn:hover {
+    background: rgba(220, 38, 38, 0.25) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(220, 38, 38, 0.4) !important;
+}
+
+body.dark-mode .cal-grid-weekdays span {
+    color: #64748b !important;
+}
+
+body.dark-mode .cal-day-cell {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .cal-day-cell:hover:not(.other-month) {
+    background: rgba(220, 38, 38, 0.25) !important;
+    color: #fca5a5 !important;
+}
+
+body.dark-mode .cal-day-cell.other-month {
+    color: #475569 !important;
+    opacity: 0.45;
+}
+
+body.dark-mode .cal-day-cell.today {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45) !important;
+}
+
+body.dark-mode .cal-day-cell.selected:not(.today) {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #fca5a5 !important;
+    border-color: #ef4444 !important;
+}
+
+body.dark-mode .cal-pane-footer {
+    border-top-color: #2e3542 !important;
+    color: #94a3b8 !important;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 992px) {
+    .chrono-calendar-hub {
+        flex-direction: column !important;
+    }
+    .chrono-hub-divider {
+        width: 100% !important;
+        height: 1px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .chrono-station-pane,
+    .chrono-calendar-pane {
+        padding: 18px 16px !important;
+    }
+    .chrono-digit-pod {
+        min-width: 52px !important;
+        padding: 6px 10px !important;
+    }
+    .pod-val {
+        font-size: 24px !important;
+    }
+}

@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Dashboard Styles
    Extracted from ojtCoordinator/dashboard.blade.php
    ========================================================================== */
@@ -215,6 +215,29 @@
             .page-header h1 { font-size: 26px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
             .page-header h1 span { color: var(--red); }
             .page-header p { font-size: 13.5px; color: #888; margin-top: 4px; }
+
+            .btn-switch-view {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 9px 18px;
+                background: #ffffff;
+                border: 1.5px solid #fecaca;
+                border-radius: 12px;
+                color: #dc2626;
+                font-weight: 700;
+                font-size: 13px;
+                text-decoration: none;
+                box-shadow: 0 3px 12px rgba(220,38,38,0.1);
+                transition: all 0.25s;
+            }
+
+            .btn-switch-view:hover {
+                background: #fff5f5;
+                border-color: #f87171;
+                color: #b91c1c;
+                transform: translateY(-1px);
+            }
 
             /* =============== STATS ROW =============== */
             .stats-row {
@@ -662,338 +685,565 @@
             }
 
             /* =============================================
-               DATE & TIME MODAL
+               UNIQUE ACADEMIC CHRONO & CALENDAR HUB
             ============================================= */
-            .dt-overlay {
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,0.5);
-                backdrop-filter: blur(4px);
-                z-index: 2000;
+            .chrono-calendar-hub {
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.3s ease;
-            }
-
-            .dt-overlay.open {
-                opacity: 1;
-                pointer-events: all;
-            }
-
-            .dt-modal {
-                background: #fff;
-                border-radius: 22px;
-                width: 360px;
-                box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.05);
-                overflow: hidden;
-                transform: scale(0.88) translateY(20px);
-                transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
-                opacity: 0;
-            }
-
-            body.dark-mode .dt-modal {
-                background: #1a1a1a;
-                box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
-            }
-
-            .dt-overlay.open .dt-modal {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
-
-            /* Modal gradient header */
-            .dt-modal-header {
-                background: linear-gradient(135deg, #7f0000 0%, #b91c1c 45%, #dc2626 100%);
-                padding: 20px 22px 16px;
+                align-items: stretch;
+                background: #ffffff;
+                border: 1px solid rgba(0, 0, 0, 0.08);
+                border-radius: 20px;
+                margin-top: 10px;
+                margin-bottom: 24px;
+                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
                 position: relative;
                 overflow: hidden;
+                transition: all 0.3s ease;
             }
 
-            .dt-modal-header::before {
-                content: '';
-                position: absolute;
-                top: -40px;
-                right: -40px;
-                width: 160px;
-                height: 160px;
-                border-radius: 50%;
-                background: rgba(255,255,255,0.06);
-                pointer-events: none;
+            .chrono-calendar-hub:hover {
+                box-shadow: 0 10px 32px rgba(0, 0, 0, 0.07);
             }
 
-            .dt-modal-header::after {
-                content: '';
-                position: absolute;
-                bottom: -30px;
-                left: 20px;
-                width: 100px;
-                height: 100px;
-                border-radius: 50%;
-                background: rgba(255,255,255,0.04);
-                pointer-events: none;
+            /* Left Pane: Time & Status */
+            .chrono-station-pane {
+                flex: 1 1 45%;
+                padding: 26px 28px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background: linear-gradient(145deg, #ffffff 0%, #fcfbfb 50%, #fef2f2 100%);
+                position: relative;
             }
 
-            .dt-header-top {
+            .chrono-pane-top {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                position: relative;
-                z-index: 1;
+                gap: 12px;
             }
 
-            .dt-header-title {
-                font-size: 13px;
-                font-weight: 600;
-                color: rgba(255,255,255,0.8);
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }
-
-            .dt-close-btn {
-                width: 28px;
-                height: 28px;
-                border-radius: 8px;
-                background: rgba(255,255,255,0.15);
-                border: none;
-                cursor: pointer;
-                display: flex;
+            .chrono-tag-pill {
+                display: inline-flex;
                 align-items: center;
-                justify-content: center;
-                color: #fff;
-                font-size: 13px;
-                transition: background 0.2s;
-            }
-
-            .dt-close-btn:hover { background: rgba(255,255,255,0.25); }
-
-            /* Live clock inside modal header */
-            .dt-clock-display {
-                margin-top: 10px;
-                position: relative;
-                z-index: 1;
-            }
-
-            .dt-time-big {
-                font-size: 42px;
-                font-weight: 800;
-                color: #fff;
-                letter-spacing: -1px;
-                line-height: 1;
-                display: flex;
-                align-items: center;
-                gap: 4px;
-            }
-
-            .dt-time-big .colon {
-                animation: blink-colon 1s step-end infinite;
-                display: inline-block;
-                margin: 0 1px;
-            }
-
-            @keyframes blink-colon {
-                0%, 100% { opacity: 1; }
-                50%       { opacity: 0.15; }
-            }
-
-            .dt-time-ampm {
-                font-size: 14px;
+                gap: 8px;
+                padding: 6px 12px;
+                border-radius: 999px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                font-size: 11px;
                 font-weight: 700;
-                color: rgba(255,255,255,0.7);
-                margin-left: 6px;
-                align-self: flex-end;
-                margin-bottom: 6px;
+                color: #475569;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
 
-            .dt-date-sub {
-                font-size: 12.5px;
-                color: rgba(255,255,255,0.65);
-                margin-top: 4px;
-                font-weight: 500;
-                letter-spacing: 0.3px;
+            .chrono-tag-pill i {
+                color: #dc2626;
+                font-size: 12px;
             }
 
-            /* Analog clock */
-            .dt-analog-wrap {
+            .chrono-utc-tag {
+                background: #fee2e2;
+                color: #dc2626;
+                padding: 2px 6px;
+                border-radius: 6px;
+                font-size: 9.5px;
+                font-weight: 800;
+            }
+
+            .chrono-live-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 5px 11px;
+                border-radius: 999px;
+                background: #ecfdf5;
+                border: 1px solid #a7f3d0;
+                color: #059669;
+                font-size: 10.5px;
+                font-weight: 800;
+                letter-spacing: 0.8px;
+            }
+
+            .chrono-pulse-core {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #10b981;
+                box-shadow: 0 0 8px #10b981;
+                animation: chronoPulse 1.8s infinite;
+            }
+
+            @keyframes chronoPulse {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(0.85); opacity: 0.4; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+
+            /* Digit Display with Moving Clock on Left */
+            .chrono-digit-display {
                 display: flex;
+                align-items: center;
+                gap: 16px;
+                margin: 20px 0 16px 0;
+                flex-wrap: wrap;
+            }
+
+            .chrono-moving-clock-wrap {
+                display: flex;
+                align-items: center;
                 justify-content: center;
-                padding: 16px 0 8px;
+                flex-shrink: 0;
             }
 
-            .analog-clock {
-                width: 110px;
-                height: 110px;
+            .chrono-analog-clock {
+                width: 74px;
+                height: 74px;
                 border-radius: 50%;
-                background: #fafafa;
-                border: 3px solid #e5e5e5;
+                background: #ffffff;
+                border: 2px solid #e2e8f0;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 2px 4px rgba(0, 0, 0, 0.02);
                 position: relative;
-                box-shadow: inset 0 2px 8px rgba(0,0,0,0.08), 0 4px 18px rgba(0,0,0,0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
             }
 
-            body.dark-mode .analog-clock {
-                background: #2a2a2a;
-                border-color: #3a3a3a;
-                box-shadow: inset 0 2px 8px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.3);
-            }
-
-            /* Hour markers */
-            .clock-mark {
+            .chrono-clock-mark {
                 position: absolute;
+                width: 1.5px;
+                height: 5px;
+                background: #94a3b8;
+                border-radius: 1px;
+                top: 4px;
+                left: calc(50% - 0.75px);
+                transform-origin: center 33px;
+            }
+
+            .chrono-clock-mark.major {
                 width: 2px;
-                border-radius: 2px;
-                background: #888;
+                height: 7px;
+                background: #dc2626;
+                left: calc(50% - 1px);
             }
 
-            body.dark-mode .clock-mark {
-                background: #666;
-            }
-
-            /* Center dot */
-            .clock-center {
-                position: absolute;
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                background: var(--red);
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                z-index: 10;
-                box-shadow: 0 0 0 2px #fff;
-            }
-
-            body.dark-mode .clock-center {
-                box-shadow: 0 0 0 2px #2a2a2a;
-            }
-
-            /* Hands */
-            .hand {
+            .chrono-hand {
                 position: absolute;
                 bottom: 50%;
                 left: 50%;
                 transform-origin: bottom center;
-                border-radius: 4px 4px 0 0;
+                border-radius: 3px 3px 0 0;
+                transition: transform 0.2s cubic-bezier(0.4, 2.08, 0.55, 0.44);
             }
 
-            .hour-hand   { width: 3.5px; height: 28px; background: #333; margin-left: -1.75px; }
-            .minute-hand { width: 2.5px; height: 36px; background: #333; margin-left: -1.25px; }
-            .second-hand { width: 1.5px; height: 40px; background: var(--red); margin-left: -0.75px; }
+            .chrono-hour-hand {
+                width: 3.5px;
+                height: 20px;
+                background: #1e293b;
+                margin-left: -1.75px;
+                z-index: 2;
+            }
 
-            body.dark-mode .hour-hand   { background: #e0e0e0; }
-            body.dark-mode .minute-hand { background: #e0e0e0; }
+            .chrono-min-hand {
+                width: 2.5px;
+                height: 26px;
+                background: #475569;
+                margin-left: -1.25px;
+                z-index: 3;
+            }
 
-            /* Calendar */
-            .dt-calendar { padding: 0 18px 18px; }
+            .chrono-sec-hand {
+                width: 1.5px;
+                height: 30px;
+                background: #dc2626;
+                margin-left: -0.75px;
+                z-index: 4;
+                transition: transform 0.1s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+            }
 
-            .cal-nav {
+            .chrono-sec-hand::after {
+                content: '';
+                position: absolute;
+                bottom: -6px;
+                left: -1.25px;
+                width: 4px;
+                height: 6px;
+                background: #dc2626;
+                border-radius: 2px;
+            }
+
+            .chrono-clock-pivot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #dc2626;
+                border: 2px solid #ffffff;
+                position: absolute;
+                z-index: 5;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+            }
+
+            .chrono-digits-pod-group {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                padding: 10px 2px;
+                gap: 8px;
+                flex-wrap: wrap;
             }
 
-            .cal-nav-btn {
-                width: 30px;
-                height: 30px;
-                border-radius: 8px;
-                background: #fafafa;
-                border: 1px solid #e5e5e5;
-                cursor: pointer;
+            .chrono-digit-pod {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: #ffffff;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 8px 14px;
+                min-width: 66px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            }
+
+            .pod-val {
+                font-size: 32px;
+                font-weight: 800;
+                font-family: 'Poppins', monospace, sans-serif;
+                line-height: 1.05;
+                color: #0f172a;
+                font-variant-numeric: tabular-nums;
+            }
+
+            .pod-lbl {
+                font-size: 9px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                color: #94a3b8;
+                margin-top: 3px;
+            }
+
+            .chrono-digit-sep {
+                font-size: 26px;
+                font-weight: 800;
+                color: #dc2626;
+                margin: 0 -2px;
+                line-height: 1;
+                animation: blinkColon 1s step-start infinite;
+            }
+
+            @keyframes blinkColon {
+                50% { opacity: 0.3; }
+            }
+
+            .chrono-ampm-badge {
+                padding: 6px 10px;
+                background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+                color: #ffffff;
+                font-size: 13px;
+                font-weight: 800;
+                border-radius: 10px;
+                letter-spacing: 0.5px;
+                align-self: flex-start;
+                margin-top: 4px;
+                box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+            }
+
+            /* Date Strip */
+            .chrono-date-strip {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: rgba(254, 242, 242, 0.6);
+                border: 1px solid #fecaca;
+                padding: 10px 14px;
+                border-radius: 12px;
+                margin-bottom: 18px;
+            }
+
+            .chrono-date-icon-wrap {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                background: #ffffff;
+                border: 1px solid #fca5a5;
+                color: #dc2626;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                color: #888;
+                font-size: 15px;
+                flex-shrink: 0;
+                box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1);
+            }
+
+            .chrono-date-meta {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chrono-day-name {
+                font-size: 13.5px;
+                font-weight: 800;
+                color: #991b1b;
+                line-height: 1.2;
+            }
+
+            .chrono-full-date {
                 font-size: 12px;
-                transition: all 0.2s;
+                font-weight: 500;
+                color: #64748b;
             }
 
-            .cal-nav-btn:hover {
-                background: #fee2e2;
-                border-color: #fecaca;
-                color: var(--red);
+            /* Footer Greeting */
+            .chrono-pane-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                padding-top: 14px;
+                border-top: 1px dashed #e2e8f0;
+                flex-wrap: wrap;
             }
 
-            body.dark-mode .cal-nav-btn {
-                background: #3a3a3a;
-                border-color: #555;
-                color: #999;
+            .chrono-greeting-wrap {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                font-size: 12.5px;
+                font-weight: 600;
+                color: #1e293b;
             }
 
-            body.dark-mode .cal-nav-btn:hover {
-                background: rgba(220,38,38,0.2);
-                border-color: var(--red);
-                color: #ff6b6b;
-            }
-
-            .cal-month-label {
+            .chrono-greeting-icon {
                 font-size: 14px;
+                color: #f59e0b;
+            }
+
+            .chrono-greeting-user {
                 font-weight: 700;
-                color: #1a1a1a;
+                color: #dc2626;
             }
 
-            body.dark-mode .cal-month-label { color: #fff; }
-
-            .cal-grid {
-                display: grid;
-                grid-template-columns: repeat(7, 1fr);
-                gap: 2px;
+            .chrono-sync-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 11px;
+                font-weight: 600;
+                color: #64748b;
             }
 
-            .cal-day-name {
-                text-align: center;
+            .chrono-sync-pill i {
+                color: #10b981;
+                font-size: 12px;
+            }
+
+            /* Vertical Divider */
+            .chrono-hub-divider {
+                width: 1px;
+                background: #e2e8f0;
+                flex-shrink: 0;
+            }
+
+            /* Right Pane: Calendar */
+            .chrono-calendar-pane {
+                flex: 1 1 55%;
+                padding: 24px 28px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background: #ffffff;
+            }
+
+            .cal-pane-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 14px;
+                flex-wrap: wrap;
+            }
+
+            .cal-pane-title-group {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .cal-header-icon-box {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                background: #fee2e2;
+                color: #dc2626;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 15px;
+                flex-shrink: 0;
+            }
+
+            .cal-kicker-label {
                 font-size: 10px;
                 font-weight: 700;
-                color: #888;
                 text-transform: uppercase;
-                padding: 4px 0 6px;
+                letter-spacing: 0.8px;
+                color: #94a3b8;
+                display: block;
+                line-height: 1.2;
             }
 
-            body.dark-mode .cal-day-name { color: #999; }
+            .cal-current-month {
+                font-size: 16px;
+                font-weight: 800;
+                color: #0f172a;
+                margin: 2px 0 0 0;
+                letter-spacing: -0.2px;
+            }
 
-            .cal-day {
-                text-align: center;
-                font-size: 12.5px;
-                font-weight: 500;
-                color: #1a1a1a;
-                padding: 7px 4px;
+            .cal-nav-group {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .cal-nav-arrow-btn {
+                width: 30px;
+                height: 30px;
                 border-radius: 8px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                color: #475569;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
                 cursor: pointer;
-                transition: all 0.15s;
-                line-height: 1;
+                font-size: 11px;
+                transition: all 0.2s ease;
             }
 
-            body.dark-mode .cal-day { color: #e0e0e0; }
-
-            .cal-day:hover:not(.empty):not(.today) {
-                background: #fafafa;
-                color: var(--red);
-            }
-
-            body.dark-mode .cal-day:hover:not(.empty):not(.today) {
-                background: #3a3a3a;
-            }
-
-            .cal-day.empty  { cursor: default; color: transparent; }
-            .cal-day.other-month { color: #aaa; }
-            body.dark-mode .cal-day.other-month { color: #666; }
-
-            .cal-day.today {
-                background: linear-gradient(135deg, #dc2626, #991b1b);
-                color: #fff !important;
-                font-weight: 700;
-                box-shadow: 0 3px 10px rgba(220,38,38,0.35);
-            }
-
-            .cal-day.selected:not(.today) {
+            .cal-nav-arrow-btn:hover {
                 background: #fee2e2;
-                color: var(--red);
-                font-weight: 700;
+                color: #dc2626;
+                border-color: #fca5a5;
+                transform: translateY(-1px);
             }
 
-            body.dark-mode .cal-day.selected:not(.today) {
-                background: rgba(220,38,38,0.2);
+            .cal-nav-today-btn {
+                height: 30px;
+                padding: 0 12px;
+                border-radius: 8px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                color: #475569;
+                font-size: 11.5px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .cal-nav-today-btn:hover {
+                background: #fee2e2;
+                color: #dc2626;
+                border-color: #fca5a5;
+                transform: translateY(-1px);
+            }
+
+            .cal-grid-weekdays {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                text-align: center;
+                gap: 4px;
+                margin-bottom: 6px;
+            }
+
+            .cal-grid-weekdays span {
+                font-size: 11px;
+                font-weight: 700;
+                color: #94a3b8;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 3px 0;
+            }
+
+            .cal-grid-days {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 4px;
+            }
+
+            .cal-day-cell {
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #334155;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                user-select: none;
+            }
+
+            .cal-day-cell:hover:not(.other-month) {
+                background: #fee2e2;
+                color: #dc2626;
+            }
+
+            .cal-day-cell.other-month {
+                color: #cbd5e1;
+                font-weight: 400;
+                opacity: 0.6;
+                cursor: default;
+            }
+
+            .cal-day-cell.today {
+                background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+                color: #ffffff !important;
+                font-weight: 800;
+                box-shadow: 0 3px 10px rgba(220, 38, 38, 0.35);
+            }
+
+            .cal-day-cell.selected:not(.today) {
+                background: #fef2f2;
+                color: #dc2626;
+                font-weight: 700;
+                border: 1.5px solid #dc2626;
+            }
+
+            .cal-pane-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-top: 14px;
+                padding-top: 12px;
+                border-top: 1px dashed #e2e8f0;
+                flex-wrap: wrap;
+                font-size: 11.5px;
+                color: #64748b;
+            }
+
+            .cal-legend-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .legend-circle {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+            }
+
+            .legend-today {
+                background: #dc2626;
+            }
+
+            .legend-selected {
+                background: #f87171;
+                border: 1px solid #dc2626;
             }
             /* =============== WELCOME BANNER =============== */
         .welcome-banner {
@@ -1142,89 +1392,629 @@
     margin: 0 2px;
 }
 /* ===== DARK MODE ===== */
-body.dark-mode { background: #000000; color: #e0e0e0; }
-body.dark-mode .main-content { background: #000000; }
-body.dark-mode .sidebar { box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
-body.dark-mode .topbar { background: #252525 !important; border-bottom: 1px solid #3a3a3a; }
-body.dark-mode .menu-toggle { background: #3a3a3a; color: #e0e0e0; }
-body.dark-mode .topbar-title { color: #999; }
-body.dark-mode .topbar-badge { background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.3); color: #ff6b6b; }
-body.dark-mode .page-content { background: #000000; }
-body.dark-mode h1 { color: #fff !important; }
+body.dark-mode { background: #0f1115 !important; color: #f3f4f6 !important; }
+body.dark-mode .main-content { background: #0f1115 !important; }
+body.dark-mode .sidebar { box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+body.dark-mode .topbar { background: #181b21 !important; border-bottom: 1px solid #2e3542 !important; }
+body.dark-mode .menu-toggle { background: #20242c !important; color: #f3f4f6 !important; border: 1px solid #2e3542 !important; }
+body.dark-mode .darkmode-toggle { background: #20242c !important; color: #f3f4f6 !important; border-color: #2e3542 !important; }
+body.dark-mode .topbar-title { color: #9ca3af !important; }
+body.dark-mode .topbar-badge { background: rgba(220,38,38,0.15) !important; border: 1px solid rgba(220,38,38,0.3) !important; color: #ff8080 !important; }
+body.dark-mode .page-content { background: #0f1115 !important; }
+body.dark-mode h1 { color: #f3f4f6 !important; }
+
+/* Switch to Professor View button */
+body.dark-mode .btn-switch-view,
+html.dark-mode .btn-switch-view {
+    background: #181b21 !important;
+    border-color: rgba(220, 38, 38, 0.35) !important;
+    color: #f87171 !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35) !important;
+}
+body.dark-mode .btn-switch-view:hover,
+html.dark-mode .btn-switch-view:hover {
+    background: rgba(220, 38, 38, 0.18) !important;
+    border-color: #ef4444 !important;
+    color: #fca5a5 !important;
+}
+
+/* Date badge */
+body.dark-mode .date-badge,
+html.dark-mode .date-badge {
+    background: #181b21 !important;
+    border-color: #2e3542 !important;
+    color: #9ca3af !important;
+}
+body.dark-mode .date-badge:hover,
+html.dark-mode .date-badge:hover {
+    background: #20242c !important;
+    border-color: rgba(220, 38, 38, 0.4) !important;
+    color: #f3f4f6 !important;
+}
 
 /* Stat cards */
-body.dark-mode .stat-card { background: #2a2a2a !important; border: 1px solid #3a3a3a; box-shadow: 0 2px 10px rgba(0,0,0,0.3); color: #e0e0e0; }
-body.dark-mode .stat-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important; }
-body.dark-mode .stat-num { color: #fff; }
-body.dark-mode .stat-name { color: #999; }
+body.dark-mode .stat-card {
+    background: #181b21 !important;
+    border: 1px solid #2e3542 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35) !important;
+    color: #f3f4f6 !important;
+}
+body.dark-mode .stat-card:hover {
+    background: #1d2129 !important;
+    border-color: rgba(220, 38, 38, 0.35) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.45) !important;
+}
+body.dark-mode .stat-num { color: #f3f4f6 !important; }
+body.dark-mode .stat-name { color: #9ca3af !important; }
+body.dark-mode .stat-change.up {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+body.dark-mode .stat-change.blue {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+body.dark-mode .stat-change.amber {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+body.dark-mode .stat-icon-box.red {
+    background: rgba(220, 38, 38, 0.15) !important;
+    color: #f87171 !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+}
+body.dark-mode .stat-icon-box.blue {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+body.dark-mode .stat-icon-box.green {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+/* AI Brief Card */
+body.dark-mode [data-ai-insight-card],
+html.dark-mode [data-ai-insight-card] {
+    background: #181b21 !important;
+    border: 1px solid #2e3542 !important;
+    border-left: 5px solid #dc2626 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35) !important;
+}
+body.dark-mode [data-ai-insight-card] > div:first-child,
+html.dark-mode [data-ai-insight-card] > div:first-child {
+    border-bottom: 1px solid #2e3542 !important;
+}
+body.dark-mode [data-ai-insight-card] h2,
+html.dark-mode [data-ai-insight-card] h2 {
+    color: #f3f4f6 !important;
+}
+body.dark-mode [data-ai-insight-card] p,
+html.dark-mode [data-ai-insight-card] p {
+    color: #9ca3af !important;
+}
+body.dark-mode [data-ai-insight-card] [data-ai-badge],
+html.dark-mode [data-ai-insight-card] [data-ai-badge],
+body.dark-mode [data-ai-insight-card] span:has([data-ai-badge]),
+html.dark-mode [data-ai-insight-card] span:has([data-ai-badge]) {
+    background: rgba(220, 38, 38, 0.15) !important;
+    border-color: rgba(220, 38, 38, 0.35) !important;
+    color: #fca5a5 !important;
+}
+body.dark-mode [data-ai-insight-card] .fa-robot,
+html.dark-mode [data-ai-insight-card] .fa-robot {
+    color: #f87171 !important;
+}
+body.dark-mode [data-ai-insight-card] div:has(> .fa-robot),
+html.dark-mode [data-ai-insight-card] div:has(> .fa-robot) {
+    background: rgba(220, 38, 38, 0.15) !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+}
+body.dark-mode [data-ai-result-panel],
+html.dark-mode [data-ai-result-panel] {
+    background: #181b21 !important;
+    color: #cbd5e1 !important;
+}
+body.dark-mode [data-ai-result-panel] div[style*="background:#fafafa"],
+html.dark-mode [data-ai-result-panel] div[style*="background:#fafafa"],
+body.dark-mode [data-ai-result-panel] div[style*="background: #fafafa"],
+html.dark-mode [data-ai-result-panel] div[style*="background: #fafafa"] {
+    background: #20242c !important;
+    border-color: #2e3542 !important;
+}
+body.dark-mode [data-ai-result-panel] ul,
+html.dark-mode [data-ai-result-panel] ul,
+body.dark-mode [data-ai-result-panel] li,
+html.dark-mode [data-ai-result-panel] li {
+    color: #cbd5e1 !important;
+}
+body.dark-mode [data-ai-summary],
+html.dark-mode [data-ai-summary] {
+    color: #e2e8f0 !important;
+}
+body.dark-mode .dashboard-ai-quick-question,
+html.dark-mode .dashboard-ai-quick-question {
+    background: #20242c !important;
+    border-color: #2e3542 !important;
+    color: #fca5a5 !important;
+}
+body.dark-mode .dashboard-ai-quick-question:hover,
+html.dark-mode .dashboard-ai-quick-question:hover {
+    background: rgba(220, 38, 38, 0.2) !important;
+    border-color: rgba(220, 38, 38, 0.4) !important;
+    color: #ffffff !important;
+}
+body.dark-mode .dashboard-ai-quick-question i,
+html.dark-mode .dashboard-ai-quick-question i {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #f87171 !important;
+}
+body.dark-mode #dashboardAiQuestionInput,
+html.dark-mode #dashboardAiQuestionInput {
+    background: #20242c !important;
+    border: 1.5px solid #2e3542 !important;
+    color: #f3f4f6 !important;
+}
+body.dark-mode #dashboardAiQuestionInput:focus,
+html.dark-mode #dashboardAiQuestionInput:focus {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+}
+body.dark-mode #dashboardAiAnswer,
+html.dark-mode #dashboardAiAnswer {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+}
+body.dark-mode #dashboardAiAnswerText,
+html.dark-mode #dashboardAiAnswerText {
+    color: #e2e8f0 !important;
+}
 
 /* Panel cards */
-body.dark-mode .panel-card { background: #2a2a2a; border: 1px solid #3a3a3a; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
-body.dark-mode .panel-card-header { background: #2a2a2a; border-bottom: 1px solid #3a3a3a; }
-body.dark-mode .panel-card-header h2 { color: #fff; }
-body.dark-mode .panel-card-header p { color: #999; }
-body.dark-mode .panel-card-footer { background: #2a2a2a !important; border-top: 1px solid #3a3a3a; }
-body.dark-mode .announcement-manage-table th { background: #2a2a2a; color: #aaa; border-bottom-color: #3a3a3a; }
-body.dark-mode .announcement-manage-table td { color: #e0e0e0; border-bottom-color: rgba(255,255,255,0.05); }
-            body.dark-mode .announcement-manage-table tbody tr:hover td { background: rgba(220,38,38,0.1); }
-body.dark-mode .announcement-title-cell strong { color: #fff; }
-body.dark-mode .announcement-title-cell span { color: #aaa; }
-body.dark-mode .btn-edit-announcement { background: rgba(37,99,235,0.12); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
-body.dark-mode .btn-edit-announcement:hover { background: rgba(37,99,235,0.22); color: #bfdbfe; }
-body.dark-mode .announcement-sort-select { background: #2a2a2a; color: #e5e7eb; border-color: #3a3a3a; }
+body.dark-mode .panel-card {
+    background: #181b21 !important;
+    border: 1px solid #2e3542 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35) !important;
+}
+body.dark-mode .panel-card-header {
+    background: #181b21 !important;
+    border-bottom: 1px solid #2e3542 !important;
+}
+body.dark-mode .panel-header-icon {
+    background: rgba(220, 38, 38, 0.15) !important;
+    color: #f87171 !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+}
+body.dark-mode .panel-card-header h2 { color: #f3f4f6 !important; }
+body.dark-mode .panel-card-header p { color: #9ca3af !important; }
+body.dark-mode .panel-card-footer {
+    background: #181b21 !important;
+    border-top: 1px solid #2e3542 !important;
+}
+
+/* Form fields */
+body.dark-mode .field-label { color: #e2e8f0 !important; }
+body.dark-mode .field-label i { color: #f87171 !important; }
+body.dark-mode .field-input {
+    background: #20242c !important;
+    color: #f3f4f6 !important;
+    border: 1.5px solid #2e3542 !important;
+}
+body.dark-mode .field-input::placeholder { color: #64748b !important; }
+body.dark-mode .field-input:focus {
+    border-color: var(--red) !important;
+    background: #20242c !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+}
+body.dark-mode textarea.field-input {
+    background: #20242c !important;
+    color: #f3f4f6 !important;
+}
+
+/* Voice input mic buttons in dark mode */
+body.dark-mode .voice-mic-button,
+html.dark-mode .voice-mic-button {
+    background: #282e38 !important;
+    border-color: #ef4444 !important;
+    color: #fca5a5 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+body.dark-mode .voice-mic-button:hover,
+html.dark-mode .voice-mic-button:hover {
+    background: #3b1d22 !important;
+    border-color: #f87171 !important;
+}
+body.dark-mode .voice-guide-btn,
+html.dark-mode .voice-guide-btn {
+    background: #20242c !important;
+    color: #f87171 !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5) !important;
+}
+body.dark-mode .voice-guide-btn:hover,
+html.dark-mode .voice-guide-btn:hover {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+}
+body.dark-mode .voice-guide-modal-content,
+html.dark-mode .voice-guide-modal-content {
+    background: #181b21 !important;
+    border-color: #2e3542 !important;
+}
+body.dark-mode .voice-guide-modal-body,
+html.dark-mode .voice-guide-modal-body {
+    background: #181b21 !important;
+    color: #cbd5e1 !important;
+}
+body.dark-mode .voice-guide-modal-body .cmd,
+html.dark-mode .voice-guide-modal-body .cmd {
+    background: #20242c !important;
+    color: #fca5a5 !important;
+}
+
+/* Quick links */
+body.dark-mode .quick-link-item {
+    background: #20242c !important;
+    border: 1px solid #2e3542 !important;
+    color: #f3f4f6 !important;
+}
+body.dark-mode .quick-link-item:hover {
+    background: #282e38 !important;
+    border-color: rgba(220, 38, 38, 0.4) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4) !important;
+}
+body.dark-mode .quick-link-item:hover .quick-link-icon {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+body.dark-mode .quick-link-icon.red    { background: rgba(220, 38, 38, 0.15) !important; color: #f87171 !important; }
+body.dark-mode .quick-link-icon.blue   { background: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; }
+body.dark-mode .quick-link-icon.green  { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+body.dark-mode .quick-link-icon.purple { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; }
+body.dark-mode .quick-link-icon.amber  { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+body.dark-mode .quick-link-icon.teal   { background: rgba(20, 184, 166, 0.15) !important; color: #2dd4bf !important; }
+body.dark-mode .quick-link-label { color: #e2e8f0 !important; }
+
+/* My Announcements Table & DataTables */
+body.dark-mode .announcement-manage-table th {
+    background: #14171f !important;
+    color: #9ca3af !important;
+    border-bottom: 1px solid #2e3542 !important;
+}
+body.dark-mode .announcement-manage-table td {
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid #20242c !important;
+}
+body.dark-mode .announcement-manage-table tbody tr:hover td {
+    background: rgba(220,38,38,0.08) !important;
+}
+body.dark-mode .announcement-title-cell strong { color: #f3f4f6 !important; }
+body.dark-mode .announcement-title-cell span { color: #9ca3af !important; }
+body.dark-mode .btn-edit-announcement {
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.35) !important;
+    color: #93c5fd !important;
+}
+body.dark-mode .btn-edit-announcement:hover {
+    background: rgba(59, 130, 246, 0.25) !important;
+    color: #bfdbfe !important;
+}
+body.dark-mode .announcement-sort-select {
+    background: #20242c !important;
+    color: #f3f4f6 !important;
+    border: 1px solid #2e3542 !important;
+}
 body.dark-mode .announcement-table-wrap .dataTables_length label,
 body.dark-mode .announcement-table-wrap .dataTables_filter label,
-body.dark-mode .announcement-table-wrap .dataTables_info { color: #d1d5db !important; }
+body.dark-mode .announcement-table-wrap .dataTables_info {
+    color: #9ca3af !important;
+}
 body.dark-mode .announcement-table-wrap .dataTables_length select,
 body.dark-mode .announcement-table-wrap .dataTables_filter input {
-    background: #2a2a2a !important;
-    color: #e5e7eb !important;
-    border-color: #3a3a3a !important;
+    background: #20242c !important;
+    color: #f3f4f6 !important;
+    border: 1.5px solid #2e3542 !important;
+}
+body.dark-mode .announcement-table-wrap .dataTables_filter input:focus {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
 }
 body.dark-mode .announcement-table-wrap .dataTables_paginate .paginate_button {
-    background: #2a2a2a !important;
-    color: #e5e7eb !important;
-    border-color: #3a3a3a !important;
+    background: #20242c !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #2e3542 !important;
 }
 body.dark-mode .announcement-table-wrap .dataTables_paginate .paginate_button:hover {
     background: rgba(220,38,38,0.2) !important;
-    color: #ff6b6b !important;
-    border-color: rgba(220,38,38,0.3) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(220,38,38,0.4) !important;
 }
-body.dark-mode .announcement-table-wrap .dataTables_empty { color: #9ca3af; }
-body.dark-mode .analytics-header h2 { color: #fff; }
-body.dark-mode .analytics-header p { color: #aaa; }
-body.dark-mode .analytics-updated { background: #2a2a2a; border: 1px solid #3a3a3a; color: #e0e0e0; }
-body.dark-mode .analytics-item-title { color: #f3f4f6; }
-body.dark-mode .analytics-item-meta { color: #9ca3af; }
-body.dark-mode .analytics-track { background: #3a3a3a; }
-body.dark-mode .analytics-month-label { color: #d1d5db; }
-body.dark-mode .analytics-bar-group span { color: #9ca3af; }
+body.dark-mode .announcement-table-wrap .dataTables_paginate .paginate_button.current {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #dc2626 !important;
+}
+body.dark-mode .announcement-table-wrap .dataTables_empty { color: #9ca3af !important; }
 
-/* Form fields */
-body.dark-mode .field-label { color: #e0e0e0; }
-body.dark-mode .field-input { background: #3a3a3a !important; color: #e0e0e0 !important; border: 1.5px solid #4a4a4a !important; }
-body.dark-mode .field-input::placeholder { color: #777 !important; }
-body.dark-mode .field-input:focus { border-color: var(--red) !important; background: #3a3a3a !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
-body.dark-mode textarea.field-input { background: #3a3a3a !important; color: #e0e0e0 !important; }
+/* Dashboard Footer (Consistent with Professor and Class pages) */
+body.dark-mode .dashboard-footer,
+html.dark-mode .dashboard-footer {
+    background: transparent !important;
+    border-top: none !important;
+    box-shadow: none !important;
+    color: #9ca3af !important;
+}
+body.dark-mode .dashboard-footer a,
+html.dark-mode .dashboard-footer a {
+    color: #9ca3af !important;
+}
+body.dark-mode .dashboard-footer a:hover,
+html.dark-mode .dashboard-footer a:hover {
+    color: #ef4444 !important;
+}
+body.dark-mode .dashboard-footer .divider,
+html.dark-mode .dashboard-footer .divider {
+    color: #475569 !important;
+}
+body.dark-mode .dashboard-footer .footer-copy,
+html.dark-mode .dashboard-footer .footer-copy {
+    color: #9ca3af !important;
+}
+body.dark-mode .dashboard-footer .footer-copy span,
+html.dark-mode .dashboard-footer .footer-copy span {
+    color: #ef4444 !important;
+}
+body.dark-mode .dashboard-footer .footer-logo,
+html.dark-mode .dashboard-footer .footer-logo {
+    opacity: 0.7 !important;
+}
 
-/* Quick links — gray in dark mode */
-body.dark-mode .quick-link-item { background: #2a2a2a; border-color: #3a3a3a; color: #e0e0e0; }
-body.dark-mode .quick-link-item:hover { background: #333; border-color: #555; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.3); }
-body.dark-mode .quick-link-item:hover .quick-link-icon { background: #4a4a4a; color: #e0e0e0; }
-body.dark-mode .quick-link-icon.red    { background: #3a2a2a; color: #ff8080; }
-body.dark-mode .quick-link-icon.blue   { background: #1e2a3a; color: #7eb3f5; }
-body.dark-mode .quick-link-icon.green  { background: #1e3a2a; color: #6ee7b7; }
-body.dark-mode .quick-link-icon.purple { background: #2a1e3a; color: #c4b5fd; }
-body.dark-mode .quick-link-icon.amber  { background: #3a2e1e; color: #fcd34d; }
-body.dark-mode .quick-link-icon.teal   { background: #1e3a38; color: #5eead4; }
-body.dark-mode .quick-link-label { color: #e0e0e0; }
+/* ===== DARK MODE FOR CHRONO CALENDAR HUB ===== */
+body.dark-mode .chrono-calendar-hub,
+html.dark-mode .chrono-calendar-hub {
+    background: #181b21 !important;
+    border-color: #2e3542 !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35) !important;
+}
 
-/* Footer */
-body.dark-mode .dashboard-footer { background: #1a1a1a !important; border-top: 1px solid #3a3a3a; color: #999; }
-body.dark-mode .dashboard-footer a { color: #999; }
-body.dark-mode .dashboard-footer a:hover { color: var(--red); }
-body.dark-mode .dashboard-footer .divider { color: #3a3a3a; }
-body.dark-mode .dashboard-footer .footer-copy { color: #999; }
-body.dark-mode .dashboard-footer .footer-copy span { color: var(--red); }
-body.dark-mode .dashboard-footer .footer-logo { opacity: 0.4; }
+body.dark-mode .chrono-station-pane,
+html.dark-mode .chrono-station-pane {
+    background: linear-gradient(145deg, #181b21 0%, #1e222b 50%, #25181c 100%) !important;
+}
+
+body.dark-mode .chrono-tag-pill,
+html.dark-mode .chrono-tag-pill {
+    background: #20242c !important;
+    border-color: #2e3542 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .chrono-live-chip,
+html.dark-mode .chrono-live-chip {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    color: #34d399 !important;
+}
+
+body.dark-mode .chrono-analog-clock,
+html.dark-mode .chrono-analog-clock {
+    background: #14171f !important;
+    border-color: #2e3542 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .chrono-clock-mark,
+html.dark-mode .chrono-clock-mark {
+    background: #475569 !important;
+}
+
+body.dark-mode .chrono-clock-mark.major,
+html.dark-mode .chrono-clock-mark.major {
+    background: #ef4444 !important;
+}
+
+body.dark-mode .chrono-hour-hand,
+html.dark-mode .chrono-hour-hand {
+    background: #f1f5f9 !important;
+}
+
+body.dark-mode .chrono-min-hand,
+html.dark-mode .chrono-min-hand {
+    background: #cbd5e1 !important;
+}
+
+body.dark-mode .chrono-sec-hand,
+html.dark-mode .chrono-sec-hand {
+    background: #ef4444 !important;
+}
+
+body.dark-mode .chrono-sec-hand::after,
+html.dark-mode .chrono-sec-hand::after {
+    background: #ef4444 !important;
+}
+
+body.dark-mode .chrono-clock-pivot,
+html.dark-mode .chrono-clock-pivot {
+    background: #ef4444 !important;
+    border-color: #14171f !important;
+}
+
+body.dark-mode .chrono-digit-pod,
+html.dark-mode .chrono-digit-pod {
+    background: #12151c !important;
+    border-color: #2e3542 !important;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .pod-val,
+html.dark-mode .pod-val {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .pod-lbl,
+html.dark-mode .pod-lbl {
+    color: #64748b !important;
+}
+
+body.dark-mode .chrono-digit-sep,
+html.dark-mode .chrono-digit-sep {
+    color: #ef4444 !important;
+}
+
+body.dark-mode .chrono-date-strip,
+html.dark-mode .chrono-date-strip {
+    background: rgba(220, 38, 38, 0.1) !important;
+    border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+body.dark-mode .chrono-date-icon-wrap,
+html.dark-mode .chrono-date-icon-wrap {
+    background: #1e222b !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #f87171 !important;
+}
+
+body.dark-mode .chrono-day-name,
+html.dark-mode .chrono-day-name {
+    color: #fca5a5 !important;
+}
+
+body.dark-mode .chrono-full-date,
+html.dark-mode .chrono-full-date {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .chrono-pane-footer,
+html.dark-mode .chrono-pane-footer {
+    border-top-color: #2e3542 !important;
+}
+
+body.dark-mode .chrono-greeting-wrap,
+html.dark-mode .chrono-greeting-wrap {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .chrono-greeting-user,
+html.dark-mode .chrono-greeting-user {
+    color: #f87171 !important;
+}
+
+body.dark-mode .chrono-sync-pill,
+html.dark-mode .chrono-sync-pill {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .chrono-hub-divider,
+html.dark-mode .chrono-hub-divider {
+    background: #2e3542 !important;
+}
+
+body.dark-mode .chrono-calendar-pane,
+html.dark-mode .chrono-calendar-pane {
+    background: #181b21 !important;
+}
+
+body.dark-mode .cal-header-icon-box,
+html.dark-mode .cal-header-icon-box {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #f87171 !important;
+}
+
+body.dark-mode .cal-kicker-label,
+html.dark-mode .cal-kicker-label {
+    color: #64748b !important;
+}
+
+body.dark-mode .cal-current-month,
+html.dark-mode .cal-current-month {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .cal-nav-arrow-btn,
+body.dark-mode .cal-nav-today-btn,
+html.dark-mode .cal-nav-arrow-btn,
+html.dark-mode .cal-nav-today-btn {
+    background: #20242c !important;
+    border-color: #2e3542 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .cal-nav-arrow-btn:hover,
+body.dark-mode .cal-nav-today-btn:hover,
+html.dark-mode .cal-nav-arrow-btn:hover,
+html.dark-mode .cal-nav-today-btn:hover {
+    background: rgba(220, 38, 38, 0.25) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(220, 38, 38, 0.4) !important;
+}
+
+body.dark-mode .cal-grid-weekdays span,
+html.dark-mode .cal-grid-weekdays span {
+    color: #64748b !important;
+}
+
+body.dark-mode .cal-day-cell,
+html.dark-mode .cal-day-cell {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .cal-day-cell:hover:not(.other-month),
+html.dark-mode .cal-day-cell:hover:not(.other-month) {
+    background: rgba(220, 38, 38, 0.25) !important;
+    color: #fca5a5 !important;
+}
+
+body.dark-mode .cal-day-cell.other-month,
+html.dark-mode .cal-day-cell.other-month {
+    color: #475569 !important;
+    opacity: 0.45;
+}
+
+body.dark-mode .cal-day-cell.today,
+html.dark-mode .cal-day-cell.today {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45) !important;
+}
+
+body.dark-mode .cal-day-cell.selected:not(.today),
+html.dark-mode .cal-day-cell.selected:not(.today) {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #fca5a5 !important;
+    border-color: #ef4444 !important;
+}
+
+body.dark-mode .cal-pane-footer,
+html.dark-mode .cal-pane-footer {
+    border-top-color: #2e3542 !important;
+    color: #94a3b8 !important;
+}
+
+/* Responsive Breakpoints for Chrono Calendar Hub */
+@media (max-width: 992px) {
+    .chrono-calendar-hub {
+        flex-direction: column !important;
+    }
+    .chrono-hub-divider {
+        width: 100% !important;
+        height: 1px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .chrono-station-pane,
+    .chrono-calendar-pane {
+        padding: 18px 16px !important;
+    }
+    .chrono-digit-pod {
+        min-width: 52px !important;
+        padding: 6px 10px !important;
+    }
+    .pod-val {
+        font-size: 24px !important;
+    }
+}

@@ -1,19 +1,22 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
+    
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>InternConnect - Downloadable Files</title>
         <link rel="shortcut icon" href="/images/final-puptg_logo-ojtims_nbg.png" type="image/png">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
         <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+        <link rel="stylesheet" href="{{ vasset('css/student/file.css') }}">
         <link rel="stylesheet" href="{{ vasset('css/student_downloadablefile-responsive.css') }}">
-
-    <link rel="stylesheet" href="{{ vasset('css/student/file.css') }}">
+        <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+        <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
     <body>
@@ -105,7 +108,7 @@
             <div class="topbar-right">
                 <div class="topbar-badge">
                     <i class="fa fa-graduation-cap"></i>
-                    Student Portal
+                    <span>Student Portal</span>
                 </div>
             </div>
         </div>
@@ -167,79 +170,59 @@
                 </div>
 
                 <div class="table-card-body">
-
-                    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-                        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-                    <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                    <script>
-                        $(document).ready(function () {
-                        $('#fileTable').DataTable({
-                            "order": [[2, 'desc']],
-                            "autoWidth": false
-                        });
-                    });
-                    </script>
-                    <div style="overflow-x: auto; width: 100%;">
-                      <table id="fileTable" class="display" style="width:100%">
+                    <table id="fileTable" class="display" style="width:100%">
                         <thead>
                             <tr>
-                                <th>File Name</th>
-                                <th>File</th>
-                                <th>Date Uploaded</th>
-                                <th>Uploaded By</th>
-                                <th>Action</th>
+                                <th>FILE NAME</th>
+                                <th>FILE</th>
+                                <th>DATE UPLOADED</th>
+                                <th>UPLOADED BY</th>
+                                <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($upload as $file)
+                            @php
+                                $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
+                                $icon = match($ext) {
+                                    'pdf'  => 'fa-file-pdf',
+                                    'doc', 'docx' => 'fa-file-word',
+                                    'xls', 'xlsx' => 'fa-file-excel',
+                                    'ppt', 'pptx' => 'fa-file-powerpoint',
+                                    'jpg', 'jpeg', 'png', 'gif' => 'fa-file-image',
+                                    'zip', 'rar' => 'fa-file-archive',
+                                    default => 'fa-file-alt'
+                                };
+                            @endphp
                             <tr>
                                 <td>
                                     <div class="file-name-cell">
                                         <div class="file-icon-wrap">
-                                            @php
-                                                $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
-                                                $icon = match($ext) {
-                                                    'pdf'  => 'fa-file-pdf',
-                                                    'doc', 'docx' => 'fa-file-word',
-                                                    'xls', 'xlsx' => 'fa-file-excel',
-                                                    'ppt', 'pptx' => 'fa-file-powerpoint',
-                                                    'jpg', 'jpeg', 'png', 'gif' => 'fa-file-image',
-                                                    'zip', 'rar' => 'fa-file-archive',
-                                                    default => 'fa-file-alt'
-                                                };
-                                            @endphp
                                             <i class="fa {{ $icon }}"></i>
                                         </div>
                                         <div>
                                             <div class="file-name-text">{{ $file->name }}</div>
-                                            <div class="file-ext">{{ strtoupper($ext) }} file</div>
+                                            <div class="file-ext">{{ strtoupper($ext) }}</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td style="color:#888; font-size:12.5px;">{{ $file->file }}</td>
-                                <td>
-                                    <div class="date-cell">
-                                        {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
-                                        <div class="date-time">{{ \Carbon\Carbon::parse($file->created_at)->format('h:i A') }}</div>
-                                    </div>
+                                <td style="color:#666; font-size:13px;">{{ $file->file }}</td>
+                                <td data-order="{{ \Carbon\Carbon::parse($file->created_at)->timestamp }}">
+                                    {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
                                 </td>
                                 <td>
-                                    <div class="uploader-cell">
-                                        <div class="uploader-avatar"><i class="fa fa-user"></i></div>
-                                        {{ $file->uploader_name }}
-                                    </div>
+                                    {{ $file->uploader_name ?: '-' }}
                                 </td>
                                 <td>
-                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                        @if(in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
-                                            <button type="button"
-                                                    class="btn-view btn-preview-file"
-                                                    data-file-url="{{ url('/view/file', $file->file) }}"
-                                                    data-file-name="{{ $file->name }}"
-                                                    data-download-url="{{ url('/download', $file->file) }}">
-                                                <i class="fa fa-eye"></i> View
-                                            </button>
-                                        @endif
+                                    <div class="action-btn-group">
+                                        <button type="button"
+                                                class="btn-view btn-preview-file"
+                                                data-file-url="{{ url('/view/file', $file->file) }}"
+                                                data-file-name="{{ $file->name }}"
+                                                data-file-ext="{{ $ext }}"
+                                                data-download-url="{{ url('/download', $file->file) }}">
+                                            <i class="fa fa-eye"></i> View
+                                        </button>
                                         <a href="{{ url('/download', $file->file) }}" class="btn-download">
                                             <i class="fa fa-download"></i> Download
                                         </a>
@@ -249,8 +232,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
-
                 </div>
             </div>
 
@@ -292,7 +273,7 @@
                 <div class="modal-body" style="padding:0; background:#f8fafc;">
                     <div style="padding:12px 18px; border-bottom:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
                         <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                            <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:600; flex-shrink:0;">
+                            <span id="filePreviewBadge" style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:600; flex-shrink:0;">
                                 <i class="fa fa-eye"></i> Preview
                             </span>
                             <span id="filePreviewSubTitle" style="font-size:13px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
@@ -301,7 +282,25 @@
                             <i class="fa fa-download"></i> Download File
                         </a>
                     </div>
-                    <iframe id="filePreviewFrame" title="File Preview" style="width:100%; height:75vh; min-height:400px; border:0; background:#fff;"></iframe>
+                    
+                    <!-- In-browser preview iframe for PDF, Images, Text -->
+                    <iframe id="filePreviewFrame" title="File Preview" style="width:100%; height:75vh; min-height:400px; border:0; background:#fff; display:none;"></iframe>
+
+                    <!-- Clean Notice Box for Word / Unsupported documents -->
+                    <div id="filePreviewNotice" style="display:none; padding:60px 24px; text-align:center; background:#fff; min-height:400px;">
+                        <div style="width:80px; height:80px; margin:0 auto 20px auto; border-radius:20px; background:#eff6ff; border:1px solid #bfdbfe; display:flex; align-items:center; justify-content:center; color:#2563eb; font-size:36px;">
+                            <i class="fa fa-file-word" id="fileNoticeIcon"></i>
+                        </div>
+                        <h4 style="font-size:18px; font-weight:700; color:#1e293b; margin-bottom:8px;" id="fileNoticeHeading">
+                            Preview Not Supported for Word Documents
+                        </h4>
+                        <p style="font-size:14px; color:#64748b; max-width:480px; margin:0 auto 24px auto; line-height:1.6;" id="fileNoticeText">
+                            In-browser preview is not supported for Word (.docx / .doc) documents. Instead of viewing in browser, please download the file to open and view it directly on your device.
+                        </p>
+                        <a id="fileNoticeDownloadBtn" href="#" class="btn-download" style="padding:10px 24px; font-size:14px; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
+                            <i class="fa fa-download"></i> Download File Now
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

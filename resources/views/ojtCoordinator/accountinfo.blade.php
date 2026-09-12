@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,6 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/accountinfo.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -413,7 +416,6 @@
     };
 </script>
 <script src="{{ vasset('js/coordinator/accountinfo.js') }}?v={{ time() }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

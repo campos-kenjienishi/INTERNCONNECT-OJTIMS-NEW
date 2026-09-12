@@ -1,8 +1,9 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Coordinator Search Page Scripts
    Extracted from ojtCoordinator/search.blade.php
    ========================================================================== */
 
+function initLegacyRemoveForms() {
     document.querySelectorAll('.legacy-remove-form').forEach(function (form) {
         form.addEventListener('submit', function (event) {
             event.preventDefault();
@@ -34,3 +35,10 @@
             });
         });
     });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLegacyRemoveForms);
+} else {
+    initLegacyRemoveForms();
+}

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professor Analytics Report</title>
@@ -324,6 +325,8 @@
             .grid-2 { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 <body>
     <div class="page">
@@ -332,9 +335,9 @@
                 <i class="fa fa-arrow-left"></i>
                 Back to Analytics
             </a>
-            <button type="button" class="btn-tool primary" id="printBtn">
+            <button type="button" class="btn-tool primary" id="printBtn" onclick="window.print()">
                 <i class="fa fa-print"></i>
-                Print Report
+                <span>Print Analytics Report</span>
             </button>
         </div>
 
@@ -508,11 +511,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('printBtn')?.addEventListener('click', function () {
-            window.print();
-        });
-    </script>
 </body>
 </html>

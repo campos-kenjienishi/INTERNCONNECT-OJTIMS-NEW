@@ -1,6 +1,17 @@
 
 
 
+/* ============================================================
+   student_downloadablefile-responsive.css
+   RESPONSIVE ONLY — Mobile, Tablet, and Desktop Breakpoints
+   ============================================================ */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 /* ─────────────────────────────────────────────
    LG — 1024px and below (small laptops)
 ───────────────────────────────────────────── */
@@ -8,6 +19,8 @@
 
     .page-content {
         padding: 22px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .page-header h1 {
@@ -22,8 +35,12 @@
         padding: 14px 20px !important;
     }
 
-    .table-card-body .dataTables_wrapper {
+    .table-card-body {
         padding: 14px 18px !important;
+    }
+
+    .table-card-body .dataTables_wrapper {
+        padding: 0 !important;
     }
 
     .stat-card {
@@ -37,14 +54,40 @@
 
 
 /* ─────────────────────────────────────────────
-   MD — 900px and below (tablets / iPad)
-   Sidebar already becomes a drawer via existing code.
+   MD — 900px and below (tablets / iPad / mobile)
 ───────────────────────────────────────────── */
 @media (max-width: 900px) {
+
+    /* Drawer Sidebar */
+    .sidebar {
+        width: var(--sidebar-w) !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0) !important;
+    }
+
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+
+    /* Main Container expands to 100% full width */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 
     /* Topbar */
     .topbar {
         padding: 0 16px !important;
+        width: 100% !important;
+    }
+
+    .topbar-title {
+        display: none !important;
     }
 
     .topbar-badge {
@@ -52,25 +95,31 @@
         padding: 5px 10px !important;
     }
 
-    /* Page */
+    /* Page Content */
     .page-content {
         padding: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .page-header h1 {
         font-size: 18px !important;
     }
 
-    /* Stats row — already 2 columns via your existing code */
+    /* Stats row: Stacked single column on mobile */
     .stats-row {
+        grid-template-columns: 1fr !important;
         gap: 12px !important;
         margin-bottom: 18px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .stat-card {
         padding: 14px 16px !important;
         border-radius: 12px !important;
         gap: 12px !important;
+        width: 100% !important;
     }
 
     .stat-icon {
@@ -91,6 +140,8 @@
     /* Table card */
     .table-card {
         border-radius: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .table-card-header {
@@ -111,22 +162,21 @@
         padding: 4px 12px !important;
     }
 
-    /* DataTables */
-    .table-card-body .dataTables_wrapper {
+    /* DataTables horizontal scroll container */
+    .table-card-body {
         padding: 12px 14px !important;
-        font-size: 13px !important;
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    /* File table scrolls inside its wrapper — does NOT cause page-level horizontal scroll */
     .table-card-body .dataTables_wrapper {
-        max-width: 100%;
-    }
-
-    .table-card-body .dataTables_scroll,
-    .table-card-body .dataTables_scrollBody {
-        overflow-x: auto !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     table#fileTable {
@@ -166,19 +216,16 @@
         font-size: 10px !important;
     }
 
-    /* Download button */
-    .btn-download {
+    /* Download and View buttons */
+    .btn-download,
+    .btn-view {
         font-size: 12px !important;
-        padding: 6px 13px !important;
+        padding: 6px 12px !important;
     }
 
     /* Date cell */
     .date-cell {
         font-size: 12.5px !important;
-    }
-
-    .date-cell .date-time {
-        font-size: 11px !important;
     }
 
     /* Footer */
@@ -194,8 +241,15 @@
 ───────────────────────────────────────────── */
 @media (max-width: 640px) {
 
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     .topbar {
         padding: 0 12px !important;
+        width: 100% !important;
     }
 
     /* Collapse "Student Portal" badge to icon only */
@@ -205,12 +259,15 @@
 
     .topbar-badge {
         padding: 6px 10px !important;
-        border-radius: 50% !important;
+        border-radius: 20px !important;
         gap: 0 !important;
+        font-size: 13px !important;
     }
 
     .page-content {
         padding: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .page-header h1 {
@@ -221,15 +278,18 @@
         font-size: 11.5px !important;
     }
 
-    /* Stats: 1 column on small phones */
+    /* Stats: 1 column on phones */
     .stats-row {
         grid-template-columns: 1fr !important;
         gap: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .stat-card {
         padding: 12px 14px !important;
         border-radius: 10px !important;
+        width: 100% !important;
     }
 
     .stat-icon {
@@ -261,13 +321,22 @@
     }
 
     /* DataTables */
-    .table-card-body .dataTables_wrapper {
+    .table-card-body {
         padding: 10px 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .table-card-body .dataTables_wrapper {
+        padding: 0 !important;
         font-size: 12.5px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     table#fileTable {
-        min-width: 520px !important;
+        min-width: 540px !important;
     }
 
     .table-card-body table.dataTable thead th {
@@ -289,31 +358,13 @@
         font-size: 12px !important;
     }
 
-    /* File name cell */
-    .file-name-cell {
-        gap: 8px !important;
-    }
-
-    .file-icon-wrap {
-        width: 28px !important;
-        height: 28px !important;
-        font-size: 12px !important;
-    }
-
-    .file-name-text {
-        font-size: 12px !important;
-    }
-
-    .file-ext {
-        font-size: 10px !important;
-    }
-
-    /* Download button */
-    .btn-download {
+    /* Action buttons in table */
+    .btn-download,
+    .btn-view {
         font-size: 11.5px !important;
-        padding: 5px 11px !important;
+        padding: 5px 10px !important;
         border-radius: 7px !important;
-        gap: 5px !important;
+        gap: 4px !important;
     }
 
     /* Footer */
@@ -338,14 +389,20 @@
 ───────────────────────────────────────────── */
 @media (max-width: 480px) {
 
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     :root {
         --topbar-h: 56px !important;
     }
 
     .menu-toggle,
     .darkmode-toggle {
-        width: 34px !important;
-        height: 34px !important;
+        width: 36px !important;
+        height: 36px !important;
         font-size: 15px !important;
     }
 
@@ -353,14 +410,27 @@
         gap: 8px !important;
     }
 
+    .page-content {
+        padding: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     .page-header h1 {
         font-size: 15px !important;
     }
 
     /* Stats even more compact */
+    .stats-row {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     .stat-card {
         padding: 10px 12px !important;
         gap: 10px !important;
+        width: 100% !important;
     }
 
     .stat-icon {
@@ -380,7 +450,7 @@
 
     /* Table */
     table#fileTable {
-        min-width: 480px !important;
+        min-width: 500px !important;
     }
 
     .table-card-body table.dataTable thead th {
@@ -400,14 +470,11 @@
         flex-shrink: 0 !important;
     }
 
-    .btn-download {
+    .btn-download,
+    .btn-view {
         font-size: 11px !important;
-        padding: 5px 9px !important;
+        padding: 5px 8px !important;
         white-space: nowrap !important;
-    }
-
-    .uploader-cell {
-        gap: 6px !important;
     }
 }
 
@@ -445,37 +512,28 @@
         padding: 14px 18px !important;
     }
 
-    .btn-download {
+    .btn-download,
+    .btn-view {
         font-size: 13.5px !important;
-        padding: 9px 18px !important;
+        padding: 8px 16px !important;
     }
 }
 
-/* Keep DataTables controls anchored; only the table body scrolls sideways */
+/* Keep DataTables controls anchored and properly padded */
 .table-card {
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 .table-card-body {
     max-width: 100%;
-    overflow: visible !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box !important;
 }
 
 .table-card-body .dataTables_wrapper {
-    overflow: visible !important;
-    min-width: 0;
-}
-
-.table-card-body .dataTables_scroll {
-    width: 100%;
-}
-
-.table-card-body .dataTables_scrollHead {
-    overflow: hidden !important;
-}
-
-.table-card-body .dataTables_scrollBody {
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
 }

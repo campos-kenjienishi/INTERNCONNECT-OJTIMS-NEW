@@ -373,4 +373,87 @@
         });
     }
 
+    // Expose functions globally for inline onclick handlers
+    window.showDenialReason = showDenialReason;
+    window.showRemoveConfirmation = showRemoveConfirmation;
+
+    // View requirement file in modal
+    $(document).on('click', '.view-button', function (e) {
+        e.preventDefault();
+        var fileUrl = $(this).data('file-url');
+        var downloadUrl = $(this).data('download-url');
+        var fileName = $(this).data('file-name') || '';
+        var ext = fileName.split('.').pop().toLowerCase();
+
+        $('#previewDownloadBtn').attr('href', downloadUrl);
+        $('#previewDownloadBtnBottom').attr('href', downloadUrl);
+
+        var canPreview = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'txt'].includes(ext);
+        if (canPreview) {
+            $('#previewBadge').html('<i class="fa fa-eye"></i> Preview available');
+            $('#previewFrame').attr('src', fileUrl).show();
+            $('#previewFallback').hide();
+        } else {
+            $('#previewBadge').html('<i class="fa fa-info-circle"></i> Download to View');
+            $('#previewFrame').attr('src', 'about:blank').hide();
+            $('#previewFallback').show();
+        }
+
+        var modalEl = document.getElementById('previewModal');
+        if (modalEl && modalEl.parentNode !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    });
+
+    var previewModalEl = document.getElementById('previewModal');
+    if (previewModalEl) {
+        previewModalEl.addEventListener('hidden.bs.modal', function () {
+            var frame = document.getElementById('previewFrame');
+            if (frame) frame.src = 'about:blank';
+            $('#previewFallback').hide();
+        });
+    }
+
+    // Remove requirement button click
+    $(document).on('click', '.remove-button', function (e) {
+        e.preventDefault();
+        var fileId = $(this).data('file-id');
+        showRemoveConfirmation(fileId);
+    });
+
+    // Initialize DataTable on Submitted Requirements table
+    function initFileTable() {
+        if (window.jQuery && $('#fileTable').length && !$.fn.DataTable.isDataTable('#fileTable')) {
+            $('#fileTable').DataTable({
+                order: [[3, 'desc']],
+                autoWidth: false,
+                pageLength: 10,
+                columnDefs: [
+                    { width: "24%", targets: 0 },
+                    { width: "24%", targets: 1 },
+                    { width: "16%", targets: 2 },
+                    { width: "18%", targets: 3 },
+                    { width: "18%", targets: 4, orderable: false, searchable: false, className: "text-end" }
+                ],
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search requirements...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ requirements",
+                    infoEmpty: "Showing 0 to 0 of 0 requirements",
+                    zeroRecords: "No matching requirements found",
+                    emptyTable: "No requirements submitted yet"
+                }
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFileTable);
+    } else {
+        initFileTable();
+    }
+
 

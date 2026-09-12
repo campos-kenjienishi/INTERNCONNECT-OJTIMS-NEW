@@ -720,4 +720,36 @@
     margin: 0 2px;
 }
 
-    </style>
+/* =============== DARK MODE =============== */
+body.dark-mode {
+    background: #14161b !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .cat-name-text,
+html.dark-mode .cat-name-text {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .file-name-text,
+html.dark-mode .file-name-text {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .cat-icon-box,
+html.dark-mode .cat-icon-box {
+    background: rgba(220, 38, 38, 0.2) !important;
+    border: 1px solid rgba(220, 38, 38, 0.35) !important;
+    color: #f87171 !important;
+}
+
+body.dark-mode .date-main { color: #f1f5f9 !important; }
+body.dark-mode .date-sub { color: #94a3b8 !important; }
+
+body.dark-mode .table-card { background: #1e222b !important; border: 1px solid #2e3542 !important; }
+body.dark-mode .table-card-header { background: #181b22 !important; border-bottom: 1px solid #2e3542 !important; }
+body.dark-mode .table-card-header h2 { color: #f1f5f9 !important; }
+body.dark-mode .table-card-header p { color: #94a3b8 !important; }
+body.dark-mode .table-card-body table.dataTable thead th { background: #181b22; color: #cbd5e1; border-bottom: 1px solid #2e3542; }
+body.dark-mode .table-card-body table.dataTable tbody td { color: #e2e8f0; border-bottom: 1px solid #282e3a; }
+body.dark-mode .table-card-body table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }

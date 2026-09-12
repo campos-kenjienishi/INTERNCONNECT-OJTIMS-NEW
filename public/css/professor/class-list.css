@@ -580,25 +580,25 @@
             transform: translateY(-2px);
         }
 
-        /* Dark mode for class list tables */
+        /* Dark mode for class list tables & modals */
         html.dark-mode .table-card,
         body.dark-mode .table-card {
-            background: #1a1a1a !important;
-            border-color: #2a2a2a !important;
+            background: #1e222b !important;
+            border: 1px solid #2e3542 !important;
         }
 
         html.dark-mode .table-card-body table.dataTable thead th,
         body.dark-mode .table-card-body table.dataTable thead th {
-            background: #252525 !important; 
-            color: #e8e8e8 !important;
-            border-bottom-color: #2a2a2a !important;
-            border-top-color: #2a2a2a !important;
+            background: #181b22 !important; 
+            color: #cbd5e1 !important;
+            border-bottom: 1px solid #2e3542 !important;
+            border-top: none !important;
         }
 
         html.dark-mode .table-card-body table.dataTable tbody td,
         body.dark-mode .table-card-body table.dataTable tbody td {
-            color: #e8e8e8 !important;
-            border-bottom-color: #2a2a2a !important;
+            color: #e2e8f0 !important;
+            border-bottom: 1px solid #282e3a !important;
         }
 
         html.dark-mode .table-card-body table.dataTable tbody tr:hover td,
@@ -608,49 +608,142 @@
 
         html.dark-mode .dataTables_filter input,
         body.dark-mode .dataTables_filter input {
-            background: #252525 !important;
-            color: #e8e8e8 !important;
+            background: #2a2a2a !important;
+            color: #f1f5f9 !important;
             border-color: #3a3a3a !important;
         }
 
         html.dark-mode .dataTables_length select,
         body.dark-mode .dataTables_length select {
-            background: #252525 !important;
-            color: #e8e8e8 !important;
+            background: #2a2a2a !important;
+            color: #f1f5f9 !important;
             border-color: #3a3a3a !important;
         }
 
         html.dark-mode .dataTables_info,
         body.dark-mode .dataTables_info {
-            color: #a0a0a0 !important;
+            color: #94a3b8 !important;
         }
 
         html.dark-mode .dataTables_paginate .paginate_button,
         body.dark-mode .dataTables_paginate .paginate_button {
-            background: #252525 !important;
+            background: #2a2a2a !important;
             border-color: #3a3a3a !important;
-            color: #e8e8e8 !important;
+            color: #e0e0e0 !important;
         }
 
         html.dark-mode .dataTables_paginate .paginate_button:not(.disabled):hover,
         body.dark-mode .dataTables_paginate .paginate_button:not(.disabled):hover {
-            background: #3a3a3a !important;
-            border-color: #4a4a4a !important;
+            background: rgba(220,38,38,0.2) !important;
+            border-color: var(--red) !important;
+            color: #ff6b6b !important;
+        }
+
+        html.dark-mode .dataTables_paginate .paginate_button.current,
+        body.dark-mode .dataTables_paginate .paginate_button.current {
+            background: var(--red) !important;
+            border-color: var(--red) !important;
+            color: #fff !important;
         }
 
         html.dark-mode .table-card-header,
         body.dark-mode .table-card-header {
-            background: #252525 !important;
-            border-bottom-color: #2a2a2a !important;
+            background: #181b22 !important;
+            border-bottom: 1px solid #2e3542 !important;
         }
 
         html.dark-mode .table-card-header h2,
         body.dark-mode .table-card-header h2 {
-            color: #e8e8e8 !important;
+            color: #f1f5f9 !important;
         }
 
         html.dark-mode .table-card-header p,
         body.dark-mode .table-card-header p {
-            color: #a0a0a0 !important;
+            color: #94a3b8 !important;
         }
-    </style>
+
+        /* Modals in Dark Mode */
+        html.dark-mode .modal-content,
+        body.dark-mode .modal-content {
+            background: #1e222b !important;
+            border: 1px solid #2e3542 !important;
+        }
+
+        html.dark-mode .modal-body,
+        body.dark-mode .modal-body {
+            background: #1e222b !important;
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .modal-student-banner,
+        body.dark-mode .modal-student-banner {
+            background: #181b22 !important;
+            border: 1px solid #2e3542 !important;
+        }
+
+        html.dark-mode .modal-student-avatar,
+        body.dark-mode .modal-student-avatar {
+            background: rgba(220, 38, 38, 0.2) !important;
+            border: 1px solid rgba(220, 38, 38, 0.35) !important;
+            color: #f87171 !important;
+        }
+
+        html.dark-mode .modal-student-name,
+        body.dark-mode .modal-student-name {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .modal-student-sub,
+        body.dark-mode .modal-student-sub {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .modal-info-row,
+        body.dark-mode .modal-info-row {
+            border-bottom: 1px solid #282e3a !important;
+        }
+
+        html.dark-mode .modal-info-icon,
+        body.dark-mode .modal-info-icon {
+            background: rgba(220, 38, 38, 0.18) !important;
+            border: 1px solid rgba(220, 38, 38, 0.3) !important;
+            color: #f87171 !important;
+        }
+
+        html.dark-mode .modal-info-label,
+        body.dark-mode .modal-info-label {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .modal-info-value,
+        body.dark-mode .modal-info-value {
+            color: #f1f5f9 !important;
+            font-weight: 600 !important;
+        }
+
+        html.dark-mode .modal-footer,
+        body.dark-mode .modal-footer {
+            background: #181b22 !important;
+            border-top: 1px solid #2e3542 !important;
+        }
+
+        html.dark-mode .btn-modal-close,
+        body.dark-mode .btn-modal-close {
+            background: #2a2a2a !important;
+            border: 1px solid #3a3a3a !important;
+            color: #e0e0e0 !important;
+        }
+
+        html.dark-mode .btn-modal-close:hover,
+        body.dark-mode .btn-modal-close:hover {
+            background: rgba(220,38,38,0.2) !important;
+            border-color: var(--red) !important;
+            color: #ff6b6b !important;
+        }
+
+        html.dark-mode .btn-back,
+        body.dark-mode .btn-back,
+        html.dark-mode .btn-back *,
+        body.dark-mode .btn-back * {
+            color: #ffffff !important;
+        }

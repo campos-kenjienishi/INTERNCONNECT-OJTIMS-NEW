@@ -1,6 +1,7 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="en">
     <head>
+    
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,11 +12,12 @@
         <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
         <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/dashboard.css') }}?v={{ time() }}">
-    </head>
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}?v={{ time() }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
+</head>
 
     <body>
 
@@ -133,19 +135,14 @@
 
             <!-- Page Header -->
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
-                <h1 style="font-size:26px; font-weight:800; color:#1a1a1a; letter-spacing:-0.5px;">
+                <h1 style="font-size:26px; font-weight:800; letter-spacing:-0.5px;">
                     Home <span style="color:var(--red);">Dashboard</span>
                 </h1>
                 <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                    <a href="{{ route('professor_home') }}" class="btn-switch-view" style="display:inline-flex; align-items:center; gap:8px; padding:9px 18px; background:#ffffff; border:1.5px solid #fecaca; border-radius:12px; color:#dc2626; font-weight:700; font-size:13px; text-decoration:none; box-shadow:0 3px 12px rgba(220,38,38,0.1); transition:all 0.25s;">
+                    <a href="{{ route('professor_home') }}" class="btn-switch-view">
                         <i class="fa fa-exchange-alt"></i>
                         Switch to Professor View
                     </a>
-                    <div class="date-badge" id="dateBadge" title="Click to view calendar & clock">
-                        <span class="pulse-dot"></span>
-                        <i class="fa fa-calendar-alt"></i>
-                        <span id="currentDate"></span>
-                    </div>
                 </div>
             </div>
 
@@ -332,6 +329,132 @@
                     </div>
                 </section>
             @endif
+
+            <!-- Live Academic Chrono & Calendar Hub -->
+            <div class="chrono-calendar-hub">
+                <!-- Left Pane: Live Time & Date Station -->
+                <div class="chrono-station-pane">
+                    <div class="chrono-pane-top">
+                        <div class="chrono-tag-pill">
+                            <i class="fa fa-clock"></i>
+                            <span>Philippine Standard Time</span>
+                            <span class="chrono-utc-tag">UTC+8</span>
+                        </div>
+                        <div class="chrono-live-chip">
+                            <span class="chrono-pulse-core"></span>
+                            <span>LIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="chrono-digit-display">
+                        <!-- Left: Moving Clock Design -->
+                        <div class="chrono-moving-clock-wrap">
+                            <div class="chrono-analog-clock" id="chronoMovingClock">
+                                <div class="clock-dial-marks" id="chronoDialMarks"></div>
+                                <div class="chrono-hand chrono-hour-hand" id="chronoHourHand"></div>
+                                <div class="chrono-hand chrono-min-hand" id="chronoMinHand"></div>
+                                <div class="chrono-hand chrono-sec-hand" id="chronoSecHand"></div>
+                                <div class="chrono-clock-pivot"></div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Hours, Minutes, Seconds Digits -->
+                        <div class="chrono-digits-pod-group">
+                            <div class="chrono-digit-pod">
+                                <span class="pod-val" id="dashHours">--</span>
+                                <span class="pod-lbl">Hours</span>
+                            </div>
+                            <span class="chrono-digit-sep">:</span>
+                            <div class="chrono-digit-pod">
+                                <span class="pod-val" id="dashMins">--</span>
+                                <span class="pod-lbl">Minutes</span>
+                            </div>
+                            <span class="chrono-digit-sep">:</span>
+                            <div class="chrono-digit-pod chrono-sec-pod">
+                                <span class="pod-val" id="dashSecs">--</span>
+                                <span class="pod-lbl">Seconds</span>
+                            </div>
+                            <div class="chrono-ampm-badge" id="dashAmPm">--</div>
+                        </div>
+                    </div>
+
+                    <div class="chrono-date-strip">
+                        <div class="chrono-date-icon-wrap">
+                            <i class="fa fa-calendar-check"></i>
+                        </div>
+                        <div class="chrono-date-meta">
+                            <span class="chrono-day-name" id="dashDayName">Loading...</span>
+                            <span class="chrono-full-date" id="dashFullDate">Loading date...</span>
+                        </div>
+                    </div>
+
+                    <div class="chrono-pane-footer">
+                        <div class="chrono-greeting-wrap">
+                            <span class="chrono-greeting-icon" id="dashGreetingIcon"><i class="fa fa-sun"></i></span>
+                            <span class="chrono-greeting-msg" id="dashGreetingMsg">Good day</span>
+                            @if(!empty($data->full_name))
+                                <span class="chrono-greeting-user">, {{ $data->full_name }}</span>
+                            @endif
+                        </div>
+                        <div class="chrono-sync-pill">
+                            <i class="fa fa-shield-alt"></i> Official Academic Clock
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Divider -->
+                <div class="chrono-hub-divider"></div>
+
+                <!-- Right Pane: Interactive Academic Calendar -->
+                <div class="chrono-calendar-pane">
+                    <div class="cal-pane-header">
+                        <div class="cal-pane-title-group">
+                            <div class="cal-header-icon-box">
+                                <i class="fa fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <span class="cal-kicker-label">Academic Calendar</span>
+                                <h3 class="cal-current-month" id="dashCalMonthLabel">Loading...</h3>
+                            </div>
+                        </div>
+                        <div class="cal-nav-group">
+                            <button type="button" class="cal-nav-arrow-btn" id="dashCalPrev" title="Previous Month" aria-label="Previous Month">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <button type="button" class="cal-nav-today-btn" id="dashCalToday" title="Jump to Today">
+                                Today
+                            </button>
+                            <button type="button" class="cal-nav-arrow-btn" id="dashCalNext" title="Next Month" aria-label="Next Month">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="cal-pane-grid-wrap">
+                        <div class="cal-grid-weekdays">
+                            <span>Sun</span>
+                            <span>Mon</span>
+                            <span>Tue</span>
+                            <span>Wed</span>
+                            <span>Thu</span>
+                            <span>Fri</span>
+                            <span>Sat</span>
+                        </div>
+                        <div class="cal-grid-days" id="dashCalGrid">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <div class="cal-pane-footer">
+                        <div class="cal-legend-item">
+                            <span class="legend-circle legend-today"></span> Today
+                        </div>
+                        <div class="cal-legend-item">
+                            <span class="legend-circle legend-selected"></span> Selected: <strong id="dashCalSelectedLabel">Loading...</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Dashboard Grid -->
             <div class="dashboard-grid">
@@ -597,7 +720,6 @@
     </script>
     <script src="{{ vasset('js/coordinator/dashboard.js') }}?v={{ time() }}"></script>
     <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
-    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
     @include('partials.password-setup-modal')
     @include('students.terms_modal')

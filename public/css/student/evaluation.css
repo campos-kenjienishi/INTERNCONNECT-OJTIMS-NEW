@@ -72,10 +72,29 @@
         }
 
         .btn-eval.is-disabled {
-            opacity: 0.55;
             cursor: not-allowed;
             pointer-events: none;
-            filter: grayscale(0.12);
+        }
+
+        .btn-eval-locked,
+        .btn-eval.btn-eval-locked {
+            background: #fee2e2 !important;
+            border: 1.5px solid #fca5a5 !important;
+            color: #dc2626 !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            cursor: not-allowed !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            opacity: 1 !important;
+            filter: none !important;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12) !important;
+        }
+
+        .btn-eval-locked i,
+        .btn-eval.btn-eval-locked i {
+            color: #dc2626 !important;
         }
 
 .nav-item:hover {

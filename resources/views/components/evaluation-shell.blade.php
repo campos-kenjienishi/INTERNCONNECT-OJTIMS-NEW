@@ -68,10 +68,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
     <link rel="stylesheet" href="{{ vasset('css/student_evaluation-responsive.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/components/evaluation-shell.css') }}">
-</head>
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 <body>
 @if($isAuthenticatedShell)

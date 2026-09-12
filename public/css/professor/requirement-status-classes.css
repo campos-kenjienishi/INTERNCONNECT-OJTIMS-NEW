@@ -90,4 +90,92 @@
         body.dark-mode .page-btn.active { background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; border-color:#991b1b; }
         body.dark-mode .pagination-meta, body.dark-mode .empty-state { color:#aaa; }
         @media (max-width:900px) { .sidebar { transform:translateX(-100%); z-index:2000; } .sidebar.mobile-open { transform:translateX(0); } .main-content,.main-content.expanded { margin-left:0; } .page-content { padding:20px 14px; } }
+
+        /* Dashboard Footer */
+        .dashboard-footer {
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            color: #888;
+            text-align: center;
+            padding: 18px 28px;
+            font-size: 12.5px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .dashboard-footer .footer-logo {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            opacity: 0.8;
+        }
+
+        .dashboard-footer .footer-copy {
+            font-size: 12.5px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .dashboard-footer .footer-copy span {
+            color: var(--red, #dc2626);
+            font-weight: 600;
+        }
+
+        .dashboard-footer .footer-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-footer a {
+            color: #888;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12.5px;
+            transition: color 0.2s;
+        }
+
+        .dashboard-footer a:hover {
+            color: var(--red, #dc2626);
+            text-decoration: none;
+        }
+
+        .dashboard-footer .divider {
+            color: #d1d5db;
+            margin: 0 2px;
+        }
+
+        body.dark-mode .dashboard-footer {
+            background: #14161b !important;
+            border-top: 1px solid #2e3542 !important;
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .dashboard-footer .footer-copy {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .dashboard-footer .footer-copy span {
+            color: #ef4444 !important;
+        }
+
+        body.dark-mode .dashboard-footer a {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .dashboard-footer a:hover {
+            color: #ef4444 !important;
+        }
+
+        body.dark-mode .dashboard-footer .divider {
+            color: #3b4252 !important;
+        }
     </style>

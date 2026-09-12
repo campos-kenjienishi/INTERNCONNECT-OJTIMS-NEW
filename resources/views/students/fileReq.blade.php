@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,9 +12,12 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="{{ vasset('css/student_filereq-responsive.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/student/file-req.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -105,7 +109,7 @@
         <div class="topbar-right">
             <div class="topbar-badge">
                 <i class="fa fa-graduation-cap"></i>
-                Student Portal
+                <span>Student Portal</span>
             </div>
         </div>
     </div>
@@ -190,7 +194,7 @@
             </div>
         </div>
 
-        <div class="stats-row" style="margin-top:-6px;">
+        <div class="stats-row stats-row-3" style="margin-top:-6px;">
             <div class="stat-card">
                 <div class="stat-icon blue"><i class="fa fa-unlock-alt"></i></div>
                 <div>
@@ -346,68 +350,6 @@
             </div>
 
             <div class="table-card-body">
-
-                <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-                <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                <script>
-                    $(document).ready(function () {
-                        const fileTable = $('#fileTable').DataTable({
-                            "order": [[3, 'desc']],
-                            "scrollX": true,
-                            "autoWidth": false,
-                            "columnDefs": [
-                                { "width": "32%", "targets": 0 },
-                                { "width": "18%", "targets": 2 },
-                                { "width": "14%", "targets": 3 },
-                                { "width": "18%", "targets": 4 }
-                            ]
-                        });
-
-                        $('#fileTable tbody').on('click', '.remove-button', function (e) {
-                            e.preventDefault();
-                            var fileId = $(this).data('file-id');
-                            showRemoveConfirmation(fileId);
-                        });
-
-                        $('#fileTable tbody').on('click', '.view-button', function (e) {
-                            e.preventDefault();
-                            var fileUrl = $(this).data('file-url');
-                            var fileName = $(this).data('file-name');
-                            var downloadUrl = $(this).data('download-url');
-                            var fileExt = (fileName.split('.').pop() || '').toLowerCase();
-                            var previewable = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'txt', 'html', 'htm'].indexOf(fileExt) !== -1;
-
-                            $('#previewFileName').text(fileName);
-                            $('#previewDownloadBtn').attr('href', downloadUrl);
-                            $('#previewDownloadBtnBottom').attr('href', downloadUrl);
-                            if (previewable) {
-                                $('#previewFrame').show().attr('src', fileUrl);
-                                $('#previewFallback').hide();
-                                $('#previewBadge').removeClass('no-preview').html('<i class="fa fa-eye"></i> Preview available');
-                            } else {
-                                $('#previewFrame').hide().attr('src', 'about:blank');
-                                $('#previewFallback').show();
-                                $('#previewBadge').addClass('no-preview').html('<i class="fa fa-file-download"></i> No preview available');
-                            }
-                             var modalEl = document.getElementById('previewModal');
-                             if (modalEl && modalEl.parentNode !== document.body) {
-                                 document.body.appendChild(modalEl);
-                             }
-                             var previewModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                             previewModal.show();
-                        });
-
-                        document.getElementById('previewModal').addEventListener('hidden.bs.modal', function () {
-                            $('#previewFrame').attr('src', 'about:blank');
-                            $('#previewFrame').show();
-                            $('#previewFallback').hide();
-                            $('#previewBadge').removeClass('no-preview').html('<i class="fa fa-eye"></i> Preview available');
-                            $('#previewDownloadBtn').attr('href', '#');
-                            $('#previewDownloadBtnBottom').attr('href', '#');
-                        });
-                    });
-                </script>
-
                 <table id="fileTable" class="display" style="width:100%">
                     <thead>
                         <tr>
@@ -415,7 +357,7 @@
                             <th>File</th>
                             <th>Status</th>
                             <th>Date Submitted</th>
-                            <th>Action</th>
+                            <th class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -430,7 +372,7 @@
                             <td>
                                 <div class="file-cell">
                                     <i class="fa fa-paperclip"></i>
-                                    {{ $files->file }}
+                                    <span>{{ $files->file }}</span>
                                 </div>
                             </td>
                             <td>
@@ -457,16 +399,16 @@
                                     @endif
                                 </div>
                             </td>
-                            <td>
+                            <td data-order="{{ \Carbon\Carbon::parse($files->created_at)->timestamp }}">
                                 <div class="date-main">{{ \Carbon\Carbon::parse($files->created_at)->format('M d, Y') }}</div>
                                 <div class="date-sub">{{ \Carbon\Carbon::parse($files->created_at)->format('h:i A') }}</div>
                             </td>
                             <td>
-                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <div class="action-btn-group">
                                     <button type="button" class="btn-view view-button" data-file-url="{{ url('/student/requirements/view/' . $files->id) }}" data-download-url="{{ url('/student/requirements/download/' . $files->id) }}" data-file-name="{{ $files->file }}">
                                         <i class="fa fa-eye"></i> View
                                     </button>
-                                    <button class="btn-remove remove-button" data-file-id="{{ $files->id }}">
+                                    <button type="button" class="btn-remove remove-button" data-file-id="{{ $files->id }}">
                                         <i class="fa fa-trash"></i> Remove
                                     </button>
                                 </div>
@@ -475,9 +417,6 @@
                         @endforeach
                     </tbody>
                 </table>
-
-                
-
             </div>
         </div>
 
@@ -801,7 +740,7 @@
         submittedRequirementNames: @json($submittedRequirementNames->values())
     };
 </script>
-    <script src="{{ vasset('js/student/file-req.js') }}"></script>
+    <script src="{{ vasset('js/student/file-req.js') }}?v={{ time() }}" defer></script>
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
