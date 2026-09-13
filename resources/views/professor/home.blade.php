@@ -327,10 +327,15 @@
                     </div>
                     <div class="cal-legend-item">
                         <span class="legend-circle legend-selected"></span> Selected: <strong id="dashCalSelectedLabel">Loading...</strong>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- RIGHT: InternConnect AI Assistant -->
-        <x-dashboard-ai-hero :role="'professor'" />
+        <!-- InternConnect AI Assistant Hero -->
+        <div style="margin-bottom: 28px;">
+            <x-dashboard-ai-hero :role="'professor'" />
+        </div>
         <!-- Overall Overview Summary & Visual Trends -->
         <div class="analytics-section-title" style="margin-top:32px;">
             <i class="fa fa-chart-area"></i> Overall Overview Summary & Trends
