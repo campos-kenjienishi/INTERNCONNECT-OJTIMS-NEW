@@ -2,11 +2,15 @@
    INTERNCONNECT QUICK TOOLS FLOATING SPEED DIAL (FAB)
    ============================================================ */
 
-/* Hide native sienna floating button so only our FAB is shown */
+/* Hide native sienna & userway floating buttons so only our FAB is shown */
 .asw-menu-btn,
 .asw-btn,
 [data-asw-btn],
-.sienna-accessibility-btn {
+.sienna-accessibility-btn,
+.uai,
+#userwayAccessibilityIcon,
+[data-userway-widget],
+.userway_buttons_wrapper {
     display: none !important;
 }
 
@@ -95,6 +99,32 @@ body.modal-open .ic-speed-dial {
     font-size: 13px;
     flex-shrink: 0;
     transition: background 0.2s, transform 0.2s;
+}
+
+.ic-item-bud-emblem {
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 100%) !important;
+    border: 1.5px solid #FED700 !important;
+    box-shadow: 0 0 8px rgba(254, 215, 0, 0.4) !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+.ic-bud-fab-img {
+    width: 44px !important;
+    max-width: none !important;
+    height: auto !important;
+    object-fit: cover !important;
+    margin-top: -2px !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25)) !important;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.ic-speed-dial-item:hover .ic-bud-fab-img {
+    transform: translateY(-2px) scale(1.12) !important;
 }
 
 .ic-speed-dial-item:hover .ic-item-emblem {

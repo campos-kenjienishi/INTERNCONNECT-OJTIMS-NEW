@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Student Dashboard</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
@@ -301,6 +302,9 @@
             <!-- RIGHT: Journey + Tips -->
             <div class="dash-right-col">
 
+                <!-- InternConnect AI Assistant -->
+                <x-dashboard-ai-hero :role="'student'" />
+
                 <!-- OJT Journey -->
                 <div class="panel-card">
                     <div class="panel-card-header">
@@ -354,35 +358,6 @@
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Helpful Tips -->
-                <div class="panel-card">
-                    <div class="panel-card-header">
-                        <div class="panel-header-icon"><i class="fa fa-lightbulb" aria-hidden="true"></i></div>
-                        <div>
-                            <h2>Helpful Tips</h2>
-                            <p>Make the most of your OJT</p>
-                        </div>
-                    </div>
-                    <div class="tips-wrap">
-                        <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-clock" aria-hidden="true"></i></div>
-                            <div class="tip-text">Submit your requirements before the deadline to avoid delays in your OJT approval.</div>
-                        </div>
-                        <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-file-alt" aria-hidden="true"></i></div>
-                            <div class="tip-text">Download all necessary templates from the Files section early to stay prepared.</div>
-                        </div>
-                        <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-user-tie" aria-hidden="true"></i></div>
-                            <div class="tip-text">Keep your OJT Information updated with your company details and supervisor.</div>
-                        </div>
-                        <div class="tip-item">
-                            <div class="tip-icon"><i class="fa fa-bell" aria-hidden="true"></i></div>
-                            <div class="tip-text">Check the Announcements section regularly for important updates from your coordinator.</div>
                         </div>
                     </div>
                 </div>

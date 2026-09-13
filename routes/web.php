@@ -16,6 +16,7 @@ use App\Http\Controllers\ForgotPassController;
 use App\Http\Controllers\CoursePerSYController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ChatbotController;
 use App\Models\User;
 
 /*
@@ -33,6 +34,7 @@ use App\Models\User;
 
 Route::view('/', 'landing')->name('landing');
 Route::get('/login-gateway', [AuthController::class, 'loginGateway'])->name('login.gateway');
+Route::redirect('/login/gateway', '/login-gateway');
 
 // IdP Authentication Routes
 Route::get('/auth/login/external', [AuthController::class, 'showIdpTransition'])->name('login.external');
@@ -66,6 +68,7 @@ Route::get('/evaluation/form/{token}', [EvaluationController::class, 'showSuperv
 Route::post('/evaluation/form/{token}/review', [EvaluationController::class, 'reviewSupervisorForm'])->name('evaluation.form.review');
 Route::post('/evaluation/form/{token}', [EvaluationController::class, 'submitSupervisorForm'])->name('evaluation.form.submit');
 Route::get('/evaluation/submitted', [EvaluationController::class, 'thankYou'])->name('evaluation.form.thankyou');
+Route::post('/chatbot/message', [ChatbotController::class, 'message'])->name('chatbot.message');
 
 // ─── AUTHENTICATED: ANY LOGGED-IN USER ──────────────────────────────
 

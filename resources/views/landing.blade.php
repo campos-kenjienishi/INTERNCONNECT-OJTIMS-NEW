@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Landing Page</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="{{ vasset('css/pages/landing-page.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/quick-tools-fab.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/chatbot-widget.css') }}">
 </head>
 <body>
     <header class="topbar">
@@ -189,7 +192,8 @@
                 </a>
             </div>
         </div>
-    </footer>
     <script src="{{ vasset('js/pages/landing-page.js') }}"></script>
+    <script src="{{ vasset('js/components/chatbot-widget.js') }}"></script>
+    <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

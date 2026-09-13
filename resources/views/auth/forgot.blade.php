@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Reset Password</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,6 +12,8 @@
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/forgotpassword-responsive.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/pages/auth-forgot.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/quick-tools-fab.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/chatbot-widget.css') }}">
 </head>
 
 <body class="auth-centered-page">
@@ -150,6 +153,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url('/frontend/js/script.js') }}"></script>
+<script src="{{ vasset('js/components/chatbot-widget.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

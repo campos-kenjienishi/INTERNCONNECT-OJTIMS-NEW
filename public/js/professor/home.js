@@ -8,9 +8,8 @@ $(document).ready(function () {
         "paging": true,
         "info": false,
         "lengthChange": false,
-        "pageLength": 8,
-        "scrollX": true,
-        "scrollCollapse": true,
+        "pageLength": 5,
+        "scrollX": false,
         "autoWidth": false,
         "order": [[0, 'asc']],
         "language": {

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Professor Dashboard</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
@@ -21,9 +22,7 @@
             } catch(e){}
         })();
     </script>
-    <link rel="stylesheet" href="{{ vasset('css/professor_home-responsive.css') }}">
-
-    <link rel="stylesheet" href="{{ vasset('css/professor/home.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor/home.css') }}?v={{ time() }}">
 </head>
 
 <body>
@@ -207,87 +206,108 @@
             </a>
         </div>
 
-        <!-- Students by Class -->
-        <div class="table-card" style="margin-top:32px;">
-            <div class="table-card-header">
-                <h2>
-                    <div class="header-icon"><i class="fa fa-users"></i></div>
-                    Students by Class
-                </h2>
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <select id="courseFilter" style="border-radius:8px;padding:6px 12px;font-size:13px;">
-                        <option value="">All Courses</option>
-                        @if(isset($class))
-                            @foreach($class->pluck('course')->unique() as $course)
-                                <option value="{{ $course }}">{{ $course }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                    <select id="classFilter" style="border-radius:8px;padding:6px 12px;font-size:13px;">
-                        <option value="">All Classes</option>
-                        @if(isset($class))
-                            @foreach($class as $room)
-                                <option value="{{ $room->room }}" data-course="{{ $room->course }}">{{ $room->room }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
-            </div>
-            <div class="table-card-body" style="padding: 0;">
-                <div style="overflow-x:auto;">
-                <table id="studentsTable" class="display" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Email</th>
-                            <th>Course</th>
-                            <th>Class</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(isset($class) && count($class) > 0)
-                            @foreach($class as $room)
-                                @if(isset($room->students) && count($room->students) > 0)
-                                    @foreach($room->students as $student)
-                                        <tr data-course="{{ $room->course }}" data-class="{{ $room->room }}">
-                                            <td>{{ $student->full_name }}</td>
-                                            <td>{{ $student->email }}</td>
-                                            <td>{{ $room->course }}</td>
-                                            <td>{{ $room->room }}</td>
-                                        </tr>
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid" style="margin-top:28px;">
+            <!-- Students by Class -->
+            <div class="table-card" style="margin-top:0;">
+                <div class="table-card-header">
+                    <h2>
+                        <div class="header-icon"><i class="fa fa-users"></i></div>
+                        Students by Class
+                    </h2>
+                    <div class="table-card-filters">
+                        <div class="prof-select-wrap">
+                            <i class="fa fa-graduation-cap"></i>
+                            <select id="courseFilter" class="prof-filter-select">
+                                <option value="">All Courses</option>
+                                @if(isset($class))
+                                    @foreach($class->pluck('course')->unique() as $course)
+                                        <option value="{{ $course }}">{{ $course }}</option>
                                     @endforeach
                                 @endif
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
+                            </select>
+                        </div>
+                        <div class="prof-select-wrap">
+                            <i class="fa fa-chalkboard"></i>
+                            <select id="classFilter" class="prof-filter-select">
+                                <option value="">All Classes</option>
+                                @if(isset($class))
+                                    @foreach($class as $room)
+                                        <option value="{{ $room->room }}" data-course="{{ $room->course }}">{{ $room->room }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                @if(!(isset($class) && count($class) > 0))
-                    <div style="color:#888; font-size:13px; padding:18px;">No classes found.</div>
-                @endif
+                <div class="table-card-body" style="padding: 0;">
+                    <table id="studentsTable" class="display" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Class</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(isset($class) && count($class) > 0)
+                                @foreach($class as $room)
+                                    @if(isset($room->students) && count($room->students) > 0)
+                                        @foreach($room->students as $student)
+                                            <tr data-course="{{ $room->course }}" data-class="{{ $room->room }}">
+                                                <td>
+                                                    <div class="prof-student-cell">
+                                                        <div class="prof-student-avatar">{{ strtoupper(substr($student->full_name, 0, 1)) }}</div>
+                                                        <div class="prof-student-name">{{ $student->full_name }}</div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="prof-student-email">{{ $student->email }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="prof-course-pill">{{ $room->course }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="prof-class-badge">{{ $room->room }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                    @if(!(isset($class) && count($class) > 0))
+                        <div style="color:#888; font-size:13px; padding:18px; text-align:center;">No classes found.</div>
+                    @endif
+                </div>
             </div>
+
+            <!-- RIGHT: InternConnect AI Assistant -->
+            <x-dashboard-ai-hero :role="'professor'" />
         </div>
-
-
-<!-- Dashboard Footer (restored, only at the bottom) -->
-<footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
-    <div style="display:flex; align-items:center; gap:8px;">
-        <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" class="footer-logo" alt="PUP">
-        <span class="footer-copy">
-            &copy; 1998–{{ date('Y') }} <span>Polytechnic University of the Philippines</span>
-        </span>
     </div>
-    <div class="footer-links">
-        <a href="https://www.pup.edu.ph/" target="_blank">
-            <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
-            PUP Website
-        </a>
-        <span class="divider">|</span>
-        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
-        <span class="divider">|</span>
-        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
-    </div>
-</footer>
+
+    <!-- Dashboard Footer -->
+    <footer class="dashboard-footer">
+        <div class="footer-inner">
+            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" class="footer-logo" alt="PUP">
+            <span class="footer-copy">
+                &copy; 1998–{{ date('Y') }} <span>Polytechnic University of the Philippines</span>
+            </span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank">
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                PUP Website
+            </a>
+            <span class="divider">|</span>
+            <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+        </div>
+    </footer>
 </div>
 
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

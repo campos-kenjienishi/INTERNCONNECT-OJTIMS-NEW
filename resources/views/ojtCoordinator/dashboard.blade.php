@@ -5,6 +5,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>InternConnect - Dashboard</title>
         <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
@@ -403,63 +404,8 @@
                     </form>
                 </div>
 
-                <!-- ===== RIGHT: Quick Links ===== -->
-                <div class="panel-card">
-                    <div class="panel-card-header">
-                        <div class="panel-header-icon">
-                            <i class="fa fa-bolt"></i>
-                        </div>
-                        <div>
-                            <h2>Quick Links</h2>
-                            <p>Jump to any section of the portal</p>
-                        </div>
-                    </div>
-
-                    <div class="quick-links-grid">
-                        <a href="{{ url('/studentLists') }}" class="quick-link-item">
-                            <div class="quick-link-icon red">
-                                <i class="fa fa-users"></i>
-                            </div>
-                            <span class="quick-link-label">Students</span>
-                        </a>
-                        <a href="{{ url('/professorTab') }}" class="quick-link-item">
-                            <div class="quick-link-icon blue">
-                                <i class="fa fa-chalkboard-teacher"></i>
-                            </div>
-                            <span class="quick-link-label">Professors</span>
-                        </a>
-                        <a href="{{ url('/uploadpage') }}" class="quick-link-item">
-                            <div class="quick-link-icon green">
-                                <i class="fa fa-file-upload"></i>
-                            </div>
-                            <span class="quick-link-label">Upload Templates</span>
-                        </a>
-                        <a href="{{ url('/MOA') }}" class="quick-link-item">
-                            <div class="quick-link-icon purple">
-                                <i class="fa fa-file-contract"></i>
-                            </div>
-                            <span class="quick-link-label">MOA</span>
-                        </a>
-                        <a href="{{ url('/maintenance') }}" class="quick-link-item">
-                            <div class="quick-link-icon amber">
-                                <i class="fa fa-cogs"></i>
-                            </div>
-                            <span class="quick-link-label">Maintenance</span>
-                        </a>
-                        <a href="{{ url('/reports') }}" class="quick-link-item">
-                            <div class="quick-link-icon teal">
-                                <i class="fa fa-chart-bar"></i>
-                            </div>
-                            <span class="quick-link-label">Reports</span>
-                        </a>
-                        <a href="{{ url('/analytics') }}" class="quick-link-item">
-                            <div class="quick-link-icon blue">
-                                <i class="fa fa-chart-line"></i>
-                            </div>
-                            <span class="quick-link-label">Analytics</span>
-                        </a>
-                    </div>
-                </div>
+                <!-- ===== RIGHT: InternConnect AI Assistant ===== -->
+                <x-dashboard-ai-hero :role="'coordinator'" />
 
             </div>
 
