@@ -106,9 +106,6 @@
             analyticsHeading.insertAdjacentElement('afterend', analyticsAiCard);
         }
 
-        const darkToggle = document.getElementById('darkmodeToggle');
-        const darkIcon = document.getElementById('darkmodeIcon');
-        const darkKey = 'internconnect_darkmode';
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -131,24 +128,6 @@
                     sidebar.classList.remove('mobile-open');
                     sidebarOverlay.classList.remove('active');
                 }
-            });
-        }
-
-        const applyDarkMode = (isDark) => {
-            document.body.classList.toggle('dark-mode', isDark);
-            if (darkIcon) {
-                darkIcon.className = isDark ? 'fa fa-sun' : 'fa fa-moon';
-            }
-        };
-
-        const savedMode = localStorage.getItem(darkKey);
-        applyDarkMode(savedMode === '1');
-
-        if (darkToggle) {
-            darkToggle.addEventListener('click', function () {
-                const isDark = !document.body.classList.contains('dark-mode');
-                applyDarkMode(isDark);
-                localStorage.setItem(darkKey, isDark ? '1' : '0');
             });
         }
 

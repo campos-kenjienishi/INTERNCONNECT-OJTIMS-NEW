@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -17,6 +18,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="{{ vasset('css/pages/onboarding.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 <body class="auth-centered-page">
 <div class="main-wrapper">

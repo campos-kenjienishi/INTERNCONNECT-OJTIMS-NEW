@@ -119,21 +119,7 @@ overlay.addEventListener('click', function () {
     overlay.classList.remove('active');
 });
 
-// Dark mode toggle
-const darkmodeToggle = document.getElementById('darkmodeToggle');
-const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
 
-if (isDarkMode) {
-    document.body.classList.add('dark-mode');
-    darkmodeToggle.innerHTML = '<i class="fa fa-sun"></i>';
-}
-
-darkmodeToggle.addEventListener('click', function () {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    darkmodeToggle.innerHTML = isDark ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
-});
 
 /* ── DataTable ── */
 $(document).ready(function () {

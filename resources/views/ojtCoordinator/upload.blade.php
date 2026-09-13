@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,6 +23,8 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/upload.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -404,8 +407,6 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ vasset('js/coordinator/upload.js') }}?v={{ time() }}"></script>
-<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

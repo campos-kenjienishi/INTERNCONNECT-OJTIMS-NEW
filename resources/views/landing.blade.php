@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,8 @@
     <link rel="stylesheet" href="{{ vasset('css/pages/landing-page.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/components/quick-tools-fab.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/components/chatbot-widget.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 <body>
     <header class="topbar">
@@ -53,7 +56,7 @@
 
         <div class="hero-text">
             <h1 class="hero-title">Intern<span>Connect</span>:</h1>
-            <h2 class="hero-subtitle">On-the-Job Training (OJT)<br>Information Management System</h2>
+            <h2 class="hero-subtitle">An On-the-Job (OJT) Training<br>Information Management System</h2>
             <p class="hero-copy">
                 A centralized and secure platform for OJT management, including MOA management, OJT requirements tracking, and company evaluations for PUP&ndash;Taguig Campus.
             </p>
@@ -80,7 +83,7 @@
     </div>
 </main>
 
-    <section id="Features" class="section section-centered">
+    <section id="Features" class="section section-centered features-section">
         <div class="section-inner">
             <div class="section-label reveal" data-reveal="fade"><i class="fa fa-info-circle"></i> Features</div>
             <h2 class="reveal" data-reveal="slide">Built for students, coordinators, and professors.</h2>
@@ -89,20 +92,64 @@
             </p>
 
             <div class="feature-grid">
+                <!-- 1. Student Experience Card -->
                 <article class="feature-card reveal" data-reveal="slide">
-                    <div class="feature-icon"><i class="fa fa-file-upload"></i></div>
-                    <h3>Document Submission</h3>
+                    <span class="feature-watermark">01</span>
+                    <div class="feature-role-pill role-student">
+                        <i class="fa fa-user-graduate"></i> Student Portal
+                    </div>
+                    <div class="feature-title-row">
+                        <div class="feature-icon icon-student">
+                            <i class="fa fa-file-upload"></i>
+                        </div>
+                        <h3>Document Submission</h3>
+                    </div>
                     <p>Upload requirements quickly through a clear portal flow designed for mobile and desktop users.</p>
+                    <div class="feature-tag-list">
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Mobile & Desktop Flow</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Instant Status Tracking</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> PDF & Image Submissions</span>
+                    </div>
                 </article>
+
+                <!-- 2. Professor Hub Card -->
                 <article class="feature-card reveal" data-reveal="bounce">
-                    <div class="feature-icon"><i class="fa fa-clipboard-check"></i></div>
-                    <h3>Transparent Evaluation</h3>
+                    <span class="feature-watermark">02</span>
+                    <div class="feature-role-pill role-professor">
+                        <i class="fa fa-chalkboard-teacher"></i> Professor Hub
+                    </div>
+                    <div class="feature-title-row">
+                        <div class="feature-icon icon-professor">
+                            <i class="fa fa-clipboard-check"></i>
+                        </div>
+                        <h3>Transparent Evaluation</h3>
+                    </div>
                     <p>Track approvals, denials, and completion states with less back-and-forth and fewer manual checks.</p>
+                    <div class="feature-tag-list">
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Faster Review Cycles</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Real-Time Feedback Notes</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Dynamic Scoring Rubrics</span>
+                    </div>
                 </article>
+
+                <!-- 3. Coordinator Deck Card -->
                 <article class="feature-card reveal" data-reveal="slide">
-                    <div class="feature-icon"><i class="fa fa-users-cog"></i></div>
-                    <h3>Program Management</h3>
+                    <span class="feature-watermark">03</span>
+                    <div class="feature-role-pill role-coordinator">
+                        <i class="fa fa-user-shield"></i> Coordinator Deck
+                    </div>
+                    <div class="feature-title-row">
+                        <div class="feature-icon icon-coordinator">
+                            <i class="fa fa-users-cog"></i>
+                        </div>
+                        <h3>Program Management</h3>
+                    </div>
                     <p>Keep students, companies, and coordinators aligned inside one system that follows the workflow.</p>
+                    <div class="feature-tag-list">
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Company MoA Tracking</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Bulk Advisee Auditing</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Analytics & Class Control</span>
+                    </div>
                 </article>
             </div>
         </div>
@@ -117,25 +164,64 @@
             </p>
 
             <div class="contact-highlights">
-                <div class="contact-highlight location reveal" data-reveal="slide">
-                    <i class="fa fa-map-marker-alt"></i>
-                    <strong>Location</strong>
+                <!-- Location Tile -->
+                <div class="contact-highlight location-tile reveal" data-reveal="slide">
+                    <div class="contact-title-row">
+                        <div class="contact-icon-bubble bubble-location">
+                            <i class="fa fa-map-marker-alt"></i>
+                        </div>
+                        <strong>Campus Office</strong>
+                    </div>
                     <span>PUP Taguig Campus, for on-site coordination and office visits when needed.</span>
+                    <a href="https://maps.google.com/?q=PUP+Taguig+Campus" target="_blank" rel="noopener noreferrer" class="contact-action-btn btn-location">
+                        <span><i class="fa fa-directions"></i> View Map</span>
+                        <i class="fa fa-arrow-right"></i>
+                    </a>
                 </div>
-                <div class="contact-highlight contact reveal" data-reveal="bounce">
-                    <i class="fa fa-comments"></i>
-                    <strong>Contact</strong>
-                    <span>Use Facebook Messenger for fast concerns or email for formal support messages.</span>
+
+                <!-- Messenger Tile -->
+                <div class="contact-highlight messenger-tile reveal" data-reveal="bounce">
+                    <div class="contact-title-row">
+                        <div class="contact-icon-bubble bubble-messenger">
+                            <i class="fab fa-facebook-messenger"></i>
+                        </div>
+                        <strong>Messenger Support</strong>
+                    </div>
+                    <span>Use Facebook Messenger for fast concerns or real-time requirement guidance.</span>
+                    <a href="https://www.facebook.com/profile.php?id=61593939354633" target="_blank" rel="noopener noreferrer" class="contact-action-btn btn-messenger">
+                        <span><i class="fab fa-facebook-f"></i> Message Us</span>
+                        <i class="fa fa-arrow-right"></i>
+                    </a>
                 </div>
-                <div class="contact-highlight reveal" data-reveal="fade">
-                    <i class="fa fa-envelope"></i>
-                    <strong>Email Support</strong>
+
+                <!-- Email Support Tile -->
+                <div class="contact-highlight email-tile reveal" data-reveal="fade">
+                    <div class="contact-title-row">
+                        <div class="contact-icon-bubble bubble-email">
+                            <i class="fa fa-envelope-open-text"></i>
+                        </div>
+                        <strong>Email Support Desk</strong>
+                    </div>
                     <span>Use email for formal concerns, attachments, or issues that need a written record.</span>
+                    <a href="mailto:internconnect.ojtims@gmail.com" class="contact-action-btn btn-email">
+                        <span><i class="fa fa-paper-plane"></i> Send Email</span>
+                        <i class="fa fa-arrow-right"></i>
+                    </a>
                 </div>
-                <div class="contact-highlight reveal" data-reveal="slide">
-                    <i class="fa fa-clock"></i>
-                    <strong>Working Hours</strong>
-                    <span>We usually reply during Mon-Fri, 8AM-5PM, as soon as the support team is available.</span>
+
+                <!-- Hours Tile -->
+                <div class="contact-highlight hours-tile reveal" data-reveal="slide">
+                    <div class="contact-title-row">
+                        <div class="contact-icon-bubble bubble-hours">
+                            <i class="fa fa-clock"></i>
+                        </div>
+                        <strong>Operating Hours</strong>
+                    </div>
+                    <span>Support team replies during active campus office hours on school days.</span>
+                    <div class="contact-status-chip">
+                        <span class="status-pulse-dot"></span>
+                        <span>Mon–Fri • 8:00 AM – 5:00 PM</span>
+                    </div>
                 </div>
             </div>
 

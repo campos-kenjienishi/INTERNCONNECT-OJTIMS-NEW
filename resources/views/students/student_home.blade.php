@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,6 @@
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/student_home-responsive.css') }}">
-    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
     <script>
         (function(){
             try {
@@ -26,6 +26,8 @@
         })();
     </script>
     <link rel="stylesheet" href="{{ vasset('css/student/home.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>

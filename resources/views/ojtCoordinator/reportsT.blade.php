@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,6 +24,8 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/reports-table.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>

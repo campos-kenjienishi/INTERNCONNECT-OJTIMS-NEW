@@ -295,30 +295,15 @@ window.isTablet = () => window.innerWidth >= 768 && window.innerWidth < 992;
 // Check if device is in landscape
 window.isLandscape = () => window.innerHeight < window.innerWidth;
 
-// Toggle dark mode
-window.toggleDarkMode = (enable = null) => {
-    const html = document.documentElement;
-    const body = document.body;
-    
-    if (enable === null) {
-        enable = !html.classList.contains('dark-mode') && !body.classList.contains('dark-mode');
-    }
-
-    if (enable) {
-        html.classList.add('dark-mode');
-        body.classList.add('dark-mode');
-        localStorage.setItem('darkMode', 'true');
-    } else {
-        html.classList.remove('dark-mode');
-        body.classList.remove('dark-mode');
-        localStorage.setItem('darkMode', 'false');
-    }
-};
-
-// Load saved dark mode preference
-window.addEventListener('DOMContentLoaded', () => {
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'true') {
-        window.toggleDarkMode(true);
-    }
-});
+// Dark mode is handled centrally by darkmode.js
+if (!window.toggleDarkMode) {
+    window.toggleDarkMode = (enable = null) => {
+        if (window.DarkModeManager) {
+            if (enable === null) {
+                window.DarkModeManager.toggle();
+            } else {
+                window.DarkModeManager.setDarkMode(enable);
+            }
+        }
+    };
+}
