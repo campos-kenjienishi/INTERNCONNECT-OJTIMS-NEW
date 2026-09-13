@@ -43,7 +43,7 @@
                 The System may collect and process the following personal and academic information:
                 <ul>
                     <li>Full name, student number, and email address</li>
-                    <li>Course, year level, and academic details</li>
+                    <li>Program, year level, and academic details</li>
                     <li>Internship company information and supervisor details</li>
                     <li>Uploaded MOAs, reports, evaluations, and other supporting documents</li>
                     <li>Login activity records, including timestamps</li>

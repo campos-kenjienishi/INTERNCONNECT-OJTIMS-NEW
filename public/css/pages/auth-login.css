@@ -526,6 +526,48 @@ body.auth-centered-page .right-panel {
             text-decoration: underline;
         }
 
+        /* Login Form Links (e.g. Forgot Password) */
+        .footer-wrap {
+            margin-top: -2px;
+            margin-bottom: 12px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .footer-wrap .footer-links {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        .footer-wrap .footer-links a {
+            color: #e2a94c !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .footer-wrap .footer-links a i {
+            color: #ef4444 !important;
+            font-size: 13px !important;
+            transition: transform 0.2s ease, color 0.2s ease !important;
+        }
+
+        .footer-wrap .footer-links a:hover {
+            color: #fbbf24 !important;
+            text-decoration: underline !important;
+        }
+
+        .footer-wrap .footer-links a:hover i {
+            color: #f87171 !important;
+            transform: scale(1.1);
+        }
+
         .terms-wrap {
             margin-top: 16px;
             margin-bottom: 14px;

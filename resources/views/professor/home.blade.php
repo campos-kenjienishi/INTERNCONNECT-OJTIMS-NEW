@@ -12,11 +12,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/professor_home-responsive.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/professor/home.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}?v={{ time() }}">
     <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
     <script src="{{ vasset('js/darkmode.js') }}"></script>
     <script>
@@ -341,11 +340,23 @@
                         <div class="header-icon"><i class="fa fa-users"></i></div>
                         Students by Class
                     </h2>
+                    <span class="table-header-pill">
+                        <i class="fa fa-layer-group"></i> Class Rosters
+                    </span>
+                </div>
+                <div class="table-action-bar">
+                    <div class="table-search-wrap">
+                        <i class="fa fa-search search-icon"></i>
+                        <input type="text" id="studentSearchInput" class="prof-search-input" placeholder="Search student name or email..." autocomplete="off" data-voice-mic-skip="true" aria-label="Search students">
+                        <button type="button" class="search-clear-btn" id="searchClearBtn" title="Clear search" style="display:none;" aria-label="Clear search">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
                     <div class="table-card-filters">
                         <div class="prof-select-wrap">
-                            <i class="fa fa-graduation-cap"></i>
-                            <select id="courseFilter" class="prof-filter-select">
-                                <option value="">All Courses</option>
+                            <span class="filter-icon-badge"><i class="fa fa-graduation-cap"></i></span>
+                            <select id="courseFilter" class="prof-filter-select" aria-label="Filter by Program">
+                                <option value="">All Programs</option>
                                 @if(isset($class))
                                     @foreach($class->pluck('course')->unique() as $course)
                                         <option value="{{ $course }}">{{ $course }}</option>
@@ -354,8 +365,8 @@
                             </select>
                         </div>
                         <div class="prof-select-wrap">
-                            <i class="fa fa-chalkboard"></i>
-                            <select id="classFilter" class="prof-filter-select">
+                            <span class="filter-icon-badge"><i class="fa fa-chalkboard"></i></span>
+                            <select id="classFilter" class="prof-filter-select" aria-label="Filter by Class">
                                 <option value="">All Classes</option>
                                 @if(isset($class))
                                     @foreach($class as $room)
@@ -366,13 +377,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-card-body" style="padding: 0;">
+                <div class="table-card-body">
                     <table id="studentsTable" class="display" style="width:100%;">
                         <thead>
                             <tr>
                                 <th>Student Name</th>
                                 <th>Email</th>
-                                <th>Course</th>
+                                <th>Program</th>
                                 <th>Class</th>
                             </tr>
                         </thead>
@@ -426,16 +437,16 @@
                             <i class="fa fa-chart-line"></i>
                         </div>
                         <div>
-                            <h2>Evaluation & Submission Activity</h2>
-                            <p>6-Month activity tracking for evaluation requests sent and student responses submitted</p>
+                            <h2>Monthly Activity & Submissions</h2>
+                            <p>6-Month trend of student document submissions and approved requirements</p>
                         </div>
                     </div>
                     <div class="analytics-chart-legend">
                         <span class="legend-badge legend-sent">
-                            <span class="legend-dot"></span> Requests Sent
+                            <span class="legend-dot"></span> Submissions
                         </span>
                         <span class="legend-badge legend-submitted">
-                            <span class="legend-dot"></span> Submitted
+                            <span class="legend-dot"></span> Approved
                         </span>
                     </div>
                 </div>

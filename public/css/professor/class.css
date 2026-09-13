@@ -1546,3 +1546,107 @@ button.btn-action {
     padding: 16px 18px;
     white-space: pre-line;
 }
+
+/* Empty State Styling */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    gap: 12px;
+    text-align: center;
+    background: #fcfcfd;
+    border: 1.5px dashed #e2e8f0;
+    border-radius: 16px;
+    margin: 4px 0;
+}
+
+.empty-state .empty-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: #fee2e2;
+    border: 1.5px solid #fecaca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--red);
+    font-size: 24px;
+    margin-bottom: 4px;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.12);
+}
+
+.empty-state p {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.empty-state .empty-hint {
+    font-size: 13px;
+    color: #64748b;
+    max-width: 440px;
+    line-height: 1.5;
+}
+
+body.dark-mode .empty-state {
+    background: #1f1f23;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .empty-state .empty-icon-wrap {
+    background: rgba(220, 38, 38, 0.2);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #fca5a5;
+}
+
+body.dark-mode .empty-state p {
+    color: #f4f4f5;
+}
+
+body.dark-mode .empty-state .empty-hint {
+    color: #a1a1aa;
+}
+
+/* Sleek Scrollbars */
+.dataTables_scrollBody::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar,
+.table-card-body::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-track,
+.table-responsive::-webkit-scrollbar-track,
+.table-card-body::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-thumb,
+.table-responsive::-webkit-scrollbar-thumb,
+.table-card-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-thumb:hover,
+.table-responsive::-webkit-scrollbar-thumb:hover,
+.table-card-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+body.dark-mode .dataTables_scrollBody::-webkit-scrollbar-track,
+body.dark-mode .table-responsive::-webkit-scrollbar-track,
+body.dark-mode .table-card-body::-webkit-scrollbar-track {
+    background: #1e1e24;
+}
+
+body.dark-mode .dataTables_scrollBody::-webkit-scrollbar-thumb,
+body.dark-mode .table-responsive::-webkit-scrollbar-thumb,
+body.dark-mode .table-card-body::-webkit-scrollbar-thumb {
+    background: #3f3f46;
+}

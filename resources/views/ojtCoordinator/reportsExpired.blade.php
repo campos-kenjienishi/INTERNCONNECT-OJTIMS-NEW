@@ -322,7 +322,7 @@
                 <div class="panel-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h2>Generate MOA Report</h2>
-                    <p>Filter MOAs by school year and course</p>
+                    <p>Filter MOAs by school year and program</p>
                 </div>
             </div>
             <div class="panel-card-body">
@@ -341,7 +341,7 @@
                             </select>
                         </div>
                         <div class="field-group">
-                            <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                            <label class="field-label"><i class="fa fa-graduation-cap"></i> Program</label>
                             <select class="field-select" id="course" name="course" required>
                                 @foreach ($course as $c)
                                 <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>

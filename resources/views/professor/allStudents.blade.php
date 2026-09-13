@@ -157,14 +157,14 @@
                     <div class="stat-num">
                         {{ count(collect($studentData)->pluck('student.course')->unique()) }}
                     </div>
-                    <div class="stat-name">Courses</div>
+                    <div class="stat-name">Programs</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon green"><i class="fa fa-chalkboard"></i></div>
                 <div>
                     <div class="stat-num">OJT</div>
-                    <div class="stat-name">Program</div>
+                    <div class="stat-name">Training</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -189,9 +189,9 @@
                     </div>
                 </div>
                 <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
-                    <label for="course" style="margin-bottom:0; font-size:13px; font-weight:600;">Filter by Course:</label>
+                    <label for="course" style="margin-bottom:0; font-size:13px; font-weight:600;">Filter by Program:</label>
                     <select name="course" id="course" class="form-select" style="width:auto; min-width:160px;" onchange="this.form.submit()">
-                        <option value="">All Courses</option>
+                        <option value="">All Programs</option>
                         @foreach($course as $c)
                             <option value="{{ $c->course }}" {{ request('course') == $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                         @endforeach
@@ -209,7 +209,7 @@
                     <thead>
                         <tr>
                             <th>Student Name</th>
-                            <th>Course</th>
+                            <th>Program</th>
                             <th>Year & Section</th>
                             <th>School Year</th>
                         </tr>

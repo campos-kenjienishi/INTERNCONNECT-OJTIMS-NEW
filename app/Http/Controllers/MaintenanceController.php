@@ -42,12 +42,12 @@ class MaintenanceController extends Controller
             AuditLogger::log(
                 'Maintenance',
                 'Create',
-                'Added course: ' . $courses->course . ' (' . $courses->acronym . ')',
+                'Added program: ' . $courses->course . ' (' . $courses->acronym . ')',
                 Session::get('loginId') ?? null,
                 null,
                 ['course' => $courses->course, 'acronym' => $courses->acronym]
             );
-            return back()->with('success','You have added the course successfully!');
+            return back()->with('success','You have added the program successfully!');
         }
         else{
             return back()->with('fail','Oh no! Something went wrong.');
@@ -59,7 +59,7 @@ class MaintenanceController extends Controller
         $course = Courses::find($id);
 
         if (!$course) {
-            return redirect()->back()->with('error', 'Course not found.');
+            return redirect()->back()->with('error', 'Program not found.');
         }
 
         $oldValues = [
@@ -75,13 +75,13 @@ class MaintenanceController extends Controller
             AuditLogger::log(
                 'Maintenance',
                 'Update',
-                'Updated course: ' . $course->course . ' (' . $course->acronym . ')',
+                'Updated program: ' . $course->course . ' (' . $course->acronym . ')',
                 Session::get('loginId') ?? null,
                 $oldValues,
                 ['course' => $course->course, 'acronym' => $course->acronym]
             );
 
-            return back()->with('success', 'Course updated successfully.');
+            return back()->with('success', 'Program updated successfully.');
         }
 
         return back()->with('fail', 'Oh no! Something went wrong.');
@@ -90,13 +90,16 @@ class MaintenanceController extends Controller
 
 
 
-    public function remove($id)
+    public function remove(Request $request, $id)
     {
 
         $data = Courses::find($id);
 
         if (!$data) {
-            return redirect()->back()->with('error', 'File not found.');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Program not found.'], 404);
+            }
+            return redirect()->back()->with('error', 'Program not found.');
         }
     
         $data->delete();
@@ -104,12 +107,17 @@ class MaintenanceController extends Controller
             AuditLogger::log(
                 'Maintenance',
                 'Delete',
-                'Deleted course: ' . $data->course . ' (' . $data->acronym . ')',
+                'Deleted program: ' . $data->course . ' (' . $data->acronym . ')',
                 Session::get('loginId') ?? null,
                 ['course_id' => $data->id, 'course' => $data->course, 'acronym' => $data->acronym],
                 null
             );
         }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Program removed successfully.']);
+        }
+
         return redirect()->back();
     }
     

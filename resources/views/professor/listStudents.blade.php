@@ -220,7 +220,7 @@
                     <thead>
                         <tr>
                             <th>Student Name</th>
-                            <th>Course</th>
+                            <th>Program</th>
                             <th>Year &amp; Section</th>
                             <th>Actions</th>
                         </tr>

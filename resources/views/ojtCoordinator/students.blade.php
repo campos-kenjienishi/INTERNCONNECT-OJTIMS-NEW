@@ -195,7 +195,7 @@
                 <div class="stat-icon purple"><i class="fa fa-graduation-cap"></i></div>
                 <div>
                     <div class="stat-num">{{ count(collect($studentData)->pluck('student')->pluck('course')->unique()) }}</div>
-                    <div class="stat-name">Courses</div>
+                    <div class="stat-name">Programs</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -209,7 +209,7 @@
                 <div class="stat-icon green"><i class="fa fa-chalkboard-teacher"></i></div>
                 <div>
                     <div class="stat-num">OJT</div>
-                    <div class="stat-name">Active Program</div>
+                    <div class="stat-name">Active Training</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -249,9 +249,9 @@
                 </div>
                 <div class="table-card-header-right">
                     <div class="table-inline-filter">
-                        <label for="courseFilter" class="table-inline-filter-label">Filter by course</label>
+                        <label for="courseFilter" class="table-inline-filter-label">Filter by program</label>
                         <select id="courseFilter" class="table-inline-filter-select">
-                            <option value="">All Courses</option>
+                            <option value="">All Programs</option>
                             @foreach ($courseOptions as $courseOption)
                                 <option value="{{ $courseOption }}">{{ $courseOption }}</option>
                             @endforeach
@@ -278,7 +278,7 @@
                     <thead>
                         <tr>
                             <th>Student Name</th>
-                            <th>Course</th>
+                            <th>Program</th>
                             <th>Year &amp; Section</th>
                             <th>Professor</th>
                             <th>School Year</th>

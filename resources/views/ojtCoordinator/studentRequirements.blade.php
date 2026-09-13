@@ -205,15 +205,15 @@
                 <div class="filter-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h3>Filter & Search Requirements</h3>
-                    <p>Filter student submission records by course, section, professor or submission status</p>
+                    <p>Filter student submission records by program, section, professor or submission status</p>
                 </div>
             </div>
             <form action="{{ route('coordinator.studentRequirements') }}" method="GET">
                 <div class="filter-card-body">
                     <div class="filter-field">
-                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Program</label>
                         <select name="course" class="filter-select">
-                            <option value="">All Courses</option>
+                            <option value="">All Programs</option>
                             @foreach($courses as $c)
                                 <option value="{{ $c }}" {{ $selectedCourse === $c ? 'selected' : '' }}>
                                     {{ $c }}
@@ -283,7 +283,7 @@
                     <thead>
                         <tr>
                             <th>STUDENT DETAILS</th>
-                            <th>COURSE</th>
+                            <th>PROGRAM</th>
                             <th>SECTION</th>
                             <th>SCHOOL YEAR</th>
                             <th>PROFESSOR</th>

@@ -907,7 +907,7 @@
                             </div>
 
                             <div class="field-group">
-                                <label class="form-label">Course</label>
+                                <label class="form-label">Program</label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-university i-icon"></i>
                                     <select name="course">

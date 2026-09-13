@@ -282,13 +282,13 @@
                             <i class="fa fa-door-closed"></i>
                         </div>
                         <p>No class matched your academic details yet.</p>
-                        <span class="empty-hint">Once your professor creates the matching class for your course and school year, it can appear here automatically.</span>
+                        <span class="empty-hint">Once your professor creates the matching class for your program and school year, it can appear here automatically.</span>
                     </div>
                 @else
                 <table id="roomsTable" class="display rooms-table" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Course</th>
+                            <th>Program</th>
                             <th>Room</th>
                             <th>School Year</th>
                             <th>Status</th>
@@ -344,7 +344,7 @@
                                 <div class="modal fade" id="modal{{ $loop->iteration }}" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
-                                            <div class="modal-header">
+                                             <div class="modal-header">
                                                 <h5 class="modal-title">
                                                     <i class="fa fa-door-open"></i> Room Details
                                                 </h5>
@@ -361,7 +361,7 @@
                                                 <div class="modal-detail-row">
                                                     <div class="modal-detail-icon"><i class="fa fa-graduation-cap"></i></div>
                                                     <div>
-                                                        <div class="modal-detail-label">Course</div>
+                                                        <div class="modal-detail-label">Program</div>
                                                         <div class="modal-detail-value">{{ $classItem->course }}</div>
                                                     </div>
                                                 </div>

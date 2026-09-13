@@ -1744,16 +1744,50 @@ class AuthController extends Controller
         $pendingApprovals = $adviseeStudents->where('status', 3)->count();
         $deniedStudents = $adviseeStudents->where('status', 2)->count();
         $inactiveStudents = $adviseeStudents->where('status', 0)->count();
+        $professorName = $data->full_name;
+        $studentUserIds = $adviseeStudents->pluck('id')->filter()->unique()->values()->all();
+        $studentNames = $adviseeStudents->pluck('full_name')->filter()->unique()->values()->all();
 
-        $monthlyActivity = collect(range(5, 0))->map(function ($offset) use ($classIds) {
+        $monthlyActivity = collect(range(5, 0))->map(function ($offset) use ($classIds, $professorName, $studentUserIds, $studentNames) {
             $month = Carbon::now()->subMonths($offset);
             $start = $month->copy()->startOfMonth();
             $end = $month->copy()->endOfMonth();
 
+            // Total student submissions (Requirements + Evaluations)
+            $fileSubmissions = FileRequirement::where(function ($q) use ($professorName, $studentUserIds, $studentNames) {
+                    $q->where('adviser', $professorName);
+                    if (!empty($studentUserIds)) {
+                        $q->orWhereIn('uploader_user_id', $studentUserIds);
+                    }
+                    if (!empty($studentNames)) {
+                        $q->orWhereIn('uploadedBy', $studentNames);
+                    }
+                })
+                ->whereBetween('created_at', [$start, $end])
+                ->count();
+
+            $evalSubmissions = OjtEvaluationRequest::whereIn('class_id', $classIds)
+                ->whereBetween('submitted_at', [$start, $end])
+                ->count();
+
+            // Total approved requirements & completed evaluations
+            $fileApproved = FileRequirement::where(function ($q) use ($professorName, $studentUserIds, $studentNames) {
+                    $q->where('adviser', $professorName);
+                    if (!empty($studentUserIds)) {
+                        $q->orWhereIn('uploader_user_id', $studentUserIds);
+                    }
+                    if (!empty($studentNames)) {
+                        $q->orWhereIn('uploadedBy', $studentNames);
+                    }
+                })
+                ->where('status', 1)
+                ->whereBetween('updated_at', [$start, $end])
+                ->count();
+
             return [
                 'label' => $month->format('M Y'),
-                'submitted' => OjtEvaluationRequest::whereIn('class_id', $classIds)->whereBetween('submitted_at', [$start, $end])->count(),
-                'sent' => OjtEvaluationRequest::whereIn('class_id', $classIds)->whereBetween('emailed_at', [$start, $end])->count(),
+                'submitted' => $fileSubmissions + $evalSubmissions,
+                'approved' => $fileApproved + $evalSubmissions,
             ];
         })->values();
 

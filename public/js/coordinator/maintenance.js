@@ -36,7 +36,7 @@
             autoWidth: false,
             language: {
                 search: '',
-                searchPlaceholder: 'Search courses...',
+                searchPlaceholder: 'Search programs...',
             }
         });
 
@@ -56,7 +56,7 @@
             const courseId = $(this).data('course-id');
 
             Swal.fire({
-                title: 'Remove this course?',
+                title: 'Remove this program?',
                 text: 'This action cannot be undone.',
                 icon: 'warning',
                 showCancelButton: true,
@@ -66,14 +66,18 @@
                 cancelButtonText: 'Cancel',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const token = (window.coordinatorConfig && window.coordinatorConfig.csrfToken) || ($('meta[name="csrf-token"]').attr('content') || '');
                     $.ajax({
                         type: 'POST',
                         url: '/remove/course/' + courseId,
-                        data: { _token: (window.coordinatorConfig && window.coordinatorConfig.csrfToken) || (meta[name="csrf-token"].attr('content') || '') },
+                        data: { _token: token },
+                        headers: {
+                            'X-CSRF-TOKEN': token
+                        },
                         success: function () {
                             Swal.fire({
                                 title: 'Removed!',
-                                text: 'The course has been removed.',
+                                text: 'The program has been removed.',
                                 icon: 'success',
                                 confirmButtonColor: '#dc2626',
                             }).then(() => location.reload());

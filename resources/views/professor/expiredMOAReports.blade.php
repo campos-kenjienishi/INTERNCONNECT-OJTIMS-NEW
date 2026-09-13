@@ -142,7 +142,7 @@
                 <div class="filter-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h2>Generate MOA Report</h2>
-                    <p>Filter by school year and course to generate a report</p>
+                    <p>Filter by school year and program to generate a report</p>
                 </div>
             </div>
             <form action="{{ route('reports.generate.prof') }}" method="post">
@@ -174,7 +174,7 @@
                         <span class="error-hint" id="school_year-error">Please select the school year.</span>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Program</label>
                         <select class="filter-select" name="course" id="courseSelect" required>
                             @foreach ($courseAll as $c)
                                 <option value="{{ $c->course }}" {{ (string) ($selectedCourse ?? '') === (string) $c->course ? 'selected' : '' }}>{{ $c->course }}</option>

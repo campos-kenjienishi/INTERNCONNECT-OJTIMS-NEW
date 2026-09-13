@@ -175,7 +175,7 @@
                     <div class="profile-info-row">
                         <div class="profile-info-icon"><i class="fa fa-graduation-cap"></i></div>
                         <div>
-                            <div class="profile-info-label">Course</div>
+                            <div class="profile-info-label">Program</div>
                             <div class="profile-info-value">{{ $data->course ?? '—' }}</div>
                         </div>
                     </div>
@@ -320,7 +320,7 @@
                             <div class="section-title"><i class="fa fa-graduation-cap"></i> Academic Information</div>
                             <div class="form-grid">
                                 <div class="field-group">
-                                    <label class="field-label"><i class="fa fa-university"></i> Course</label>
+                                    <label class="field-label"><i class="fa fa-university"></i> Program</label>
                                     <select name="course" class="field-select">
                                         @foreach ($course as $courseI)
                                             <option value="{{ $courseI->course }}"

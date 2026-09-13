@@ -368,8 +368,8 @@
 
             <article class="panel">
                 <header class="panel-head">
-                    <h2>Course Distribution</h2>
-                    <p>Students grouped by course</p>
+                    <h2>Program Distribution</h2>
+                    <p>Students grouped by program</p>
                 </header>
                 <div class="panel-body">
                     @forelse ($courseAnalytics as $course)
@@ -384,7 +384,7 @@
                             <div class="track"><div class="fill fill-teal" data-width="{{ $course['percentage'] }}"></div></div>
                         </div>
                     @empty
-                        <div class="metric-meta">No course data available yet.</div>
+                        <div class="metric-meta">No program data available yet.</div>
                     @endforelse
                 </div>
             </article>

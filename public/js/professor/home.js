@@ -10,13 +10,30 @@ $(document).ready(function () {
         "paging": true,
         "info": false,
         "lengthChange": false,
+        "searching": true,
         "pageLength": 5,
         "scrollX": false,
         "autoWidth": false,
         "order": [[0, 'asc']],
+        "dom": '<"table-scroll-wrap"t><"table-bottom-bar"p>',
         "language": {
             "emptyTable": "No students to display"
         }
+    });
+
+    // Connect custom search input
+    $('#studentSearchInput').on('keyup input', function () {
+        var val = this.value;
+        table.search(val).draw();
+        if (val && val.trim().length > 0) {
+            $('#searchClearBtn').fadeIn(150);
+        } else {
+            $('#searchClearBtn').fadeOut(150);
+        }
+    });
+
+    $('#searchClearBtn').on('click', function () {
+        $('#studentSearchInput').val('').trigger('input').focus();
     });
 
     function updateFilters() {
@@ -436,13 +453,13 @@ if (document.readyState === 'loading') {
                 var theme = getChartThemeColors();
                 var monthlyList = cfg.monthlyActivity || [];
                 var labels = monthlyList.map(function(i) { return i.label; });
-                var sentData = monthlyList.map(function(i) { return i.sent; });
-                var submittedData = monthlyList.map(function(i) { return i.submitted; });
+                var submittedData = monthlyList.map(function(i) { return i.submitted || 0; });
+                var approvedData = monthlyList.map(function(i) { return i.approved !== undefined ? i.approved : (i.sent || 0); });
 
                 if (labels.length === 0) {
                     labels = ['No data'];
-                    sentData = [0];
                     submittedData = [0];
+                    approvedData = [0];
                 }
 
                 if (monthlyChart) {
@@ -455,8 +472,8 @@ if (document.readyState === 'loading') {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Requests Sent',
-                                data: sentData,
+                                label: 'Submissions',
+                                data: submittedData,
                                 borderColor: '#3b82f6',
                                 backgroundColor: 'rgba(59,130,246,0.12)',
                                 tension: 0.35,
@@ -468,8 +485,8 @@ if (document.readyState === 'loading') {
                                 fill: true
                             },
                             {
-                                label: 'Submitted',
-                                data: submittedData,
+                                label: 'Approved',
+                                data: approvedData,
                                 borderColor: '#10b981',
                                 backgroundColor: 'rgba(16,185,129,0.12)',
                                 tension: 0.35,

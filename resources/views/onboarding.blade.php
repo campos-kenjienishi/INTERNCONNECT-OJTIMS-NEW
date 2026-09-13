@@ -173,7 +173,7 @@
                                 </div>
                             </div>
                             <div class="field-group span-3">
-                                <label class="form-label">Course <span style="color:#fca5a5;">*</span></label>
+                                <label class="form-label">Program <span style="color:#fca5a5;">*</span></label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-university i-icon"></i>
                                     <select name="course" class="form-control" required>

@@ -558,6 +558,10 @@
         `;
     }
 
+    document.getElementById('printBtn')?.addEventListener('click', function () {
+        const cfg = window.professorAnalyticsConfig || {};
+        const analyticsPrintUrl = cfg.printUrl;
+
         if (typeof analyticsPrintUrl !== 'undefined' && analyticsPrintUrl) {
             const frame = document.createElement('iframe');
             frame.style.position = 'fixed';
@@ -603,6 +607,7 @@
                 wrapper.innerHTML = '';
             }, 1000);
         }
+    });
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && drilldownModal && drilldownModal.style.display === 'flex') {

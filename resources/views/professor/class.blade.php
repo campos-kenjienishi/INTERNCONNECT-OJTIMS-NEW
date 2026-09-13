@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/professor_class-responsive.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/professor/class.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor_class-responsive.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor/class.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}?v={{ time() }}">
     <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
     <script src="{{ vasset('js/darkmode.js') }}"></script>
     <script>
@@ -177,7 +177,7 @@
                 <table id="fileTable" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Course</th>
+                            <th>Program</th>
                             <th>Class Name</th>
                             <th>Semester</th>
                             <th>School Year</th>
@@ -442,7 +442,7 @@
                                                     <label class="modal-field-label"><i class="fa fa-chalkboard"></i> Class Name</label>
                                                     <input class="modal-field-input" type="text" name="room" value="{{ $room->room }}" placeholder="Enter class name" required>
 
-                                                    <label class="modal-field-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                                                    <label class="modal-field-label"><i class="fa fa-graduation-cap"></i> Program</label>
                                                     <select name="course" class="modal-field-select" required>
                                                         @foreach ($course as $c)
                                                             <option value="{{ $c->course }}" {{ $room->course == $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
@@ -719,10 +719,10 @@
                            placeholder="Enter class name" required>
 
                     <label class="modal-field-label">
-                        <i class="fa fa-graduation-cap"></i> Course
+                        <i class="fa fa-graduation-cap"></i> Program
                     </label>
                     <select name="course" class="modal-field-select" required>
-                        <option value="">Select a course</option>
+                        <option value="">Select a program</option>
                         @foreach ($course as $c)
                             <option value="{{ $c->course }}">{{ $c->course }}</option>
                         @endforeach
