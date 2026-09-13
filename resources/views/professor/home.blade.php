@@ -479,7 +479,7 @@
     </div>
 
     <!-- Dashboard Footer -->
-    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+    <footer class="dashboard-footer">
         <div style="display:flex; align-items:center; gap:8px;">
             <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" class="footer-logo" alt="PUP">
             <span class="footer-copy">
