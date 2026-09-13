@@ -332,8 +332,85 @@
             </div>
         </div>
 
-        <!-- InternConnect AI Assistant Hero -->
-        <div style="margin-bottom: 28px;">
+        <!-- Dashboard Grid (2 columns: Students by Class on Left, Bud AI Hero on Right) -->
+        <div class="dashboard-grid" style="margin-top:28px; margin-bottom:32px;">
+            <!-- Left: Students by Class -->
+            <div class="table-card" style="margin-top:0;">
+                <div class="table-card-header">
+                    <h2>
+                        <div class="header-icon"><i class="fa fa-users"></i></div>
+                        Students by Class
+                    </h2>
+                    <div class="table-card-filters">
+                        <div class="prof-select-wrap">
+                            <i class="fa fa-graduation-cap"></i>
+                            <select id="courseFilter" class="prof-filter-select">
+                                <option value="">All Courses</option>
+                                @if(isset($class))
+                                    @foreach($class->pluck('course')->unique() as $course)
+                                        <option value="{{ $course }}">{{ $course }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="prof-select-wrap">
+                            <i class="fa fa-chalkboard"></i>
+                            <select id="classFilter" class="prof-filter-select">
+                                <option value="">All Classes</option>
+                                @if(isset($class))
+                                    @foreach($class as $room)
+                                        <option value="{{ $room->room }}" data-course="{{ $room->course }}">{{ $room->room }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-card-body" style="padding: 0;">
+                    <table id="studentsTable" class="display" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Class</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(isset($class) && count($class) > 0)
+                                @foreach($class as $room)
+                                    @if(isset($room->students) && count($room->students) > 0)
+                                        @foreach($room->students as $student)
+                                            <tr data-course="{{ $room->course }}" data-class="{{ $room->room }}">
+                                                <td>
+                                                    <div class="prof-student-cell">
+                                                        <div class="prof-student-avatar">{{ strtoupper(substr($student->full_name, 0, 1)) }}</div>
+                                                        <div class="prof-student-name">{{ $student->full_name }}</div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="prof-student-email">{{ $student->email }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="prof-course-pill">{{ $room->course }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="prof-class-badge">{{ $room->room }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                    @if(!(isset($class) && count($class) > 0))
+                        <div style="color:#888; font-size:13px; padding:18px; text-align:center;">No classes found.</div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Right: InternConnect AI Assistant -->
             <x-dashboard-ai-hero :role="'professor'" />
         </div>
         <!-- Overall Overview Summary & Visual Trends -->
