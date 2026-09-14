@@ -792,6 +792,34 @@
     </div>
 </div>
 
+<!-- File Preview Modal -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7f0000 0%, #dc2626 100%); color:#fff; padding:16px 20px;">
+                <h5 class="modal-title" style="font-size:16px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
+                    <i class="fa fa-file-alt"></i> <span id="filePreviewTitle">Document Preview</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.8;"></button>
+            </div>
+            <div class="modal-body" style="padding:0; background:#f8fafc;">
+                <div style="padding:12px 18px; border-bottom:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                        <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; font-size:12px; font-weight:600; flex-shrink:0;">
+                            <i class="fa fa-eye"></i> Preview
+                        </span>
+                        <span id="filePreviewSubTitle" style="font-size:13px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+                    </div>
+                    <a id="filePreviewDownloadBtn" href="#" class="btn-download" style="padding:6px 14px; font-size:12px; text-decoration:none;">
+                        <i class="fa fa-download"></i> Download File
+                    </a>
+                </div>
+                <iframe id="filePreviewFrame" title="File Preview" style="width:100%; height:75vh; min-height:400px; border:0; background:#fff;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>

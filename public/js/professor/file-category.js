@@ -44,6 +44,7 @@
         $('.remove-button').on('click', function (e) {
             e.preventDefault();
             var fileId = $(this).data('file-id');
+            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || $('meta[name="csrf-token"]').attr('content') || '';
 
             Swal.fire({
                 title: 'Remove this category?',
@@ -59,19 +60,28 @@
                     $.ajax({
                         type: 'POST',
                         url: '/remove/files/' + fileId,
-                        data: { _token: (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
-                        success: function () {
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        data: {
+                            _token: csrfToken
+                        },
+                        success: function (res) {
                             Swal.fire({
-                                toast: true, icon: 'success',
-                                title: 'Category removed successfully!',
+                                toast: true,
+                                icon: 'success',
+                                title: (res && res.message) ? res.message : 'Category removed successfully!',
                                 position: 'top-end',
                                 showConfirmButton: false,
-                                timer: 1800, timerProgressBar: true
+                                timer: 1500,
+                                timerProgressBar: true
                             });
-                            setTimeout(() => location.reload(), 1800);
+                            setTimeout(() => location.reload(), 1500);
                         },
-                        error: function () {
-                            Swal.fire('Oops!', 'Something went wrong.', 'error');
+                        error: function (xhr) {
+                            var errorMsg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Something went wrong.';
+                            Swal.fire('Oops!', errorMsg, 'error');
                         }
                     });
                 }

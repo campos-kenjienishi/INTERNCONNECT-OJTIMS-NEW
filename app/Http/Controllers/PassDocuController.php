@@ -425,10 +425,12 @@ class PassDocuController extends Controller
 
     public function removeCategory($id)
     {
-
         $data = FileCategory::find($id);
 
         if (!$data) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'File category not found.'], 404);
+            }
             return redirect()->back()->with('error', 'File not found.');
         }
 
@@ -448,6 +450,11 @@ class PassDocuController extends Controller
             ['id' => $data->id, 'fileName' => $data->fileName, 'uploadedBy' => $data->uploadedBy],
             null
         );
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Category removed successfully!']);
+        }
+
         return redirect()->back();
     }
 
