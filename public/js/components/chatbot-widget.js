@@ -14,6 +14,142 @@
         isListening: false,
         history: [],
 
+        detectUserRole: function () {
+            var path = (window.location.pathname || "").toLowerCase();
+
+            // 1. Check DOM badge / user role text
+            var userRoleEl = document.querySelector(".user-role, .topbar-badge, [data-user-role]");
+            var roleText = userRoleEl ? (userRoleEl.textContent || "").toLowerCase() : "";
+
+            if (roleText.includes("coordinator") || roleText.includes("admin")) {
+                return "coordinator";
+            }
+            if (roleText.includes("professor") || roleText.includes("faculty")) {
+                return "professor";
+            }
+            if (roleText.includes("student")) {
+                return "student";
+            }
+
+            // 2. Auth routes
+            if (path.includes("login") || path.includes("onboarding") || path.includes("forgot") || path.includes("reset") || path.includes("registration") || path.includes("gateway")) {
+                return "auth";
+            }
+
+            // 3. Landing page
+            if (path === "/" || path.endsWith("/landing") || path.includes("landing")) {
+                return "landing";
+            }
+
+            // 4. Coordinator specific URL paths
+            var coordPaths = [
+                "studentlists", "students", "professorstab", "uploadpage", "upload", 
+                "maintenance", "moa", "reports", "reportsexpired", "reportst", 
+                "audit", "audit_log", "accountinfo", "moa-unlock-requests", "moaview",
+                "coordinator"
+            ];
+            if (coordPaths.some(function (p) { return path.includes(p); })) {
+                return "coordinator";
+            }
+
+            // 5. Professor specific URL paths
+            var profPaths = [
+                "homeprof", "liststudents", "classprof", "classlist", "class", 
+                "requirementstatus", "requirementstatusclasses", "evaluationprof", 
+                "expiredmoareportsprof", "analyticsprof", "profacc", "studentrequire", 
+                "filecategory", "allstudents", "requireview", "prof"
+            ];
+            if (profPaths.some(function (p) { return path.includes(p); })) {
+                return "professor";
+            }
+
+            // 6. Student specific URL paths
+            var studentPaths = [
+                "student_home", "studenthome", "filereq", "student_file", "student_class", 
+                "evaluation", "companiesup", "ojtinfo", "student_account", "pending"
+            ];
+            if (studentPaths.some(function (p) { return path.includes(p); })) {
+                return "student";
+            }
+
+            if (path.includes("dashboard")) {
+                return "coordinator";
+            }
+
+            return "student";
+        },
+
+        getRoleConfig: function (role) {
+            role = role || this.detectUserRole();
+            switch (role) {
+                case "coordinator":
+                    return {
+                        welcome: "Hi! My name is **Bud**, your OJT Buddy! 🐾 Welcome, **OJT Coordinator**! I can help you manage partner companies, track MOA expirations, sync faculty and student rosters, and monitor overall OJT compliance.\n\nHow can I help you today?",
+                        placeholder: "Ask Bud about companies, MOA, sync, or compliance...",
+                        suggestions: [
+                            "How to sync faculty from FLSS?",
+                            "Where do I manage partner companies and MOA?",
+                            "How to sync students from GuiSIS?",
+                            "How to sync degree programs from PUPTAS?",
+                            "Where are the expired MOA reports?",
+                            "How to handle MOA unlock requests?"
+                        ]
+                    };
+                case "professor":
+                    return {
+                        welcome: "Hi! My name is **Bud**, your OJT Buddy! 🐾 Welcome, **Professor**! I can help you review student requirement submissions, check supervisor evaluation forms, manage class sections, and track internship progress.\n\nHow can I help you today?",
+                        placeholder: "Ask Bud about submissions, sections, evaluations...",
+                        suggestions: [
+                            "How do I review student requirement submissions?",
+                            "Where can I see student supervisor evaluations?",
+                            "How to view class adviser analytics?",
+                            "Where do I view student masterlist?",
+                            "Where are expired MOA records?"
+                        ]
+                    };
+                case "auth":
+                    return {
+                        welcome: "Hi! My name is **Bud**, your OJT Buddy! 🐾 Welcome to the **InternConnect Sign-In Portal**! Need help choosing a portal, using IdP, or signing in with local credentials?\n\nHow can I help you today?",
+                        placeholder: "Ask Bud about IDP, sign-in, or portals...",
+                        suggestions: [
+                            "What is IDP?",
+                            "IDP is down, what should I do?",
+                            "What are Local Credentials?",
+                            "Which portal should I choose?"
+                        ]
+                    };
+                case "landing":
+                    return {
+                        welcome: "Hi! My name is **Bud**, your OJT Buddy! 🐾 Welcome to **InternConnect**! I can help you navigate the landing page, show you how to launch the portal, or answer questions about the system.\n\nHow can I help you today?",
+                        placeholder: "Ask Bud about InternConnect, portals, etc...",
+                        suggestions: [
+                            "How do I go to the main website?",
+                            "What is InternConnect?",
+                            "What is IDP?",
+                            "How do I contact support?"
+                        ]
+                    };
+                case "student":
+                default:
+                    return {
+                        welcome: "Hi! My name is **Bud**, your OJT Buddy! 🐾 I can help you navigate InternConnect, understand your OJT requirement phases, submit documents, and manage your internship workflow.\n\nHow can I help you today?",
+                        placeholder: "Ask Bud about navigation, requirements, etc...",
+                        suggestions: [
+                            "Explain the requirement phases",
+                            "Where do I submit my Notarized MOA?",
+                            "Where do I upload requirements?",
+                            "Where can I update my OJT Information?",
+                            "How do I sync my profile with GuiSIS?",
+                            "How does supervisor evaluation work?"
+                        ]
+                    };
+            }
+        },
+
+        getStorageKey: function () {
+            return STORAGE_KEY + "_" + this.detectUserRole();
+        },
+
         init: function () {
             if (document.getElementById("icChatbotDrawer")) {
                 return;
@@ -26,6 +162,9 @@
         },
 
         injectHTML: function () {
+            var self = this;
+            var config = this.getRoleConfig();
+
             var drawer = document.createElement("div");
             drawer.className = "ic-chatbot-drawer";
             drawer.id = "icChatbotDrawer";
@@ -60,41 +199,15 @@
                 '<div class="ic-chat-suggestions-wrap" id="icChatSuggestionsWrap">',
                 '    <button type="button" class="ic-sug-nav-btn prev" id="icSugNavPrev" title="Scroll left" aria-label="Scroll left"><i class="fas fa-chevron-left"></i></button>',
                 '    <div class="ic-chat-suggestions" id="icChatSuggestions">',
-                (function() {
-                    var path = window.location.pathname.toLowerCase();
-                    var isAuth = path.includes("login") || path.includes("onboarding") || path.includes("forgot") || path.includes("reset") || path.includes("registration");
-                    var isLanding = path === "/" || path.endsWith("/landing") || path.includes("landing");
-                    
-                    if (isAuth) {
-                        return [
-                            '    <button type="button" class="ic-chat-chip" data-query="What is IDP?">What is IDP?</button>',
-                            '    <button type="button" class="ic-chat-chip" data-query="IDP is down, what should I do?">IDP is down?</button>',
-                            '    <button type="button" class="ic-chat-chip" data-query="What are Local Credentials?">Local Credentials</button>',
-                            '    <button type="button" class="ic-chat-chip" data-query="Which portal should I choose?">Which Portal?</button>'
-                        ].join('\n');
-                    }
-                    if (isLanding) {
-                        return [
-                            '    <button type="button" class="ic-chat-chip" data-query="How do I go to the main website?">Go to Main Website</button>',
-                            '    <button type="button" class="ic-chat-chip" data-query="What is InternConnect?">What is InternConnect?</button>',
-                            '    <button type="button" class="ic-chat-chip" data-query="What is IDP?">What is IDP?</button>',
-                            '    <button type="button" class="ic-chat-chip" data-query="How do I contact support?">Contact Support</button>'
-                        ].join('\n');
-                    }
-                    return [
-                        '    <button type="button" class="ic-chat-chip" data-query="Explain the requirement phases">Requirement Phases</button>',
-                        '    <button type="button" class="ic-chat-chip" data-query="How do I submit my MOA?">Submit Notarized MOA</button>',
-                        '    <button type="button" class="ic-chat-chip" data-query="Where do I upload requirements?">Upload Requirements</button>',
-                        '    <button type="button" class="ic-chat-chip" data-query="How do I sync my profile with GuiSIS?">Sync GuiSIS</button>',
-                        '    <button type="button" class="ic-chat-chip" data-query="How do I send evaluation to supervisor?">Supervisor Evaluation</button>'
-                    ].join('\n');
-                })(),
+                config.suggestions.map(function(sug) {
+                    return '    <button type="button" class="ic-chat-chip" data-query="' + sug + '">' + sug + '</button>';
+                }).join('\n'),
                 '    </div>',
                 '    <button type="button" class="ic-sug-nav-btn next" id="icSugNavNext" title="Scroll right" aria-label="Scroll right"><i class="fas fa-chevron-right"></i></button>',
                 '</div>',
                 '<div class="ic-chat-footer">',
                 '    <div class="ic-chat-input-box">',
-                '        <input type="text" class="ic-chat-input" id="icChatInput" placeholder="Ask Bud about navigation, requirements, etc..." autocomplete="off">',
+                '        <input type="text" class="ic-chat-input" id="icChatInput" placeholder="' + config.placeholder + '" autocomplete="off">',
                 '        <button type="button" class="ic-chat-mic-btn" id="icChatMicBtn" title="Speak to Dictate"><i class="fas fa-microphone"></i></button>',
                 '    </div>',
                 '    <button type="button" class="ic-chat-send-btn" id="icChatSendBtn" title="Send Message to Bud"><i class="fas fa-paper-plane"></i></button>',
@@ -435,54 +548,25 @@
         },
 
         loadHistory: function () {
+            var key = this.getStorageKey();
             try {
-                var stored = sessionStorage.getItem(STORAGE_KEY);
+                var stored = sessionStorage.getItem(key);
                 if (stored) {
                     this.history = JSON.parse(stored);
+                } else {
+                    this.history = [];
                 }
             } catch (e) {
                 this.history = [];
             }
 
             if (!this.history || this.history.length === 0) {
-                var path = window.location.pathname.toLowerCase();
-                var isAuth = path.includes("login") || path.includes("onboarding") || path.includes("forgot") || path.includes("reset") || path.includes("registration");
-                var isLanding = path === "/" || path.endsWith("/landing") || path.includes("landing");
-                
-                if (isAuth) {
-                    this.addBotMessage({
-                        reply: "Hi! My name is **Bud**, your OJT Buddy! 🐾 Welcome to the **InternConnect Sign-In Portal**! Need help choosing a portal, using IdP, or signing in with local credentials?\n\nHow can I help you today?",
-                        actions: [],
-                        suggestions: [
-                            "What is IDP?",
-                            "IDP is down, what should I do?",
-                            "What are Local Credentials?",
-                            "Which portal should I choose?"
-                        ]
-                    }, false);
-                } else if (isLanding) {
-                    this.addBotMessage({
-                        reply: "Hi! My name is **Bud**, your OJT Buddy! 🐾 Welcome to **InternConnect**! I can help you navigate the landing page, show you how to launch the portal, or answer questions about the system.\n\nHow can I help you today?",
-                        actions: [],
-                        suggestions: [
-                            "How do I go to the main website?",
-                            "What is InternConnect?",
-                            "What is IDP?",
-                            "How do I contact support?"
-                        ]
-                    }, false);
-                } else {
-                    this.addBotMessage({
-                        reply: "Hi! My name is **Bud**, your OJT Buddy! 🐾 I can help you navigate InternConnect, understand the requirement phases, and manage your internship workflow.\n\nHow can I help you today?",
-                        actions: [],
-                        suggestions: [
-                            "Explain the requirement phases",
-                            "Where do I submit my Notarized MOA?",
-                            "Where do I upload requirements?",
-                            "How to sync with GuiSIS?"
-                        ]
-                    }, false);
-                }
+                var config = this.getRoleConfig();
+                this.addBotMessage({
+                    reply: config.welcome,
+                    actions: [],
+                    suggestions: config.suggestions
+                }, false);
             } else {
                 var self = this;
                 this.history.forEach(function (msg) {
@@ -497,7 +581,7 @@
 
         saveHistory: function () {
             try {
-                sessionStorage.setItem(STORAGE_KEY, JSON.stringify(this.history.slice(-20)));
+                sessionStorage.setItem(this.getStorageKey(), JSON.stringify(this.history.slice(-20)));
             } catch (e) {}
         },
 
@@ -505,7 +589,7 @@
             this.isLoading = false;
             this.setLoading(false);
             this.history = [];
-            sessionStorage.removeItem(STORAGE_KEY);
+            sessionStorage.removeItem(this.getStorageKey());
             var body = document.getElementById("icChatBody");
             if (body) body.innerHTML = "";
             this.loadHistory();
@@ -539,6 +623,7 @@
                 },
                 body: JSON.stringify({
                     message: text,
+                    role: self.detectUserRole(),
                     history: self.history.slice(-6)
                 })
             })
