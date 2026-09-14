@@ -404,10 +404,10 @@
                                     {{ $company->company_address }}
                                 </div>
                             </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <i class="fa fa-user-tie" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
-                                    {{ $company->company_rep }}
+                            <td class="company-rep-cell">
+                                <div class="rep-wrap">
+                                    <i class="fa fa-user-tie" style="color:var(--red);font-size:11px;flex-shrink:0;"></i>
+                                    <span class="rep-name-text">{{ $company->company_rep }}</span>
                                 </div>
                             </td>
                             <td>

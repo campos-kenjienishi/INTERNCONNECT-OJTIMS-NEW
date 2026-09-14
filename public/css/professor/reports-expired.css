@@ -298,6 +298,10 @@
         .company-icon-box { width: 34px; height: 34px; border-radius: 9px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 13px; flex-shrink: 0; }
         .company-name-text { font-weight: 600; color: #1a1a1a; }
         .company-name-cell { color: #1a1a1a !important; }
+        .company-rep-cell { max-width: 175px; word-break: break-word; font-size: 12px; line-height: 1.45; }
+        .rep-wrap { display: flex; align-items: flex-start; gap: 6px; }
+        .rep-wrap i { color: var(--red); font-size: 11px; margin-top: 3px; flex-shrink: 0; }
+        .rep-name-text { font-size: 12px; font-weight: 500; color: #374151; line-height: 1.45; }
 
         /* Status badges */
         .badge-active { display: inline-flex; align-items: center; gap: 5px; background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
@@ -432,8 +436,12 @@
 
         body.dark-mode .company-name-cell,
         body.dark-mode .company-name-text,
+        body.dark-mode .company-rep-cell,
+        body.dark-mode .rep-name-text,
         html.dark-mode .company-name-cell,
-        html.dark-mode .company-name-text {
+        html.dark-mode .company-name-text,
+        html.dark-mode .company-rep-cell,
+        html.dark-mode .rep-name-text {
             color: #f1f5f9 !important;
         }
 
