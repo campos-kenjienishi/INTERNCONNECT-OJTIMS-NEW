@@ -4,26 +4,30 @@
             return;
         }
 
-        // Do not inject floating Bud speed dial on home dashboard pages where Bud AI Hero is already embedded
-        var pathname = window.location.pathname.replace(/\/+$/, '').toLowerCase();
-        var isHomeDashboard = Boolean(
-            document.querySelector('.ic-ai-dashboard-hero') ||
-            document.querySelector('.dashboard-ai-hero') ||
-            document.querySelector('[data-ai-hero-card]') ||
-            ['/dashboard', '/home', '/student_home', '/studenthome', '/homeprof'].includes(pathname)
-        );
-
-        if (isHomeDashboard) {
-            return;
+        function isHomeDashboardPage() {
+            var path = (window.location.pathname || "").replace(/\/+$/, '').toLowerCase();
+            return Boolean(
+                document.getElementById("icEmbeddedAiCard") ||
+                document.querySelector(".ic-ai-vertical-card") ||
+                document.querySelector(".ic-dashboard-ai-hero") ||
+                document.querySelector(".ic-ai-dashboard-hero") ||
+                document.querySelector(".dashboard-ai-hero") ||
+                document.querySelector("[data-ai-hero-card]") ||
+                ['/dashboard', '/home', '/student_home', '/studenthome', '/homeprof', '/student/home', '/coordinator/dashboard', '/admin/dashboard'].indexOf(path) !== -1 ||
+                ['/dashboard', '/home', '/student_home', '/studenthome', '/homeprof', '/student/home'].some(function(p) { return path.endsWith(p); })
+            );
         }
+
+        var isHome = isHomeDashboardPage();
+        var budBtnStyle = isHome ? 'style="display:none!important;"' : '';
 
         var wrapper = document.createElement("div");
         wrapper.className = "ic-speed-dial";
         wrapper.id = "icFloatingSpeedDial";
         wrapper.innerHTML = [
             '<div class="ic-speed-dial-menu" id="icSpeedDialMenu">',
-            '    <button type="button" class="ic-speed-dial-item" id="icBtnAskAi" title="Ask Bud (Your OJT Buddy)">',
-            '        <span class="ic-item-emblem ic-item-bud-emblem" style="width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;max-width:32px!important;max-height:32px!important;border-radius:50%!important;overflow:hidden!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative!important;"><img src="/images/mascot/bud_waving.png" alt="Bud" class="ic-bud-fab-img" style="width:34px!important;max-width:34px!important;height:34px!important;max-height:34px!important;object-fit:contain!important;display:block!important;margin:0!important;"></span>',
+            '    <button type="button" class="ic-speed-dial-item" id="icBtnAskAi" title="Ask Bud (Your OJT Buddy)" ' + budBtnStyle + '>',
+            '        <span class="ic-item-emblem ic-item-bud-emblem" style="width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;max-width:32px!important;max-height:32px!important;border-radius:50%!important;overflow:hidden!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative!important;background:#ffffff!important;background:radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 100%)!important;border:1.5px solid #FED700!important;box-shadow:0 0 8px rgba(254, 215, 0, 0.4)!important;padding:0!important;flex-shrink:0!important;"><img src="/images/mascot/bud_waving.png" alt="Bud" class="ic-bud-fab-img" style="width:34px!important;max-width:34px!important;min-width:34px!important;height:34px!important;max-height:34px!important;min-height:34px!important;object-fit:contain!important;display:block!important;margin:0!important;border:none!important;"></span>',
             '        <span class="ic-item-label">Ask Bud</span>',
             '    </button>',
             '    <button type="button" class="ic-speed-dial-item" id="icBtnVoiceGuide" title="Voice Input & Commands Guide">',
@@ -209,24 +213,22 @@
         }
 
         if (btnAskAi) {
-            var path = (window.location.pathname || "").toLowerCase();
-            var isHomeDashboard = path === "/student/home" ||
-                                  path === "/home" ||
-                                  path === "/dashboard" ||
-                                  path.endsWith("/student/home") ||
-                                  path.endsWith("/home") ||
-                                  path.endsWith("/dashboard") ||
-                                  document.querySelector(".ic-ai-vertical-card") !== null ||
-                                  document.querySelector(".ic-dashboard-ai-hero") !== null;
-
-            if (isHomeDashboard) {
+            if (isHomeDashboardPage()) {
                 btnAskAi.style.display = "none";
+            } else {
+                btnAskAi.style.display = "inline-flex";
             }
 
             btnAskAi.addEventListener("click", function (e) {
                 e.stopPropagation();
                 openChatbot();
             });
+
+            setTimeout(function () {
+                if (btnAskAi && isHomeDashboardPage()) {
+                    btnAskAi.style.display = "none";
+                }
+            }, 350);
         }
 
         if (btnVoiceGuide) {

@@ -114,6 +114,8 @@ body.modal-open .ic-speed-dial {
     min-height: 32px !important;
     max-width: 32px !important;
     max-height: 32px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
     background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 100%) !important;
     border: 1.5px solid #FED700 !important;
     box-shadow: 0 0 8px rgba(254, 215, 0, 0.4) !important;
@@ -123,16 +125,20 @@ body.modal-open .ic-speed-dial {
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
+    flex-shrink: 0 !important;
 }
 
 .ic-bud-fab-img {
     width: 34px !important;
     max-width: 34px !important;
+    min-width: 34px !important;
     height: 34px !important;
     max-height: 34px !important;
+    min-height: 34px !important;
     object-fit: contain !important;
     display: block !important;
     margin: 0 !important;
+    border: none !important;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25)) !important;
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
@@ -144,6 +150,13 @@ body.modal-open .ic-speed-dial {
 .ic-speed-dial-item:hover .ic-item-emblem {
     background: #FED700 !important;
     color: #7f0000 !important;
+    border-color: #FED700 !important;
+    transform: scale(1.06) !important;
+}
+
+.ic-speed-dial-item:hover .ic-item-bud-emblem {
+    background: #ffffff !important;
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 100%) !important;
     border-color: #FED700 !important;
     transform: scale(1.06) !important;
 }

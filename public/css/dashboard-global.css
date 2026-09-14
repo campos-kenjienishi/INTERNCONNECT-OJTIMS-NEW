@@ -1,10 +1,25 @@
 /* ============================================================
    INTERNCONNECT GLOBAL DASHBOARD & COMPONENT STYLES
-   Version: 2.1 - Updated component imports and widget assets
+   Version: 2.2 - Quick tools FAB Bud emblem & home dashboard sync
    ============================================================ */
 @import "components/sync-alerts.css";
 @import "components/quick-tools-fab.css";
 @import "components/chatbot-widget.css";
+
+/* Bud Floating Speed Dial Mascot Emblem Protection */
+.ic-item-bud-emblem {
+    background: #ffffff !important;
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 100%) !important;
+    border: 1.5px solid #FED700 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+}
+
+.ic-speed-dial-item:hover .ic-item-bud-emblem {
+    background: #ffffff !important;
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 100%) !important;
+    border-color: #FED700 !important;
+}
 
 /* ========================================
    GLOBAL MOBILE VIEW FOR ALL DASHBOARDS
