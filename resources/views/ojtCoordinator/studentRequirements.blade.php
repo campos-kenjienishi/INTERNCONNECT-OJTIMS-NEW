@@ -314,7 +314,7 @@
                                             <div style="font-weight:700; color:#1a1a1a;">{{ $studentName }}</div>
                                             <div style="font-size:12px; color:#888;">{{ $st->studentNum ?? '' }}</div>
                                             @if(!empty($st->is_inhouse_ojt))
-                                                <span class="req-badge" style="background:#d1fae5; color:#047857; border:1px solid #a7f3d0; margin-top:3px; display:inline-flex; align-items:center; gap:4px;" title="Student is in School In-House OJT mode. External MOA requirement is waived.">
+                                                <span class="req-badge inhouse-badge-tag" title="Student is in School In-House OJT mode. External MOA requirement is waived.">
                                                     <i class="fa fa-university"></i> In-House OJT
                                                 </span>
                                             @endif

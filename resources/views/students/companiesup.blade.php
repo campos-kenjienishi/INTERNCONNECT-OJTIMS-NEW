@@ -160,40 +160,40 @@
         </div>
 
         @if($isInhouseOjt)
-            <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); border-radius: 16px; padding: 22px 26px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(4,120,87,0.2);">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; flex-shrink: 0;">
+            <div class="inhouse-active-banner">
+                <div class="inhouse-active-left">
+                    <div class="inhouse-active-icon">
                         <i class="fa fa-university"></i>
                     </div>
                     <div>
-                        <div style="font-size: 16px; font-weight: 700; color: #ffffff;">School In-House OJT Mode Active</div>
-                        <div style="font-size: 13px; color: #d1fae5; margin-top: 2px;">
+                        <div class="inhouse-active-title">School In-House OJT Mode Active</div>
+                        <div class="inhouse-active-sub">
                             You are registered for internal campus OJT. External notarized MOA requirement is <strong>waived</strong>, and all requirement submission slots are unlocked!
                         </div>
                     </div>
                 </div>
                 @if(!empty($unlockRequest) && $unlockRequest->status === 'pending')
-                    <button type="button" class="btn" disabled style="background: rgba(253, 230, 138, 0.2); color: #fef08a; border: 1px solid rgba(253, 230, 138, 0.4); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: not-allowed;">
+                    <button type="button" class="btn btn-inhouse-pending" disabled>
                         <i class="fa fa-clock me-1"></i> Switch Request Pending
                     </button>
                 @else
-                    <button type="button" class="btn" onclick="openUnlockRequestModal('switch_external', true)" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                    <button type="button" class="btn btn-inhouse-switch" onclick="openUnlockRequestModal('switch_external', true)">
                         <i class="fa fa-paper-plane me-1"></i> Request Switch to External MOA
                     </button>
                 @endif
             </div>
         @elseif(empty($isLocked) && count($companies) === 0)
-            <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+            <div class="inhouse-prompt-card">
+                <div class="inhouse-prompt-left">
+                    <div class="inhouse-prompt-icon">
                         <i class="fa fa-university"></i>
                     </div>
-                    <div>
-                        <div style="font-size: 14px; font-weight: 700; color: #0f172a;">Doing OJT inside the School / Campus?</div>
-                        <div style="font-size: 12.5px; color: #64748b;">If your OJT is internal within PUP / School, no external MOA is required.</div>
+                    <div class="inhouse-prompt-text">
+                        <div class="inhouse-prompt-title">Doing OJT inside the School / Campus?</div>
+                        <div class="inhouse-prompt-sub">If your OJT is internal within PUP / School, no external MOA is required.</div>
                     </div>
                 </div>
-                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#confirmInhouseLockModal" style="background: #0284c7; color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; box-shadow: 0 2px 8px rgba(2,132,199,0.25);">
+                <button type="button" class="btn btn-declare-inhouse" data-bs-toggle="modal" data-bs-target="#confirmInhouseLockModal">
                     <i class="fa fa-check-circle me-1"></i> Declare School In-House OJT
                 </button>
             </div>
@@ -201,25 +201,25 @@
 
         @if(!empty($isLocked))
             <!-- Lock Alert Banner -->
-            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 20px; flex-shrink: 0;">
+            <div class="moa-lock-banner">
+                <div class="moa-lock-left">
+                    <div class="moa-lock-icon">
                         <i class="fa fa-lock"></i>
                     </div>
                     <div>
-                        <div style="font-size: 15px; font-weight: 700; color: #f8fafc;">MOA Selection Locked</div>
-                        <div style="font-size: 13px; color: #94a3b8; margin-top: 2px;">
+                        <div class="moa-lock-title">MOA Selection Locked</div>
+                        <div class="moa-lock-sub">
                             Your account is locked to your selected company MOA. Browsing or linking to other companies is disabled.
                         </div>
                     </div>
                 </div>
                 <div>
                     @if(isset($unlockRequest) && $unlockRequest->status === 'pending')
-                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15; font-size: 13px; font-weight: 600;">
+                        <span class="moa-lock-pending">
                             <i class="fa fa-clock"></i> Request Pending Review
                         </span>
                     @else
-                        <button type="button" class="btn" style="background: #ef4444; color: #fff; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 10px; border: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;" data-bs-toggle="modal" data-bs-target="#requestUnlockModal">
+                        <button type="button" class="btn btn-moa-lock-reset" data-bs-toggle="modal" data-bs-target="#requestUnlockModal">
                             <i class="fa fa-key"></i> Request MOA Reset / Change
                         </button>
                     @endif
@@ -830,25 +830,25 @@
 <!-- =============== REQUEST UNLOCK MODAL =============== -->
 <div class="modal fade" id="requestUnlockModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.18);">
-            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 18px 24px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+        <div class="modal-content modal-unlock-content">
+            <div class="modal-header modal-unlock-header">
+                <div class="modal-unlock-header-left">
+                    <div class="modal-unlock-icon">
                         <i class="fa fa-key"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title" style="color: #0f172a; font-weight: 700; font-size: 16px; margin: 0;">
+                        <h5 class="modal-title modal-unlock-title">
                             Request MOA Unlock
                         </h5>
-                        <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Coordinator approval required</p>
+                        <p class="modal-unlock-subtitle">Coordinator approval required</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ route('student.moa.requestUnlock') }}" method="POST">
                 @csrf
-                <div class="modal-body" style="padding: 24px;">
-                    <p style="font-size: 13px; color: #64748b; margin-bottom: 18px; line-height: 1.5; background:#f8fafc; padding:10px 14px; border-radius:8px; border:1px solid #f1f5f9;">
+                <div class="modal-body modal-unlock-body">
+                    <p class="modal-unlock-tip">
                         <i class="fa fa-info-circle me-1" style="color:#2563eb;"></i> Select your purpose and provide a clear explanation for your OJT Coordinator.
                     </p>
 
@@ -866,9 +866,9 @@
                     </label>
                     <textarea name="reason" rows="4" class="modal-field-input" style="width:100%; font-family: inherit; resize: vertical;" placeholder="e.g. Need to update company address / replacement PDF file..." required minlength="5"></textarea>
                 </div>
-                <div class="modal-footer" style="background: #fafafa; padding: 14px 24px;">
+                <div class="modal-footer modal-unlock-footer">
                     <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-modal-submit" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+                    <button type="submit" class="btn-modal-submit btn-unlock-submit">
                         <i class="fa fa-paper-plane me-1"></i> Submit Request
                     </button>
                 </div>
@@ -880,9 +880,9 @@
 <!-- =============== CONFIRM IN-HOUSE OJT LOCK MODAL =============== -->
 <div class="modal fade" id="confirmInhouseLockModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: #e0f2fe; border-bottom: 1px solid #bae6fd;">
-                <h5 class="modal-title" style="color: #0369a1; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+        <div class="modal-content modal-inhouse-content">
+            <div class="modal-header modal-inhouse-header">
+                <h5 class="modal-title modal-inhouse-title">
                     <i class="fa fa-university"></i> Confirm School In-House OJT
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -890,17 +890,17 @@
             <form action="{{ route('student.moa.toggleInhouse') }}" method="POST">
                 @csrf
                 <input type="hidden" name="is_inhouse" value="1">
-                <div class="modal-body" style="padding: 24px;">
-                    <p style="font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 14px;">
+                <div class="modal-body modal-inhouse-body">
+                    <p class="inhouse-modal-text">
                         Are you sure you want to register for <strong>School In-House OJT</strong>?
                     </p>
-                    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 14px; font-size: 13px; color: #9f1239; line-height: 1.5;">
+                    <div class="inhouse-modal-disclaimer">
                         <i class="fa fa-lock me-1"></i> <strong>Important Disclaimer:</strong> Once confirmed, your selection will be <strong>locked</strong> to School In-House OJT mode. You will not be able to upload or link to an external company MOA without prior unlock approval from your Internship Coordinator.
                     </div>
                 </div>
-                <div class="modal-footer" style="background: #fafafa;">
+                <div class="modal-footer modal-inhouse-footer">
                     <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-modal-submit" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                    <button type="submit" class="btn-modal-submit btn-inhouse-submit">
                         <i class="fa fa-lock me-1"></i> Yes, Confirm & Lock Selection
                     </button>
                 </div>

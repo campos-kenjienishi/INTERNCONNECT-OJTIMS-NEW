@@ -4007,5 +4007,220 @@ body.dark-mode .empty-state p {
     color: #94a3b8 !important;
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   IN-HOUSE OJT & MOA SELECTION / LOCK DARK MODE STYLES
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* 1. In-House OJT Prompt Card (Student MOA Page) */
+html.dark-mode .inhouse-prompt-card,
+body.dark-mode .inhouse-prompt-card {
+    background: #181c24 !important;
+    border: 1.5px dashed #2e384d !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark-mode .inhouse-prompt-icon,
+body.dark-mode .inhouse-prompt-icon {
+    background: rgba(2, 132, 199, 0.18) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(2, 132, 199, 0.35) !important;
+}
+
+html.dark-mode .inhouse-prompt-title,
+body.dark-mode .inhouse-prompt-title {
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode .inhouse-prompt-sub,
+body.dark-mode .inhouse-prompt-sub {
+    color: #94a3b8 !important;
+}
+
+html.dark-mode .btn-declare-inhouse,
+body.dark-mode .btn-declare-inhouse {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4) !important;
+}
+
+html.dark-mode .btn-declare-inhouse:hover,
+body.dark-mode .btn-declare-inhouse:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5) !important;
+}
+
+/* 2. In-House OJT Active Banner */
+html.dark-mode .inhouse-active-banner,
+body.dark-mode .inhouse-active-banner {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.25) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .inhouse-active-title,
+body.dark-mode .inhouse-active-title {
+    color: #ffffff !important;
+}
+
+html.dark-mode .inhouse-active-sub,
+body.dark-mode .inhouse-active-sub {
+    color: #a7f3d0 !important;
+}
+
+/* 3. MOA Lock Banner */
+html.dark-mode .moa-lock-banner,
+body.dark-mode .moa-lock-banner {
+    background: linear-gradient(135deg, #181e29 0%, #0f131a 100%) !important;
+    border: 1px solid #2e384d !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark-mode .moa-lock-title,
+body.dark-mode .moa-lock-title {
+    color: #f8fafc !important;
+}
+
+html.dark-mode .moa-lock-sub,
+body.dark-mode .moa-lock-sub {
+    color: #94a3b8 !important;
+}
+
+/* 4. Request Unlock Modal */
+html.dark-mode #requestUnlockModal .modal-content,
+body.dark-mode #requestUnlockModal .modal-content,
+html.dark-mode .modal-unlock-content,
+body.dark-mode .modal-unlock-content {
+    background: #181b21 !important;
+    border: 1px solid #2e3542 !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark-mode #requestUnlockModal .modal-header,
+body.dark-mode #requestUnlockModal .modal-header,
+html.dark-mode .modal-unlock-header,
+body.dark-mode .modal-unlock-header {
+    background: #1e2430 !important;
+    border-bottom: 1px solid #2e3542 !important;
+}
+
+html.dark-mode #requestUnlockModal .modal-title,
+body.dark-mode #requestUnlockModal .modal-title,
+html.dark-mode .modal-unlock-title,
+body.dark-mode .modal-unlock-title {
+    color: #f8fafc !important;
+}
+
+html.dark-mode #requestUnlockModal .modal-unlock-subtitle,
+body.dark-mode #requestUnlockModal .modal-unlock-subtitle {
+    color: #94a3b8 !important;
+}
+
+html.dark-mode #requestUnlockModal .modal-unlock-tip,
+body.dark-mode #requestUnlockModal .modal-unlock-tip {
+    background: #13161c !important;
+    border-color: #2e3542 !important;
+    color: #94a3b8 !important;
+}
+
+html.dark-mode #requestUnlockModal .modal-footer,
+body.dark-mode #requestUnlockModal .modal-footer,
+html.dark-mode .modal-unlock-footer,
+body.dark-mode .modal-unlock-footer {
+    background: #13161c !important;
+    border-top: 1px solid #2e3542 !important;
+}
+
+/* 5. Confirm In-House Lock Modal */
+html.dark-mode #confirmInhouseLockModal .modal-content,
+body.dark-mode #confirmInhouseLockModal .modal-content,
+html.dark-mode .modal-inhouse-content,
+body.dark-mode .modal-inhouse-content {
+    background: #181b21 !important;
+    border: 1px solid #2e3542 !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark-mode #confirmInhouseLockModal .modal-header,
+body.dark-mode #confirmInhouseLockModal .modal-header,
+html.dark-mode .modal-inhouse-header,
+body.dark-mode .modal-inhouse-header {
+    background: #142233 !important;
+    border-bottom: 1px solid rgba(2, 132, 199, 0.3) !important;
+}
+
+html.dark-mode #confirmInhouseLockModal .modal-title,
+body.dark-mode #confirmInhouseLockModal .modal-title,
+html.dark-mode .modal-inhouse-title,
+body.dark-mode .modal-inhouse-title {
+    color: #38bdf8 !important;
+}
+
+html.dark-mode #confirmInhouseLockModal .inhouse-modal-text,
+body.dark-mode #confirmInhouseLockModal .inhouse-modal-text {
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode #confirmInhouseLockModal .inhouse-modal-text strong,
+body.dark-mode #confirmInhouseLockModal .inhouse-modal-text strong {
+    color: #ffffff !important;
+}
+
+html.dark-mode #confirmInhouseLockModal .inhouse-modal-disclaimer,
+body.dark-mode #confirmInhouseLockModal .inhouse-modal-disclaimer {
+    background: rgba(225, 29, 72, 0.12) !important;
+    border: 1px solid rgba(225, 29, 72, 0.3) !important;
+    color: #fda4af !important;
+}
+
+html.dark-mode #confirmInhouseLockModal .inhouse-modal-disclaimer strong,
+body.dark-mode #confirmInhouseLockModal .inhouse-modal-disclaimer strong {
+    color: #fecdd3 !important;
+}
+
+html.dark-mode #confirmInhouseLockModal .modal-footer,
+body.dark-mode #confirmInhouseLockModal .modal-footer,
+html.dark-mode .modal-inhouse-footer,
+body.dark-mode .modal-inhouse-footer {
+    background: #13161c !important;
+    border-top: 1px solid #2e3542 !important;
+}
+
+/* 6. Coordinator In-House Badges & Unlock Request Pills */
+html.dark-mode .inhouse-badge-tag,
+body.dark-mode .inhouse-badge-tag {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark-mode .req-type-edit,
+body.dark-mode .req-type-edit {
+    background: rgba(37, 99, 235, 0.18) !important;
+    color: #93c5fd !important;
+    border: 1px solid rgba(37, 99, 235, 0.35) !important;
+}
+
+html.dark-mode .req-type-external,
+body.dark-mode .req-type-external {
+    background: rgba(22, 163, 74, 0.18) !important;
+    color: #86efac !important;
+    border: 1px solid rgba(22, 163, 74, 0.35) !important;
+}
+
+html.dark-mode .req-type-inhouse,
+body.dark-mode .req-type-inhouse {
+    background: rgba(5, 150, 105, 0.18) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(5, 150, 105, 0.35) !important;
+}
+
+html.dark-mode .req-type-unlink,
+body.dark-mode .req-type-unlink {
+    background: rgba(225, 29, 72, 0.18) !important;
+    color: #fda4af !important;
+    border: 1px solid rgba(225, 29, 72, 0.35) !important;
+}
+
+
 
 

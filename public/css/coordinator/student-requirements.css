@@ -416,10 +416,21 @@
         body.dark-mode .btn-action-inhouse.active { background: rgba(249, 115, 22, 0.15); border-color: rgba(249, 115, 22, 0.3); color: #ffedd5; }
         body.dark-mode .btn-action-inhouse.active:hover { background: #f97316; color: #fff; }
 
-        body.dark-mode .btn-action.view-personal {
-            background: rgba(79,70,229,0.15); border-color: rgba(79,70,229,0.3); color: #93c5fd;
+        .inhouse-badge-tag {
+            background: #d1fae5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            margin-top: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        body.dark-mode .btn-action.view-personal:hover { background: rgba(79,70,229,0.25); }
+
+        body.dark-mode .inhouse-badge-tag {
+            background: rgba(16, 185, 129, 0.18) !important;
+            color: #6ee7b7 !important;
+            border: 1px solid rgba(16, 185, 129, 0.35) !important;
+        }
 
         .progress-bar-container {
             width: 100%; height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden;
