@@ -489,7 +489,7 @@
                         </div>
                         <div>
                             <h2>Create Announcement</h2>
-                            <p>Broadcast a message to all students and professors</p>
+                            <p>Broadcast a message to all students</p>
                         </div>
                     </div>
 
