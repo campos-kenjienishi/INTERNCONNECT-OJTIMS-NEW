@@ -2114,6 +2114,26 @@ body.dark-mode #announcementEmptySearch p {
 }
 
 /* Announcement Feed Dark Mode */
+html.dark-mode .announcement-feed-stream,
+body.dark-mode .announcement-feed-stream {
+    scrollbar-color: rgba(239, 68, 68, 0.45) transparent !important;
+}
+
+html.dark-mode .announcement-feed-stream::-webkit-scrollbar-thumb,
+body.dark-mode .announcement-feed-stream::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.45) !important;
+}
+
+html.dark-mode .template-grid-container,
+body.dark-mode .template-grid-container {
+    scrollbar-color: rgba(239, 68, 68, 0.45) transparent !important;
+}
+
+html.dark-mode .template-grid-container::-webkit-scrollbar-thumb,
+body.dark-mode .template-grid-container::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.45) !important;
+}
+
 html.dark-mode .announcement-feed-card,
 body.dark-mode .announcement-feed-card {
     background: var(--dm-bg-surface) !important;

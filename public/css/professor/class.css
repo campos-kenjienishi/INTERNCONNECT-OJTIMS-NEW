@@ -826,9 +826,28 @@
         }
 
         .template-list-scroll {
-            max-height: 280px;
+            max-height: 220px;
             overflow-y: auto;
             padding: 10px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(37, 99, 235, 0.4) transparent;
+        }
+
+        .template-list-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .template-list-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .template-list-scroll::-webkit-scrollbar-thumb {
+            background: rgba(37, 99, 235, 0.35);
+            border-radius: 4px;
+        }
+
+        .template-list-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(37, 99, 235, 0.6);
         }
 
         .template-list-empty {
@@ -1377,6 +1396,29 @@ button.btn-action {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 6px;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(220, 38, 38, 0.4) transparent;
+}
+
+.announcement-feed-stream::-webkit-scrollbar {
+    width: 6px;
+}
+
+.announcement-feed-stream::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.announcement-feed-stream::-webkit-scrollbar-thumb {
+    background: rgba(220, 38, 38, 0.35);
+    border-radius: 4px;
+}
+
+.announcement-feed-stream::-webkit-scrollbar-thumb:hover {
+    background: rgba(220, 38, 38, 0.6);
 }
 
 .announcement-feed-card {

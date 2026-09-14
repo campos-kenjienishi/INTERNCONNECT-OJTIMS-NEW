@@ -15,7 +15,14 @@ class GeminiClient
             return null;
         }
 
-        $model = $model ?: (string) config('services.ai.model', 'gemini-3.5-flash');
+        $configuredModel = (string) config('services.ai.model', 'gemini-2.5-flash');
+        $model = $model ?: ($configuredModel !== '' ? $configuredModel : 'gemini-2.5-flash');
+
+        // Normalize non-existent or legacy model names
+        if (str_contains($model, '3.5') || $model === '') {
+            $model = 'gemini-2.5-flash';
+        }
+
         $endpoint = trim((string) config('services.ai.gemini_endpoint', ''));
 
         if ($endpoint === '') {
@@ -33,13 +40,13 @@ class GeminiClient
                     ],
                 ],
                 'generationConfig' => [
-                    'maxOutputTokens' => 350,
+                    'maxOutputTokens' => 2048,
                     'temperature' => 0.2,
                     'responseMimeType' => 'application/json',
                 ],
             ];
 
-            $response = Http::timeout(15)
+            $response = Http::timeout(20)
                 ->acceptJson()
                 ->withHeaders(['x-goog-api-key' => $apiKey])
                 ->post($endpoint, $payload);
@@ -49,6 +56,9 @@ class GeminiClient
                 Log::warning('GeminiClient request failed', ['status' => $response->status(), 'body' => $response->body()]);
                 return null;
             }
+
+            // On success, clear any stale unavailable flag
+            Cache::forget('ai:gemini:last_unavailable');
 
             $json = $response->json();
 
@@ -80,18 +90,18 @@ class GeminiClient
     {
         $retryAfterSeconds = $this->extractRetryDelaySeconds($json);
         $retryAt = $retryAfterSeconds !== null ? now()->addSeconds($retryAfterSeconds) : null;
-        $isRateLimited = $status === 429 || str_contains(strtolower($rawMessage), 'quota');
+        $isRateLimited = $status === 429 || str_contains(strtolower($rawMessage), 'quota') || str_contains(strtolower($rawMessage), 'resource_exhausted');
 
         $message = $isRateLimited
-            ? 'Gemini is rate-limited right now.'
-            : 'Gemini is temporarily unavailable.';
+            ? 'Gemini quota limit reached.'
+            : 'Gemini is temporarily busy.';
 
         if ($retryAt !== null) {
-            $message .= ' Try again around ' . $retryAt->format('g:i A') . '.';
+            $message .= ' Will resume around ' . $retryAt->format('g:i A') . '.';
         } elseif ($isRateLimited) {
-            $message .= ' Gemini did not provide an exact reset time; try again later today or after the free-tier quota refreshes.';
+            $message .= ' Automatic fallback insights active.';
         } else {
-            $message .= ' Try again in a few minutes.';
+            $message .= ' Automatic fallback insights active.';
         }
 
         Cache::put('ai:gemini:last_unavailable', [
@@ -100,7 +110,7 @@ class GeminiClient
             'retry_after_seconds' => $retryAfterSeconds,
             'retry_at' => $retryAt?->toIso8601String(),
             'reason' => $isRateLimited ? 'rate_limit' : 'unavailable',
-        ], now()->addMinutes(30));
+        ], now()->addMinutes(10));
     }
 
     protected function extractRetryDelaySeconds(?array $json): ?int
@@ -127,3 +137,4 @@ class GeminiClient
         return null;
     }
 }
+

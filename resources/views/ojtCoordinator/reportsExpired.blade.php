@@ -207,47 +207,45 @@
         </div>
 
         @if(!empty($reportInsights))
-            <div data-ai-insight-card class="panel-card" style="margin-bottom:22px; border-left:4px solid var(--red);">
-                <div class="panel-card-header">
-                    <div class="panel-header-icon"><i class="fa fa-robot"></i></div>
-                    <div>
-                        <h2>AI Report Insight</h2>
-                        <p>Generated from the current MOA report data</p>
+            <div data-ai-insight-card class="bud-ai-insight-card">
+                <div class="bud-ai-header">
+                    <div class="bud-ai-brand">
+                        <div class="bud-ai-avatar">
+                            <i class="fa fa-paw" style="color:#d97706; font-size:18px;"></i>
+                            <span class="bud-ai-avatar-pulse"></span>
+                        </div>
+                        <div class="bud-ai-title-wrap">
+                            <h2>Bud AI Intelligence <span>• Report Insights</span></h2>
+                            <p>Strategic analytics and compliance recommendations for MOA agreements</p>
+                        </div>
                     </div>
-                    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <button type="button" data-ai-insight-button data-ai-context="aiReportContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
+                    <div class="bud-ai-actions">
+                        <button type="button" data-ai-insight-button data-ai-context="aiReportContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" class="bud-generate-btn">
                             <i class="fa fa-magic"></i> Generate AI Insight
                         </button>
-                        <div style="display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:700;">
+                        <div class="bud-source-badge" data-ai-badge-wrap>
                             <i class="fa fa-brain"></i>
                             <span data-ai-badge>{{ ($reportInsights['source'] ?? '') === 'openai' ? 'OpenAI' : (($reportInsights['source'] ?? '') === 'gemini' ? 'Gemini AI' : (!empty($reportInsights['used_local_ai']) ? 'Local AI' : 'Internal Insight')) }}</span>
                         </div>
                     </div>
                 </div>
-                <div data-ai-result-panel class="panel-card-body" style="display:none;">
-                    @if(($reportInsights['source'] ?? '') === 'fallback')
-                        <div data-ai-notice style="display:flex; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;">
-                            <i class="fa fa-exclamation-triangle" style="margin-top:2px;"></i>
-                            <div>
-                                <strong>Gemini is temporarily unavailable.</strong>
-                                <span data-ai-notice-text>{{ $reportInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes if this is a short rate limit; if the daily free-tier limit was reached, AI answers may resume after the quota resets.' }}</span>
-                            </div>
-                        </div>
-                    @endif
-                    <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; color:#888;"></div>
-                    <p data-ai-summary style="font-size:14px; line-height:1.7; color:#333; margin-bottom:16px;">{{ $reportInsights['summary'] ?? 'No AI insight available.' }}</p>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
-                        <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
-                            <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
-                            <ul data-ai-findings style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                <div data-ai-result-panel class="bud-ai-body" style="display:none;">
+                    <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; font-weight:700; color:#059669;"></div>
+                    <div data-ai-summary-card class="bud-ai-summary-card">
+                        <p data-ai-summary style="margin:0; line-height:1.7;">{{ $reportInsights['summary'] ?? 'No AI insight available.' }}</p>
+                    </div>
+                    <div data-ai-pillars-grid class="bud-pillars-grid">
+                        <div class="bud-pillar highlights">
+                            <div class="bud-pillar-title"><i class="fa fa-chart-line"></i> Key Trends & Findings</div>
+                            <ul data-ai-findings class="bud-pillar-list">
                                 @foreach(($reportInsights['key_findings'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @endforeach
                             </ul>
                         </div>
-                        <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
-                            <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
-                            <ul data-ai-watchouts style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                        <div class="bud-pillar watchouts">
+                            <div class="bud-pillar-title"><i class="fa fa-exclamation-triangle"></i> Watchouts & Risks</div>
+                            <ul data-ai-watchouts class="bud-pillar-list">
                                 @forelse(($reportInsights['watchouts'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
@@ -255,9 +253,9 @@
                                 @endforelse
                             </ul>
                         </div>
-                        <div style="background:#fafafa; border:1px solid #eee; border-radius:12px; padding:14px;">
-                            <div style="font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
-                            <ul data-ai-actions style="margin:0; padding-left:18px; color:#444; line-height:1.65;">
+                        <div class="bud-pillar actions">
+                            <div class="bud-pillar-title"><i class="fa fa-tasks"></i> Recommended Actions</div>
+                            <ul data-ai-actions class="bud-pillar-list">
                                 @foreach(($reportInsights['recommendations'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @endforeach
@@ -267,8 +265,8 @@
                     <div style="margin-top:18px; border-top:1px solid #f0f0f0; padding-top:16px;">
                         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
                             <div>
-                                <div style="font-size:13px; font-weight:800; color:#1f2937;">Ask AI about this report</div>
-                                <div style="font-size:12px; color:#888; margin-top:2px;">Click a suggested prompt to ask instantly, or type your own question and press Ask.</div>
+                                <div style="font-size:13.5px; font-weight:800; color:#1f2937;"><i class="fa fa-comments" style="color:var(--red); margin-right:6px;"></i>Ask Bud about this report</div>
+                                <div style="font-size:12px; color:#888; margin-top:2px;">Click a suggested prompt to ask instantly, or type your custom inquiry.</div>
                             </div>
                             @php
                                 $aiPromptSuggestions = [

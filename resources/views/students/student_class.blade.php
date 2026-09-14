@@ -564,16 +564,6 @@
                         <p style="margin: 0; font-weight: 600; color: #1e293b; font-size: 15px;">No room templates found</p>
                         <span class="empty-hint" style="display:block; margin-top: 4px; color: #64748b; font-size: 12.5px;">Try adjusting your search query</span>
                     </div>
-
-                    <!-- Template Pagination Wrapper (Max 3 items per page) -->
-                    <div class="template-pagination-wrapper" id="templatePaginationWrapper" style="display: none;">
-                        <div class="template-pagination-info" id="templatePaginationInfo">
-                            Showing <span id="templatePageRange">1–3</span> of <span id="templateTotalCount">{{ count($roomTemplates) }}</span> templates
-                        </div>
-                        <div class="template-pagination-controls" id="templatePaginationControls">
-                            <!-- Page buttons rendered by JavaScript -->
-                        </div>
-                    </div>
                 @endif
             </div>
         </div>

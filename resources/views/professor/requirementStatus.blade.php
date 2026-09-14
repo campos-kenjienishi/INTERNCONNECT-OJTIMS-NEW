@@ -194,15 +194,16 @@
         </div>
 
         @if(!empty($requirementInsights))
-            <section data-ai-insight-card class="report-card" style="margin-bottom:18px; border-left:4px solid var(--red);">
-                <div class="report-head" style="align-items:center;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div style="width:42px; height:42px; border-radius:12px; background:#fee2e2; color:var(--red); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa fa-robot"></i>
+            <div data-ai-insight-card class="bud-ai-insight-card">
+                <div class="bud-ai-header">
+                    <div class="bud-ai-brand">
+                        <div class="bud-ai-avatar">
+                            <i class="fa fa-paw" style="color:#d97706; font-size:18px;"></i>
+                            <span class="bud-ai-avatar-pulse"></span>
                         </div>
-                        <div class="report-head-left">
-                            <h2>AI Requirement Insight</h2>
-                            <p>Generated from the current class requirement status</p>
+                        <div class="bud-ai-title-wrap">
+                            <h2>Bud AI Intelligence <span>• Requirement Status</span></h2>
+                            <p>Student document submission bottlenecks, verification progress, and compliance alerts</p>
                         </div>
                     </div>
                     @php
@@ -211,30 +212,25 @@
                             ? 'Gemini AI'
                             : ($requirementAiSource === 'openai' ? 'OpenAI' : 'Internal Insight');
                     @endphp
-                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <button type="button" data-ai-insight-button data-ai-context="requirementAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.25);">
+                    <div class="bud-ai-actions">
+                        <button type="button" data-ai-insight-button data-ai-context="requirementAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" class="bud-generate-btn">
                             <i class="fa fa-magic"></i> Generate AI Insight
                         </button>
-                        <div style="display:inline-flex; align-items:center; gap:6px; background:#fff5f5; border:1px solid #fecaca; color:var(--red-dark); border-radius:999px; padding:7px 12px; font-size:12px; font-weight:800;">
+                        <div class="bud-source-badge" data-ai-badge-wrap>
                             <i class="fa fa-brain"></i> <span data-ai-badge>{{ $requirementAiLabel }}</span>
                         </div>
                     </div>
                 </div>
-                <div data-ai-result-panel style="display:none; padding:0 20px 20px;">
-                    @if(($requirementInsights['source'] ?? '') === 'fallback')
-                        <div data-ai-notice style="display:flex; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;">
-                            <i class="fa fa-exclamation-triangle" style="margin-top:2px;"></i>
-                            <div><strong>Gemini is temporarily unavailable.</strong> <span data-ai-notice-text>{{ $requirementInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes, or later if the daily free-tier quota was reached.' }}</span></div>
-                        </div>
-                    @endif
+                <div data-ai-result-panel class="bud-ai-body" style="display:none;">
+                    <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; font-weight:700; color:#059669;"></div>
+                    <div data-ai-summary-card class="bud-ai-summary-card">
+                        <p data-ai-summary style="margin:0; line-height:1.7;">{{ $requirementInsights['summary'] ?? 'No requirement insight available.' }}</p>
+                    </div>
 
-                    <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; color:#777;"></div>
-                    <p data-ai-summary style="font-size:14px; line-height:1.7; color:#374151; margin:0 0 16px;">{{ $requirementInsights['summary'] ?? 'No requirement insight available.' }}</p>
-
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
-                        <div style="background:#fafafa; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                            <div style="font-size:12px; font-weight:800; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
-                            <ul data-ai-findings style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                    <div data-ai-pillars-grid class="bud-pillars-grid">
+                        <div class="bud-pillar highlights">
+                            <div class="bud-pillar-title"><i class="fa fa-chart-line"></i> Key Trends & Findings</div>
+                            <ul data-ai-findings class="bud-pillar-list">
                                 @forelse(($requirementInsights['key_findings'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
@@ -242,9 +238,9 @@
                                 @endforelse
                             </ul>
                         </div>
-                        <div style="background:#fafafa; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                            <div style="font-size:12px; font-weight:800; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
-                            <ul data-ai-watchouts style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                        <div class="bud-pillar watchouts">
+                            <div class="bud-pillar-title"><i class="fa fa-exclamation-triangle"></i> Watchouts & Risks</div>
+                            <ul data-ai-watchouts class="bud-pillar-list">
                                 @forelse(($requirementInsights['watchouts'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
@@ -252,9 +248,9 @@
                                 @endforelse
                             </ul>
                         </div>
-                        <div style="background:#fafafa; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                            <div style="font-size:12px; font-weight:800; color:var(--red); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
-                            <ul data-ai-actions style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                        <div class="bud-pillar actions">
+                            <div class="bud-pillar-title"><i class="fa fa-tasks"></i> Recommended Actions</div>
+                            <ul data-ai-actions class="bud-pillar-list">
                                 @forelse(($requirementInsights['recommendations'] ?? []) as $item)
                                     <li>{{ $item }}</li>
                                 @empty
@@ -314,7 +310,7 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         @endif
 
         <section class="report-card">

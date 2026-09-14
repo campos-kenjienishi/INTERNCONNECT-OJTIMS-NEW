@@ -38,7 +38,7 @@ return [
 
     'ai' => [
         'provider' => env('AI_PROVIDER', 'gemini'),
-        'model' => env('AI_MODEL', 'gemini-3.5-flash'),
+        'model' => env('AI_MODEL', 'gemini-2.5-flash'),
         'gemini_endpoint' => env('GEMINI_API_ENDPOINT', ''),
         'gemini_api_key' => env('GEMINI_API_KEY', ''),
         'openai_endpoint' => env('OPENAI_API_ENDPOINT', 'https://api.openai.com/v1/responses'),

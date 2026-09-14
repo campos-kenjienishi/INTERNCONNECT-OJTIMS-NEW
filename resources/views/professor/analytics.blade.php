@@ -134,15 +134,16 @@
             </div>
         </div>
 
-        <div data-ai-insight-card class="panel full" style="margin-bottom:24px;">
-            <div class="panel-head" style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:42px; height:42px; border-radius:12px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <i class="fa fa-robot"></i>
+        <div data-ai-insight-card class="bud-ai-insight-card" style="margin-bottom:24px;">
+            <div class="bud-ai-header">
+                <div class="bud-ai-brand">
+                    <div class="bud-ai-avatar">
+                        <i class="fa fa-paw" style="color:#d97706; font-size:18px;"></i>
+                        <span class="bud-ai-avatar-pulse"></span>
                     </div>
-                    <div>
-                        <h2>AI Analytics Insight</h2>
-                        <p>Summary generated from the current dashboard metrics</p>
+                    <div class="bud-ai-title-wrap">
+                        <h2>Bud AI Intelligence <span>• Faculty Analytics</span></h2>
+                        <p>Class progress overview, requirement completion trends, and adviser action points</p>
                     </div>
                 </div>
                 @php
@@ -151,29 +152,25 @@
                         ? 'Gemini AI'
                         : ($analyticsAiSource === 'openai' ? 'OpenAI' : 'Internal Insight');
                 @endphp
-                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-left:auto;">
-                    <button type="button" data-ai-insight-button data-ai-context="analyticsAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" style="display:inline-flex; align-items:center; gap:7px; border:none; background:#dc2626; color:#fff; border-radius:10px; padding:9px 13px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; cursor:pointer;">
+                <div class="bud-ai-actions">
+                    <button type="button" data-ai-insight-button data-ai-context="analyticsAiContext" data-ai-endpoint="{{ route('reports.ai.insight') }}" data-ai-token="{{ csrf_token() }}" class="bud-generate-btn">
                         <i class="fa fa-magic"></i> Generate AI Insight
                     </button>
-                    <span style="display:inline-flex; align-items:center; gap:7px; border:1px solid #fecaca; background:#fff5f5; color:#b91c1c; border-radius:999px; padding:8px 13px; font-size:12px; font-weight:800;">
+                    <div class="bud-source-badge" data-ai-badge-wrap>
                         <i class="fa fa-brain"></i>
                         <span data-ai-badge>{{ $analyticsAiLabel }}</span>
-                    </span>
+                    </div>
                 </div>
             </div>
-            <div data-ai-result-panel class="panel-body" style="display:none;">
-                @if(($analyticsInsights['source'] ?? '') === 'fallback')
-                    <div data-ai-notice style="display:flex; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;">
-                        <i class="fa fa-exclamation-triangle" style="margin-top:2px;"></i>
-                        <div><strong>Gemini is temporarily unavailable.</strong> <span data-ai-notice-text>{{ $analyticsInsights['availability']['message'] ?? 'Internal insight is shown for now. Try again in a few minutes, or later if the daily free-tier quota was reached.' }}</span></div>
-                    </div>
-                @endif
-                <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; color:#888;"></div>
-                <p data-ai-summary style="font-size:14px; line-height:1.7; color:#374151; margin-bottom:16px;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
-                    <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                        <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
-                        <ul data-ai-findings style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+            <div data-ai-result-panel class="bud-ai-body" style="display:none;">
+                <div data-ai-status style="display:none; margin-bottom:12px; font-size:12px; font-weight:700; color:#059669;"></div>
+                <div data-ai-summary-card class="bud-ai-summary-card">
+                    <p data-ai-summary style="margin:0; line-height:1.7;">{{ $analyticsInsights['summary'] ?? 'No insight available.' }}</p>
+                </div>
+                <div data-ai-pillars-grid class="bud-pillars-grid">
+                    <div class="bud-pillar highlights">
+                        <div class="bud-pillar-title"><i class="fa fa-chart-line"></i> Key Trends & Findings</div>
+                        <ul data-ai-findings class="bud-pillar-list">
                             @forelse(($analyticsInsights['key_findings'] ?? []) as $item)
                                 <li>{{ $item }}</li>
                             @empty
@@ -181,9 +178,9 @@
                             @endforelse
                         </ul>
                     </div>
-                    <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                        <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
-                        <ul data-ai-watchouts style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                    <div class="bud-pillar watchouts">
+                        <div class="bud-pillar-title"><i class="fa fa-exclamation-triangle"></i> Watchouts & Risks</div>
+                        <ul data-ai-watchouts class="bud-pillar-list">
                             @forelse(($analyticsInsights['watchouts'] ?? []) as $item)
                                 <li>{{ $item }}</li>
                             @empty
@@ -191,9 +188,9 @@
                             @endforelse
                         </ul>
                     </div>
-                    <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px;">
-                        <div style="font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
-                        <ul data-ai-actions style="margin:0; padding-left:18px; color:#374151; line-height:1.65;">
+                    <div class="bud-pillar actions">
+                        <div class="bud-pillar-title"><i class="fa fa-tasks"></i> Recommended Actions</div>
+                        <ul data-ai-actions class="bud-pillar-list">
                             @forelse(($analyticsInsights['recommendations'] ?? []) as $item)
                                 <li>{{ $item }}</li>
                             @empty

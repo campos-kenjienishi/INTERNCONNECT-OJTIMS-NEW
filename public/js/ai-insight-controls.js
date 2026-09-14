@@ -16,56 +16,52 @@
         });
     }
 
+    function applyShimmer(card) {
+        const summary = card.querySelector('[data-ai-summary]');
+        const findings = card.querySelector('[data-ai-findings]');
+        const watchouts = card.querySelector('[data-ai-watchouts]');
+        const actions = card.querySelector('[data-ai-actions]');
+
+        if (summary) {
+            summary.innerHTML = '<div class="bud-shimmer" style="height:18px; width:92%; margin-bottom:8px;"></div><div class="bud-shimmer" style="height:18px; width:76%;"></div>';
+        }
+        if (findings) {
+            findings.innerHTML = '<li class="bud-shimmer" style="height:16px; width:88%; margin-bottom:6px;"></li><li class="bud-shimmer" style="height:16px; width:70%;"></li>';
+        }
+        if (watchouts) {
+            watchouts.innerHTML = '<li class="bud-shimmer" style="height:16px; width:85%; margin-bottom:6px;"></li><li class="bud-shimmer" style="height:16px; width:65%;"></li>';
+        }
+        if (actions) {
+            actions.innerHTML = '<li class="bud-shimmer" style="height:16px; width:90%; margin-bottom:6px;"></li><li class="bud-shimmer" style="height:16px; width:75%;"></li>';
+        }
+    }
+
     function statusMessage(data) {
+        if (data.source === 'gemini') {
+            return '✓ AI insights generated via Google Gemini';
+        }
+        if (data.source === 'openai') {
+            return '✓ AI insights generated via OpenAI';
+        }
         if (data.source === 'fallback') {
             return data.availability && data.availability.message
                 ? data.availability.message + ' Internal insight shown.'
-                : 'Gemini is unavailable or rate-limited. Internal insight shown.';
+                : 'Internal analytical insight active.';
         }
-
-        if (data.source === 'manual') {
-            return 'Internal insight shown. Click Generate AI Insight to use Gemini.';
-        }
-
-        return 'AI insight generated.';
-    }
-
-    function ensureNotice(card, summary) {
-        let notice = card.querySelector('[data-ai-notice]');
-        if (notice) return notice;
-
-        notice = document.createElement('div');
-        notice.setAttribute('data-ai-notice', '');
-        notice.style.cssText = 'display:none; align-items:flex-start; gap:10px; background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; color:#92400e; border-radius:10px; padding:11px 13px; margin-bottom:14px; font-size:12.5px; line-height:1.55;';
-
-        const icon = document.createElement('i');
-        icon.className = 'fa fa-exclamation-triangle';
-        icon.style.marginTop = '2px';
-
-        const text = document.createElement('div');
-        text.innerHTML = '<strong>Gemini is temporarily unavailable.</strong> <span data-ai-notice-text>Internal insight is shown for now.</span>';
-
-        notice.appendChild(icon);
-        notice.appendChild(text);
-
-        if (summary && summary.parentNode) {
-            summary.parentNode.insertBefore(notice, summary);
-        }
-
-        return notice;
+        return 'Internal analytical insight active.';
     }
 
     function ensureCloseButton(resultPanel) {
         if (!resultPanel || resultPanel.querySelector('[data-ai-close-panel]')) return;
 
         const wrap = document.createElement('div');
-        wrap.style.cssText = 'display:flex; justify-content:flex-end; margin-bottom:10px;';
+        wrap.style.cssText = 'display:flex; justify-content:flex-end; margin-bottom:12px;';
 
         const button = document.createElement('button');
         button.type = 'button';
         button.setAttribute('data-ai-close-panel', '');
-        button.style.cssText = 'display:inline-flex; align-items:center; gap:7px; border:1px solid #e5e7eb; background:#fff; color:#374151; border-radius:9px; padding:7px 11px; font:inherit; font-size:12px; font-weight:800; cursor:pointer;';
-        button.innerHTML = '<i class="fa fa-times"></i> Close';
+        button.style.cssText = 'display:inline-flex; align-items:center; gap:6px; border:1px solid #e2e8f0; background:#fff; color:#475569; border-radius:8px; padding:6px 12px; font-family:\'Poppins\',sans-serif; font-size:11.5px; font-weight:700; cursor:pointer; transition:all .2s ease;';
+        button.innerHTML = '<i class="fa fa-chevron-up"></i> Hide Insight';
         button.addEventListener('click', function () {
             resultPanel.style.display = 'none';
         });
@@ -91,13 +87,17 @@
             const findings = card.querySelector('[data-ai-findings]');
             const watchouts = card.querySelector('[data-ai-watchouts]');
             const actions = card.querySelector('[data-ai-actions]');
-            const notice = ensureNotice(card, summary);
 
+            const originalBtnHtml = button.innerHTML;
             button.disabled = true;
+            button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Analyzing...';
+
             if (resultPanel) {
                 ensureCloseButton(resultPanel);
                 resultPanel.style.display = 'block';
+                applyShimmer(card);
             }
+
             if (status) {
                 status.textContent = 'Generating AI insight...';
                 status.style.display = 'block';
@@ -125,7 +125,10 @@
                 .then(function (data) {
                     context.insight = data;
 
-                    if (summary) summary.textContent = data.summary || 'No AI insight available.';
+                    if (summary) {
+                        summary.innerHTML = '';
+                        summary.textContent = data.summary || 'No AI insight available.';
+                    }
                     replaceList(findings, data.key_findings, 'No key findings available.');
                     replaceList(watchouts, data.watchouts, 'No major watchouts detected.');
                     replaceList(actions, data.recommendations, 'No actions suggested.');
@@ -136,16 +139,6 @@
                             : (data.source === 'openai' ? 'OpenAI' : 'Internal Insight');
                     }
 
-                    if (notice) {
-                        notice.style.display = data.source === 'fallback' ? 'flex' : 'none';
-                        const noticeText = notice.querySelector('[data-ai-notice-text]');
-                        if (noticeText) {
-                            noticeText.textContent = data.availability && data.availability.message
-                                ? data.availability.message
-                                : 'Internal insight is shown for now. Try again in a few minutes, or later if the daily free-tier quota was reached.';
-                        }
-                    }
-
                     if (status) {
                         status.textContent = statusMessage(data);
                         status.style.display = 'block';
@@ -153,12 +146,13 @@
                 })
                 .catch(function () {
                     if (status) {
-                        status.textContent = 'AI insight could not be generated right now. Please try again later.';
+                        status.textContent = 'Internal insight shown. (AI service busy)';
                         status.style.display = 'block';
                     }
                 })
                 .finally(function () {
                     button.disabled = false;
+                    button.innerHTML = '<i class="fa fa-magic"></i> Refresh AI Insight';
                 });
         });
     }

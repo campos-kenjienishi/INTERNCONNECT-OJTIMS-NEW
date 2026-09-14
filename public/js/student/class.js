@@ -220,7 +220,7 @@ $(document).on('click', '.btn-preview-file', function (e) {
 });
 
 // ==========================================
-// Room Templates: Search, Sort & Pagination (Max 3 per page)
+// Room Templates: Search & Sort (Scrollable Grid)
 // ==========================================
 function initRoomTemplates() {
     const gridContainer = document.getElementById('templateGridContainer');
@@ -233,14 +233,6 @@ function initRoomTemplates() {
     const sortSelect = document.getElementById('templateSortSelect');
     const templateCount = document.getElementById('templateCount');
     const emptySearch = document.getElementById('templateEmptySearch');
-    const paginationWrapper = document.getElementById('templatePaginationWrapper');
-    const pageRangeEl = document.getElementById('templatePageRange');
-    const totalCountEl = document.getElementById('templateTotalCount');
-    const paginationControls = document.getElementById('templatePaginationControls');
-
-    const ITEMS_PER_PAGE = 3;
-    let currentPage = 1;
-    let filteredCards = [...cards];
 
     function applySort(items) {
         const sortVal = sortSelect ? sortSelect.value : 'newest';
@@ -265,11 +257,11 @@ function initRoomTemplates() {
         return items;
     }
 
-    function render(shouldScroll) {
+    function render() {
         const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
 
         // 1. Filter
-        filteredCards = cards.filter(card => {
+        const filteredCards = cards.filter(card => {
             if (!query) return true;
             const name = (card.getAttribute('data-name') || '').toLowerCase();
             const file = (card.getAttribute('data-file') || '').toLowerCase();
@@ -283,17 +275,12 @@ function initRoomTemplates() {
         filteredCards.forEach(card => gridContainer.appendChild(card));
 
         const totalItems = filteredCards.length;
-        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
-
-        if (currentPage > totalPages) currentPage = totalPages;
-        if (currentPage < 1) currentPage = 1;
 
         // 3. Handle Empty State
         if (totalItems === 0) {
-            cards.forEach(card => card.classList.add('template-card-hidden'));
+            cards.forEach(card => card.style.display = 'none');
             gridContainer.style.display = 'none';
             if (emptySearch) emptySearch.style.display = 'block';
-            if (paginationWrapper) paginationWrapper.style.display = 'none';
             if (templateCount) templateCount.textContent = '0';
             return;
         }
@@ -301,116 +288,35 @@ function initRoomTemplates() {
         if (emptySearch) emptySearch.style.display = 'none';
         gridContainer.style.display = 'grid';
 
-        // 4. Paginate - Max 3 items visible
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-        const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
-
+        // 4. Show all matching cards inside scrollable container
         cards.forEach(card => {
-            const indexInFiltered = filteredCards.indexOf(card);
-            if (indexInFiltered >= startIndex && indexInFiltered < endIndex) {
+            if (filteredCards.includes(card)) {
+                card.style.display = 'flex';
                 card.classList.remove('template-card-hidden');
             } else {
+                card.style.display = 'none';
                 card.classList.add('template-card-hidden');
             }
         });
 
         // 5. Update Counters
         if (templateCount) {
-            if (totalItems <= ITEMS_PER_PAGE) {
-                templateCount.textContent = totalItems;
-            } else {
-                templateCount.textContent = `${startIndex + 1}–${endIndex} of ${totalItems}`;
-            }
+            templateCount.textContent = totalItems;
         }
-
-        // 6. Update Pagination UI
-        if (paginationWrapper) {
-            if (totalPages <= 1) {
-                paginationWrapper.style.display = 'none';
-            } else {
-                paginationWrapper.style.display = 'flex';
-                if (pageRangeEl) pageRangeEl.textContent = `${startIndex + 1}–${endIndex}`;
-                if (totalCountEl) totalCountEl.textContent = totalItems;
-                renderPaginationButtons(totalPages);
-            }
-        }
-
-        if (shouldScroll) {
-            const containerRect = gridContainer.getBoundingClientRect();
-            if (containerRect.top < 70 || containerRect.top > window.innerHeight) {
-                gridContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-    }
-
-    function renderPaginationButtons(totalPages) {
-        if (!paginationControls) return;
-        paginationControls.innerHTML = '';
-
-        // Previous button
-        const prevBtn = document.createElement('button');
-        prevBtn.type = 'button';
-        prevBtn.className = `template-page-btn nav-btn ${currentPage === 1 ? 'disabled' : ''}`;
-        prevBtn.innerHTML = '<i class="fa fa-chevron-left"></i> Prev';
-        prevBtn.setAttribute('aria-label', 'Previous Page');
-        if (currentPage > 1) {
-            prevBtn.addEventListener('click', () => {
-                currentPage--;
-                render(true);
-            });
-        }
-        paginationControls.appendChild(prevBtn);
-
-        // Page number buttons
-        for (let p = 1; p <= totalPages; p++) {
-            const pageBtn = document.createElement('button');
-            pageBtn.type = 'button';
-            pageBtn.className = `template-page-btn ${p === currentPage ? 'active' : ''}`;
-            pageBtn.textContent = p;
-            pageBtn.setAttribute('aria-label', `Page ${p}`);
-            if (p !== currentPage) {
-                const targetPage = p;
-                pageBtn.addEventListener('click', () => {
-                    currentPage = targetPage;
-                    render(true);
-                });
-            }
-            paginationControls.appendChild(pageBtn);
-        }
-
-        // Next button
-        const nextBtn = document.createElement('button');
-        nextBtn.type = 'button';
-        nextBtn.className = `template-page-btn nav-btn ${currentPage === totalPages ? 'disabled' : ''}`;
-        nextBtn.innerHTML = 'Next <i class="fa fa-chevron-right"></i>';
-        nextBtn.setAttribute('aria-label', 'Next Page');
-        if (currentPage < totalPages) {
-            nextBtn.addEventListener('click', () => {
-                currentPage++;
-                render(true);
-            });
-        }
-        paginationControls.appendChild(nextBtn);
     }
 
     // Search input event
     if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            currentPage = 1;
-            render(false);
-        });
+        searchInput.addEventListener('input', render);
     }
 
     // Sort select event
     if (sortSelect) {
-        sortSelect.addEventListener('change', function () {
-            currentPage = 1;
-            render(false);
-        });
+        sortSelect.addEventListener('change', render);
     }
 
     // Initial render
-    render(false);
+    render();
 }
 
 // ==========================================
@@ -479,19 +385,3 @@ function initAnnouncements() {
 
     render();
 }
-
->>>>>>> origin/feature/landing-and-student-revise
-
-if (overlay) {
-    overlay.addEventListener('click', closeMobileSidebar);
-}
-
-$(document).ready(function() {
-    if ($.fn.select2) {
-        $('select[name="adviser_name"]').select2({
-            placeholder: 'Select your Professor',
-            allowClear: true,
-            width: '100%'
-        });
-    }
-});
