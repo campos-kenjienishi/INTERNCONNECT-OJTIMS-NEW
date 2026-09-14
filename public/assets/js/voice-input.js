@@ -4,6 +4,19 @@
             return;
         }
 
+        // Do not inject floating Bud speed dial on home dashboard pages where Bud AI Hero is already embedded
+        var pathname = window.location.pathname.replace(/\/+$/, '').toLowerCase();
+        var isHomeDashboard = Boolean(
+            document.querySelector('.ic-ai-dashboard-hero') ||
+            document.querySelector('.dashboard-ai-hero') ||
+            document.querySelector('[data-ai-hero-card]') ||
+            ['/dashboard', '/home', '/student_home', '/studenthome', '/homeprof'].includes(pathname)
+        );
+
+        if (isHomeDashboard) {
+            return;
+        }
+
         var wrapper = document.createElement("div");
         wrapper.className = "ic-speed-dial";
         wrapper.id = "icFloatingSpeedDial";
