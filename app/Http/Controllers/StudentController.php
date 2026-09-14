@@ -115,13 +115,18 @@ private function classAnnouncementsForStudent($data, $classRoomNames = [])
 
         // Filter by class audience if column exists
         if ($hasAudienceColumn) {
-            $query->where('audience', 'class');
+            $query->where(function ($q) {
+                $q->where('audience', 'class')
+                  ->orWhereNull('audience')
+                  ->orWhere('audience', '');
+            });
         }
 
         // Filter by target course if specified on announcement
         if ($hasTargetCourseColumn && !empty($data->course)) {
             $query->where(function ($q) use ($data) {
                 $q->where('target_course', $data->course)
+                  ->orWhere('target_course', 'like', '%' . $data->course . '%')
                   ->orWhereNull('target_course')
                   ->orWhere('target_course', '');
             });
@@ -445,7 +450,7 @@ public function home()
 
 
         $classRoomNames = collect([$currentClass])->filter()->pluck('room')->values()->all();
-        $isEnrolledAndApproved = !empty($data) && isset($data->status) && $data->status == 1 && !empty($data->class_id);
+        $isEnrolledAndApproved = !empty($data) && (int) ($data->status ?? 0) === 1 && (!empty($data->class_id) || !empty($currentClass));
         $announce = $isEnrolledAndApproved
             ? $this->classAnnouncementsForStudent($data, $classRoomNames)
             : collect([]);

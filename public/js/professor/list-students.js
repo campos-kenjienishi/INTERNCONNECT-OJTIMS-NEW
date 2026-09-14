@@ -1,4 +1,4 @@
-﻿/* Professor Students in Class Scripts */
+/* Professor Students in Class Scripts */
 
     // Sidebar toggle
     const sidebar     = document.getElementById('sidebar');
@@ -49,14 +49,20 @@
 
         // Approve — SweetAlert toast
         $(document).on('submit', '.approveForm', function (e) {
-            e.preventDefault();
             const form = this;
+            if (form.dataset.submitting === 'true') {
+                return;
+            }
+            e.preventDefault();
+            form.dataset.submitting = 'true';
             const Toast = Swal.mixin({
                 toast: true, position: 'top-end',
-                showConfirmButton: false, timer: 2500, timerProgressBar: true,
+                showConfirmButton: false, timer: 2000, timerProgressBar: true,
             });
             Toast.fire({ icon: 'success', title: 'Student approved successfully' });
-            setTimeout(() => form.submit(), 500);
+            setTimeout(() => {
+                HTMLFormElement.prototype.submit.call(form);
+            }, 300);
         });
 
         $('#approveAllStudentsForm').on('submit', function (e) {

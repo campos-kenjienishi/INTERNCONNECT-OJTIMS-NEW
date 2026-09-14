@@ -890,6 +890,16 @@ public function approve(Request $request, $email)
 {
     $user = User::where('email', $email)->first();
 
+    if (!$user && is_numeric($email)) {
+        $user = User::find($email);
+    }
+    if (!$user && $request->filled('user_id')) {
+        $user = User::find($request->user_id);
+    }
+    if (!$user && $request->filled('email')) {
+        $user = User::where('email', $request->email)->first();
+    }
+
     if (!$user) {
         return back()->with('error', 'User not found.');
     }
@@ -903,10 +913,15 @@ public function approve(Request $request, $email)
         'Approved student: ' . $user->full_name,
         $user->id
     );
-    // Send approval email
-    Mail::to($user->email)->send(new UserApproved($user));
 
-    return back()->with('success', 'You have updated the information successfully!');
+    // Send approval email safely without crashing approval process
+    try {
+        Mail::to($user->email)->send(new UserApproved($user));
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::warning('Could not send approval email to ' . $user->email . ': ' . $e->getMessage());
+    }
+
+    return back()->with('success', 'Student approved successfully!');
 }
 
 public function approveAll(Request $request, $roomId)
@@ -945,7 +960,11 @@ public function approveAll(Request $request, $roomId)
         $student->status = 1;
         $student->save();
 
-        Mail::to($student->email)->send(new UserApproved($student));
+        try {
+            Mail::to($student->email)->send(new UserApproved($student));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Could not send approval email to ' . $student->email . ': ' . $e->getMessage());
+        }
     }
 
     AuditLogger::log(
