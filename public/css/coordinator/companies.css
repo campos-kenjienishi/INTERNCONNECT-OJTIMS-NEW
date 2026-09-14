@@ -301,6 +301,33 @@
         }
         .company-name-text { font-weight: 600; color: #1a1a1a; font-size: 13px; }
 
+        /* Email cell */
+        .table-card-body table.dataTable tbody td.email-cell {
+            max-width: 175px;
+            width: 175px;
+        }
+        .email-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            font-size: 12px;
+            line-height: 1.45;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-all;
+        }
+        .email-wrap i {
+            color: var(--red);
+            font-size: 11px;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        .email-wrap span {
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+
         /* Student list pills */
         .student-pill {
             display: inline-flex;
@@ -653,6 +680,7 @@
         body.dark-mode table.dataTable thead th:first-child { background: #2a2a2a; }
         body.dark-mode table.dataTable tbody td { color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         body.dark-mode table.dataTable tbody td:first-child { background: #2a2a2a; }
+        body.dark-mode .email-wrap, body.dark-mode .email-cell { color: #e0e0e0 !important; }
         body.dark-mode table.dataTable tbody tr:hover td { background: rgba(220,38,38,0.1); }
         body.dark-mode table.dataTable tbody tr:hover td:first-child { background: rgba(220,38,38,0.1); }
 

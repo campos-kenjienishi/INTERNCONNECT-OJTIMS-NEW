@@ -338,10 +338,10 @@
                             </td>
 
                             <!-- Email -->
-                            <td>
-                                <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
-                                    <i class="fa fa-envelope" style="color:var(--red); font-size:11px;"></i>
-                                    {{ $company->company_email ?: '—' }}
+                            <td class="email-cell">
+                                <div class="email-wrap">
+                                    <i class="fa fa-envelope"></i>
+                                    <span>{{ $company->company_email ?: '—' }}</span>
                                 </div>
                             </td>
 
