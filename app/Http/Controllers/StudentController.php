@@ -86,12 +86,38 @@ private function coordinatorAnnouncementsForStudent($data)
 
 private function classAnnouncementsForStudent($data, $classRoomNames = [])
 {
-    if (empty($data->adviser_name)) {
+    $adviserNames = collect([$data->adviser_name ?? null])->filter()->values();
+
+    // If student is assigned to a class, include class adviser name as well
+    if (!empty($data->class_id)) {
+        $classObj = Classes::find($data->class_id);
+        if ($classObj && !empty($classObj->adviser_name)) {
+            $adviserNames->push($classObj->adviser_name);
+        }
+    }
+
+    $adviserNames = $adviserNames->unique()->values()->all();
+
+    if (empty($adviserNames)) {
         return collect([]);
     }
 
+    // Build list of name variants (handling ñ vs n and casing)
+    $allNameVariants = collect();
+    foreach ($adviserNames as $name) {
+        $allNameVariants->push($name);
+        $allNameVariants->push(str_replace(['ñ', 'Ñ'], ['n', 'N'], $name));
+        $allNameVariants->push(str_replace(['n', 'N'], ['ñ', 'Ñ'], $name));
+    }
+    $allNameVariants = $allNameVariants->unique()->values()->all();
+
     $professorIds = User::where('role', 2)
-        ->where('full_name', $data->adviser_name)
+        ->where(function ($q) use ($allNameVariants) {
+            $q->whereIn('full_name', $allNameVariants);
+            foreach ($allNameVariants as $v) {
+                $q->orWhere('full_name', 'like', '%' . $v . '%');
+            }
+        })
         ->pluck('id')
         ->filter()
         ->values()
@@ -102,14 +128,17 @@ private function classAnnouncementsForStudent($data, $classRoomNames = [])
     $hasTargetCourseColumn = Schema::hasColumn('announcements', 'target_course');
     $hasTargetRoomColumn = Schema::hasColumn('announcements', 'target_room');
 
-    return Announcements::where(function ($query) use ($data, $classRoomNames, $professorIds, $hasAudienceColumn, $hasTargetCourseColumn, $hasTargetRoomColumn, $hasAnnouncerUserIdColumn) {
-        // Must be posted by student's adviser
-        $query->where(function ($profQuery) use ($data, $professorIds, $hasAnnouncerUserIdColumn) {
+    return Announcements::where(function ($query) use ($data, $classRoomNames, $professorIds, $allNameVariants, $hasAudienceColumn, $hasTargetCourseColumn, $hasTargetRoomColumn, $hasAnnouncerUserIdColumn) {
+        // Must be posted by student's adviser (by user ID or any full_name spelling variation)
+        $query->where(function ($profQuery) use ($allNameVariants, $professorIds, $hasAnnouncerUserIdColumn) {
             if ($hasAnnouncerUserIdColumn && !empty($professorIds)) {
                 $profQuery->whereIn('announcer_user_id', $professorIds)
-                          ->orWhere('announcer', $data->adviser_name);
+                          ->orWhereIn('announcer', $allNameVariants);
             } else {
-                $profQuery->where('announcer', $data->adviser_name);
+                $profQuery->whereIn('announcer', $allNameVariants);
+            }
+            foreach ($allNameVariants as $v) {
+                $profQuery->orWhere('announcer', 'like', '%' . $v . '%');
             }
         });
 
