@@ -13,6 +13,7 @@ class PuptasApiService
     protected string $clientSecret;
     protected string $scope;
     protected int $cacheTtl;
+    protected ?string $lastAuthError = null;
 
     public function __construct()
     {
@@ -32,47 +33,65 @@ class PuptasApiService
             Cache::forget('puptas_oauth_access_token');
         }
 
-        return Cache::remember('puptas_oauth_access_token', 3600 * 12, function () {
-            try {
-                if (empty($this->clientId) || empty($this->clientSecret)) {
-                    Log::warning('PUPTAS API: Missing client_id or client_secret in configuration.');
-                    return null;
-                }
+        $this->lastAuthError = null;
 
-                $endpoint = $this->baseUrl . '/oauth/token';
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            $this->lastAuthError = 'PUPTAS API configuration is missing Client ID or Secret in .env.';
+            Log::warning('PUPTAS API: Missing client_id or client_secret in configuration.');
+            return null;
+        }
 
-                $response = Http::asForm()
-                    ->withOptions(['verify' => false])
-                    ->timeout(10)
-                    ->connectTimeout(5)
-                    ->withHeaders([
-                        'Accept' => 'application/json',
-                    ])
-                    ->post($endpoint, [
-                        'grant_type'    => 'client_credentials',
-                        'client_id'     => $this->clientId,
-                        'client_secret' => $this->clientSecret,
-                        'scope'         => $this->scope,
-                    ]);
+        if (Cache::has('puptas_oauth_access_token')) {
+            return Cache::get('puptas_oauth_access_token');
+        }
 
-                if ($response->successful()) {
-                    $json = $response->json();
-                    $token = $json['access_token'] ?? null;
-                    if ($token) {
-                        return $token;
-                    }
-                }
+        try {
+            $endpoint = $this->baseUrl . '/oauth/token';
 
-                Log::warning('PUPTAS OAuth token request failed', [
-                    'status' => $response->status(),
-                    'body'   => $response->body(),
+            $response = Http::asForm()
+                ->withOptions(['verify' => false])
+                ->timeout(10)
+                ->connectTimeout(5)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                ])
+                ->post($endpoint, [
+                    'grant_type'    => 'client_credentials',
+                    'client_id'     => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'scope'         => $this->scope,
                 ]);
-                return null;
-            } catch (\Exception $e) {
-                Log::error('PUPTAS OAuth token exception: ' . $e->getMessage());
-                return null;
+
+            if ($response->successful()) {
+                $json = $response->json();
+                $token = $json['access_token'] ?? null;
+                $expiresIn = (int) ($json['expires_in'] ?? (3600 * 12));
+                if ($token) {
+                    Cache::put('puptas_oauth_access_token', $token, max(60, $expiresIn - 60));
+                    return $token;
+                }
             }
-        });
+
+            if ($response->status() === 401 || $response->status() === 400) {
+                $this->lastAuthError = 'Failed to authenticate with PUPTAS Admission System. Please check Client ID and Secret.';
+            } else {
+                $this->lastAuthError = 'PUPTAS OAuth authentication returned HTTP ' . $response->status() . '.';
+            }
+
+            Log::warning('PUPTAS OAuth token request failed', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+            return null;
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            $this->lastAuthError = 'Unable to reach PUPTAS Admission System at ' . $this->baseUrl . ' (Connection timed out or host is unreachable).';
+            Log::error('PUPTAS OAuth connection exception: ' . $e->getMessage());
+            return null;
+        } catch (\Exception $e) {
+            $this->lastAuthError = 'Connection error reaching PUPTAS Admission System: ' . $e->getMessage();
+            Log::error('PUPTAS OAuth token exception: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -98,7 +117,7 @@ class PuptasApiService
                 'success' => false,
                 'data'    => [],
                 'meta'    => [],
-                'error'   => 'Failed to authenticate with PUPTAS Admission System. Please check Client ID and Secret.',
+                'error'   => $this->lastAuthError ?: 'Failed to authenticate with PUPTAS Admission System. Please check Client ID and Secret.',
             ];
         }
 
