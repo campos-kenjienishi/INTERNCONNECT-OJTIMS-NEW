@@ -146,8 +146,19 @@
             }
         },
 
+        detectUserIdentity: function () {
+            var userNameEl = document.querySelector(".user-name, [data-user-name]");
+            var name = userNameEl ? (userNameEl.textContent || "").trim() : "";
+            var role = this.detectUserRole();
+            if (name) {
+                var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+                return slug + "_" + role;
+            }
+            return role;
+        },
+
         getStorageKey: function () {
-            return STORAGE_KEY + "_" + this.detectUserRole();
+            return STORAGE_KEY + "_" + this.detectUserIdentity();
         },
 
         init: function () {
@@ -548,6 +559,13 @@
         },
 
         loadHistory: function () {
+            // Purge legacy un-scoped session storage key from previous versions
+            try {
+                if (sessionStorage.getItem(STORAGE_KEY)) {
+                    sessionStorage.removeItem(STORAGE_KEY);
+                }
+            } catch (e) {}
+
             var key = this.getStorageKey();
             try {
                 var stored = sessionStorage.getItem(key);
