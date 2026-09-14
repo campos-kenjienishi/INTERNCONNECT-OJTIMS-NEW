@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +11,14 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor_moa-responsive.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor/reports-expired.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
     <script>
         (function(){
             try {
@@ -21,11 +28,6 @@
             } catch(e){}
         })();
     </script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{{ vasset('css/professor_moa-responsive.css') }}">
-
-    <link rel="stylesheet" href="{{ vasset('css/professor/reports-expired.css') }}">
 </head>
 
 
@@ -140,7 +142,7 @@
                 <div class="filter-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h2>Generate MOA Report</h2>
-                    <p>Filter by school year and course to generate a report</p>
+                    <p>Filter by school year and program to generate a report</p>
                 </div>
             </div>
             <form action="{{ route('reports.generate.prof') }}" method="post">
@@ -172,7 +174,7 @@
                         <span class="error-hint" id="school_year-error">Please select the school year.</span>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Program</label>
                         <select class="filter-select" name="course" id="courseSelect" required>
                             @foreach ($courseAll as $c)
                                 <option value="{{ $c->course }}" {{ (string) ($selectedCourse ?? '') === (string) $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
@@ -544,7 +546,6 @@
 <script src="{{ vasset('js/professor/reports-expired.js') }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 @include('partials.password-setup-modal')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

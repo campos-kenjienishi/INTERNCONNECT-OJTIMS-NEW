@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,6 +24,8 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/reports-table.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -304,7 +307,7 @@
                 <div class="panel-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h2>Generate Report</h2>
-                    <p>Filter by school year and course to generate the OJT report</p>
+                    <p>Filter by school year and program to generate the OJT report</p>
                 </div>
             </div>
             <div class="panel-card-body">
@@ -323,7 +326,7 @@
                             </select>
                         </div>
                         <div class="field-group">
-                            <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                            <label class="field-label"><i class="fa fa-graduation-cap"></i> Program</label>
                             <select class="field-select" id="course" name="course" required>
                                 @foreach ($course as $c)
                                 <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
@@ -375,7 +378,7 @@
                         <thead>
                             <tr>
                                 <th style="white-space:nowrap; min-width:140px;">Student Name</th>
-                                <th style="white-space:nowrap; min-width:130px;">Course / Major</th>
+                                <th style="white-space:nowrap; min-width:130px;">Program / Major</th>
                                 <th style="white-space:nowrap; min-width:70px;">Section</th>
                                 <th style="white-space:nowrap; min-width:160px;">Company Name</th>
                                 <th style="white-space:nowrap; min-width:120px;">Assigned Dept.</th>

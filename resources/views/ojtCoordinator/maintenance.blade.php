@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Maintenance</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         (function(){
             try {
@@ -23,6 +26,9 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/maintenance.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/sync-alerts.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -155,9 +161,15 @@
         
     </nav>
             </div>
-            <button class="btn-add-course" data-bs-toggle="modal" data-bs-target="#addCourseModal">
-                <i class="fa fa-plus"></i> Add Course
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button type="button" id="btnSyncPuptas" class="btn-sync-puptas">
+                    <i class="fa fa-sync-alt" id="puptasSyncIcon"></i>
+                    <span>Sync with PUPTAS</span>
+                </button>
+                <button class="btn-add-course" data-bs-toggle="modal" data-bs-target="#addCourseModal">
+                    <i class="fa fa-plus-circle"></i> Manual Add
+                </button>
+            </div>
         </div>
 
         <!-- Stats Row -->
@@ -167,7 +179,7 @@
                 <div class="stat-icon red"><i class="fa fa-graduation-cap"></i></div>
                 <div>
                     <div class="stat-num">{{ $totalCourses }}</div>
-                    <div class="stat-name">Total Courses</div>
+                    <div class="stat-name">Total Programs</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -181,7 +193,7 @@
                 <div class="stat-icon blue"><i class="fa fa-check-circle"></i></div>
                 <div>
                     <div class="stat-num">{{ $totalCourses }}</div>
-                    <div class="stat-name">Available Courses</div>
+                    <div class="stat-name">Available Programs</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -199,13 +211,13 @@
                 <div class="table-card-header-left">
                     <div class="header-icon"><i class="fa fa-graduation-cap"></i></div>
                     <div>
-                        <h2>Courses</h2>
-                        <p>Manage all available courses in the system</p>
+                        <h2>Programs</h2>
+                        <p>Manage all available programs in the system</p>
                     </div>
                 </div>
                 <div class="count-badge">
                     <i class="fa fa-list"></i>
-                    {{ $totalCourses }} {{ $totalCourses == 1 ? 'course' : 'courses' }}
+                    {{ $totalCourses }} {{ $totalCourses == 1 ? 'program' : 'programs' }}
                 </div>
             </div>
 
@@ -213,13 +225,13 @@
                 <table id="courseTable" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Course Name</th>
+                            <th>Program Name</th>
                             <th>Acronym</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($data as $data)
+                        @foreach($data as $course)
                         <tr>
                             <td>
                                 <div class="course-cell">
@@ -227,12 +239,12 @@
                                         <i class="fa fa-book"></i>
                                     </div>
                                     <div>
-                                        <div class="course-name-text">{{ $data->course }}</div>
+                                        <div class="course-name-text">{{ $course->course }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="acronym-badge">{{ $data->acronym }}</span>
+                                <span class="acronym-badge">{{ $course->acronym }}</span>
                             </td>
                             <td>
                                 <div class="course-actions">
@@ -240,12 +252,12 @@
                                         class="btn-edit edit-button"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editCourseModal"
-                                        data-course-id="{{ $data->id }}"
-                                        data-course-name="{{ $data->course }}"
-                                        data-course-acronym="{{ $data->acronym }}">
+                                        data-course-id="{{ $course->id }}"
+                                        data-course-name="{{ $course->course }}"
+                                        data-course-acronym="{{ $course->acronym }}">
                                         <i class="fa fa-pen"></i> Edit
                                     </button>
-                                    <button class="btn-remove remove-button" data-course-id="{{ $data->id }}">
+                                    <button class="btn-remove remove-button" data-course-id="{{ $course->id }}">
                                         <i class="fa fa-trash-alt"></i> Remove
                                     </button>
                                 </div>
@@ -284,7 +296,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fa fa-graduation-cap"></i> Add New Course
+                    <i class="fa fa-graduation-cap"></i> Manual Add Program
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -293,17 +305,17 @@
                 <div class="modal-body">
                     <div class="field-group">
                         <label class="field-label">
-                            <i class="fa fa-book"></i> Course Name
+                            <i class="fa fa-book"></i> Program Name
                         </label>
                         <input class="field-input" type="text" name="course"
-                               placeholder="e.g. Bachelor of Science in Information Technology" required>
+                                placeholder="e.g. Bachelor of Science in Information Technology" required>
                     </div>
                     <div class="field-group">
                         <label class="field-label">
                             <i class="fa fa-tag"></i> Acronym
                         </label>
                         <input class="field-input" type="text" name="acronym"
-                               placeholder="e.g. BSIT" required>
+                                placeholder="e.g. BSIT" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -311,7 +323,7 @@
                         <i class="fa fa-times"></i> Close
                     </button>
                     <button type="submit" class="btn-modal-submit">
-                        <i class="fa fa-plus"></i> Add Course
+                        <i class="fa fa-plus-circle"></i> Add Program
                     </button>
                 </div>
             </form>
@@ -324,7 +336,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fa fa-pen"></i> Edit Course
+                    <i class="fa fa-pen"></i> Edit Program
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -334,7 +346,7 @@
                 <div class="modal-body">
                     <div class="field-group">
                         <label class="field-label">
-                            <i class="fa fa-book"></i> Course Name
+                            <i class="fa fa-book"></i> Program Name
                         </label>
                         <input id="edit-course-name" class="field-input" type="text" name="course"
                                placeholder="e.g. Bachelor of Science in Information Technology" required>
@@ -372,9 +384,8 @@
         csrfToken: @json(csrf_token())
     };
 </script>
+<script src="{{ vasset('js/components/sync-alerts.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/coordinator/maintenance.js') }}?v={{ time() }}"></script>
-<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

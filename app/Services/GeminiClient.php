@@ -33,12 +33,13 @@ class GeminiClient
                     ],
                 ],
                 'generationConfig' => [
-                    'maxOutputTokens' => 800,
+                    'maxOutputTokens' => 350,
+                    'temperature' => 0.2,
                     'responseMimeType' => 'application/json',
                 ],
             ];
 
-            $response = Http::timeout(20)
+            $response = Http::timeout(15)
                 ->acceptJson()
                 ->withHeaders(['x-goog-api-key' => $apiKey])
                 ->post($endpoint, $payload);

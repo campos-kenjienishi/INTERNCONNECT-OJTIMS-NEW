@@ -44,12 +44,32 @@
             e.preventDefault();
             var fileUrl = $(this).data('file-url');
             var fileName = $(this).data('file-name');
+            var fileExt = ($(this).data('file-ext') || '').toString().toLowerCase();
             var downloadUrl = $(this).data('download-url');
 
             $('#filePreviewTitle').text(fileName || 'Document Preview');
             $('#filePreviewSubTitle').text(fileName || '');
             $('#filePreviewDownloadBtn').attr('href', downloadUrl);
-            $('#filePreviewFrame').attr('src', fileUrl);
+            $('#fileNoticeDownloadBtn').attr('href', downloadUrl);
+
+            var previewableExts = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg'];
+            if (previewableExts.includes(fileExt)) {
+                $('#filePreviewNotice').hide();
+                $('#filePreviewFrame').attr('src', fileUrl).show();
+                $('#filePreviewBadge').html('<i class="fa fa-eye"></i> Preview');
+            } else {
+                $('#filePreviewFrame').attr('src', 'about:blank').hide();
+                var extUpper = fileExt ? fileExt.toUpperCase() : 'DOCX';
+                var iconClass = (fileExt === 'docx' || fileExt === 'doc') ? 'fa-file-word' :
+                                (fileExt === 'xlsx' || fileExt === 'xls') ? 'fa-file-excel' :
+                                (fileExt === 'pptx' || fileExt === 'ppt') ? 'fa-file-powerpoint' : 'fa-file-alt';
+                
+                $('#fileNoticeIcon').attr('class', 'fa ' + iconClass);
+                $('#fileNoticeHeading').text('Preview Not Supported for ' + extUpper + ' Documents');
+                $('#fileNoticeText').text('In-browser preview is not supported for .' + fileExt + ' files. Instead of viewing in browser, please download the file to open and view it directly on your device.');
+                $('#filePreviewNotice').show();
+                $('#filePreviewBadge').html('<i class="fa fa-info-circle"></i> Download Required');
+            }
 
             var modalEl = document.getElementById('filePreviewModal');
             if (modalEl && modalEl.parentNode !== document.body) {
@@ -60,11 +80,31 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
+            if (window.jQuery && $('#fileTable').length && !$.fn.DataTable.isDataTable('#fileTable')) {
+                $('#fileTable').DataTable({
+                    order: [[2, 'desc']],
+                    autoWidth: false,
+                    pageLength: 10,
+                    columnDefs: [
+                        { width: "28%", targets: 0 },
+                        { width: "20%", targets: 1 },
+                        { width: "16%", targets: 2 },
+                        { width: "16%", targets: 3 },
+                        { width: "20%", targets: 4, orderable: false, searchable: false, className: "text-end" }
+                    ],
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search files..."
+                    }
+                });
+            }
+
             var modalEl = document.getElementById('filePreviewModal');
             if (modalEl) {
                 modalEl.addEventListener('hidden.bs.modal', function () {
                     var frame = document.getElementById('filePreviewFrame');
                     if (frame) frame.src = 'about:blank';
+                    $('#filePreviewNotice').hide();
                 });
             }
         });

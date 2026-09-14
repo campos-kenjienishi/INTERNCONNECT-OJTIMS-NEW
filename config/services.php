@@ -76,4 +76,12 @@ return [
         'api_key'  => env('FLSS_API_KEY', ''),
     ],
 
+    'puptas' => [
+        'base_url'      => env('PUPTAS_BASE_URL', 'https://puptas.undraftedbsit2027.com'),
+        'client_id'     => env('PUPTAS_CLIENT_ID', ''),
+        'client_secret' => env('PUPTAS_CLIENT_SECRET', ''),
+        'scope'         => env('PUPTAS_SCOPE', 'program-read'),
+        'cache_ttl'     => (int) env('PUPTAS_CACHE_TTL', 86400),
+    ],
+
 ];

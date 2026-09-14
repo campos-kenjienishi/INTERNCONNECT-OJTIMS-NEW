@@ -626,7 +626,7 @@
                 title: 'Sync Profile from GuiSIS?',
                 subtitle: 'Automatically fetch your verified academic & demographic details from Guidance.',
                 bullets: [
-                    'Updates Student Number, Course/Program, and Year & Section',
+                    'Updates Student Number, Program, and Year & Section',
                     'Synchronizes Birthdate, Contact Number, and Home Address',
                     'Keeps your student internship profile 100% verified and up-to-date'
                 ],
@@ -660,7 +660,7 @@
 
                                 if (d.full_name) syncedList.push({ label: 'Full Name', value: d.full_name, icon: 'fa-user' });
                                 if (d.studentNum) syncedList.push({ label: 'Student Number', value: d.studentNum, icon: 'fa-id-card' });
-                                if (d.course) syncedList.push({ label: 'Program / Course', value: d.course, icon: 'fa-graduation-cap' });
+                                if (d.course) syncedList.push({ label: 'Program', value: d.course, icon: 'fa-graduation-cap' });
                                 if (d.year_and_section) syncedList.push({ label: 'Year & Section', value: d.year_and_section, icon: 'fa-layer-group' });
                                 if (d.contact_number) syncedList.push({ label: 'Contact Number', value: d.contact_number, icon: 'fa-phone' });
                                 if (d.date_of_birth) syncedList.push({ label: 'Date of Birth', value: d.date_of_birth, icon: 'fa-calendar-alt' });

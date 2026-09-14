@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,6 +25,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/companies.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -226,7 +229,7 @@
                             @endforeach
                         </select>
                         <select name="course" class="company-toolbar-select company-toolbar-select-course">
-                            <option value="">All Courses</option>
+                            <option value="">All Programs</option>
                             @foreach ($course as $courseItem)
                                 <option value="{{ $courseItem->course }}" {{ ($selectedCourse ?? '') === $courseItem->course ? 'selected' : '' }}>
                                     {{ $courseItem->course }}
@@ -258,7 +261,7 @@
                             <th>Contact No.</th>
                             <th>Email</th>
                             <th>School Year</th>
-                            <th>Course</th>
+                            <th>Program</th>
                             <th>Students</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -609,7 +612,7 @@
 
                    <div class="field-group">
                         <label class="field-label">
-                            <i class="fa fa-graduation-cap"></i> Course
+                            <i class="fa fa-graduation-cap"></i> Program
                             <span style="color:var(--red);">*</span>
                         </label>
 
@@ -618,7 +621,7 @@
                                 type="text"
                                 id="moaCourseSearch"
                                 class="course-picker-search"
-                                placeholder="Search course acronym or name..."
+                                placeholder="Search program acronym or name..."
                             >
 
                             <div id="moaCourseSelect" class="course-picker-scroll course-checkbox-group">
@@ -640,7 +643,7 @@
                         </div>
 
                         <div style="font-size:11.5px; color:#777;">
-                            Select one or more courses.
+                            Select one or more programs.
                         </div>
                     </div>
 
@@ -774,13 +777,13 @@
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Course <span style="color:var(--red);">*</span></label>
+                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Program <span style="color:var(--red);">*</span></label>
                         <div class="course-picker-shell">
                             <input
                                 type="text"
                                 id="editMoaCourseSearch"
                                 class="course-picker-search"
-                                placeholder="Search course acronym or name..."
+                                placeholder="Search program acronym or name..."
                             >
 
                             <div id="editMoaCourseSelect" class="course-picker-scroll course-checkbox-group">
@@ -800,7 +803,7 @@
                                 @endforeach
                             </div>
                         </div>
-                        <div style="font-size:11.5px; color:#777;">Select one or more courses.</div>
+                        <div style="font-size:11.5px; color:#777;">Select one or more programs.</div>
                     </div>
 
                     <div class="modal-section"><i class="fa fa-paperclip"></i> MOA Document</div>
@@ -866,9 +869,9 @@
             <div class="modal-body" style="background:#fff; max-height:78vh;">
                 <div style="display:grid; grid-template-columns: 1.1fr 1fr; gap:12px; margin-bottom:14px;">
                     <div class="field-group" style="margin:0;">
-                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                        <label class="field-label"><i class="fa fa-graduation-cap"></i> Program</label>
                         <select id="assignStudentsCourse" class="field-select">
-                            <option value="">All Courses</option>
+                            <option value="">All Programs</option>
                             @foreach ($course as $courseItem)
                                 <option value="{{ $courseItem->course }}">{{ $courseItem->course }}</option>
                             @endforeach
@@ -999,8 +1002,6 @@
     };
 </script>
 <script src="{{ vasset('js/coordinator/companies.js') }}?v={{ time() }}"></script>
-<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>

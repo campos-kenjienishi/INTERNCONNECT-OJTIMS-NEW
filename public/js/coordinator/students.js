@@ -285,7 +285,7 @@
                 title: 'Sync from GuiSIS (Guidance)?',
                 subtitle: 'Update academic and demographic records for existing students from GuiSIS.',
                 bullets: [
-                    'Updates Student Numbers, Program/Course, and Year & Section',
+                    'Updates Student Numbers, Program, and Year & Section',
                     'Synchronizes Birthdates, Contact Numbers, and Home Addresses',
                     'Maintains full synchronization with Guidance Counselor database'
                 ],

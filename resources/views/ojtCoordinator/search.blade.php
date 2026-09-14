@@ -2,12 +2,15 @@
 <html lang="en">
 
 <head>
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternConnect</title>
     <!-- ======= Styles ====== -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -253,45 +256,10 @@
     <script src="assets/js/main.js"></script>
 
     <!-- ====== ionicons ======= -->
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-<script>
-    document.querySelectorAll('.legacy-remove-form').forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const templateName = form.dataset.templateName || 'this template';
-            const proceed = function () { form.submit(); };
-
-            if (typeof Swal === 'undefined') {
-                if (window.confirm('Remove ' + templateName + '? This cannot be undone.')) {
-                    proceed();
-                }
-                return;
-            }
-
-            Swal.fire({
-                title: 'Remove template?',
-                html: 'This will permanently delete <strong>' + templateName + '</strong>.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, remove it',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    proceed();
-                }
-            });
-        });
-    });
-</script>
-<script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
-<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
+    <script src="{{ vasset('js/coordinator/search.js') }}?v={{ time() }}" defer></script>
+    <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+    <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
-
 </html>
 
 

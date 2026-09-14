@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +12,13 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor_studentRequire-responsive.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor/student-require.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
     <script>
         (function(){
             try {
@@ -22,9 +28,6 @@
             } catch(e){}
         })();
     </script>
-    <link rel="stylesheet" href="{{ vasset('css/professor_studentRequire-responsive.css') }}">
-
-    <link rel="stylesheet" href="{{ vasset('css/professor/student-require.css') }}">
 </head>
 
 
@@ -449,8 +452,6 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="{{ vasset('js/professor/student-require.js') }}"></script>
-<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 @include('partials.password-setup-modal')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

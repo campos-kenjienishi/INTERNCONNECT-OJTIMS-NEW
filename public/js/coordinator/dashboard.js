@@ -114,229 +114,236 @@
             });
         });
 
-        /* ══════════════════════════════════════════════
-           DATE & TIME MODAL
-        ══════════════════════════════════════════════ */
+        /* ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ 
+           ACADEMIC CHRONO & CALENDAR HUB
+        ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═  */
 
-        const dateEl = document.getElementById('currentDate');
-        if (dateEl) {
-            dateEl.textContent = new Date().toLocaleDateString('en-US', {
-                weekday: 'short', year: 'numeric',
-                month: 'long', day: 'numeric'
-            });
-        }
+        // 1. LIVE DIGITAL CHRONO STATION & MOVING CLOCK (Philippine Standard Time UTC+8)
+        function initDashboardLiveClock() {
+            const hoursEl = document.getElementById('dashHours');
+            const minsEl = document.getElementById('dashMins');
+            const secsEl = document.getElementById('dashSecs');
+            const ampmEl = document.getElementById('dashAmPm');
+            const dayNameEl = document.getElementById('dashDayName');
+            const fullDateEl = document.getElementById('dashFullDate');
+            const greetingMsgEl = document.getElementById('dashGreetingMsg');
+            const greetingIconEl = document.getElementById('dashGreetingIcon');
 
-        const dtOverlay  = document.getElementById('dtOverlay') || createDTModal();
-        const dtCloseBtn = document.getElementById('dtCloseBtn');
-        const dateBadge  = document.getElementById('dateBadge');
+            // Moving Clock elements
+            const hourHandEl = document.getElementById('chronoHourHand');
+            const minHandEl = document.getElementById('chronoMinHand');
+            const secHandEl = document.getElementById('chronoSecHand');
+            const dialMarksEl = document.getElementById('chronoDialMarks');
 
-        function createDTModal() {
-            const html = `
-            <div class="dt-overlay" id="dtOverlay">
-                <div class="dt-modal" id="dtModal">
-                    <div class="dt-modal-header">
-                        <div class="dt-header-top">
-                            <span class="dt-header-title"><i class="fa fa-clock" style="margin-right:6px;"></i>Date & Time</span>
-                            <button class="dt-close-btn" id="dtCloseBtn"><i class="fa fa-times"></i></button>
-                        </div>
-                        <div class="dt-clock-display">
-                            <div class="dt-time-big">
-                                <span id="dtHours">00</span>
-                                <span class="colon">:</span>
-                                <span id="dtMinutes">00</span>
-                                <span class="colon">:</span>
-                                <span id="dtSeconds">00</span>
-                                <span class="dt-time-ampm" id="dtAmPm">AM</span>
-                            </div>
-                            <div class="dt-date-sub" id="dtDateSub"></div>
-                        </div>
-                    </div>
-                    <div class="dt-analog-wrap">
-                        <div class="analog-clock" id="analogClock">
-                            <div class="clock-center"></div>
-                            <div class="hand hour-hand" id="hourHand"></div>
-                            <div class="hand minute-hand" id="minuteHand"></div>
-                            <div class="hand second-hand" id="secondHand"></div>
-                        </div>
-                    </div>
-                    <div class="dt-calendar">
-                        <div class="cal-nav">
-                            <button class="cal-nav-btn" id="calPrev"><i class="fa fa-chevron-left"></i></button>
-                            <span class="cal-month-label" id="calMonthLabel"></span>
-                            <button class="cal-nav-btn" id="calNext"><i class="fa fa-chevron-right"></i></button>
-                        </div>
-                        <div class="cal-grid" id="calGrid"></div>
-                    </div>
-                </div>
-            </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', html);
-            return document.getElementById('dtOverlay');
-        }
+            if (!hoursEl) return;
 
-        /* Open / Close */
-        if (dateBadge) {
-            dateBadge.addEventListener('click', function () {
-                dtOverlay.classList.add('open');
-                startClock();
-                renderCalendar(calViewYear, calViewMonth);
-            });
-        }
+            // Generate 12 clock dial marks once
+            if (dialMarksEl && !dialMarksEl.children.length) {
+                for (let i = 0; i < 12; i++) {
+                    const mark = document.createElement('div');
+                    mark.className = 'chrono-clock-mark' + (i % 3 === 0 ? ' major' : '');
+                    mark.style.transform = `rotate(${i * 30}deg)`;
+                    dialMarksEl.appendChild(mark);
+                }
+            }
 
-        function closeModal() {
-            dtOverlay.classList.remove('open');
-            stopClock();
-        }
+            const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const MONTH_NAMES = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
 
-        if (dtCloseBtn) {
-            dtCloseBtn.addEventListener('click', closeModal);
-        }
-        dtOverlay.addEventListener('click', function (e) {
-            if (e.target === dtOverlay) closeModal();
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        /* ── Digital Clock ── */
-        let clockRAF = null;
-
-        function startClock() {
             function tick() {
-                const now  = new Date();
-                let   h    = now.getHours();
-                const m    = now.getMinutes();
-                const s    = now.getSeconds();
-                const ampm = h >= 12 ? 'PM' : 'AM';
-                h = h % 12 || 12;
+                const now = new Date();
 
-                document.getElementById('dtHours').textContent   = String(h).padStart(2,'0');
-                document.getElementById('dtMinutes').textContent = String(m).padStart(2,'0');
-                document.getElementById('dtSeconds').textContent = String(s).padStart(2,'0');
-                document.getElementById('dtAmPm').textContent    = ampm;
-                document.getElementById('dtDateSub').textContent =
-                    now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+                const secNum = now.getSeconds();
+                const minNum = now.getMinutes();
+                const rawHours = now.getHours();
+                const hourNum = rawHours % 12;
+                const ampm = rawHours >= 12 ? 'PM' : 'AM';
 
-                /* ── Analog hands ── */
-                const secDeg  = s * 6;
-                const minDeg  = m * 6 + s * 0.1;
-                const hourDeg = (h % 12) * 30 + m * 0.5;
+                const minutes = String(minNum).padStart(2, '0');
+                const seconds = String(secNum).padStart(2, '0');
+                const displayHours = String(hourNum || 12).padStart(2, '0');
 
-                document.getElementById('secondHand').style.transform = `rotate(${secDeg}deg)`;
-                document.getElementById('minuteHand').style.transform = `rotate(${minDeg}deg)`;
-                document.getElementById('hourHand').style.transform   = `rotate(${hourDeg}deg)`;
+                // Numeric Pods (Right side)
+                hoursEl.textContent = displayHours;
+                if (minsEl) minsEl.textContent = minutes;
+                if (secsEl) secsEl.textContent = seconds;
+                if (ampmEl) ampmEl.textContent = ampm;
 
-                clockRAF = requestAnimationFrame(tick);
+                // Moving Clock Hands (Left side)
+                const secDeg = secNum * 6;
+                const minDeg = minNum * 6 + secNum * 0.1;
+                const hourDeg = hourNum * 30 + minNum * 0.5;
+
+                if (secHandEl) secHandEl.style.transform = `rotate(${secDeg}deg)`;
+                if (minHandEl) minHandEl.style.transform = `rotate(${minDeg}deg)`;
+                if (hourHandEl) hourHandEl.style.transform = `rotate(${hourDeg}deg)`;
+
+                // Date Ribbon
+                if (dayNameEl) {
+                    dayNameEl.textContent = DAY_NAMES[now.getDay()];
+                }
+
+                if (fullDateEl) {
+                    const month = MONTH_NAMES[now.getMonth()];
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const year = now.getFullYear();
+                    fullDateEl.textContent = `${month} ${day}, ${year}`;
+                }
+
+                // Dynamic greeting by hour of the day
+                if (greetingMsgEl) {
+                    let greeting = 'Good day';
+                    let iconClass = 'fa-sun';
+
+                    if (rawHours >= 5 && rawHours < 12) {
+                        greeting = 'Good morning';
+                        iconClass = 'fa-sun';
+                    } else if (rawHours >= 12 && rawHours < 18) {
+                        greeting = 'Good afternoon';
+                        iconClass = 'fa-cloud-sun';
+                    } else {
+                        greeting = 'Good evening';
+                        iconClass = 'fa-moon';
+                    }
+
+                    greetingMsgEl.textContent = greeting;
+                    if (greetingIconEl) {
+                        greetingIconEl.innerHTML = `<i class="fa ${iconClass}"></i>`;
+                    }
+                }
             }
+
             tick();
+            setInterval(tick, 1000);
         }
 
-        function stopClock() {
-            if (clockRAF) { cancelAnimationFrame(clockRAF); clockRAF = null; }
-        }
+        // 2. INTERACTIVE MONTHLY CALENDAR PANE
+        function initDashboardCalendarWidget() {
+            const monthLabelEl = document.getElementById('dashCalMonthLabel');
+            const gridEl = document.getElementById('dashCalGrid');
+            const prevBtn = document.getElementById('dashCalPrev');
+            const nextBtn = document.getElementById('dashCalNext');
+            const todayBtn = document.getElementById('dashCalToday');
+            const selectedLabelEl = document.getElementById('dashCalSelectedLabel');
 
-        /* ── Build hour tick marks ── */
-        (function buildMarks() {
-            const clock = document.getElementById('analogClock');
-            if (!clock) return;
-            for (let i = 0; i < 12; i++) {
-                const mark = document.createElement('div');
-                mark.className = 'clock-mark';
-                const angle  = i * 30;
-                mark.style.cssText = `
-                    position: absolute;
-                    width:  ${i % 3 === 0 ? 2.5 : 1.5}px;
-                    height: ${i % 3 === 0 ? 8 : 5}px;
-                    background: currentColor;
-                    border-radius: 2px;
-                    top: 4px;
-                    left: calc(50% - ${i % 3 === 0 ? 1.25 : 0.75}px);
-                    transform-origin: center 53px;
-                    transform: rotate(${angle}deg);
-                `;
-                clock.appendChild(mark);
-            }
-        })();
+            if (!gridEl || !monthLabelEl) return;
 
-        /* ── Calendar ── */
-        const MONTHS = ['January','February','March','April','May','June',
-                        'July','August','September','October','November','December'];
-        const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+            const MONTH_NAMES = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        const today       = new Date();
-        let calViewYear   = today.getFullYear();
-        let calViewMonth  = today.getMonth();
-        let selectedDay   = today.getDate();
+            const realToday = new Date();
+            let currentYear = realToday.getFullYear();
+            let currentMonth = realToday.getMonth();
+            let selectedDate = new Date(realToday.getFullYear(), realToday.getMonth(), realToday.getDate());
 
-        const calPrev = document.getElementById('calPrev');
-        const calNext = document.getElementById('calNext');
-
-        if (calPrev) {
-            calPrev.addEventListener('click', function () {
-                calViewMonth--;
-                if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
-                renderCalendar(calViewYear, calViewMonth);
-            });
-        }
-
-        if (calNext) {
-            calNext.addEventListener('click', function () {
-                calViewMonth++;
-                if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
-                renderCalendar(calViewYear, calViewMonth);
-            });
-        }
-
-        function renderCalendar(year, month) {
-            document.getElementById('calMonthLabel').textContent = `${MONTHS[month]} ${year}`;
-
-            const grid      = document.getElementById('calGrid');
-            grid.innerHTML  = '';
-
-            /* Day-name headers */
-            DAYS.forEach(d => {
-                const el = document.createElement('div');
-                el.className   = 'cal-day-name';
-                el.textContent = d;
-                grid.appendChild(el);
-            });
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            /* Empty leading cells */
-            for (let i = 0; i < firstDay; i++) {
-                const el = document.createElement('div');
-                el.className = 'cal-day empty';
-                grid.appendChild(el);
+            function updateSelectedLabel() {
+                if (selectedLabelEl && selectedDate) {
+                    selectedLabelEl.textContent = `${MONTH_SHORT[selectedDate.getMonth()]} ${selectedDate.getDate()}, ${selectedDate.getFullYear()}`;
+                }
             }
 
-            /* Day cells */
-            for (let d = 1; d <= daysInMonth; d++) {
-                const el = document.createElement('div');
-                el.className   = 'cal-day';
-                el.textContent = d;
+            function renderCalendar(year, month) {
+                monthLabelEl.textContent = `${MONTH_NAMES[month]} ${year}`;
+                gridEl.innerHTML = '';
 
-                const isToday  = d === today.getDate() &&
-                                 month === today.getMonth() &&
-                                 year  === today.getFullYear();
-                const isSel    = d === selectedDay &&
-                                 month === calViewMonth &&
-                                 year  === calViewYear;
+                const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Sun
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-                if (isToday) el.classList.add('today');
-                else if (isSel) el.classList.add('selected');
+                // Previous month trailing days
+                for (let i = firstDayIndex - 1; i >= 0; i--) {
+                    const dayNum = daysInPrevMonth - i;
+                    const cell = document.createElement('div');
+                    cell.className = 'cal-day-cell other-month';
+                    cell.textContent = dayNum;
+                    gridEl.appendChild(cell);
+                }
 
-                el.addEventListener('click', function () {
-                    selectedDay  = d;
-                    calViewYear  = year;
-                    calViewMonth = month;
-                    renderCalendar(year, month);
+                // Current month days
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cal-day-cell';
+                    cell.textContent = day;
+
+                    const isToday = day === realToday.getDate() &&
+                                    month === realToday.getMonth() &&
+                                    year === realToday.getFullYear();
+
+                    const isSelected = selectedDate &&
+                                       day === selectedDate.getDate() &&
+                                       month === selectedDate.getMonth() &&
+                                       year === selectedDate.getFullYear();
+
+                    if (isToday) {
+                        cell.classList.add('today');
+                    } else if (isSelected) {
+                        cell.classList.add('selected');
+                    }
+
+                    cell.addEventListener('click', function () {
+                        selectedDate = new Date(year, month, day);
+                        updateSelectedLabel();
+                        renderCalendar(year, month);
+                    });
+
+                    gridEl.appendChild(cell);
+                }
+
+                // Next month leading days to complete grid row
+                const totalCells = firstDayIndex + daysInMonth;
+                const remaining = (7 - (totalCells % 7)) % 7;
+                for (let nextDay = 1; nextDay <= remaining; nextDay++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cal-day-cell other-month';
+                    cell.textContent = nextDay;
+                    gridEl.appendChild(cell);
+                }
+
+                updateSelectedLabel();
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function () {
+                    currentMonth--;
+                    if (currentMonth < 0) {
+                        currentMonth = 11;
+                        currentYear--;
+                    }
+                    renderCalendar(currentYear, currentMonth);
                 });
-
-                grid.appendChild(el);
             }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function () {
+                    currentMonth++;
+                    if (currentMonth > 11) {
+                        currentMonth = 0;
+                        currentYear++;
+                    }
+                    renderCalendar(currentYear, currentMonth);
+                });
+            }
+
+            if (todayBtn) {
+                todayBtn.addEventListener('click', function () {
+                    currentYear = realToday.getFullYear();
+                    currentMonth = realToday.getMonth();
+                    selectedDate = new Date(realToday.getFullYear(), realToday.getMonth(), realToday.getDate());
+                    renderCalendar(currentYear, currentMonth);
+                });
+            }
+
+            renderCalendar(currentYear, currentMonth);
         }
+
+        initDashboardLiveClock();
+        initDashboardCalendarWidget();
 
 
         function renderDashboardAiAnswer(data) {

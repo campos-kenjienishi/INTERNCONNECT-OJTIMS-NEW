@@ -9,13 +9,17 @@
         wrapper.id = "icFloatingSpeedDial";
         wrapper.innerHTML = [
             '<div class="ic-speed-dial-menu" id="icSpeedDialMenu">',
-            '    <button type="button" class="ic-speed-dial-item" id="icBtnAccessibility" title="Toggle Accessibility Tools">',
-            '        <span class="ic-item-emblem"><i class="fas fa-universal-access"></i></span>',
-            '        <span class="ic-item-label">Accessibility</span>',
+            '    <button type="button" class="ic-speed-dial-item" id="icBtnAskAi" title="Ask Bud (Your OJT Buddy)">',
+            '        <span class="ic-item-emblem ic-item-bud-emblem"><img src="/images/mascot/bud_waving.png" alt="Bud" class="ic-bud-fab-img"></span>',
+            '        <span class="ic-item-label">Ask Bud</span>',
             '    </button>',
             '    <button type="button" class="ic-speed-dial-item" id="icBtnVoiceGuide" title="Voice Input & Commands Guide">',
             '        <span class="ic-item-emblem"><i class="fas fa-microphone-alt"></i></span>',
             '        <span class="ic-item-label">Voice Guide</span>',
+            '    </button>',
+            '    <button type="button" class="ic-speed-dial-item" id="icBtnAccessibility" title="Toggle Accessibility Tools">',
+            '        <span class="ic-item-emblem"><i class="fas fa-universal-access"></i></span>',
+            '        <span class="ic-item-label">Accessibility</span>',
             '    </button>',
             '</div>',
             '<button type="button" class="ic-speed-dial-trigger" id="icSpeedDialTrigger" aria-label="Quick Tools Menu" title="Quick Tools">',
@@ -111,6 +115,7 @@
         // Event bindings for Speed Dial & Modal
         var trigger = document.getElementById("icSpeedDialTrigger");
         var speedDial = document.getElementById("icFloatingSpeedDial");
+        var btnAskAi = document.getElementById("icBtnAskAi");
         var btnAccess = document.getElementById("icBtnAccessibility");
         var btnVoiceGuide = document.getElementById("icBtnVoiceGuide");
         var guideModal = document.getElementById("voiceInputGuideModal");
@@ -128,6 +133,25 @@
         function closeSpeedDial() {
             if (speedDial) {
                 speedDial.classList.remove("open");
+            }
+        }
+
+        function openChatbot() {
+            closeSpeedDial();
+            if (window.ChatbotWidget) {
+                window.ChatbotWidget.open();
+                return;
+            }
+            // Dynamically load chatbot script if not yet present
+            if (!document.querySelector('script[src*="chatbot-widget.js"]')) {
+                var s = document.createElement("script");
+                s.src = "/js/components/chatbot-widget.js?v=" + new Date().getTime();
+                s.onload = function () {
+                    if (window.ChatbotWidget) {
+                        window.ChatbotWidget.open();
+                    }
+                };
+                document.body.appendChild(s);
             }
         }
 
@@ -169,6 +193,27 @@
                 };
                 document.body.appendChild(s);
             }
+        }
+
+        if (btnAskAi) {
+            var path = (window.location.pathname || "").toLowerCase();
+            var isHomeDashboard = path === "/student/home" ||
+                                  path === "/home" ||
+                                  path === "/dashboard" ||
+                                  path.endsWith("/student/home") ||
+                                  path.endsWith("/home") ||
+                                  path.endsWith("/dashboard") ||
+                                  document.querySelector(".ic-ai-vertical-card") !== null ||
+                                  document.querySelector(".ic-dashboard-ai-hero") !== null;
+
+            if (isHomeDashboard) {
+                btnAskAi.style.display = "none";
+            }
+
+            btnAskAi.addEventListener("click", function (e) {
+                e.stopPropagation();
+                openChatbot();
+            });
         }
 
         if (btnVoiceGuide) {
@@ -274,7 +319,7 @@
             return true;
         }
 
-        if (field.closest(".swal2-container, .swal2-popup, #voiceInputGuideModal")) {
+        if (field.closest(".swal2-container, .swal2-popup, #voiceInputGuideModal, .ic-chatbot-drawer, #icChatbotDrawer, .ic-ai-vertical-card, .ic-dashboard-ai-hero") || field.id === "icChatInput" || field.classList.contains("ic-chat-input") || field.classList.contains("ic-ai-vcard-input") || field.id === "icDashboardHeroInput") {
             return false;
         }
 

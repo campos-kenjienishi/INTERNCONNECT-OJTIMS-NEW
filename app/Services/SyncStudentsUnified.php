@@ -400,8 +400,12 @@ class SyncStudentsUnified
                     }
                 }
 
-                if ($course && $studentProfile->course !== $course) {
-                    $studentProfile->course = $course;
+                // Skip overwriting course from GuiSIS so students retain InternConnect's official PUPTAS program list
+                if (empty($studentProfile->course) && $course) {
+                    $matchedCourse = \App\Models\Courses::whereRaw('LOWER(TRIM(acronym)) = ?', [strtolower($course)])
+                        ->orWhereRaw('LOWER(TRIM(course)) = ?', [strtolower($course)])
+                        ->first();
+                    $studentProfile->course = $matchedCourse ? $matchedCourse->course : $course;
                     $profileChanged = true;
                 }
 
@@ -560,8 +564,12 @@ class SyncStudentsUnified
             if ($studentNum) {
                 $studentProfile->studentNum = $studentNum;
             }
-            if ($course) {
-                $studentProfile->course = $course;
+            // Skip overwriting course from GuiSIS so students retain InternConnect's official PUPTAS program list
+            if (empty($studentProfile->course) && $course) {
+                $matchedCourse = \App\Models\Courses::whereRaw('LOWER(TRIM(acronym)) = ?', [strtolower($course)])
+                    ->orWhereRaw('LOWER(TRIM(course)) = ?', [strtolower($course)])
+                    ->first();
+                $studentProfile->course = $matchedCourse ? $matchedCourse->course : $course;
             }
             if ($yearSection) {
                 $studentProfile->year_and_section = $yearSection;

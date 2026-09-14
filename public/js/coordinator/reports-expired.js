@@ -119,21 +119,7 @@ overlay.addEventListener('click', function () {
     overlay.classList.remove('active');
 });
 
-// Dark mode toggle
-const darkmodeToggle = document.getElementById('darkmodeToggle');
-const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
 
-if (isDarkMode) {
-    document.body.classList.add('dark-mode');
-    darkmodeToggle.innerHTML = '<i class="fa fa-sun"></i>';
-}
-
-darkmodeToggle.addEventListener('click', function () {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    darkmodeToggle.innerHTML = isDark ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
-});
 
 /* ── DataTable ── */
 $(document).ready(function () {
@@ -315,7 +301,7 @@ function buildPrintHTML() {
                     </div>
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Course:</span>
+                        <span style="color:#6b7280;">Program:</span>
                         <strong style="color:#111827;">${course}</strong>
                     </div>
                     ${semester ? `

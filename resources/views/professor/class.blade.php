@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -11,8 +12,13 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
-    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor_class-responsive.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor/class.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}?v={{ time() }}">
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
     <script>
         (function(){
             try {
@@ -22,9 +28,6 @@
             } catch(e){}
         })();
     </script>
-    <link rel="stylesheet" href="{{ vasset('css/professor_class-responsive.css') }}">
-
-    <link rel="stylesheet" href="{{ vasset('css/professor/class.css') }}">
 </head>
 
 
@@ -174,7 +177,7 @@
                 <table id="fileTable" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Course</th>
+                            <th>Program</th>
                             <th>Class Name</th>
                             <th>Semester</th>
                             <th>School Year</th>
@@ -230,14 +233,14 @@
                             </td>
                             <td>
                                 <a href="{{ url('/professor/listStudents', $room->id) }}"
-                                    class="btn-action btn-approval">
-                                        <i class="fa fa-eye"></i> View
+                                    class="btn-action btn-approval" style="color: #ffffff !important;">
+                                        <i class="fa fa-eye" style="color: #ffffff !important;"></i> <span style="color: #ffffff !important;">View</span>
                                     </a>
                             </td>
                             <td>
                                 <a href="{{ url('/professor/classList', $room->id) }}"
-                                class="btn-action btn-students">
-                                    <i class="fa fa-users"></i> View
+                                class="btn-action btn-students" style="color: #ffffff !important;">
+                                    <i class="fa fa-users" style="color: #ffffff !important;"></i> <span style="color: #ffffff !important;">View</span>
                                 </a>
                             </td>
                             <td>
@@ -439,7 +442,7 @@
                                                     <label class="modal-field-label"><i class="fa fa-chalkboard"></i> Class Name</label>
                                                     <input class="modal-field-input" type="text" name="room" value="{{ $room->room }}" placeholder="Enter class name" required>
 
-                                                    <label class="modal-field-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                                                    <label class="modal-field-label"><i class="fa fa-graduation-cap"></i> Program</label>
                                                     <select name="course" class="modal-field-select" required>
                                                         @foreach ($course as $c)
                                                             <option value="{{ $c->course }}" {{ $room->course == $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
@@ -528,84 +531,114 @@
                         @endforeach
                     </tbody>
                 </table>
-
             </div>
         </div>
 
-        <div class="table-card">
+        <!-- My Announcements Section (Modern Bulletin Feed matching Student Portal) -->
+        <div class="table-card" style="margin-top: 28px; margin-bottom: 28px;">
             <div class="table-card-header">
-                <div class="table-card-header-left">
+                <div class="table-card-header-left" style="display:flex;align-items:center;gap:12px;">
                     <div class="header-icon"><i class="fa fa-bullhorn"></i></div>
                     <div>
                         <h2>My Announcements</h2>
-                        <p>Review or delete announcements you posted</p>
+                        <p>Review, edit, or delete announcements you posted</p>
                     </div>
-                </div>
-                <div class="announcement-toolbar">
-                    <div class="room-count-badge">
-                        <i class="fa fa-list"></i>
-                        {{ count($announcements ?? []) }} {{ count($announcements ?? []) == 1 ? 'announcement' : 'announcements' }}
-                    </div>
-                    <select id="profAnnouncementSort" class="announcement-sort-select" aria-label="Sort announcements by date">
-                        <option value="desc" selected>Newest first</option>
-                        <option value="asc">Oldest first</option>
-                    </select>
                 </div>
             </div>
 
-            <div class="table-card-body announcement-table-wrap">
-                <table id="profAnnouncementTable" class="announcement-manage-table">
-                    <colgroup>
-                        <col style="width:42%;">
-                        <col style="width:22%;">
-                        <col style="width:22%;">
-                        <col style="width:14%;">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Target Class</th>
-                            <th>Date Posted</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach(($announcements ?? []) as $announcement)
-                            <tr>
-                                <td class="announcement-title-cell">
-                                    <strong>{{ $announcement->title }}</strong>
-                                    <span>{{ Str::limit($announcement->content, 90) }}</span>
-                                </td>
-                                <td>
-                                    {{ $announcement->target_course ?? 'Class' }}
-                                    @if(!empty($announcement->target_room))
-                                        - {{ $announcement->target_room }}
-                                    @endif
-                                </td>
-                                <td data-order="{{ \Carbon\Carbon::parse($announcement->created_at)->timestamp }}">{{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}</td>
-                                <td>
-                                    <button type="button"
-                                            class="btn-edit-announcement"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editAnnouncementModal"
-                                            data-announcement-id="{{ $announcement->id }}"
-                                            data-announcement-title="{{ e($announcement->title) }}"
-                                            data-announcement-content="{{ e($announcement->content) }}"
-                                            data-announcement-action="{{ route('announcements.update', $announcement->id) }}">
-                                        <i class="fa fa-pen"></i> Edit
-                                    </button>
-                                    <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" class="delete-announcement-form" data-announcement-title="{{ e($announcement->title) }}" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-delete-announcement">
-                                            <i class="fa fa-trash"></i> Delete
+            <div class="table-card-body" style="padding: 24px;">
+                @if(empty($announcements) || count($announcements) === 0)
+                    <div class="empty-state" style="padding: 40px 20px;">
+                        <div class="empty-icon-wrap">
+                            <i class="fa fa-bullhorn"></i>
+                        </div>
+                        <p>No class announcements posted yet.</p>
+                        <span class="empty-hint">Click the "+ Add" button on any room above to publish an announcement.</span>
+                    </div>
+                @else
+                    <!-- Search & Filter Bar -->
+                    <div class="section-filter-bar">
+                        <div class="search-input-pill">
+                            <i class="fa fa-search"></i>
+                            <input type="text" id="profAnnouncementSearch" placeholder="Search announcements..." autocomplete="off">
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <div class="header-sort-pill" style="margin-left:0;">
+                                <i class="fa fa-sort-amount-down sort-icon"></i>
+                                <label for="profAnnouncementSort">Sort:</label>
+                                <select id="profAnnouncementSort" class="sort-select">
+                                    <option value="newest" selected>Newest first</option>
+                                    <option value="oldest">Oldest first</option>
+                                    <option value="az">Title (A-Z)</option>
+                                    <option value="za">Title (Z-A)</option>
+                                </select>
+                            </div>
+                            <div style="font-size:12.5px; color:#64748b; font-weight:500;">
+                                Showing <span id="profAnnouncementCount" style="font-weight:700; color:var(--red);">{{ count($announcements) }}</span> announcement{{ count($announcements) != 1 ? 's' : '' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Announcement Feed Stream -->
+                    <div class="announcement-feed-stream" id="profAnnouncementFeedStream">
+                        @foreach($announcements as $announcement)
+                            <div class="announcement-feed-card"
+                                 data-title="{{ strtolower($announcement->title) }}"
+                                 data-content="{{ strtolower($announcement->content) }}"
+                                 data-room="{{ strtolower(($announcement->target_course ?? '') . ' ' . ($announcement->target_room ?? '')) }}"
+                                 data-timestamp="{{ \Carbon\Carbon::parse($announcement->created_at)->timestamp }}">
+                                <div class="announcement-card-head">
+                                    <div class="announcement-author-info">
+                                        <div class="announcement-avatar">
+                                            <i class="fa fa-user-tie"></i>
+                                        </div>
+                                        <div class="announcement-author-details">
+                                            <span class="announcement-author-name">{{ $announcement->announcer ?? ($data->full_name ?? 'Class Adviser') }}</span>
+                                            <span class="announcement-author-role">
+                                                <i class="fa fa-chalkboard-teacher me-1"></i>
+                                                {{ $announcement->target_course ?? 'Class' }}
+                                                @if(!empty($announcement->target_room))
+                                                    — {{ $announcement->target_room }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="announcement-head-actions">
+                                        <span class="announcement-time-badge">
+                                            <i class="fa fa-calendar-alt"></i>
+                                            {{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y • h:i A') }}
+                                        </span>
+                                        <button type="button"
+                                                class="btn-edit-announcement"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editAnnouncementModal"
+                                                data-announcement-id="{{ $announcement->id }}"
+                                                data-announcement-title="{{ e($announcement->title) }}"
+                                                data-announcement-content="{{ e($announcement->content) }}"
+                                                data-announcement-action="{{ route('announcements.update', $announcement->id) }}">
+                                            <i class="fa fa-pen"></i> Edit
                                         </button>
-                                    </form>
-                                </td>
-                            </tr>
+                                        <form method="POST" action="{{ route('announcements.destroy', $announcement->id) }}" class="delete-announcement-form" data-announcement-title="{{ e($announcement->title) }}" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete-announcement">
+                                                <i class="fa fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="announcement-body-section">
+                                    <h3 class="announcement-headline">
+                                        <i class="fa fa-bullhorn"></i>
+                                        {{ $announcement->title }}
+                                    </h3>
+                                    <div class="announcement-message-text">{{ $announcement->content }}</div>
+                                </div>
+                            </div>
                         @endforeach
-                    </tbody>
-                </table>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -686,10 +719,10 @@
                            placeholder="Enter class name" required>
 
                     <label class="modal-field-label">
-                        <i class="fa fa-graduation-cap"></i> Course
+                        <i class="fa fa-graduation-cap"></i> Program
                     </label>
                     <select name="course" class="modal-field-select" required>
-                        <option value="">Select a course</option>
+                        <option value="">Select a program</option>
                         @foreach ($course as $c)
                             <option value="{{ $c->course }}">{{ $c->course }}</option>
                         @endforeach
@@ -766,8 +799,6 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="{{ vasset('js/professor/class.js') }}"></script>
-<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 @include('partials.password-setup-modal')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>

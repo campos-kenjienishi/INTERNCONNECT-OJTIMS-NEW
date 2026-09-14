@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
     <script>
         (function(){
@@ -22,6 +22,8 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/analytics.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -366,8 +368,8 @@
 
             <article class="panel">
                 <header class="panel-head">
-                    <h2>Course Distribution</h2>
-                    <p>Students grouped by course</p>
+                    <h2>Program Distribution</h2>
+                    <p>Students grouped by program</p>
                 </header>
                 <div class="panel-body">
                     @forelse ($courseAnalytics as $course)
@@ -382,7 +384,7 @@
                             <div class="track"><div class="fill fill-teal" data-width="{{ $course['percentage'] }}"></div></div>
                         </div>
                     @empty
-                        <div class="metric-meta">No course data available yet.</div>
+                        <div class="metric-meta">No program data available yet.</div>
                     @endforelse
                 </div>
             </article>

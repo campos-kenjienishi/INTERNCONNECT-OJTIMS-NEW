@@ -48,7 +48,7 @@
                 width: '100%'
             });
             $('select[name="course"]').select2({
-                placeholder: 'Select Course...',
+                placeholder: 'Select Program...',
                 width: '100%'
             });
             $('select[name="semester"]').select2({
@@ -85,7 +85,7 @@
                 if (searchField) {
                     var selectName = $(e.target).attr('name') || '';
                     if (selectName.indexOf('course') !== -1) {
-                        searchField.setAttribute('placeholder', 'Search course name...');
+                        searchField.setAttribute('placeholder', 'Search program name...');
                     } else if (selectName.indexOf('adviser') !== -1) {
                         searchField.setAttribute('placeholder', 'Search professor name...');
                     } else {

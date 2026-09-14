@@ -1905,6 +1905,36 @@
             background: rgba(220, 38, 38, 0.15);
         }
 
+        .btn-eval-success {
+            background: #16a34a;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(22,163,74,0.2);
+        }
+
+        .btn-eval-success:hover { color: #fff; }
+
+        .btn-eval-danger {
+            background: #dc2626;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(220,38,38,0.2);
+        }
+
+        .btn-eval-locked {
+            background: #fee2e2 !important;
+            border: 1.5px solid #fca5a5 !important;
+            color: #dc2626 !important;
+            box-shadow: 0 2px 8px rgba(220,38,38,0.12) !important;
+        }
+
+        .btn-eval-locked i {
+            color: #dc2626 !important;
+        }
+
+        .btn-eval-muted {
+            background: #6b7280;
+            color: #fff;
+        }
+
         .table-shell {
             width: 100%;
             border-collapse: collapse;

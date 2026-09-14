@@ -120,21 +120,7 @@ overlay.addEventListener('click', function () {
     overlay.classList.remove('active');
 });
 
-// Dark mode toggle
-const darkmodeToggle = document.getElementById('darkmodeToggle');
-const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
 
-if (isDarkMode) {
-    document.body.classList.add('dark-mode');
-    darkmodeToggle.innerHTML = '<i class="fa fa-sun"></i>';
-}
-
-darkmodeToggle.addEventListener('click', function () {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    darkmodeToggle.innerHTML = isDark ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
-});
 
 /* ── DataTable ── */
 $(document).ready(function () {
@@ -167,7 +153,7 @@ function buildPrintHTML() {
     const schoolYear = (rawSchoolYear && rawSchoolYear !== 'Select School Year') ? rawSchoolYear : (window.studentAiContext?.metrics?.school_year || window.__reportsConfig?.schoolYear || 'All School Years');
 
     const rawCourse = courseEl ? (courseEl.value || (courseEl.selectedIndex >= 0 ? courseEl.options[courseEl.selectedIndex].text : '')) : '';
-    const courseName = (rawCourse && rawCourse !== 'Select Course') ? rawCourse : (window.studentAiContext?.metrics?.course || window.__reportsConfig?.course || 'All Courses');
+    const courseName = (rawCourse && rawCourse !== 'Select Course' && rawCourse !== 'Select Program') ? rawCourse : (window.studentAiContext?.metrics?.course || window.__reportsConfig?.course || 'All Programs');
 
     const semesterEl = document.getElementById('semester');
     const rawSemester = semesterEl ? (semesterEl.value || (semesterEl.selectedIndex >= 0 ? semesterEl.options[semesterEl.selectedIndex].text : '')) : '';
@@ -257,7 +243,7 @@ function buildPrintHTML() {
                     </div>
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Course:</span>
+                        <span style="color:#6b7280;">Program:</span>
                         <strong style="color:#111827;">${courseName}</strong>
                     </div>
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
@@ -274,13 +260,13 @@ function buildPrintHTML() {
                 <div style="font-size:8px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:1.5px; border-left:3px solid #dc2626; padding-left:6px;">Student OJT Placement Details — Page ${pageNum}</div>
             </div>
 
-            <!-- DATA TABLE (Template columns: NO., STUDENT NAME, COURSE / MAJOR, SECTION, COMPANY NAME, START DATE OF OJT, ASSIGNED DEPARTMENT, ROLE, REMARKS (HIRED)) -->
+            <!-- DATA TABLE (Template columns: NO., STUDENT NAME, PROGRAM / MAJOR, SECTION, COMPANY NAME, START DATE OF OJT, ASSIGNED DEPARTMENT, ROLE, REMARKS (HIRED)) -->
             <div style="padding:4px 22px 0 22px;">
                 <table style="width:100%; table-layout:fixed; border-collapse:collapse; font-family:'Poppins',Arial,sans-serif; border:1px solid #d1d5db;">
                     <colgroup>
                         <col style="width:4%;">   <!-- NO. -->
                         <col style="width:18%;">  <!-- STUDENT NAME -->
-                        <col style="width:12%;">  <!-- COURSE / MAJOR -->
+                        <col style="width:12%;">  <!-- PROGRAM / MAJOR -->
                         <col style="width:8%;">   <!-- SECTION -->
                         <col style="width:20%;">  <!-- COMPANY NAME -->
                         <col style="width:12%;">  <!-- START DATE OF OJT -->
@@ -292,7 +278,7 @@ function buildPrintHTML() {
                         <tr style="background:#7f0000;">
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.15);">NO.</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.15);">STUDENT NAME</th>
-                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.15);">COURSE / MAJOR</th>
+                            <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.15);">PROGRAM / MAJOR</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.15);">SECTION</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.15);">COMPANY NAME</th>
                             <th style="padding:7px 5px; color:#fff; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.15);">START DATE OF OJT</th>

@@ -2,53 +2,75 @@
    Professor Classroom & Students Scripts
    Extracted from professor/class.blade.php
    ========================================================================== */
-                    $(document).ready(function () {
-                        const fileTable = $('#fileTable').DataTable({
-                            scrollX: true,
-                            autoWidth: false,
-                            columnDefs: [
-                                { width: '200px', targets: 0 },
-                                { width: '150px', targets: 1 },
-                                { width: '90px', targets: 2 },
-                                { width: '110px', targets: 3 },
-                                { width: '140px', targets: 4 },
-                                { width: '120px', targets: 5 },
-                                { width: '110px', targets: 6 },
-                                { width: '110px', targets: 7 },
-                                { width: '110px', targets: 8 },
-                                { width: '140px', targets: 9 }
-                            ]
-                        });
+    $(document).ready(function () {
+        const fileTable = $('#fileTable').DataTable({
+            scrollX: true,
+            autoWidth: false,
+            columnDefs: [
+                { width: '200px', targets: 0 },
+                { width: '150px', targets: 1 },
+                { width: '90px', targets: 2 },
+                { width: '110px', targets: 3 },
+                { width: '140px', targets: 4 },
+                { width: '120px', targets: 5 },
+                { width: '110px', targets: 6 },
+                { width: '110px', targets: 7 },
+                { width: '110px', targets: 8 },
+                { width: '140px', targets: 9 }
+            ]
+        });
 
-                        const profAnnouncementTable = $('#profAnnouncementTable').DataTable({
-                            pageLength: 5,
-                            lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
-                            scrollX: true,
-                            scrollCollapse: true,
-                            autoWidth: false,
-                            order: [[2, 'desc']],
-                            columnDefs: [
-                                { orderable: false, targets: 3 }
-                            ],
-                            language: {
-                                emptyTable: 'No announcements posted yet.'
-                            }
-                        });
+        setTimeout(function() {
+            fileTable.columns.adjust().draw(false);
+        }, 150);
 
-                        $('#profAnnouncementSort').on('change', function () {
-                            profAnnouncementTable.order([2, this.value]).draw();
-                        });
+        $(window).on('resize', function () {
+            fileTable.columns.adjust();
+        });
 
-                        setTimeout(function() {
-                            fileTable.columns.adjust().draw(false);
-                            profAnnouncementTable.columns.adjust().draw(false);
-                        }, 150);
+        // Announcement Search & Sort for Professor Portal
+        const profAnnounceSearch = document.getElementById('profAnnouncementSearch');
+        const profAnnounceSort = document.getElementById('profAnnouncementSort');
+        const profAnnounceStream = document.getElementById('profAnnouncementFeedStream');
+        const profAnnounceCount = document.getElementById('profAnnouncementCount');
 
-                        $(window).on('resize', function () {
-                            fileTable.columns.adjust();
-                            profAnnouncementTable.columns.adjust();
-                        });
-                    });
+        function filterAndSortProfAnnouncements() {
+            if (!profAnnounceStream) return;
+            const query = (profAnnounceSearch ? profAnnounceSearch.value : '').toLowerCase().trim();
+            const sortVal = profAnnounceSort ? profAnnounceSort.value : 'newest';
+            const cards = Array.from(profAnnounceStream.querySelectorAll('.announcement-feed-card'));
+
+            let visibleCount = 0;
+            cards.forEach(card => {
+                const title = (card.getAttribute('data-title') || '').toLowerCase();
+                const content = (card.getAttribute('data-content') || '').toLowerCase();
+                const room = (card.getAttribute('data-room') || '').toLowerCase();
+                const matches = !query || title.includes(query) || content.includes(query) || room.includes(query);
+                card.style.display = matches ? 'block' : 'none';
+                if (matches) visibleCount++;
+            });
+
+            if (profAnnounceCount) profAnnounceCount.textContent = visibleCount;
+
+            cards.sort((a, b) => {
+                const timeA = parseInt(a.getAttribute('data-timestamp') || '0', 10);
+                const timeB = parseInt(b.getAttribute('data-timestamp') || '0', 10);
+                const titleA = a.getAttribute('data-title') || '';
+                const titleB = b.getAttribute('data-title') || '';
+
+                if (sortVal === 'newest') return timeB - timeA;
+                if (sortVal === 'oldest') return timeA - timeB;
+                if (sortVal === 'az') return titleA.localeCompare(titleB);
+                if (sortVal === 'za') return titleB.localeCompare(titleA);
+                return 0;
+            });
+
+            cards.forEach(card => profAnnounceStream.appendChild(card));
+        }
+
+        if (profAnnounceSearch) profAnnounceSearch.addEventListener('input', filterAndSortProfAnnouncements);
+        if (profAnnounceSort) profAnnounceSort.addEventListener('change', filterAndSortProfAnnouncements);
+    });
                 
 
     // Sidebar toggle

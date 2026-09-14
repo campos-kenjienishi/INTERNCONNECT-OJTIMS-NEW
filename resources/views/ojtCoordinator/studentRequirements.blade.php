@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,6 +25,8 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/student-requirements.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 
 <body>
@@ -202,15 +205,15 @@
                 <div class="filter-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h3>Filter & Search Requirements</h3>
-                    <p>Filter student submission records by course, section, professor or submission status</p>
+                    <p>Filter student submission records by program, section, professor or submission status</p>
                 </div>
             </div>
             <form action="{{ route('coordinator.studentRequirements') }}" method="GET">
                 <div class="filter-card-body">
                     <div class="filter-field">
-                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Course</label>
+                        <label class="filter-label"><i class="fa fa-graduation-cap"></i> Program</label>
                         <select name="course" class="filter-select">
-                            <option value="">All Courses</option>
+                            <option value="">All Programs</option>
                             @foreach($courses as $c)
                                 <option value="{{ $c }}" {{ $selectedCourse === $c ? 'selected' : '' }}>
                                     {{ $c }}
@@ -280,7 +283,7 @@
                     <thead>
                         <tr>
                             <th>STUDENT DETAILS</th>
-                            <th>COURSE</th>
+                            <th>PROGRAM</th>
                             <th>SECTION</th>
                             <th>SCHOOL YEAR</th>
                             <th>PROFESSOR</th>
@@ -477,7 +480,5 @@
 <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ vasset('js/coordinator/student-requirements.js') }}?v={{ time() }}"></script>
-<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 </body>
 </html>

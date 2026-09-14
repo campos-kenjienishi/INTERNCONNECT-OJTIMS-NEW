@@ -1726,7 +1726,72 @@ class AuthController extends Controller
             return $currentYear >= $startYear && $currentYear <= $startYear + 3;
         });
         $companyNames = $companies->pluck('company_name')->toArray();
-        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount', 'class'));
+
+        $classIds = $class->pluck('id')->all();
+
+        $adviseeStudents = User::with('studentInfo')
+            ->where('role', 0)
+            ->whereHas('studentInfo', function ($query) use ($classIds, $data) {
+                $query->whereIn('class_id', $classIds)
+                      ->orWhere(function ($legacy) use ($data) {
+                          $legacy->whereNull('class_id')
+                              ->where('adviser_name', $data->full_name);
+                      });
+            })
+            ->get();
+
+        $approvedStudents = $adviseeStudents->where('status', 1)->count();
+        $pendingApprovals = $adviseeStudents->where('status', 3)->count();
+        $deniedStudents = $adviseeStudents->where('status', 2)->count();
+        $inactiveStudents = $adviseeStudents->where('status', 0)->count();
+        $professorName = $data->full_name;
+        $studentUserIds = $adviseeStudents->pluck('id')->filter()->unique()->values()->all();
+        $studentNames = $adviseeStudents->pluck('full_name')->filter()->unique()->values()->all();
+
+        $monthlyActivity = collect(range(5, 0))->map(function ($offset) use ($classIds, $professorName, $studentUserIds, $studentNames) {
+            $month = Carbon::now()->subMonths($offset);
+            $start = $month->copy()->startOfMonth();
+            $end = $month->copy()->endOfMonth();
+
+            // Total student submissions (Requirements + Evaluations)
+            $fileSubmissions = FileRequirement::where(function ($q) use ($professorName, $studentUserIds, $studentNames) {
+                    $q->where('adviser', $professorName);
+                    if (!empty($studentUserIds)) {
+                        $q->orWhereIn('uploader_user_id', $studentUserIds);
+                    }
+                    if (!empty($studentNames)) {
+                        $q->orWhereIn('uploadedBy', $studentNames);
+                    }
+                })
+                ->whereBetween('created_at', [$start, $end])
+                ->count();
+
+            $evalSubmissions = OjtEvaluationRequest::whereIn('class_id', $classIds)
+                ->whereBetween('submitted_at', [$start, $end])
+                ->count();
+
+            // Total approved requirements & completed evaluations
+            $fileApproved = FileRequirement::where(function ($q) use ($professorName, $studentUserIds, $studentNames) {
+                    $q->where('adviser', $professorName);
+                    if (!empty($studentUserIds)) {
+                        $q->orWhereIn('uploader_user_id', $studentUserIds);
+                    }
+                    if (!empty($studentNames)) {
+                        $q->orWhereIn('uploadedBy', $studentNames);
+                    }
+                })
+                ->where('status', 1)
+                ->whereBetween('updated_at', [$start, $end])
+                ->count();
+
+            return [
+                'label' => $month->format('M Y'),
+                'submitted' => $fileSubmissions + $evalSubmissions,
+                'approved' => $fileApproved + $evalSubmissions,
+            ];
+        })->values();
+
+        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount', 'class', 'approvedStudents', 'pendingApprovals', 'deniedStudents', 'inactiveStudents', 'monthlyActivity'));
     }
 
     public function professorAnalytics()

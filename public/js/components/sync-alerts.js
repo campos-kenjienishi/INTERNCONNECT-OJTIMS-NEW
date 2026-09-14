@@ -27,6 +27,13 @@
             confirmColor: '#0d9488',
             btnGradient: 'linear-gradient(135deg, #0d9488 0%, #16a34a 100%)'
         },
+        puptas: {
+            badge: 'PUPTAS Admission System',
+            icon: 'fa-graduation-cap',
+            theme: 'theme-puptas',
+            confirmColor: '#0d9488',
+            btnGradient: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)'
+        },
         success: {
             badge: 'Sync Succeeded',
             icon: 'fa-check',

@@ -148,7 +148,7 @@
                                                 </a>
                                             @else
                                                 <div class="permission-bubble-wrap" tabindex="0">
-                                                    <span class="btn-eval btn-eval-slate is-disabled" aria-disabled="true" style="opacity:0.75; cursor:not-allowed;">
+                                                    <span class="btn-eval btn-eval-locked is-disabled" aria-disabled="true">
                                                         <i class="fa fa-lock"></i> Locked
                                                     </span>
                                                     <div class="field-bubble-shell">

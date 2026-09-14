@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,12 @@
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/professor/requirement-status-classes.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}">
+    <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
     <script>
         (function(){
             try {
@@ -19,7 +24,6 @@
             } catch(e){}
         })();
     </script>
-    <link rel="stylesheet" href="{{ vasset('css/professor/requirement-status-classes.css') }}">
 </head>
 
 <body>
@@ -183,12 +187,29 @@
             @endif
         @endif
     </main>
+
+    <footer class="dashboard-footer" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <img src="/images/final-puptg_logo-ojtims_nbg.png" class="footer-logo" alt="PUP">
+            <span class="footer-copy">
+                © 1998–2026 <span>Polytechnic University of the Philippines</span>
+            </span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank">
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                PUP Website
+            </a>
+            <span class="divider">|</span>
+            <a href="{{ url('/terms') }}">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="{{ url('/privacy') }}">Privacy Statement</a>
+        </div>
+    </footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ vasset('js/professor/requirement-status-classes.js') }}"></script>
-<script src="{{ vasset('js/sidebar-persist.js') }}"></script>
-<script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
 @include('partials.password-setup-modal')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

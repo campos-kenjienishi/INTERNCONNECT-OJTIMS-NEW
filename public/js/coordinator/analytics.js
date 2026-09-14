@@ -106,9 +106,6 @@
             analyticsHeading.insertAdjacentElement('afterend', analyticsAiCard);
         }
 
-        const darkToggle = document.getElementById('darkmodeToggle');
-        const darkIcon = document.getElementById('darkmodeIcon');
-        const darkKey = 'internconnect_darkmode';
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -131,24 +128,6 @@
                     sidebar.classList.remove('mobile-open');
                     sidebarOverlay.classList.remove('active');
                 }
-            });
-        }
-
-        const applyDarkMode = (isDark) => {
-            document.body.classList.toggle('dark-mode', isDark);
-            if (darkIcon) {
-                darkIcon.className = isDark ? 'fa fa-sun' : 'fa fa-moon';
-            }
-        };
-
-        const savedMode = localStorage.getItem(darkKey);
-        applyDarkMode(savedMode === '1');
-
-        if (darkToggle) {
-            darkToggle.addEventListener('click', function () {
-                const isDark = !document.body.classList.contains('dark-mode');
-                applyDarkMode(isDark);
-                localStorage.setItem(darkKey, isDark ? '1' : '0');
             });
         }
 
@@ -308,10 +287,10 @@
 
                     <div style="padding:14px 22px 0 22px;">
                         <div style="border:1px solid #e5e7eb; border-radius:10px; padding:14px; page-break-inside:avoid;">
-                            <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Course Distribution</div>
+                            <div style="font-size:12px; font-weight:700; color:#111827; margin-bottom:10px; border-left:3px solid #dc2626; padding-left:8px;">Program Distribution</div>
                             <table style="width:100%; border-collapse:collapse; font-size:10px;">
-                                <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Course</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
-                                <tbody>${courseRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No course data found.</td></tr>'}</tbody>
+                                <thead><tr style="background:#f9fafb;"><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Program</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Students</th><th style="text-align:left; padding:7px 8px; border:1px solid #e5e7eb;">Share</th></tr></thead>
+                                <tbody>${courseRows || '<tr><td colspan="3" style="padding:8px;border:1px solid #e5e7eb;text-align:center;">No program data found.</td></tr>'}</tbody>
                             </table>
                         </div>
                     </div>

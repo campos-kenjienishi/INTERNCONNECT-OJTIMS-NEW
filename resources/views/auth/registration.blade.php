@@ -1,8 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('theme');
+                if (!theme) {
+                    var legacy = localStorage.getItem('darkMode') || localStorage.getItem('internconnect_darkmode');
+                    if (legacy === 'true' || legacy === 'enabled' || legacy === '1') theme = 'dark';
+                }
+                if (theme === 'dark' || (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark-mode');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Student Registration</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,6 +30,8 @@
     <link rel="stylesheet" href="{{ asset('/frontend/css/custom.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/login-responsive.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/quick-tools-fab.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/chatbot-widget.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -615,6 +636,7 @@
 }
 
     </style>
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
 </head>
 
 <body class="auth-centered-page">
@@ -885,7 +907,7 @@
                             </div>
 
                             <div class="field-group">
-                                <label class="form-label">Course</label>
+                                <label class="form-label">Program</label>
                                 <div class="input-wrap has-select">
                                     <i class="fa fa-university i-icon"></i>
                                     <select name="course">
@@ -1642,6 +1664,8 @@
     createBtn.classList.toggle('is-ready', allFilled && yearSectionValid);
 }
 </script>
+<script src="{{ vasset('js/components/chatbot-widget.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </body>
 </html>

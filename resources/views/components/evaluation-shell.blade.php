@@ -84,6 +84,8 @@
         })();
     </script>
     <link rel="stylesheet" href="{{ vasset('css/components/evaluation-shell.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
+    <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 <body>
 @if($isAuthenticatedShell)

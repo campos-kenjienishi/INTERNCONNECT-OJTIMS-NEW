@@ -1,14 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('theme');
+                if (!theme) {
+                    var legacy = localStorage.getItem('darkMode') || localStorage.getItem('internconnect_darkmode');
+                    if (legacy === 'true' || legacy === 'enabled' || legacy === '1') theme = 'dark';
+                }
+                if (theme === 'dark' || (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark-mode');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Welcome Portal</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ vasset('css/pages/auth-login-gateway.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/quick-tools-fab.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/chatbot-widget.css') }}">
+    <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
 </head>
 
 <body class="auth-centered-page">
@@ -119,5 +141,8 @@
     };
 </script>
 <script src="{{ vasset('js/pages/auth-login-gateway.js') }}?v={{ time() }}"></script>
+<script src="{{ vasset('js/darkmode.js') }}"></script>
+<script src="{{ vasset('js/components/chatbot-widget.js') }}"></script>
+<script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

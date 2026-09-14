@@ -2,11 +2,15 @@
    INTERNCONNECT QUICK TOOLS FLOATING SPEED DIAL (FAB)
    ============================================================ */
 
-/* Hide native sienna floating button so only our FAB is shown */
+/* Hide native sienna & userway floating buttons so only our FAB is shown */
 .asw-menu-btn,
 .asw-btn,
 [data-asw-btn],
-.sienna-accessibility-btn {
+.sienna-accessibility-btn,
+.uai,
+#userwayAccessibilityIcon,
+[data-userway-widget],
+.userway_buttons_wrapper {
     display: none !important;
 }
 
@@ -53,102 +57,155 @@ body.modal-open .ic-speed-dial {
 
 /* Speed Dial Pill Item */
 .ic-speed-dial-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding: 6px 18px 6px 6px;
-    border-radius: 9999px;
-    background: linear-gradient(135deg, #5c0606 0%, #750808 100%);
-    color: #ffffff;
-    border: 1.5px solid rgba(254, 215, 0, 0.25);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-    font-size: 13.5px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    outline: none;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 6px 18px 6px 6px !important;
+    border-radius: 9999px !important;
+    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%) !important;
+    color: #ffffff !important;
+    border: 1.5px solid rgba(254, 215, 0, 0.45) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    outline: none !important;
 }
 
 .ic-speed-dial-item:hover {
-    transform: translateX(-4px);
-    background: linear-gradient(135deg, #700808 0%, #900c0c 100%);
-    border-color: #FED700;
-    box-shadow: 0 8px 25px rgba(100, 0, 0, 0.4), 0 0 12px rgba(254, 215, 0, 0.3);
-    color: #FED700;
+    transform: translateX(-4px) !important;
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+    border-color: #FED700 !important;
+    box-shadow: 0 8px 25px rgba(185, 28, 28, 0.5), 0 0 14px rgba(254, 215, 0, 0.4) !important;
+    color: #FED700 !important;
 }
 
 .ic-speed-dial-item:active {
-    transform: translateX(-2px) scale(0.98);
+    transform: translateX(-2px) scale(0.98) !important;
 }
 
 .ic-item-emblem {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(254, 215, 0, 0.18);
-    color: #FED700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
-    transition: background 0.2s, transform 0.2s;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: rgba(254, 215, 0, 0.2) !important;
+    border: 1px solid rgba(254, 215, 0, 0.4) !important;
+    color: #FED700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 13px !important;
+    flex-shrink: 0 !important;
+    transition: background 0.2s, transform 0.2s !important;
+}
+
+.ic-item-emblem i,
+.ic-speed-dial-item i {
+    color: #FED700 !important;
+}
+
+.ic-item-bud-emblem {
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 100%) !important;
+    border: 1.5px solid #FED700 !important;
+    box-shadow: 0 0 8px rgba(254, 215, 0, 0.4) !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+.ic-bud-fab-img {
+    width: 44px !important;
+    max-width: none !important;
+    height: auto !important;
+    object-fit: cover !important;
+    margin-top: -2px !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25)) !important;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.ic-speed-dial-item:hover .ic-bud-fab-img {
+    transform: translateY(-2px) scale(1.12) !important;
 }
 
 .ic-speed-dial-item:hover .ic-item-emblem {
-    background: #FED700;
-    color: #5c0606;
-    transform: scale(1.06);
+    background: #FED700 !important;
+    color: #7f0000 !important;
+    border-color: #FED700 !important;
+    transform: scale(1.06) !important;
+}
+
+.ic-speed-dial-item:hover .ic-item-emblem i {
+    color: #7f0000 !important;
 }
 
 .ic-item-label {
-    font-size: 13.5px;
-    letter-spacing: 0.2px;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2px !important;
+    color: #ffffff !important;
+    transition: color 0.2s ease !important;
+}
+
+.ic-speed-dial-item:hover .ic-item-label {
+    color: #FED700 !important;
 }
 
 /* Main Trigger Floating Plus Button */
 .ic-speed-dial-trigger {
-    pointer-events: auto;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #5c0606 0%, #800000 100%);
-    color: #FED700;
-    border: 2px solid rgba(254, 215, 0, 0.4);
-    box-shadow: 0 6px 24px rgba(92, 6, 6, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    outline: none;
+    pointer-events: auto !important;
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(145deg, #7f0000 0%, #991b1b 100%) !important;
+    color: #FED700 !important;
+    border: 2px solid rgba(254, 215, 0, 0.6) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(254, 215, 0, 0.25) !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    outline: none !important;
+}
+
+.ic-speed-dial-trigger i,
+.ic-speed-dial-trigger .ic-trigger-icon i {
+    color: #FED700 !important;
+    font-size: 20px !important;
 }
 
 .ic-speed-dial-trigger:hover {
-    transform: scale(1.08);
-    box-shadow: 0 8px 30px rgba(92, 6, 6, 0.55), 0 0 16px rgba(254, 215, 0, 0.35);
-    border-color: #FED700;
+    transform: scale(1.08) !important;
+    box-shadow: 0 8px 30px rgba(185, 28, 28, 0.6), 0 0 18px rgba(254, 215, 0, 0.45) !important;
+    border-color: #FED700 !important;
 }
 
 .ic-trigger-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .ic-speed-dial.open .ic-speed-dial-trigger {
-    background: #3b0000;
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(145deg, #450a0a 0%, #7f1d1d 100%) !important;
+    border-color: #FED700 !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .ic-speed-dial.open .ic-trigger-icon {
-    transform: rotate(135deg);
-    color: #ffffff;
+    transform: rotate(135deg) !important;
+}
+
+.ic-speed-dial.open .ic-trigger-icon i {
+    color: #FED700 !important;
 }
 
 /* ============================================================
