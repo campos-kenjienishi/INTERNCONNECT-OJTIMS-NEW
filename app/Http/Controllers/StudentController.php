@@ -51,73 +51,88 @@ private function requireStudentSession()
     return $user;
 }
 
-private function visibleAnnouncementsForStudent($data, $classRoomNames = [], $includeClassAnnouncements = false)
+private function coordinatorAnnouncementsForStudent($data)
 {
     $coordinatorNames = User::where('role', 1)->pluck('full_name')->filter()->values()->all();
     $coordinatorIds = User::where('role', 1)->pluck('id')->filter()->values()->all();
-    $professorIds = !empty($data->adviser_name)
-        ? User::where('role', 2)->where('full_name', $data->adviser_name)->pluck('id')->filter()->values()->all()
-        : [];
+    $hasAnnouncerUserIdColumn = Schema::hasColumn('announcements', 'announcer_user_id');
+    $hasAudienceColumn = Schema::hasColumn('announcements', 'audience');
+
+    return Announcements::where(function ($query) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn, $hasAudienceColumn) {
+        if ($hasAudienceColumn) {
+            $query->where(function ($q) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn) {
+                $q->where('audience', 'all_students')
+                  ->orWhereNull('audience');
+
+                if ($hasAnnouncerUserIdColumn && !empty($coordinatorIds)) {
+                    $q->where(function ($inner) use ($coordinatorIds, $coordinatorNames) {
+                        $inner->whereIn('announcer_user_id', $coordinatorIds)
+                              ->orWhereIn('announcer', $coordinatorNames);
+                    });
+                } else {
+                    $q->whereIn('announcer', $coordinatorNames);
+                }
+            });
+        } else {
+            if ($hasAnnouncerUserIdColumn && !empty($coordinatorIds)) {
+                $query->whereIn('announcer_user_id', $coordinatorIds)
+                      ->orWhereIn('announcer', $coordinatorNames);
+            } else {
+                $query->whereIn('announcer', $coordinatorNames);
+            }
+        }
+    })->latest()->get();
+}
+
+private function classAnnouncementsForStudent($data, $classRoomNames = [])
+{
+    if (empty($data->adviser_name)) {
+        return collect([]);
+    }
+
+    $professorIds = User::where('role', 2)
+        ->where('full_name', $data->adviser_name)
+        ->pluck('id')
+        ->filter()
+        ->values()
+        ->all();
+
     $hasAnnouncerUserIdColumn = Schema::hasColumn('announcements', 'announcer_user_id');
     $hasAudienceColumn = Schema::hasColumn('announcements', 'audience');
     $hasTargetCourseColumn = Schema::hasColumn('announcements', 'target_course');
     $hasTargetRoomColumn = Schema::hasColumn('announcements', 'target_room');
 
-    if (!$hasAudienceColumn) {
-        return Announcements::where(function ($query) use ($data, $coordinatorNames, $coordinatorIds, $professorIds, $includeClassAnnouncements, $hasAnnouncerUserIdColumn) {
-            if ($hasAnnouncerUserIdColumn) {
-                $query->whereIn('announcer_user_id', $coordinatorIds);
+    return Announcements::where(function ($query) use ($data, $classRoomNames, $professorIds, $hasAudienceColumn, $hasTargetCourseColumn, $hasTargetRoomColumn, $hasAnnouncerUserIdColumn) {
+        // Must be posted by student's adviser
+        $query->where(function ($profQuery) use ($data, $professorIds, $hasAnnouncerUserIdColumn) {
+            if ($hasAnnouncerUserIdColumn && !empty($professorIds)) {
+                $profQuery->whereIn('announcer_user_id', $professorIds)
+                          ->orWhere('announcer', $data->adviser_name);
             } else {
-                $query->whereIn('announcer', $coordinatorNames);
-            }
-
-            if ($includeClassAnnouncements && !empty($data->adviser_name)) {
-                if ($hasAnnouncerUserIdColumn) {
-                    $query->orWhereIn('announcer_user_id', $professorIds);
-                } else {
-                    $query->orWhere('announcer', $data->adviser_name);
-                }
-            }
-        })->latest()->get();
-    }
-
-    return Announcements::where(function ($query) use ($data, $classRoomNames, $coordinatorNames, $coordinatorIds, $professorIds, $includeClassAnnouncements, $hasTargetCourseColumn, $hasTargetRoomColumn, $hasAnnouncerUserIdColumn) {
-        $query->where(function ($coordinatorQuery) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn) {
-            $coordinatorQuery->where('audience', 'all_students');
-
-            if ($hasAnnouncerUserIdColumn) {
-                $coordinatorQuery->whereIn('announcer_user_id', $coordinatorIds);
-            } else {
-                $coordinatorQuery->whereIn('announcer', $coordinatorNames);
-            }
-        })
-        ->orWhere(function ($legacyCoordinatorQuery) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn) {
-            $legacyCoordinatorQuery->whereNull('audience');
-
-            if ($hasAnnouncerUserIdColumn) {
-                $legacyCoordinatorQuery->whereIn('announcer_user_id', $coordinatorIds);
-            } else {
-                $legacyCoordinatorQuery->whereIn('announcer', $coordinatorNames);
+                $profQuery->where('announcer', $data->adviser_name);
             }
         });
 
-        if ($includeClassAnnouncements) {
-            $query->orWhere(function ($classQuery) use ($data, $classRoomNames, $professorIds, $hasTargetCourseColumn, $hasTargetRoomColumn, $hasAnnouncerUserIdColumn) {
-                $classQuery->where('audience', 'class');
+        // Filter by class audience if column exists
+        if ($hasAudienceColumn) {
+            $query->where('audience', 'class');
+        }
 
-                if ($hasAnnouncerUserIdColumn) {
-                    $classQuery->whereIn('announcer_user_id', $professorIds);
-                } else {
-                    $classQuery->where('announcer', $data->adviser_name);
-                }
+        // Filter by target course if specified on announcement
+        if ($hasTargetCourseColumn && !empty($data->course)) {
+            $query->where(function ($q) use ($data) {
+                $q->where('target_course', $data->course)
+                  ->orWhereNull('target_course')
+                  ->orWhere('target_course', '');
+            });
+        }
 
-                if ($hasTargetCourseColumn) {
-                    $classQuery->where('target_course', $data->course);
-                }
-
-                if ($hasTargetRoomColumn) {
-                    $classQuery->whereIn('target_room', $classRoomNames);
-                }
+        // Filter by target room if student is in a specific room
+        if ($hasTargetRoomColumn && !empty($classRoomNames)) {
+            $query->where(function ($q) use ($classRoomNames) {
+                $q->whereIn('target_room', $classRoomNames)
+                  ->orWhereNull('target_room')
+                  ->orWhere('target_room', '');
             });
         }
     })->latest()->get();
@@ -148,7 +163,7 @@ public function home()
         $fileCount = UploadedFile::where('name', '!=', '')->whereNotNull('name')->count();
     }
 
-    $announcements = $this->visibleAnnouncementsForStudent($data)->take(5);
+    $announcements = $this->coordinatorAnnouncementsForStudent($data)->take(5);
 
     return view('students.student_home', [
         'user' => $data,
@@ -430,11 +445,10 @@ public function home()
 
 
         $classRoomNames = collect([$currentClass])->filter()->pluck('room')->values()->all();
-        $announce = $this->visibleAnnouncementsForStudent(
-            $data,
-            $classRoomNames,
-            !empty($data) && isset($data->status) && $data->status == 1
-        );
+        $isEnrolledAndApproved = !empty($data) && isset($data->status) && $data->status == 1 && !empty($data->class_id);
+        $announce = $isEnrolledAndApproved
+            ? $this->classAnnouncementsForStudent($data, $classRoomNames)
+            : collect([]);
         
 
         $professors = Professor::all();

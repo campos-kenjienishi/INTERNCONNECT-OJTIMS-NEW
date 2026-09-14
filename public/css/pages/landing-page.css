@@ -133,6 +133,44 @@
     text-underline-offset: 4px;
 }
 
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.topbar-actions .darkmode-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(248, 198, 43, 0.45);
+    color: var(--gold);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    transition: all 0.22s ease;
+    flex-shrink: 0;
+    box-shadow: none;
+    outline: none;
+    padding: 0;
+}
+
+.topbar-actions .darkmode-toggle:hover {
+    background: var(--gold);
+    color: var(--maroon-deep);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(248, 198, 43, 0.35);
+}
+
+.topbar-actions .darkmode-toggle:active {
+    transform: scale(0.95);
+}
+
 .portal-btn {
     display: inline-flex;
     align-items: center;
@@ -887,34 +925,88 @@
             }
         }
 
-        /* Dark Mode Overrides for Features and Contact Sections */
+        /* Dark Mode Overrides for Landing Page */
+        html.dark-mode,
+        body.dark-mode {
+            background: #0d1017 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .topbar,
+        body.dark-mode .topbar {
+            background: #140707 !important;
+            border-bottom: 3px solid var(--gold) !important;
+        }
+
+        html.dark-mode .topbar-actions .darkmode-toggle,
+        body.dark-mode .topbar-actions .darkmode-toggle {
+            background: rgba(248, 198, 43, 0.12);
+            border-color: rgba(248, 198, 43, 0.55);
+            color: var(--gold);
+        }
+
+        html.dark-mode .topbar-actions .darkmode-toggle:hover,
+        body.dark-mode .topbar-actions .darkmode-toggle:hover {
+            background: var(--gold);
+            color: #120606;
+        }
+
+        html.dark-mode .section,
+        body.dark-mode .section {
+            background: #0f1219 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .section.alt,
+        body.dark-mode .section.alt {
+            background: #0b0e14 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .section h2,
+        body.dark-mode .section h2 {
+            color: #f8fafc !important;
+        }
+
+        html.dark-mode .section p,
+        body.dark-mode .section p {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .section-label,
+        body.dark-mode .section-label {
+            background: rgba(220, 38, 38, 0.18) !important;
+            color: #f87171 !important;
+            border: 1px solid rgba(220, 38, 38, 0.35) !important;
+        }
+
         html.dark-mode .features-section,
         body.dark-mode .features-section {
             background: radial-gradient(circle at 10% 20%, rgba(220, 38, 38, 0.08), transparent 40%),
-                        linear-gradient(180deg, #12151c 0%, #181b22 100%) !important;
+                        linear-gradient(180deg, #11141c 0%, #151924 100%) !important;
         }
 
         html.dark-mode .feature-card,
         body.dark-mode .feature-card {
-            background: #1e222b !important;
-            border-color: #2e3542 !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+            background: #181c26 !important;
+            border: 1px solid #28303f !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
         }
 
         html.dark-mode .feature-card:hover,
         body.dark-mode .feature-card:hover {
-            border-color: rgba(239, 68, 68, 0.4) !important;
-            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45) !important;
+            border-color: rgba(239, 68, 68, 0.45) !important;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55) !important;
         }
 
         html.dark-mode .feature-watermark,
         body.dark-mode .feature-watermark {
-            color: rgba(255, 255, 255, 0.05) !important;
+            color: rgba(255, 255, 255, 0.04) !important;
         }
 
         html.dark-mode .feature-card h3,
         body.dark-mode .feature-card h3 {
-            color: #f1f5f9 !important;
+            color: #f8fafc !important;
         }
 
         html.dark-mode .feature-card p,
@@ -924,7 +1016,7 @@
 
         html.dark-mode .feature-tag-list,
         body.dark-mode .feature-tag-list {
-            border-color: #2e3542 !important;
+            border-color: #28303f !important;
         }
 
         html.dark-mode .feature-tag,
@@ -932,29 +1024,34 @@
             color: #cbd5e1 !important;
         }
 
+        html.dark-mode .feature-tag i,
+        body.dark-mode .feature-tag i {
+            color: #4ade80 !important;
+        }
+
         html.dark-mode .contact-section,
         body.dark-mode .contact-section {
             background: radial-gradient(circle at top left, rgba(248, 198, 43, 0.08), transparent 32%),
                         radial-gradient(circle at bottom right, rgba(143, 17, 17, 0.08), transparent 34%),
-                        linear-gradient(180deg, #181b22 0%, #12151c 100%) !important;
+                        linear-gradient(180deg, #151924 0%, #0f1219 100%) !important;
         }
 
         html.dark-mode .contact-highlight,
         body.dark-mode .contact-highlight {
-            background: #1e222b !important;
-            border-color: #2e3542 !important;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35) !important;
+            background: #181c26 !important;
+            border: 1px solid #28303f !important;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4) !important;
         }
 
         html.dark-mode .contact-highlight:hover,
         body.dark-mode .contact-highlight:hover {
-            border-color: rgba(239, 68, 68, 0.4) !important;
-            box-shadow: 0 20px 42px rgba(0, 0, 0, 0.45) !important;
+            border-color: rgba(239, 68, 68, 0.45) !important;
+            box-shadow: 0 20px 42px rgba(0, 0, 0, 0.55) !important;
         }
 
         html.dark-mode .contact-highlight strong,
         body.dark-mode .contact-highlight strong {
-            color: #f1f5f9 !important;
+            color: #f8fafc !important;
         }
 
         html.dark-mode .contact-highlight span,
@@ -990,10 +1087,34 @@
             border-color: rgba(22, 163, 74, 0.3) !important;
         }
 
-        .meet-devs-section {
+        html.dark-mode .meet-devs-section,
+        body.dark-mode .meet-devs-section {
             background:
-                radial-gradient(circle at top, rgba(248, 198, 43, 0.18), transparent 28%),
-                linear-gradient(180deg, #fff 0%, #fff8f0 100%);
+                radial-gradient(circle at top, rgba(248, 198, 43, 0.08), transparent 28%),
+                linear-gradient(180deg, #11141c 0%, #151924 100%) !important;
+        }
+
+        html.dark-mode .dev-card,
+        body.dark-mode .dev-card {
+            background: #181c26 !important;
+            border-color: #28303f !important;
+            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        html.dark-mode .dev-name,
+        body.dark-mode .dev-name {
+            color: #f8fafc !important;
+        }
+
+        html.dark-mode .dev-position,
+        body.dark-mode .dev-position {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .footer,
+        body.dark-mode .footer {
+            background: #080303 !important;
+            border-top: 1px solid rgba(248, 198, 43, 0.15) !important;
         }
 
         .meet-devs-grid {
@@ -1484,8 +1605,15 @@
                 padding: 9px 12px;
             }
 
-            .portal-btn {
+            .topbar-actions {
                 width: 100%;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .portal-btn {
+                flex: 1;
+                width: auto;
                 min-width: 0;
             }
             

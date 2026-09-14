@@ -1,7 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('theme');
+                if (!theme) {
+                    var legacy = localStorage.getItem('darkMode') || localStorage.getItem('internconnect_darkmode');
+                    if (legacy === 'true' || legacy === 'enabled' || legacy === '1') theme = 'dark';
+                }
+                if (theme === 'dark' || (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark-mode');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,10 +53,15 @@
             <a href="#Contact Us">Contact Us</a>
         </nav>
 
-        <a class="portal-btn" href="{{ route('login.gateway') }}">
-            <i class="fa fa-sign-in-alt"></i>
-            Launch Portal
-        </a>
+        <div class="topbar-actions">
+            <button class="darkmode-toggle" id="darkmodeToggle" title="Toggle Dark Mode" aria-label="Toggle dark mode">
+                <i class="fa fa-moon" id="darkmodeIcon"></i>
+            </button>
+            <a class="portal-btn" href="{{ route('login.gateway') }}">
+                <i class="fa fa-sign-in-alt"></i>
+                Launch Portal
+            </a>
+        </div>
     </div>
 </header>
 
