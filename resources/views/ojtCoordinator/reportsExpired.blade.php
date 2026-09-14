@@ -431,9 +431,11 @@
                                 <i class="fa fa-phone" style="color:var(--red); font-size:10px; margin-right:4px;"></i>
                                 {{ $company->companyNo ?: '—' }}
                             </td>
-                            <td style="font-size:12.5px;">
-                                <i class="fa fa-envelope" style="color:var(--red); font-size:10px; margin-right:4px;"></i>
-                                {{ $company->company_email ?: '—' }}
+                            <td class="email-cell">
+                                <div class="email-wrap">
+                                    <i class="fa fa-envelope"></i>
+                                    <span>{{ $company->company_email ?: '—' }}</span>
+                                </div>
                             </td>
                             <td>
                                 <span class="school-year-badge">

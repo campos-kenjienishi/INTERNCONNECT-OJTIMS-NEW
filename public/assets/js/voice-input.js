@@ -10,7 +10,7 @@
         wrapper.innerHTML = [
             '<div class="ic-speed-dial-menu" id="icSpeedDialMenu">',
             '    <button type="button" class="ic-speed-dial-item" id="icBtnAskAi" title="Ask Bud (Your OJT Buddy)">',
-            '        <span class="ic-item-emblem ic-item-bud-emblem"><img src="/images/mascot/bud_waving.png" alt="Bud" class="ic-bud-fab-img"></span>',
+            '        <span class="ic-item-emblem ic-item-bud-emblem" style="width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;max-width:32px!important;max-height:32px!important;border-radius:50%!important;overflow:hidden!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative!important;"><img src="/images/mascot/bud_waving.png" alt="Bud" class="ic-bud-fab-img" style="width:34px!important;max-width:34px!important;height:34px!important;max-height:34px!important;object-fit:contain!important;display:block!important;margin:0!important;"></span>',
             '        <span class="ic-item-label">Ask Bud</span>',
             '    </button>',
             '    <button type="button" class="ic-speed-dial-item" id="icBtnVoiceGuide" title="Voice Input & Commands Guide">',

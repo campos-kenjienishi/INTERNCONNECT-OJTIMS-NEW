@@ -247,6 +247,31 @@
         .rep-wrap { display: flex; align-items: flex-start; gap: 6px; }
         .rep-wrap i { color: var(--red); font-size: 11px; margin-top: 3px; flex-shrink: 0; }
         .rep-name-text { font-size: 12px; font-weight: 500; color: #374151; line-height: 1.45; }
+        .table-card-body table.dataTable tbody td.email-cell {
+            max-width: 175px;
+            width: 175px;
+        }
+        .email-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            font-size: 12px;
+            line-height: 1.45;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-all;
+        }
+        .email-wrap i {
+            color: var(--red);
+            font-size: 11px;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        .email-wrap span {
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
         .school-year-badge { display: inline-flex; align-items: center; gap: 5px; background: #fef9c3; color: #ca8a04; border-radius: 20px; padding: 3px 10px; font-size: 11.5px; font-weight: 600; }
         .badge-active { display: inline-flex; align-items: center; gap: 5px; background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
         .badge-expired { display: inline-flex; align-items: center; gap: 5px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
@@ -355,6 +380,7 @@ body.dark-mode .date-badge { background: rgba(22, 163, 74, 0.2) !important; colo
 body.dark-mode .company-address-cell { color: #fff !important; }
 body.dark-mode .company-rep-cell { color: #fff !important; }
 body.dark-mode .rep-name-text { color: #e5e7eb !important; }
+body.dark-mode .email-wrap, body.dark-mode .email-cell { color: #e5e7eb !important; }
 body.dark-mode .company-name-text { color: #fff !important; }
 body.dark-mode .company-cell span { color: #fff !important; }
 body.dark-mode table.dataTable tbody td { color: #fff !important; border-bottom: 1px solid rgba(255,255,255,0.05); }
