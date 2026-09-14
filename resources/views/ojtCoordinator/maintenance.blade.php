@@ -10,7 +10,7 @@
     <title>InternConnect - Maintenance</title>
     <link rel="shortcut icon" href="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}">
@@ -26,6 +26,7 @@
     </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/maintenance.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/sync-alerts.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
     <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
@@ -160,9 +161,15 @@
         
     </nav>
             </div>
-            <button class="btn-add-course" data-bs-toggle="modal" data-bs-target="#addCourseModal">
-                <i class="fa fa-plus"></i> Add Program
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button type="button" id="btnSyncPuptas" class="btn-sync-puptas">
+                    <i class="fa fa-sync-alt" id="puptasSyncIcon"></i>
+                    <span>Sync with PUPTAS</span>
+                </button>
+                <button class="btn-add-course" data-bs-toggle="modal" data-bs-target="#addCourseModal">
+                    <i class="fa fa-plus-circle"></i> Manual Add
+                </button>
+            </div>
         </div>
 
         <!-- Stats Row -->
@@ -224,7 +231,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($data as $data)
+                        @foreach($data as $course)
                         <tr>
                             <td>
                                 <div class="course-cell">
@@ -232,12 +239,12 @@
                                         <i class="fa fa-book"></i>
                                     </div>
                                     <div>
-                                        <div class="course-name-text">{{ $data->course }}</div>
+                                        <div class="course-name-text">{{ $course->course }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="acronym-badge">{{ $data->acronym }}</span>
+                                <span class="acronym-badge">{{ $course->acronym }}</span>
                             </td>
                             <td>
                                 <div class="course-actions">
@@ -245,12 +252,12 @@
                                         class="btn-edit edit-button"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editCourseModal"
-                                        data-course-id="{{ $data->id }}"
-                                        data-course-name="{{ $data->course }}"
-                                        data-course-acronym="{{ $data->acronym }}">
+                                        data-course-id="{{ $course->id }}"
+                                        data-course-name="{{ $course->course }}"
+                                        data-course-acronym="{{ $course->acronym }}">
                                         <i class="fa fa-pen"></i> Edit
                                     </button>
-                                    <button class="btn-remove remove-button" data-course-id="{{ $data->id }}">
+                                    <button class="btn-remove remove-button" data-course-id="{{ $course->id }}">
                                         <i class="fa fa-trash-alt"></i> Remove
                                     </button>
                                 </div>
@@ -289,7 +296,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fa fa-graduation-cap"></i> Add New Program
+                    <i class="fa fa-graduation-cap"></i> Manual Add Program
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -301,14 +308,14 @@
                             <i class="fa fa-book"></i> Program Name
                         </label>
                         <input class="field-input" type="text" name="course"
-                               placeholder="e.g. Bachelor of Science in Information Technology" required>
+                                placeholder="e.g. Bachelor of Science in Information Technology" required>
                     </div>
                     <div class="field-group">
                         <label class="field-label">
                             <i class="fa fa-tag"></i> Acronym
                         </label>
                         <input class="field-input" type="text" name="acronym"
-                               placeholder="e.g. BSIT" required>
+                                placeholder="e.g. BSIT" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -316,7 +323,7 @@
                         <i class="fa fa-times"></i> Close
                     </button>
                     <button type="submit" class="btn-modal-submit">
-                        <i class="fa fa-plus"></i> Add Program
+                        <i class="fa fa-plus-circle"></i> Add Program
                     </button>
                 </div>
             </form>
@@ -377,6 +384,7 @@
         csrfToken: @json(csrf_token())
     };
 </script>
+<script src="{{ vasset('js/components/sync-alerts.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/coordinator/maintenance.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

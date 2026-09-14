@@ -966,8 +966,12 @@ public function ojt_edit(Request $request,$studentNum)
                 }
             }
 
-            if ($course) {
-                $student->course = $course;
+            // Skip overwriting course from GuiSIS so students retain InternConnect's official PUPTAS program list
+            if (empty($student->course) && $course) {
+                $matchedCourse = \App\Models\Courses::whereRaw('LOWER(TRIM(acronym)) = ?', [strtolower($course)])
+                    ->orWhereRaw('LOWER(TRIM(course)) = ?', [strtolower($course)])
+                    ->first();
+                $student->course = $matchedCourse ? $matchedCourse->course : $course;
             }
 
             if ($yearSection) {

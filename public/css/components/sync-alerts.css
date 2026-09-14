@@ -19,6 +19,11 @@
     --sync-guisis-gradient: linear-gradient(135deg, #0d9488 0%, #16a34a 100%);
     --sync-guisis-glow: rgba(22, 163, 74, 0.25);
 
+    --sync-puptas-primary: #0d9488;
+    --sync-puptas-secondary: #059669;
+    --sync-puptas-gradient: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+    --sync-puptas-glow: rgba(13, 148, 136, 0.25);
+
     --sync-card-bg: #ffffff;
     --sync-card-border: #f1f5f9;
     --sync-text-main: #0f172a;
@@ -155,6 +160,11 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
     border-bottom-color: rgba(13, 148, 136, 0.12);
 }
 
+.sync-hero-header.theme-puptas {
+    background: linear-gradient(180deg, rgba(13, 148, 136, 0.08) 0%, rgba(248, 250, 252, 0.9) 100%);
+    border-bottom-color: rgba(13, 148, 136, 0.12);
+}
+
 .sync-hero-header.theme-success {
     background: linear-gradient(180deg, rgba(16, 185, 129, 0.09) 0%, rgba(248, 250, 252, 0.9) 100%);
     border-bottom-color: rgba(16, 185, 129, 0.15);
@@ -192,6 +202,12 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
 }
 
 .sync-system-pill.theme-guisis {
+    background: rgba(13, 148, 136, 0.12);
+    color: #0f766e;
+    border: 1px solid rgba(13, 148, 136, 0.2);
+}
+
+.sync-system-pill.theme-puptas {
     background: rgba(13, 148, 136, 0.12);
     color: #0f766e;
     border: 1px solid rgba(13, 148, 136, 0.2);
@@ -240,6 +256,10 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
     border-color: rgba(13, 148, 136, 0.35);
 }
 
+.sync-orbit-wrapper.theme-puptas .sync-orbit-ring {
+    border-color: rgba(13, 148, 136, 0.35);
+}
+
 .sync-orbit-wrapper.theme-success .sync-orbit-ring {
     border-color: rgba(16, 185, 129, 0.4);
     border-style: solid;
@@ -282,6 +302,11 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
 
 .sync-orbit-icon-box.theme-guisis {
     background: var(--sync-guisis-gradient);
+    box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.45);
+}
+
+.sync-orbit-icon-box.theme-puptas {
+    background: var(--sync-puptas-gradient);
     box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.45);
 }
 
@@ -364,6 +389,11 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
     color: #0d9488;
 }
 
+.sync-feature-bullet.theme-puptas {
+    background: rgba(13, 148, 136, 0.15);
+    color: #0d9488;
+}
+
 /* Safe Badge Callout */
 .sync-safe-notice {
     display: flex;
@@ -421,6 +451,11 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
     border-right-color: #10b981;
 }
 
+.sync-loader-orbit.theme-puptas .outer-ring {
+    border-top-color: #0d9488;
+    border-right-color: #059669;
+}
+
 .sync-loader-orbit .inner-glow-core {
     width: 54px;
     height: 54px;
@@ -445,6 +480,10 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
 
 .sync-loader-orbit.theme-guisis .inner-glow-core {
     background: var(--sync-guisis-gradient);
+}
+
+.sync-loader-orbit.theme-puptas .inner-glow-core {
+    background: var(--sync-puptas-gradient);
 }
 
 /* Animated Shimmer Laser Bar */
@@ -475,6 +514,10 @@ div:where(.swal2-container) .swal2-popup.sync-alert-popup {
 
 .sync-shimmer-bar-wrapper.theme-guisis .sync-shimmer-bar-fill {
     background: var(--sync-guisis-gradient);
+}
+
+.sync-shimmer-bar-wrapper.theme-puptas .sync-shimmer-bar-fill {
+    background: var(--sync-puptas-gradient);
 }
 
 /* Caution Glass Banner */
@@ -717,6 +760,12 @@ body.dark-mode .sync-hero-header.theme-idp {
 
 html.dark-mode .sync-hero-header.theme-guisis,
 body.dark-mode .sync-hero-header.theme-guisis {
+    background: linear-gradient(180deg, rgba(13, 148, 136, 0.2) 0%, rgba(39, 39, 42, 0.95) 100%);
+    border-bottom-color: rgba(13, 148, 136, 0.25);
+}
+
+html.dark-mode .sync-hero-header.theme-puptas,
+body.dark-mode .sync-hero-header.theme-puptas {
     background: linear-gradient(180deg, rgba(13, 148, 136, 0.2) 0%, rgba(39, 39, 42, 0.95) 100%);
     border-bottom-color: rgba(13, 148, 136, 0.25);
 }

@@ -135,5 +135,24 @@ class MaintenanceController extends Controller
         // Return the coordinator audit log view
         return view('ojtCoordinator.audit', compact('logs', 'data'));
     }
+
+    /**
+     * Synchronize official academic programs with PUPTAS Admission System.
+     */
+    public function syncProgramsFromPuptas(Request $request, \App\Services\SyncProgramsFromPuptas $syncer)
+    {
+        $force = $request->boolean('force', true);
+        $result = $syncer->execute($force);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json($result);
+        }
+
+        if ($result['success']) {
+            return redirect()->back()->with('success', $result['message']);
+        }
+
+        return redirect()->back()->with('fail', $result['message'] ?: 'Failed to sync programs with PUPTAS.');
+    }
     
 }
