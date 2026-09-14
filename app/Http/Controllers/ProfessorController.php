@@ -298,6 +298,9 @@ public function roomUpdate(Request $request, $id)
         return back()->with('fail', 'Room not found.');
     }
 
+    $oldRoom = $room->room;
+    $oldCourse = $room->course;
+
     $room->room = $request->room;
     $room->course = $request->course;
     $room->semester = $request->semester;
@@ -336,6 +339,27 @@ public function roomUpdate(Request $request, $id)
     }
 
     $room->save();
+
+    if ($oldRoom !== $room->room || $oldCourse !== $room->course) {
+        if (Schema::hasTable('announcements') && Schema::hasColumn('announcements', 'target_room')) {
+            $annQuery = Announcements::where('target_room', $oldRoom);
+            if ($data) {
+                $annQuery->where(function ($q) use ($data) {
+                    if (Schema::hasColumn('announcements', 'announcer_user_id')) {
+                        $q->where('announcer_user_id', $data->id)
+                          ->orWhere('announcer', $data->full_name);
+                    } else {
+                        $q->where('announcer', $data->full_name);
+                    }
+                });
+            }
+            $updateData = ['target_room' => $room->room];
+            if (Schema::hasColumn('announcements', 'target_course')) {
+                $updateData['target_course'] = $room->course;
+            }
+            $annQuery->update($updateData);
+        }
+    }
 
     if ($hasScheduleInput && $timeSlots !== null) {
         $this->syncRoomSchedule($room, $scheduleData, $timeSlots);

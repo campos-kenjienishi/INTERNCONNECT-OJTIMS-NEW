@@ -155,6 +155,8 @@ class AnnouncementController extends Controller
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'course' => ['nullable', 'string', 'max:255'],
+            'room' => ['nullable', 'string', 'max:255'],
         ]);
 
         $announcement = $this->ownedAnnouncementsQuery($user)
@@ -164,6 +166,24 @@ class AnnouncementController extends Controller
         $oldTitle = $announcement->title;
         $announcement->title = $request->title;
         $announcement->content = $request->content;
+
+        if ((string) $user->role === '2' && $request->filled('room')) {
+            $class = Classes::where(function ($q) use ($user) {
+                    $q->where('adviser_name', $user->full_name);
+                })
+                ->where('room', $request->input('room'))
+                ->first();
+
+            if ($class) {
+                if (Schema::hasColumn('announcements', 'target_course')) {
+                    $announcement->target_course = $class->course;
+                }
+                if (Schema::hasColumn('announcements', 'target_room')) {
+                    $announcement->target_room = $class->room;
+                }
+            }
+        }
+
         $announcement->save();
 
         AuditLogger::log(

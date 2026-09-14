@@ -615,6 +615,8 @@
                                                 data-announcement-id="{{ $announcement->id }}"
                                                 data-announcement-title="{{ e($announcement->title) }}"
                                                 data-announcement-content="{{ e($announcement->content) }}"
+                                                data-announcement-room="{{ e($announcement->target_room ?? '') }}"
+                                                data-announcement-course="{{ e($announcement->target_course ?? '') }}"
                                                 data-announcement-action="{{ route('announcements.update', $announcement->id) }}">
                                             <i class="fa fa-pen"></i> Edit
                                         </button>
@@ -659,6 +661,18 @@
                                 <i class="fa fa-heading"></i> Announcement Title
                             </label>
                             <input class="modal-field-input" type="text" name="title" id="editAnnouncementTitle" required>
+
+                            @if(!empty($class) && count($class) > 0)
+                            <label class="modal-field-label">
+                                <i class="fa fa-chalkboard"></i> Target Class Room
+                            </label>
+                            <select class="modal-field-select" name="room" id="editAnnouncementRoom">
+                                @foreach($class as $c)
+                                    <option value="{{ $c->room }}" data-course="{{ $c->course }}">{{ $c->course }} — {{ $c->room }}</option>
+                                @endforeach
+                            </select>
+                            <input type="hidden" name="course" id="editAnnouncementCourse" value="">
+                            @endif
 
                             <label class="modal-field-label">
                                 <i class="fa fa-align-left"></i> Content

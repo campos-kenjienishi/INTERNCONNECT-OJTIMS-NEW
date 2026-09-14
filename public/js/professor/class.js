@@ -379,6 +379,18 @@
             $('#editAnnouncementForm').attr('action', $(this).data('announcement-action'));
             $('#editAnnouncementTitle').val($(this).data('announcement-title'));
             $('#editAnnouncementContent').val($(this).data('announcement-content'));
+
+            let targetRoom = $(this).data('announcement-room');
+            if (targetRoom && $('#editAnnouncementRoom').length) {
+                $('#editAnnouncementRoom').val(targetRoom);
+            }
+            let selectedOption = $('#editAnnouncementRoom option:selected');
+            $('#editAnnouncementCourse').val(selectedOption.data('course') || $(this).data('announcement-course') || '');
+        });
+
+        $('#editAnnouncementRoom').on('change', function () {
+            let selectedOption = $(this).find('option:selected');
+            $('#editAnnouncementCourse').val(selectedOption.data('course') || '');
         });
 
         // Archive Room
