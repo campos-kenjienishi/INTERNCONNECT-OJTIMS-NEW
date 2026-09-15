@@ -4337,6 +4337,85 @@ body.dark-mode .icon-action-btn.btn-unlock-pending {
     opacity: 0.9 !important;
 }
 
+/* 8. Downloadable Files & Class Templates Tabbed Module */
+html.dark-mode .file-tabs-nav,
+body.dark-mode .file-tabs-nav {
+    background: #1e222d !important;
+    border: 1px solid #2e3542 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark-mode .file-tab-btn,
+body.dark-mode .file-tab-btn {
+    color: #94a3b8 !important;
+}
+
+html.dark-mode .file-tab-btn:hover,
+body.dark-mode .file-tab-btn:hover {
+    color: #f1f5f9 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+html.dark-mode .file-tab-btn.active,
+body.dark-mode .file-tab-btn.active {
+    background: linear-gradient(135deg, #991b1b 0%, #ef4444 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
+}
+
+html.dark-mode .file-tab-count,
+body.dark-mode .file-tab-count {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #fca5a5 !important;
+}
+
+html.dark-mode .file-tab-count.purple,
+body.dark-mode .file-tab-count.purple {
+    background: rgba(139, 92, 246, 0.2) !important;
+    color: #c4b5fd !important;
+}
+
+html.dark-mode .stat-icon.purple,
+body.dark-mode .stat-icon.purple,
+html.dark-mode .header-icon.purple,
+body.dark-mode .header-icon.purple,
+html.dark-mode .file-icon-wrap.purple,
+body.dark-mode .file-icon-wrap.purple {
+    background: rgba(139, 92, 246, 0.2) !important;
+    color: #c4b5fd !important;
+}
+
+html.dark-mode .file-count-badge.purple,
+body.dark-mode .file-count-badge.purple {
+    background: rgba(139, 92, 246, 0.2) !important;
+    color: #c4b5fd !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+html.dark-mode .class-room-banner,
+body.dark-mode .class-room-banner {
+    background: linear-gradient(135deg, #181635 0%, #27225c 100%) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .class-empty-title,
+body.dark-mode .class-empty-title {
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode .class-empty-desc,
+body.dark-mode .class-empty-desc {
+    color: #94a3b8 !important;
+}
+
+html.dark-mode .class-template-redirect-card,
+body.dark-mode .class-template-redirect-card {
+    background: linear-gradient(135deg, #181635 0%, #27225c 100%) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
 
 
 

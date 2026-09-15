@@ -618,17 +618,41 @@ public function join(Request $request, $email, $classId)
     }
     public function fileSee()
     {   
-        $data=array();
-            if(Session::has('loginId')){
+        $sessionCheck = $this->requireStudentSession();
 
-                $user=User::where('id','=', Session::get('loginId'))->first();
-                        }
-           $class = Classes::where('adviser_name', $user->adviser_name);
-           if (Schema::hasColumn('classes', 'archived_at')) {
-               $class->whereNull('archived_at');
-           }
-           $class = $class->orderByDesc('created_at')->orderByDesc('id')->get();
-            // Student download page shows global templates (not room-specific).
+        if ($sessionCheck instanceof \Illuminate\Http\RedirectResponse || $sessionCheck instanceof \Illuminate\Http\Response) {
+            return $sessionCheck;
+        }
+
+        $user = $sessionCheck;
+        $data = $user;
+
+        $student = null;
+        $currentClass = null;
+        $roomTemplates = collect();
+
+        if (Schema::hasTable('students')) {
+            $student = Student::where('user_id', $user->id)->first();
+        }
+
+        $classId = $student->class_id ?? $user->class_id ?? null;
+
+        if (!empty($classId)) {
+            $currentClass = Classes::find($classId);
+            if ($currentClass && Schema::hasColumn('uploaded_files', 'class_id')) {
+                $roomTemplates = UploadedFile::where('class_id', $classId)
+                    ->latest()
+                    ->get();
+            }
+        }
+
+        $class = Classes::where('adviser_name', $user->adviser_name);
+        if (Schema::hasColumn('classes', 'archived_at')) {
+            $class->whereNull('archived_at');
+        }
+        $class = $class->orderByDesc('created_at')->orderByDesc('id')->get();
+
+        // Student download page shows global templates (not room-specific).
         if (Schema::hasColumn('uploaded_files', 'class_id')) {
             $upload = UploadedFile::where(function ($query) {
                     $query->whereNull('class_id')
@@ -640,10 +664,8 @@ public function join(Request $request, $email, $classId)
             $upload = UploadedFile::latest()->get();
         }
 
-    // Pass the $professor and $students variables to the view
-    return view('students.student_file', compact('data','upload','class','user'));
-
-}
+        return view('students.student_file', compact('data', 'upload', 'class', 'user', 'student', 'currentClass', 'roomTemplates'));
+    }
 
 public function StuList()
 {

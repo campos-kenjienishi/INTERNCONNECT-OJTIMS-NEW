@@ -443,130 +443,23 @@
             </div>
         </div>
 
-        <!-- Room Templates Section (Option 1: Document Gallery Grid) -->
-        <div class="table-card" style="margin-bottom: 24px;">
-            <div class="table-card-header">
-                <div class="table-card-header-left" style="display:flex;align-items:center;gap:12px;">
-                    <div class="header-icon"><i class="fa fa-file-download"></i></div>
-                    <div>
-                        <h2>Room Templates</h2>
-                        <p>Templates uploaded by your professor for your current room</p>
-                    </div>
+        <!-- Room Templates Helper Notice Card -->
+        @if (!empty($data->class_id) && $data->status == 1)
+        <div class="class-template-redirect-card" style="margin-bottom: 24px; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 16px; padding: 18px 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: 0 4px 16px rgba(49, 46, 129, 0.15);">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #e0e7ff; flex-shrink: 0;">
+                    <i class="fa fa-folder-open"></i>
+                </div>
+                <div>
+                    <h4 style="margin: 0 0 2px 0; font-size: 15px; font-weight: 700; color: #fff;">Looking for Class Templates & Materials?</h4>
+                    <p style="margin: 0; font-size: 12.5px; color: #c7d2fe;">Access all templates and rubrics uploaded by your adviser directly in the Downloadable Files module.</p>
                 </div>
             </div>
-            <div class="table-card-body" style="padding: 24px;">
-                @if (empty($data->class_id))
-                    <div class="empty-state">
-                        <div class="empty-icon-wrap">
-                            <i class="fa fa-door-closed"></i>
-                        </div>
-                        <p>You haven't joined a room yet.</p>
-                        <span class="empty-hint">Join a room above to access room-specific templates.</span>
-                    </div>
-                @elseif ($roomTemplates->isEmpty())
-                    <div class="empty-state">
-                        <div class="empty-icon-wrap">
-                            <i class="fa fa-file-alt"></i>
-                        </div>
-                        <p>No room templates uploaded yet.</p>
-                        <span class="empty-hint">Check back later — your adviser hasn't uploaded any templates.</span>
-                    </div>
-                @else
-                    <!-- Search & Filter Bar -->
-                    <div class="section-filter-bar">
-                        <div class="search-input-pill">
-                            <i class="fa fa-search"></i>
-                            <input type="text" id="templateSearchInput" placeholder="Search templates by name or file..." autocomplete="off">
-                        </div>
-                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                            <div class="header-sort-pill" style="margin-left:0;">
-                                <i class="fa fa-sort-amount-down sort-icon"></i>
-                                <label for="templateSortSelect">Sort:</label>
-                                <select id="templateSortSelect" class="sort-select">
-                                    <option value="newest" selected>Newest first</option>
-                                    <option value="oldest">Oldest first</option>
-                                    <option value="az">Name (A-Z)</option>
-                                    <option value="za">Name (Z-A)</option>
-                                </select>
-                            </div>
-                            <div style="font-size:12.5px; color:#64748b; font-weight:500;">
-                                Showing <span id="templateCount" style="font-weight:700; color:var(--red);">{{ count($roomTemplates) }}</span> template{{ count($roomTemplates) != 1 ? 's' : '' }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Template Grid -->
-                    <div class="template-grid-container" id="templateGridContainer">
-                        @foreach ($roomTemplates as $template)
-                            @php
-                                $templateExt = strtolower(pathinfo($template->file, PATHINFO_EXTENSION));
-                                $iconData = match($templateExt) {
-                                    'pdf'  => ['icon' => 'fa-file-pdf', 'class' => 'icon-pdf'],
-                                    'doc', 'docx' => ['icon' => 'fa-file-word', 'class' => 'icon-word'],
-                                    'xls', 'xlsx' => ['icon' => 'fa-file-excel', 'class' => 'icon-excel'],
-                                    'ppt', 'pptx' => ['icon' => 'fa-file-powerpoint', 'class' => 'icon-word'],
-                                    'jpg', 'jpeg', 'png', 'gif' => ['icon' => 'fa-file-image', 'class' => 'icon-image'],
-                                    default => ['icon' => 'fa-file-alt', 'class' => 'icon-file']
-                                };
-                            @endphp
-                            <div class="doc-template-card"
-                                 data-name="{{ strtolower($template->name) }}"
-                                 data-file="{{ strtolower($template->file) }}"
-                                 data-timestamp="{{ \Carbon\Carbon::parse($template->created_at)->timestamp }}">
-                                <div class="doc-card-top">
-                                    <div class="doc-card-icon {{ $iconData['class'] }}">
-                                        <i class="fa {{ $iconData['icon'] }}"></i>
-                                    </div>
-                                    <span class="doc-format-badge">{{ strtoupper($templateExt) }}</span>
-                                </div>
-
-                                <div class="doc-card-body">
-                                    <h3 class="doc-title">{{ $template->name }}</h3>
-                                    <div class="doc-filename-badge" title="{{ $template->file }}">
-                                        <i class="fa fa-paperclip"></i>
-                                        <span>{{ $template->file }}</span>
-                                    </div>
-                                    <div class="doc-meta-row">
-                                        <span class="doc-meta-item">
-                                            <i class="fa fa-calendar-alt" style="color:#94a3b8;"></i>
-                                            {{ \Carbon\Carbon::parse($template->created_at)->format('M d, Y') }}
-                                        </span>
-                                        <span class="doc-meta-item">
-                                            <i class="fa fa-clock" style="color:#94a3b8;"></i>
-                                            {{ \Carbon\Carbon::parse($template->created_at)->format('h:i A') }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="doc-card-actions">
-                                    @if(in_array($templateExt, ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg']))
-                                        <button type="button"
-                                                class="doc-btn-view btn-preview-file"
-                                                data-file-url="{{ url('/view/file', $template->file) }}"
-                                                data-file-name="{{ $template->name }}"
-                                                data-download-url="{{ url('/download', $template->file) }}">
-                                            <i class="fa fa-eye"></i> View
-                                        </button>
-                                    @endif
-                                    <a href="{{ url('/download', $template->file) }}" class="doc-btn-download">
-                                        <i class="fa fa-download"></i> Download
-                                    </a>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Empty Search State for Room Templates -->
-                    <div id="templateEmptySearch" class="empty-state" style="display: none; padding: 36px 20px;">
-                        <div class="empty-icon-wrap" style="background:#fee2e2; color:var(--red); width:50px; height:50px; font-size:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin: 0 auto 12px;">
-                            <i class="fa fa-search"></i>
-                        </div>
-                        <p style="margin: 0; font-weight: 600; color: #1e293b; font-size: 15px;">No room templates found</p>
-                        <span class="empty-hint" style="display:block; margin-top: 4px; color: #64748b; font-size: 12.5px;">Try adjusting your search query</span>
-                    </div>
-                @endif
-            </div>
+            <a href="{{ url('/student/files#class') }}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; background: #fff; color: #312e81; font-weight: 700; font-size: 13px; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;">
+                <span>View Class Templates</span> <i class="fa fa-arrow-right"></i>
+            </a>
         </div>
+        @endif
 
         <!-- Class Announcements Section (Option 1: Bulletin Feed) -->
         <div class="table-card">

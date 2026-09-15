@@ -141,108 +141,267 @@
             <!-- Stats Row -->
             <div class="stats-row">
                 <div class="stat-card">
-                    <div class="stat-icon red"><i class="fa fa-file-alt"></i></div>
+                    <div class="stat-icon red"><i class="fa fa-university"></i></div>
                     <div>
                         <div class="stat-num">{{ count($upload) }}</div>
-                        <div class="stat-name">Total Files</div>
+                        <div class="stat-name">General Files</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon green"><i class="fa fa-download"></i></div>
+                    <div class="stat-icon purple"><i class="fa fa-graduation-cap"></i></div>
                     <div>
-                        <div class="stat-num">Free</div>
-                        <div class="stat-name">All Downloads</div>
+                        <div class="stat-num">{{ count($roomTemplates) }}</div>
+                        <div class="stat-name">Class Templates</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon blue"><i class="fa fa-folder-open"></i></div>
+                    <div class="stat-icon blue"><i class="fa fa-chalkboard"></i></div>
                     <div>
-                        <div class="stat-num">OJT</div>
-                        <div class="stat-name">Templates & Forms</div>
+                        <div class="stat-num" style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">
+                            {{ $currentClass ? $currentClass->room : 'No Class' }}
+                        </div>
+                        <div class="stat-name">{{ $currentClass ? 'Enrolled Room' : 'Not Joined' }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Files Table Card -->
-            <div class="table-card">
-                <div class="table-card-header">
-                    <div class="table-card-header-left">
-                        <div class="header-icon"><i class="fa fa-folder-open"></i></div>
-                        <div>
-                            <h2>Downloadable Files</h2>
-                            <p>Click the download button to save any file to your device</p>
+            <!-- Tab Switcher Navigation -->
+            <div class="file-tabs-nav">
+                <button type="button" class="file-tab-btn active" id="tabBtnGeneral" data-tab="generalTabPane">
+                    <i class="fa fa-university"></i>
+                    <span>General OJT Files</span>
+                    <span class="file-tab-count">{{ count($upload) }}</span>
+                </button>
+                <button type="button" class="file-tab-btn" id="tabBtnClass" data-tab="classTabPane">
+                    <i class="fa fa-graduation-cap"></i>
+                    <span>Class Templates</span>
+                    <span class="file-tab-count purple">{{ count($roomTemplates) }}</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: General OJT Files (Coordinator) -->
+            <div class="tab-pane active" id="generalTabPane">
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <div class="table-card-header-left">
+                            <div class="header-icon"><i class="fa fa-folder-open"></i></div>
+                            <div>
+                                <h2>General Downloadable Files</h2>
+                                <p>Official university-wide OJT forms, guidelines, and manuals from the Coordinator</p>
+                            </div>
+                        </div>
+                        <div class="file-count-badge">
+                            <i class="fa fa-file"></i>
+                            {{ count($upload) }} file{{ count($upload) != 1 ? 's' : '' }} available
                         </div>
                     </div>
-                    <div class="file-count-badge">
-                        <i class="fa fa-file"></i>
-                        {{ count($upload) }} file{{ count($upload) != 1 ? 's' : '' }} available
+
+                    <div class="table-card-body">
+                        <table id="fileTable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>FILE NAME</th>
+                                    <th>FILE</th>
+                                    <th>DATE UPLOADED</th>
+                                    <th>UPLOADED BY</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($upload as $file)
+                                @php
+                                    $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
+                                    $icon = match($ext) {
+                                        'pdf'  => 'fa-file-pdf',
+                                        'doc', 'docx' => 'fa-file-word',
+                                        'xls', 'xlsx' => 'fa-file-excel',
+                                        'ppt', 'pptx' => 'fa-file-powerpoint',
+                                        'jpg', 'jpeg', 'png', 'gif' => 'fa-file-image',
+                                        'zip', 'rar' => 'fa-file-archive',
+                                        default => 'fa-file-alt'
+                                    };
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <div class="file-name-cell">
+                                            <div class="file-icon-wrap">
+                                                <i class="fa {{ $icon }}"></i>
+                                            </div>
+                                            <div>
+                                                <div class="file-name-text">{{ $file->name }}</div>
+                                                <div class="file-ext">{{ strtoupper($ext) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="color:#666; font-size:13px;">{{ $file->file }}</td>
+                                    <td data-order="{{ \Carbon\Carbon::parse($file->created_at)->timestamp }}">
+                                        {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
+                                    </td>
+                                    <td>
+                                        {{ $file->uploader_name ?: 'Coordinator' }}
+                                    </td>
+                                    <td>
+                                        <div class="action-btn-group">
+                                            <button type="button"
+                                                    class="btn-view btn-preview-file"
+                                                    data-file-url="{{ url('/view/file', $file->file) }}"
+                                                    data-file-name="{{ $file->name }}"
+                                                    data-file-ext="{{ $ext }}"
+                                                    data-download-url="{{ url('/download', $file->file) }}">
+                                                <i class="fa fa-eye"></i> View
+                                            </button>
+                                            <a href="{{ url('/download', $file->file) }}" class="btn-download">
+                                                <i class="fa fa-download"></i> Download
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <div class="table-card-body">
-                    <table id="fileTable" class="display" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>FILE NAME</th>
-                                <th>FILE</th>
-                                <th>DATE UPLOADED</th>
-                                <th>UPLOADED BY</th>
-                                <th>ACTION</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($upload as $file)
-                            @php
-                                $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
-                                $icon = match($ext) {
-                                    'pdf'  => 'fa-file-pdf',
-                                    'doc', 'docx' => 'fa-file-word',
-                                    'xls', 'xlsx' => 'fa-file-excel',
-                                    'ppt', 'pptx' => 'fa-file-powerpoint',
-                                    'jpg', 'jpeg', 'png', 'gif' => 'fa-file-image',
-                                    'zip', 'rar' => 'fa-file-archive',
-                                    default => 'fa-file-alt'
-                                };
-                            @endphp
-                            <tr>
-                                <td>
-                                    <div class="file-name-cell">
-                                        <div class="file-icon-wrap">
-                                            <i class="fa {{ $icon }}"></i>
-                                        </div>
-                                        <div>
-                                            <div class="file-name-text">{{ $file->name }}</div>
-                                            <div class="file-ext">{{ strtoupper($ext) }}</div>
-                                        </div>
+            <!-- TAB 2: Class Templates (Professor) -->
+            <div class="tab-pane" id="classTabPane" style="display: none;">
+                @if (!$currentClass)
+                    <div class="table-card">
+                        <div class="class-empty-container">
+                            <div class="class-empty-icon">
+                                <i class="fa fa-door-closed"></i>
+                            </div>
+                            <h3 class="class-empty-title">You Haven't Joined a Class Room Yet</h3>
+                            <p class="class-empty-desc">
+                                Class templates and instructional rubrics are uploaded specifically by professors for enrolled students.
+                                Join your designated class room under the Class module to access your adviser's materials.
+                            </p>
+                            <a href="{{ url('/student/class') }}" class="btn-class-join-link">
+                                <i class="fa fa-clipboard"></i> Go to Class Module
+                            </a>
+                        </div>
+                    </div>
+                @else
+                    <!-- Active Room Info Banner -->
+                    <div class="class-room-banner">
+                        <div class="class-room-banner-left">
+                            <div class="class-room-icon">
+                                <i class="fa fa-chalkboard-teacher"></i>
+                            </div>
+                            <div>
+                                <div class="class-room-title">
+                                    <span>{{ $currentClass->room }}</span>
+                                    <span class="class-room-badge">{{ $currentClass->course }}</span>
+                                </div>
+                                <div class="class-room-sub">
+                                    <span><i class="fa fa-user-tie"></i> Adviser: <strong>{{ $currentClass->adviser_name }}</strong></span>
+                                    @if(!empty($currentClass->semester))
+                                        <span class="separator-dot">•</span>
+                                        <span><i class="fa fa-calendar-alt"></i> {{ $currentClass->semester }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="class-room-banner-right">
+                            <span class="class-templates-count-badge">
+                                <i class="fa fa-file-download"></i> {{ count($roomTemplates) }} Class Template{{ count($roomTemplates) != 1 ? 's' : '' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <div class="table-card-header-left">
+                                <div class="header-icon purple"><i class="fa fa-file-signature"></i></div>
+                                <div>
+                                    <h2>Class & Room Templates</h2>
+                                    <p>Materials and templates uploaded by <strong>{{ $currentClass->adviser_name }}</strong> for <strong>{{ $currentClass->room }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="file-count-badge purple">
+                                <i class="fa fa-file"></i>
+                                {{ count($roomTemplates) }} file{{ count($roomTemplates) != 1 ? 's' : '' }} available
+                            </div>
+                        </div>
+
+                        <div class="table-card-body">
+                            @if ($roomTemplates->isEmpty())
+                                <div class="class-empty-container" style="padding: 42px 20px;">
+                                    <div class="class-empty-icon" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
+                                        <i class="fa fa-folder-open"></i>
                                     </div>
-                                </td>
-                                <td style="color:#666; font-size:13px;">{{ $file->file }}</td>
-                                <td data-order="{{ \Carbon\Carbon::parse($file->created_at)->timestamp }}">
-                                    {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
-                                </td>
-                                <td>
-                                    {{ $file->uploader_name ?: '-' }}
-                                </td>
-                                <td>
-                                    <div class="action-btn-group">
-                                        <button type="button"
-                                                class="btn-view btn-preview-file"
-                                                data-file-url="{{ url('/view/file', $file->file) }}"
-                                                data-file-name="{{ $file->name }}"
-                                                data-file-ext="{{ $ext }}"
-                                                data-download-url="{{ url('/download', $file->file) }}">
-                                            <i class="fa fa-eye"></i> View
-                                        </button>
-                                        <a href="{{ url('/download', $file->file) }}" class="btn-download">
-                                            <i class="fa fa-download"></i> Download
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                    <h4 class="class-empty-title" style="font-size: 17px;">No Class Templates Uploaded Yet</h4>
+                                    <p class="class-empty-desc">
+                                        Your adviser (<strong>{{ $currentClass->adviser_name }}</strong>) has not uploaded any room-specific templates for <strong>{{ $currentClass->room }}</strong> yet.
+                                    </p>
+                                </div>
+                            @else
+                                <table id="classFileTable" class="display" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>FILE NAME</th>
+                                            <th>FILE</th>
+                                            <th>DATE UPLOADED</th>
+                                            <th>UPLOADED BY</th>
+                                            <th>ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($roomTemplates as $file)
+                                        @php
+                                            $ext = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
+                                            $icon = match($ext) {
+                                                'pdf'  => 'fa-file-pdf',
+                                                'doc', 'docx' => 'fa-file-word',
+                                                'xls', 'xlsx' => 'fa-file-excel',
+                                                'ppt', 'pptx' => 'fa-file-powerpoint',
+                                                'jpg', 'jpeg', 'png', 'gif' => 'fa-file-image',
+                                                'zip', 'rar' => 'fa-file-archive',
+                                                default => 'fa-file-alt'
+                                            };
+                                        @endphp
+                                        <tr>
+                                            <td>
+                                                <div class="file-name-cell">
+                                                    <div class="file-icon-wrap purple">
+                                                        <i class="fa {{ $icon }}"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="file-name-text">{{ $file->name }}</div>
+                                                        <div class="file-ext">{{ strtoupper($ext) }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="color:#666; font-size:13px;">{{ $file->file }}</td>
+                                            <td data-order="{{ \Carbon\Carbon::parse($file->created_at)->timestamp }}">
+                                                {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
+                                            </td>
+                                            <td>
+                                                {{ $file->uploader_name ?: $currentClass->adviser_name }}
+                                            </td>
+                                            <td>
+                                                <div class="action-btn-group">
+                                                    <button type="button"
+                                                            class="btn-view btn-preview-file"
+                                                            data-file-url="{{ url('/view/file', $file->file) }}"
+                                                            data-file-name="{{ $file->name }}"
+                                                            data-file-ext="{{ $ext }}"
+                                                            data-download-url="{{ url('/download', $file->file) }}">
+                                                        <i class="fa fa-eye"></i> View
+                                                    </button>
+                                                    <a href="{{ url('/download', $file->file) }}" class="btn-download">
+                                                        <i class="fa fa-download"></i> Download
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             </div>
 
         </div>

@@ -79,9 +79,12 @@
             modal.show();
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        var fileTableInstance = null;
+        var classFileTableInstance = null;
+
+        function initDataTables() {
             if (window.jQuery && $('#fileTable').length && !$.fn.DataTable.isDataTable('#fileTable')) {
-                $('#fileTable').DataTable({
+                fileTableInstance = $('#fileTable').DataTable({
                     order: [[2, 'desc']],
                     autoWidth: false,
                     pageLength: 10,
@@ -94,10 +97,77 @@
                     ],
                     language: {
                         search: "_INPUT_",
-                        searchPlaceholder: "Search files..."
+                        searchPlaceholder: "Search general files..."
                     }
                 });
             }
+
+            if (window.jQuery && $('#classFileTable').length && !$.fn.DataTable.isDataTable('#classFileTable')) {
+                classFileTableInstance = $('#classFileTable').DataTable({
+                    order: [[2, 'desc']],
+                    autoWidth: false,
+                    pageLength: 10,
+                    columnDefs: [
+                        { width: "28%", targets: 0 },
+                        { width: "20%", targets: 1 },
+                        { width: "16%", targets: 2 },
+                        { width: "16%", targets: 3 },
+                        { width: "20%", targets: 4, orderable: false, searchable: false, className: "text-end" }
+                    ],
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search class templates..."
+                    }
+                });
+            }
+        }
+
+        function switchFileTab(tabName) {
+            $('.file-tab-btn').removeClass('active');
+            $('.tab-pane').hide().removeClass('active');
+
+            if (tabName === 'class') {
+                $('#tabBtnClass').addClass('active');
+                $('#classTabPane').fadeIn(150).addClass('active');
+                if (classFileTableInstance) {
+                    classFileTableInstance.columns.adjust().draw();
+                }
+            } else {
+                $('#tabBtnGeneral').addClass('active');
+                $('#generalTabPane').fadeIn(150).addClass('active');
+                if (fileTableInstance) {
+                    fileTableInstance.columns.adjust().draw();
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initDataTables();
+
+            // Tab button clicks
+            $('.file-tab-btn').on('click', function () {
+                var targetTab = $(this).attr('id') === 'tabBtnClass' ? 'class' : 'general';
+                switchFileTab(targetTab);
+                if (history.pushState) {
+                    history.pushState(null, null, targetTab === 'class' ? '#class' : '#general');
+                } else {
+                    location.hash = targetTab === 'class' ? '#class' : '#general';
+                }
+            });
+
+            // Activate tab from URL hash
+            if (window.location.hash === '#class') {
+                switchFileTab('class');
+            }
+
+            // Handle popstate / hashchange
+            window.addEventListener('hashchange', function () {
+                if (window.location.hash === '#class') {
+                    switchFileTab('class');
+                } else {
+                    switchFileTab('general');
+                }
+            });
 
             var modalEl = document.getElementById('filePreviewModal');
             if (modalEl) {
