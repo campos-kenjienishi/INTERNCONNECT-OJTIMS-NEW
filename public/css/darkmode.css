@@ -899,13 +899,13 @@ body.dark-mode .dataTable tbody td {
     color: var(--dm-text-primary) !important;
 }
 
-html.dark-mode table td a:not(.btn):not(.status-badge),
-body.dark-mode table td a:not(.btn):not(.status-badge) {
+html.dark-mode table td a:not(.btn):not(.btn-download):not(.btn-view):not(.btn-action):not(.icon-action-btn):not(.btn-template-download):not(.btn-template-view):not(.status-badge),
+body.dark-mode table td a:not(.btn):not(.btn-download):not(.btn-view):not(.btn-action):not(.icon-action-btn):not(.btn-template-download):not(.btn-template-view):not(.status-badge) {
     color: #60a5fa !important;
 }
 
-html.dark-mode table td a:not(.btn):not(.status-badge):hover,
-body.dark-mode table td a:not(.btn):not(.status-badge):hover {
+html.dark-mode table td a:not(.btn):not(.btn-download):not(.btn-view):not(.btn-action):not(.icon-action-btn):not(.btn-template-download):not(.btn-template-view):not(.status-badge):hover,
+body.dark-mode table td a:not(.btn):not(.btn-download):not(.btn-view):not(.btn-action):not(.icon-action-btn):not(.btn-template-download):not(.btn-template-view):not(.status-badge):hover {
     color: #93c5fd !important;
     text-decoration: underline !important;
 }
@@ -2692,43 +2692,85 @@ body.dark-mode .table-card-body table.dataTable tbody tr td.sorting_1 {
 
 /* View Button (Blue Gradient) & Download Button (Green Gradient) in Dark Mode */
 html.dark-mode .btn-view,
-body.dark-mode .btn-view {
+body.dark-mode .btn-view,
+html.dark-mode button.btn-view,
+body.dark-mode button.btn-view,
+html.dark-mode table td .btn-view,
+body.dark-mode table td .btn-view {
     background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
     border: none !important;
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
 }
 
 html.dark-mode .btn-view:hover,
-body.dark-mode .btn-view:hover {
+body.dark-mode .btn-view:hover,
+html.dark-mode button.btn-view:hover,
+body.dark-mode button.btn-view:hover,
+html.dark-mode table td .btn-view:hover,
+body.dark-mode table td .btn-view:hover {
     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5) !important;
 }
 
 html.dark-mode .btn-view i,
-body.dark-mode .btn-view i {
+body.dark-mode .btn-view i,
+html.dark-mode table td .btn-view i,
+body.dark-mode table td .btn-view i {
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 html.dark-mode .btn-download,
-body.dark-mode .btn-download {
+body.dark-mode .btn-download,
+html.dark-mode a.btn-download,
+body.dark-mode a.btn-download,
+html.dark-mode table td a.btn-download,
+body.dark-mode table td a.btn-download,
+html.dark-mode table td .btn-download,
+body.dark-mode table td .btn-download,
+html.dark-mode .action-btn-group a.btn-download,
+body.dark-mode .action-btn-group a.btn-download {
     background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
     border: none !important;
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35) !important;
+    text-decoration: none !important;
 }
 
 html.dark-mode .btn-download:hover,
-body.dark-mode .btn-download:hover {
+body.dark-mode .btn-download:hover,
+html.dark-mode a.btn-download:hover,
+body.dark-mode a.btn-download:hover,
+html.dark-mode table td a.btn-download:hover,
+body.dark-mode table td a.btn-download:hover,
+html.dark-mode table td .btn-download:hover,
+body.dark-mode table td .btn-download:hover,
+html.dark-mode .action-btn-group a.btn-download:hover,
+body.dark-mode .action-btn-group a.btn-download:hover {
     background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     box-shadow: 0 6px 18px rgba(22, 163, 74, 0.5) !important;
+    text-decoration: none !important;
 }
 
 html.dark-mode .btn-download i,
-body.dark-mode .btn-download i {
+body.dark-mode .btn-download i,
+html.dark-mode a.btn-download i,
+body.dark-mode a.btn-download i,
+html.dark-mode table td a.btn-download i,
+body.dark-mode table td a.btn-download i,
+html.dark-mode table td .btn-download i,
+body.dark-mode table td .btn-download i,
+html.dark-mode .action-btn-group a.btn-download i,
+body.dark-mode .action-btn-group a.btn-download i {
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 /* File Preview Unsupported Notice in Dark Mode */

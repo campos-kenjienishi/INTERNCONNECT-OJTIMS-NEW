@@ -701,7 +701,10 @@
                 font-size: 13px !important;
             }
 
-            .btn-download {
+            .btn-download,
+            a.btn-download,
+            table.dataTable tbody td a.btn-download,
+            .action-btn-group a.btn-download {
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -711,6 +714,7 @@
                 border: none !important;
                 border-radius: 8px !important;
                 color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
                 font-family: 'Poppins', sans-serif !important;
                 font-size: 12.5px !important;
                 font-weight: 600 !important;
@@ -721,21 +725,32 @@
                 transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
 
-            .btn-download:hover {
+            .btn-download:hover,
+            a.btn-download:hover,
+            table.dataTable tbody td a.btn-download:hover,
+            .action-btn-group a.btn-download:hover {
                 background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
                 color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
                 transform: translateY(-1px) !important;
                 box-shadow: 0 5px 16px rgba(22, 163, 74, 0.38) !important;
                 text-decoration: none !important;
             }
 
-            .btn-download:active {
+            .btn-download:active,
+            a.btn-download:active,
+            table.dataTable tbody td a.btn-download:active,
+            .action-btn-group a.btn-download:active {
                 transform: translateY(0) !important;
                 box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2) !important;
             }
 
-            .btn-download i {
+            .btn-download i,
+            a.btn-download i,
+            table.dataTable tbody td a.btn-download i,
+            .action-btn-group a.btn-download i {
                 color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
                 font-size: 13px !important;
             }
 

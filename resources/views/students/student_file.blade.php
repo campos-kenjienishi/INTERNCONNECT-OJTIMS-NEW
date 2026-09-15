@@ -243,7 +243,7 @@
                                     <td>
                                         <div class="action-btn-group">
                                             <button type="button"
-                                                    class="btn-view btn-preview-file"
+                                                    class="btn btn-view btn-preview-file"
                                                     title="Preview File"
                                                     aria-label="Preview File"
                                                     data-file-url="{{ url('/view/file', $file->file) }}"
@@ -252,7 +252,7 @@
                                                     data-download-url="{{ url('/download', $file->file) }}">
                                                 <i class="fa fa-eye"></i> View
                                             </button>
-                                            <a href="{{ url('/download', $file->file) }}" class="btn-download" title="Download File" aria-label="Download File">
+                                            <a href="{{ url('/download', $file->file) }}" class="btn btn-download" title="Download File" aria-label="Download File">
                                                 <i class="fa fa-download"></i> Download
                                             </a>
                                         </div>
@@ -384,7 +384,7 @@
                                             <td>
                                                 <div class="action-btn-group">
                                                     <button type="button"
-                                                            class="btn-view btn-preview-file"
+                                                            class="btn btn-view btn-preview-file"
                                                             title="Preview File"
                                                             aria-label="Preview File"
                                                             data-file-url="{{ url('/view/file', $file->file) }}"
@@ -393,7 +393,7 @@
                                                             data-download-url="{{ url('/download', $file->file) }}">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
-                                                    <a href="{{ url('/download', $file->file) }}" class="btn-download" title="Download File" aria-label="Download File">
+                                                    <a href="{{ url('/download', $file->file) }}" class="btn btn-download" title="Download File" aria-label="Download File">
                                                         <i class="fa fa-download"></i> Download
                                                     </a>
                                                 </div>
