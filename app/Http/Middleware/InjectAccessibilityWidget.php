@@ -24,6 +24,11 @@ class InjectAccessibilityWidget
             return $response;
         }
 
+        // Do not inject on voucher or print/preview pages
+        if ($request->is('voucher*', '*/voucher*', '*print*', '*/print*', 'view/file*') || $request->routeIs('voucher', '*.print')) {
+            return $response;
+        }
+
         if (stripos($content, 'sienna-accessibility.umd.js') !== false) {
             return $response;
         }

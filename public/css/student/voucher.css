@@ -379,3 +379,23 @@
                 print-color-adjust: exact;
             }
         }
+
+        /* Hide accessibility widgets and buttons in voucher view and print */
+        .asw-menu-btn,
+        .asw-btn,
+        .asw-menu,
+        [data-asw-btn],
+        .sienna-accessibility-btn,
+        .sienna-widget,
+        .sienna-widget *,
+        .sienna-accessibility,
+        [class*="sienna"],
+        [id*="sienna"],
+        #userwayAccessibilityIcon,
+        [data-userway-widget],
+        .userway_buttons_wrapper {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
