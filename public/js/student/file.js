@@ -87,13 +87,14 @@
                 fileTableInstance = $('#fileTable').DataTable({
                     order: [[2, 'desc']],
                     autoWidth: false,
+                    scrollX: true,
                     pageLength: 10,
                     columnDefs: [
                         { width: "28%", targets: 0 },
-                        { width: "20%", targets: 1 },
-                        { width: "16%", targets: 2 },
-                        { width: "16%", targets: 3 },
-                        { width: "20%", targets: 4, orderable: false, searchable: false, className: "text-end" }
+                        { width: "22%", targets: 1 },
+                        { width: "18%", targets: 2 },
+                        { width: "18%", targets: 3 },
+                        { width: "14%", targets: 4, orderable: false, searchable: false, className: "text-end" }
                     ],
                     language: {
                         search: "_INPUT_",
@@ -106,13 +107,14 @@
                 classFileTableInstance = $('#classFileTable').DataTable({
                     order: [[2, 'desc']],
                     autoWidth: false,
+                    scrollX: true,
                     pageLength: 10,
                     columnDefs: [
                         { width: "28%", targets: 0 },
-                        { width: "20%", targets: 1 },
-                        { width: "16%", targets: 2 },
-                        { width: "16%", targets: 3 },
-                        { width: "20%", targets: 4, orderable: false, searchable: false, className: "text-end" }
+                        { width: "22%", targets: 1 },
+                        { width: "18%", targets: 2 },
+                        { width: "18%", targets: 3 },
+                        { width: "14%", targets: 4, orderable: false, searchable: false, className: "text-end" }
                     ],
                     language: {
                         search: "_INPUT_",
@@ -129,17 +131,27 @@
             if (tabName === 'class') {
                 $('#tabBtnClass').addClass('active');
                 $('#classTabPane').fadeIn(150).addClass('active');
-                if (classFileTableInstance) {
-                    classFileTableInstance.columns.adjust().draw();
-                }
+                setTimeout(function () {
+                    if (classFileTableInstance) {
+                        classFileTableInstance.columns.adjust().draw();
+                    }
+                }, 50);
             } else {
                 $('#tabBtnGeneral').addClass('active');
                 $('#generalTabPane').fadeIn(150).addClass('active');
-                if (fileTableInstance) {
-                    fileTableInstance.columns.adjust().draw();
-                }
+                setTimeout(function () {
+                    if (fileTableInstance) {
+                        fileTableInstance.columns.adjust().draw();
+                    }
+                }, 50);
             }
         }
+
+        window.addEventListener('resize', function () {
+            if (window.jQuery && $.fn.DataTable) {
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', function () {
             initDataTables();
