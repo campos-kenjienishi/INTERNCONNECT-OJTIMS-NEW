@@ -219,17 +219,24 @@ window.bindPdfInputValidation = function(inputId, labelId, emptyLabel) {
 // Document Ready Initialization
 $(document).ready(function () {
     // DataTable for MOA
-    if ($('#moaTable').length) {
-        $('#moaTable').DataTable({
-            scrollX: true,
-            autoWidth: false,
-            order: [[0, 'asc']]
-        });
+    if ($('#moaTable').length && $.fn.DataTable) {
+        if (!$.fn.DataTable.isDataTable('#moaTable')) {
+            $('#moaTable').DataTable({
+                scrollX: true,
+                autoWidth: false,
+                order: [[0, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: 4 }
+                ]
+            });
+        }
     }
 
     // DataTable for Company1 (pending)
-    if ($('#company1Table').length) {
-        $('#company1Table').DataTable();
+    if ($('#company1Table').length && $.fn.DataTable) {
+        if (!$.fn.DataTable.isDataTable('#company1Table')) {
+            $('#company1Table').DataTable();
+        }
     }
 
     function validateForm($form) {
