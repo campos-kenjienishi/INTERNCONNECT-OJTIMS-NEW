@@ -638,18 +638,67 @@
                 box-shadow: none !important;
             }
 
-            /* Action button group */
-            .action-btn-group {
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-                gap: 8px;
-                width: 100%;
-                flex-wrap: nowrap;
+            /* Action button cell */
+            .actions-cell {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: flex-end !important;
+                gap: 6px !important;
+                flex-wrap: nowrap !important;
+                white-space: nowrap !important;
+                min-width: max-content !important;
+                width: max-content !important;
             }
 
-            /* View button (Mint Pill) */
-            .btn-view {
+            .icon-action-btn {
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                min-height: 34px !important;
+                max-width: 34px !important;
+                max-height: 34px !important;
+                aspect-ratio: 1 / 1 !important;
+                flex-shrink: 0 !important;
+                flex-grow: 0 !important;
+                box-sizing: border-box !important;
+                padding: 0 !important;
+                border: none !important;
+                border-radius: 10px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                color: #fff !important;
+                cursor: pointer;
+                transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.12) !important;
+                text-decoration: none !important;
+            }
+
+            .icon-action-btn:hover {
+                transform: translateY(-1px) !important;
+                filter: brightness(1.08) !important;
+                color: #fff !important;
+            }
+
+            .icon-action-btn:active {
+                transform: translateY(0) !important;
+            }
+
+            .icon-action-btn i {
+                font-size: 13px !important;
+                color: #ffffff !important;
+            }
+
+            .icon-action-btn.btn-view {
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+            }
+
+            .icon-action-btn.btn-download {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            }
+
+            /* View button (Mint Pill fallback for preview modal) */
+            .btn-view:not(.icon-action-btn) {
                 display: inline-flex;
                 align-items: center;
                 gap: 6px;
@@ -666,7 +715,7 @@
                 transition: all 0.2s ease;
             }
 
-            .btn-view:hover {
+            .btn-view:not(.icon-action-btn):hover {
                 background: #d1fae5;
                 border-color: #6ee7b7;
                 color: #047857 !important;
@@ -674,13 +723,13 @@
                 transform: translateY(-1px);
             }
 
-            .btn-view i {
+            .btn-view:not(.icon-action-btn) i {
                 color: #059669;
                 font-size: 13px;
             }
 
-            /* Download button (Sky Pill) */
-            .btn-download {
+            /* Download button (Sky Pill fallback for preview modal) */
+            .btn-download:not(.icon-action-btn) {
                 display: inline-flex;
                 align-items: center;
                 gap: 6px;
@@ -697,7 +746,7 @@
                 transition: all 0.2s ease;
             }
 
-            .btn-download:hover {
+            .btn-download:not(.icon-action-btn):hover {
                 background: #dbeafe;
                 border-color: #93c5fd;
                 color: #1d4ed8 !important;
@@ -705,7 +754,7 @@
                 transform: translateY(-1px);
             }
 
-            .btn-download i {
+            .btn-download:not(.icon-action-btn) i {
                 color: #2563eb;
                 font-size: 13px;
             }
