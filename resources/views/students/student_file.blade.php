@@ -241,19 +241,19 @@
                                         {{ $file->uploader_name ?: 'Coordinator' }}
                                     </td>
                                     <td>
-                                        <div class="actions-cell">
+                                        <div class="action-btn-group">
                                             <button type="button"
-                                                    class="icon-action-btn btn-view btn-preview-file"
+                                                    class="btn-view btn-preview-file"
                                                     title="Preview File"
                                                     aria-label="Preview File"
                                                     data-file-url="{{ url('/view/file', $file->file) }}"
                                                     data-file-name="{{ $file->name }}"
                                                     data-file-ext="{{ $ext }}"
                                                     data-download-url="{{ url('/download', $file->file) }}">
-                                                <i class="fa fa-eye"></i>
+                                                <i class="fa fa-eye"></i> View
                                             </button>
-                                            <a href="{{ url('/download', $file->file) }}" class="icon-action-btn btn-download" title="Download File" aria-label="Download File">
-                                                <i class="fa fa-download"></i>
+                                            <a href="{{ url('/download', $file->file) }}" class="btn-download" title="Download File" aria-label="Download File">
+                                                <i class="fa fa-download"></i> Download
                                             </a>
                                         </div>
                                     </td>
@@ -382,19 +382,19 @@
                                                 {{ $file->uploader_name ?: $currentClass->adviser_name }}
                                             </td>
                                             <td>
-                                                <div class="actions-cell">
+                                                <div class="action-btn-group">
                                                     <button type="button"
-                                                            class="icon-action-btn btn-view btn-preview-file"
+                                                            class="btn-view btn-preview-file"
                                                             title="Preview File"
                                                             aria-label="Preview File"
                                                             data-file-url="{{ url('/view/file', $file->file) }}"
                                                             data-file-name="{{ $file->name }}"
                                                             data-file-ext="{{ $ext }}"
                                                             data-download-url="{{ url('/download', $file->file) }}">
-                                                        <i class="fa fa-eye"></i>
+                                                        <i class="fa fa-eye"></i> View
                                                     </button>
-                                                    <a href="{{ url('/download', $file->file) }}" class="icon-action-btn btn-download" title="Download File" aria-label="Download File">
-                                                        <i class="fa fa-download"></i>
+                                                    <a href="{{ url('/download', $file->file) }}" class="btn-download" title="Download File" aria-label="Download File">
+                                                        <i class="fa fa-download"></i> Download
                                                     </a>
                                                 </div>
                                             </td>

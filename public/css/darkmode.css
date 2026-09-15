@@ -2690,43 +2690,45 @@ body.dark-mode .table-card-body table.dataTable tbody tr td.sorting_1 {
     box-shadow: none !important;
 }
 
-/* View Button (Mint) & Download Button (Sky) in Dark Mode */
-html.dark-mode .btn-view:not(.icon-action-btn),
-body.dark-mode .btn-view:not(.icon-action-btn) {
-    background: rgba(16, 185, 129, 0.15) !important;
-    border-color: rgba(16, 185, 129, 0.3) !important;
-    color: #34d399 !important;
+/* View Button (Blue Gradient) & Download Button (Green Gradient) in Dark Mode */
+html.dark-mode .btn-view,
+body.dark-mode .btn-view {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
 }
 
-html.dark-mode .btn-view:not(.icon-action-btn):hover,
-body.dark-mode .btn-view:not(.icon-action-btn):hover {
-    background: rgba(16, 185, 129, 0.25) !important;
-    border-color: rgba(16, 185, 129, 0.45) !important;
-    color: #6ee7b7 !important;
+html.dark-mode .btn-view:hover,
+body.dark-mode .btn-view:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5) !important;
 }
 
-html.dark-mode .btn-view:not(.icon-action-btn) i,
-body.dark-mode .btn-view:not(.icon-action-btn) i {
-    color: #34d399 !important;
+html.dark-mode .btn-view i,
+body.dark-mode .btn-view i {
+    color: #ffffff !important;
 }
 
-html.dark-mode .btn-download:not(.icon-action-btn),
-body.dark-mode .btn-download:not(.icon-action-btn) {
-    background: rgba(37, 99, 235, 0.15) !important;
-    border-color: rgba(37, 99, 235, 0.3) !important;
-    color: #60a5fa !important;
+html.dark-mode .btn-download,
+body.dark-mode .btn-download {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35) !important;
 }
 
-html.dark-mode .btn-download:not(.icon-action-btn):hover,
-body.dark-mode .btn-download:not(.icon-action-btn):hover {
-    background: rgba(37, 99, 235, 0.25) !important;
-    border-color: rgba(37, 99, 235, 0.45) !important;
-    color: #93c5fd !important;
+html.dark-mode .btn-download:hover,
+body.dark-mode .btn-download:hover {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.5) !important;
 }
 
-html.dark-mode .btn-download:not(.icon-action-btn) i,
-body.dark-mode .btn-download:not(.icon-action-btn) i {
-    color: #60a5fa !important;
+html.dark-mode .btn-download i,
+body.dark-mode .btn-download i {
+    color: #ffffff !important;
 }
 
 /* File Preview Unsupported Notice in Dark Mode */

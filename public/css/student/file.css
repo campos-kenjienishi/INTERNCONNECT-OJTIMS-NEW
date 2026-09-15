@@ -643,13 +643,103 @@
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: flex-end !important;
-                gap: 6px !important;
+                gap: 8px !important;
                 flex-wrap: nowrap !important;
                 white-space: nowrap !important;
                 min-width: max-content !important;
                 width: max-content !important;
             }
 
+            .action-btn-group,
+            .actions-cell {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: flex-end !important;
+                gap: 8px !important;
+                flex-wrap: nowrap !important;
+                white-space: nowrap !important;
+                min-width: max-content !important;
+                width: max-content !important;
+            }
+
+            /* Action Buttons (Table & Modal) */
+            .btn-view {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 6px !important;
+                padding: 7px 15px !important;
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+                border: none !important;
+                border-radius: 8px !important;
+                color: #ffffff !important;
+                font-family: 'Poppins', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 600 !important;
+                cursor: pointer !important;
+                text-decoration: none !important;
+                white-space: nowrap !important;
+                box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25) !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+
+            .btn-view:hover {
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+                color: #ffffff !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 5px 16px rgba(37, 99, 235, 0.38) !important;
+                text-decoration: none !important;
+            }
+
+            .btn-view:active {
+                transform: translateY(0) !important;
+                box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2) !important;
+            }
+
+            .btn-view i {
+                color: #ffffff !important;
+                font-size: 13px !important;
+            }
+
+            .btn-download {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 6px !important;
+                padding: 7px 15px !important;
+                background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+                border: none !important;
+                border-radius: 8px !important;
+                color: #ffffff !important;
+                font-family: 'Poppins', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 600 !important;
+                cursor: pointer !important;
+                text-decoration: none !important;
+                white-space: nowrap !important;
+                box-shadow: 0 3px 10px rgba(22, 163, 74, 0.28) !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+
+            .btn-download:hover {
+                background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+                color: #ffffff !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 5px 16px rgba(22, 163, 74, 0.38) !important;
+                text-decoration: none !important;
+            }
+
+            .btn-download:active {
+                transform: translateY(0) !important;
+                box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2) !important;
+            }
+
+            .btn-download i {
+                color: #ffffff !important;
+                font-size: 13px !important;
+            }
+
+            /* Icon action button compatibility */
             .icon-action-btn {
                 width: 34px !important;
                 height: 34px !important;
@@ -659,7 +749,6 @@
                 max-height: 34px !important;
                 aspect-ratio: 1 / 1 !important;
                 flex-shrink: 0 !important;
-                flex-grow: 0 !important;
                 box-sizing: border-box !important;
                 padding: 0 !important;
                 border: none !important;
@@ -680,10 +769,6 @@
                 color: #fff !important;
             }
 
-            .icon-action-btn:active {
-                transform: translateY(0) !important;
-            }
-
             .icon-action-btn i {
                 font-size: 13px !important;
                 color: #ffffff !important;
@@ -695,68 +780,6 @@
 
             .icon-action-btn.btn-download {
                 background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-            }
-
-            /* View button (Mint Pill fallback for preview modal) */
-            .btn-view:not(.icon-action-btn) {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 7px 16px;
-                background: #ecfdf5;
-                border: 1px solid #a7f3d0;
-                border-radius: 8px;
-                color: #059669 !important;
-                font-family: 'Poppins', sans-serif;
-                font-size: 12.5px;
-                font-weight: 600;
-                cursor: pointer;
-                text-decoration: none;
-                transition: all 0.2s ease;
-            }
-
-            .btn-view:not(.icon-action-btn):hover {
-                background: #d1fae5;
-                border-color: #6ee7b7;
-                color: #047857 !important;
-                text-decoration: none;
-                transform: translateY(-1px);
-            }
-
-            .btn-view:not(.icon-action-btn) i {
-                color: #059669;
-                font-size: 13px;
-            }
-
-            /* Download button (Sky Pill fallback for preview modal) */
-            .btn-download:not(.icon-action-btn) {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 7px 16px;
-                background: #eff6ff;
-                border: 1px solid #bfdbfe;
-                border-radius: 8px;
-                color: #2563eb !important;
-                font-family: 'Poppins', sans-serif;
-                font-size: 12.5px;
-                font-weight: 600;
-                cursor: pointer;
-                text-decoration: none;
-                transition: all 0.2s ease;
-            }
-
-            .btn-download:not(.icon-action-btn):hover {
-                background: #dbeafe;
-                border-color: #93c5fd;
-                color: #1d4ed8 !important;
-                text-decoration: none;
-                transform: translateY(-1px);
-            }
-
-            .btn-download:not(.icon-action-btn) i {
-                color: #2563eb;
-                font-size: 13px;
             }
 
             #filePreviewModal {
