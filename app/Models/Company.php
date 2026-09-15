@@ -14,6 +14,15 @@ public function students()
     return $this->belongsToMany(Student::class, 'company_student', 'company_id', 'student_id');
 }
 
+public function vouchers()
+{
+    return $this->hasMany(Voucher::class, 'company_id');
+}
+
+public function latestVoucher()
+{
+    return $this->hasOne(Voucher::class, 'company_id')->latestOfMany();
+}
 
 public function scopeFiltered($query, $schoolYear, $course)
     {

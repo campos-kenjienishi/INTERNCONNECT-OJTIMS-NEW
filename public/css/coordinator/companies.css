@@ -534,6 +534,14 @@
         .btn-action-icon.btn-print:hover,
         .btn-print:hover { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(99,102,241,0.4) !important; }
 
+        .btn-action-icon.btn-voucher,
+        .btn-voucher {
+            border: none !important; color: #fff !important; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+            box-shadow: 0 2px 6px rgba(124,58,237,0.28) !important;
+        }
+        .btn-action-icon.btn-voucher:hover,
+        .btn-voucher:hover { background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(124,58,237,0.4) !important; }
+
         .btn-action-icon.btn-remove,
         .btn-remove {
             border: none !important; color: #fff !important; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
@@ -541,6 +549,33 @@
         }
         .btn-action-icon.btn-remove:hover,
         .btn-remove:hover { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(220,38,38,0.4) !important; }
+
+        /* Voucher Code Pill */
+        .voucher-code-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: #f5f3ff;
+            border: 1px solid #ddd6fe;
+            border-radius: 6px;
+            color: #7c3aed;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            cursor: default;
+            transition: all 0.15s ease;
+        }
+        .voucher-code-pill:hover {
+            background: #ede9fe;
+            border-color: #c4b5fd;
+            color: #6d28d9;
+        }
+        .voucher-code-pill i {
+            font-size: 10px;
+            color: #8b5cf6;
+        }
 
         /* =============== MODAL =============== */
         .modal-content {

@@ -862,4 +862,57 @@ function printRegularPreview() {
         iframe.onload = function () { iframe.contentWindow.print(); };
     }
 }
-// Dark mode toggle
+
+// =============== VOUCHER MODAL & QUICK LOOKUP ===============
+window.openVoucherModal = function(url) {
+    if (!url) return;
+    const iframe = document.getElementById('voucherIframe');
+    if (iframe) {
+        iframe.src = url;
+    }
+    const modalEl = document.getElementById('voucherModal');
+    if (modalEl) {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
+};
+
+$(document).on('click', '#btnQuickVoucherSearch', function () {
+    const code = ($('#quickVoucherInput').val() || '').trim();
+    if (!code) {
+        $('#quickVoucherFeedback').text('Please enter a voucher code to search.').css('color', '#ef4444').show();
+        return;
+    }
+
+    const dt = $('#companyTable').DataTable();
+    if (dt) {
+        dt.search(code).draw();
+        const info = dt.page.info();
+        if (info.recordsDisplay > 0) {
+            const verifyModalEl = document.getElementById('verifyVoucherModal');
+            if (verifyModalEl) {
+                const verifyModal = bootstrap.Modal.getInstance(verifyModalEl);
+                if (verifyModal) verifyModal.hide();
+            }
+            $('#quickVoucherFeedback').hide();
+            const tableCard = document.querySelector('.table-card');
+            if (tableCard) {
+                tableCard.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            $('#quickVoucherFeedback').text('No MOA record found matching voucher code "' + code + '".').css('color', '#ef4444').show();
+        }
+    }
+});
+
+$('#quickVoucherInput').on('keypress', function (e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        $('#btnQuickVoucherSearch').click();
+    }
+});
+
+$('#verifyVoucherModal').on('shown.bs.modal', function () {
+    $('#quickVoucherInput').val('').focus();
+    $('#quickVoucherFeedback').hide();
+});

@@ -4385,6 +4385,26 @@ body.dark-mode .icon-action-btn.btn-unlock-pending {
     opacity: 0.9 !important;
 }
 
+/* Voucher Code Pill in Dark Mode */
+html.dark-mode .voucher-code-pill,
+body.dark-mode .voucher-code-pill {
+    background: rgba(124, 58, 237, 0.16) !important;
+    border: 1px solid rgba(139, 92, 246, 0.35) !important;
+    color: #c4b5fd !important;
+}
+
+html.dark-mode .voucher-code-pill:hover,
+body.dark-mode .voucher-code-pill:hover {
+    background: rgba(124, 58, 237, 0.28) !important;
+    border-color: rgba(167, 139, 250, 0.5) !important;
+    color: #ddd6fe !important;
+}
+
+html.dark-mode .voucher-code-pill i,
+body.dark-mode .voucher-code-pill i {
+    color: #a78bfa !important;
+}
+
 /* 8. Downloadable Files & Class Templates Tabbed Module */
 html.dark-mode .file-tabs-nav,
 body.dark-mode .file-tabs-nav {

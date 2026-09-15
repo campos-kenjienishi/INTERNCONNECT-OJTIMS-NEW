@@ -27,7 +27,7 @@
 
         <div class="page-card">
             <h1>Notarized MOA Submission Voucher</h1>
-            <p>This is the printable voucher template students should attach to the hardcopy notarized MOA when submitting to the coordinator.</p>
+            <p>This is the official submission voucher confirming your uploaded Notarized MOA. You can show this digital voucher (or a screenshot) to the OJT Coordinator when submitting your physical document.</p>
 
             <div class="print-area">
                 <div class="coupon">
@@ -49,15 +49,15 @@
         <div class="guide-card">
             <h2>What To Do With The Voucher</h2>
             <ol>
-                <li><strong>Upload</strong> the notarized MOA in the system first.</li>
-                <li><strong>Print</strong> the voucher using the template above.</li>
-                <li><strong>Staple</strong> the printed voucher to the notarized MOA hardcopy, or bring it together with the document.</li>
-                <li><strong>Submit</strong> the hardcopy notarized MOA to the coordinator.</li>
-                <li><strong>Keep</strong> a copy or photo of the voucher for your own reference until the submission is confirmed.</li>
+                <li><strong>Upload</strong> your notarized MOA in the system first.</li>
+                <li><strong>Present</strong> this voucher code (or a screenshot on your phone) to your OJT Coordinator.</li>
+                <li><strong>Submit</strong> the physical hardcopy of your Notarized MOA to the coordinator for instant verification.</li>
+                <li><strong>Keep</strong> a copy or photo of your voucher code for your reference until the submission is confirmed.</li>
+                <li><em>(Optional)</em> You may also print this voucher if physical attachment is requested.</li>
             </ol>
 
             <div class="guide-note">
-                This voucher serves as a proof or certificate of submission in the system. The coordinator can use it to match the physical notarized MOA with the uploaded record.
+                This voucher serves as verified proof of submission in the system. The OJT Coordinator can instantly look up and verify this voucher code on their dashboard.
             </div>
         </div>
     </div>

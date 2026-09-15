@@ -155,6 +155,9 @@
                 </div>
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="button" class="btn-add btn-verify-voucher-top" data-bs-toggle="modal" data-bs-target="#verifyVoucherModal" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #fff !important; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.28); border:none;">
+                    <i class="fa fa-ticket-alt"></i> Verify Voucher
+                </button>
                 <a href="{{ route('coordinator.moa.unlockRequests') }}" class="btn-add btn-unlock-requests" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff !important; text-decoration: none; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.28);">
                     <i class="fa fa-key"></i> Unlock Requests
                 </a>
@@ -396,6 +399,17 @@
                                         <span style="color:#aaa; font-size:12px;">&mdash;</span>
                                     @endforelse
                                 @endif
+
+                                @php
+                                    $latestVoucher = $company->vouchers ? $company->vouchers->sortByDesc('created_at')->first() : null;
+                                @endphp
+                                @if ($latestVoucher && !empty($latestVoucher->filename))
+                                    <div style="margin-top: 5px;">
+                                        <span class="voucher-code-pill" title="MOA Submission Voucher Code">
+                                            <i class="fa fa-ticket-alt"></i> {{ $latestVoucher->filename }}
+                                        </span>
+                                    </div>
+                                @endif
                             </td>
 
                             <!-- Status -->
@@ -461,6 +475,17 @@
                                        aria-label="Download MOA">
                                         <i class="fa fa-download"></i>
                                     </a>
+
+                                    @if ($latestVoucher)
+                                        <!-- Voucher -->
+                                        <button type="button"
+                                            class="btn-action-icon btn-voucher"
+                                            title="View Submission Voucher ({{ $latestVoucher->filename }})"
+                                            aria-label="View Submission Voucher"
+                                            onclick="openVoucherModal('{{ route('voucher', $company->id) }}')">
+                                            <i class="fa fa-ticket-alt"></i>
+                                        </button>
+                                    @endif
 
                                     <!-- Send -->
                                     <button class="btn-action-icon btn-send btn-open-send"
@@ -981,6 +1006,60 @@
                 </button>
                 <button type="button" onclick="printRegularPreview()" class="btn-modal-submit">
                     <i class="fa fa-print me-1"></i> Print
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== VOUCHER PREVIEW MODAL =============== -->
+<div class="modal fade" id="voucherModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color:#fff; padding:14px 18px; border-bottom:none;">
+                <h5 class="modal-title" style="font-size:15px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
+                    <i class="fa fa-ticket-alt"></i> MOA Submission Voucher Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.85;"></button>
+            </div>
+            <div class="modal-body" style="padding: 0; height: 75vh; min-height: 420px; background:#f8fafc;">
+                <iframe id="voucherIframe" title="Voucher Frame" style="width:100%; height:100%; border:none; display:block;"></iframe>
+            </div>
+            <div class="modal-footer" style="padding:10px 16px; background:#fff; border-top:1px solid #f0f0f0;">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== QUICK VERIFY VOUCHER MODAL =============== -->
+<div class="modal fade" id="verifyVoucherModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px; border:none; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color:#fff; padding:16px 20px; border-bottom:none;">
+                <h5 class="modal-title" style="font-size:16px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin:0;">
+                    <i class="fa fa-ticket-alt"></i> Quick Voucher Verification
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1); opacity:0.85;"></button>
+            </div>
+            <div class="modal-body" style="padding:22px;">
+                <p style="font-size:13.5px; color:#64748b; margin-bottom:16px; line-height:1.5;">
+                    Enter or scan the student's <strong>Voucher Code</strong> to instantly filter the MOA table and verify their submission record.
+                </p>
+                <div style="position:relative; margin-bottom:12px;">
+                    <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#8b5cf6; font-size:16px; pointer-events:none;">
+                        <i class="fa fa-ticket-alt"></i>
+                    </div>
+                    <input type="text" id="quickVoucherInput" class="form-control" placeholder="Enter voucher code (e.g. ABC123XYZ)..." style="padding:12px 14px 12px 42px; border-radius:10px; font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;" autocomplete="off">
+                </div>
+                <div id="quickVoucherFeedback" style="font-size:12.5px; display:none; margin-top:6px; font-weight:500;"></div>
+            </div>
+            <div class="modal-footer" style="background:#f8fafc; padding:12px 20px; border-top:1px solid #f1f5f9;">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="btnQuickVoucherSearch" class="btn-modal-submit" style="background:linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color:#fff; border:none; padding:8px 18px; border-radius:8px; font-weight:600; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
+                    <i class="fa fa-search me-1"></i> Search & View MOA
                 </button>
             </div>
         </div>

@@ -185,7 +185,7 @@ private function requireStudentSession()
         $currentYear = now()->year;
     
         // Retrieve the selected company or companies
-        $companies = Company::with('students')->get(); // Get all companies
+        $companies = Company::with(['students', 'vouchers'])->get(); // Get all companies
         $schoolYears = Company::whereNotNull('school_year')
             ->pluck('school_year')
             ->filter()
