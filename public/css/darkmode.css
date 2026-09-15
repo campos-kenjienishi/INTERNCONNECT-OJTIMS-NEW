@@ -2710,22 +2710,22 @@ body.dark-mode .btn-view i {
     color: #34d399 !important;
 }
 
-html.dark-mode .btn-download,
-body.dark-mode .btn-download {
+html.dark-mode .btn-download:not(.icon-action-btn),
+body.dark-mode .btn-download:not(.icon-action-btn) {
     background: rgba(37, 99, 235, 0.15) !important;
     border-color: rgba(37, 99, 235, 0.3) !important;
     color: #60a5fa !important;
 }
 
-html.dark-mode .btn-download:hover,
-body.dark-mode .btn-download:hover {
+html.dark-mode .btn-download:not(.icon-action-btn):hover,
+body.dark-mode .btn-download:not(.icon-action-btn):hover {
     background: rgba(37, 99, 235, 0.25) !important;
     border-color: rgba(37, 99, 235, 0.45) !important;
     color: #93c5fd !important;
 }
 
-html.dark-mode .btn-download i,
-body.dark-mode .btn-download i {
+html.dark-mode .btn-download:not(.icon-action-btn) i,
+body.dark-mode .btn-download:not(.icon-action-btn) i {
     color: #60a5fa !important;
 }
 
@@ -4219,6 +4219,122 @@ body.dark-mode .req-type-unlink {
     background: rgba(225, 29, 72, 0.18) !important;
     color: #fda4af !important;
     border: 1px solid rgba(225, 29, 72, 0.35) !important;
+}
+
+/* 7. Icon Action Buttons in Dark Mode (Tables, MOA, etc.) */
+html.dark-mode .icon-action-btn,
+body.dark-mode .icon-action-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    border-radius: 9px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
+}
+
+html.dark-mode .icon-action-btn i,
+body.dark-mode .icon-action-btn i {
+    color: #ffffff !important;
+    font-size: 13px !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark-mode .icon-action-btn:hover,
+body.dark-mode .icon-action-btn:hover {
+    transform: translateY(-2px) !important;
+    filter: brightness(1.15) !important;
+    color: #ffffff !important;
+}
+
+html.dark-mode .icon-action-btn:active,
+body.dark-mode .icon-action-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Download Action Button (Emerald Gradient) */
+html.dark-mode .icon-action-btn.btn-download,
+body.dark-mode .icon-action-btn.btn-download {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-color: rgba(52, 211, 153, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark-mode .icon-action-btn.btn-download:hover,
+body.dark-mode .icon-action-btn.btn-download:hover {
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.55) !important;
+}
+
+/* Voucher Action Button (Purple Gradient) */
+html.dark-mode .icon-action-btn.btn-voucher,
+body.dark-mode .icon-action-btn.btn-voucher {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    border-color: rgba(167, 139, 250, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35) !important;
+}
+
+html.dark-mode .icon-action-btn.btn-voucher:hover,
+body.dark-mode .icon-action-btn.btn-voucher:hover {
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.55) !important;
+}
+
+/* Print Action Button (Blue Gradient) */
+html.dark-mode .icon-action-btn.btn-print,
+body.dark-mode .icon-action-btn.btn-print {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    border-color: rgba(96, 165, 250, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark-mode .icon-action-btn.btn-print:hover,
+body.dark-mode .icon-action-btn.btn-print:hover {
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.55) !important;
+}
+
+/* Edit Action Button (Amber Gradient) */
+html.dark-mode .icon-action-btn.btn-edit,
+body.dark-mode .icon-action-btn.btn-edit {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    border-color: rgba(251, 191, 36, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark-mode .icon-action-btn.btn-edit:hover,
+body.dark-mode .icon-action-btn.btn-edit:hover {
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.55) !important;
+}
+
+/* Remove / Request Unlock Action Button (Red Gradient) */
+html.dark-mode .icon-action-btn.btn-remove,
+body.dark-mode .icon-action-btn.btn-remove,
+html.dark-mode .icon-action-btn.btn-request-unlock,
+body.dark-mode .icon-action-btn.btn-request-unlock {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border-color: rgba(248, 113, 113, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
+}
+
+html.dark-mode .icon-action-btn.btn-remove:hover,
+body.dark-mode .icon-action-btn.btn-remove:hover,
+html.dark-mode .icon-action-btn.btn-request-unlock:hover,
+body.dark-mode .icon-action-btn.btn-request-unlock:hover {
+    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.55) !important;
+}
+
+/* Unlock Pending Action Button (Amber / Warning) */
+html.dark-mode .icon-action-btn.btn-unlock-pending,
+body.dark-mode .icon-action-btn.btn-unlock-pending {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+    border-color: rgba(251, 191, 36, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+    opacity: 0.9 !important;
 }
 
 
