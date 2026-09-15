@@ -415,4 +415,3 @@ document.addEventListener('click', function(e) {
         });
     }
 })();
->>>>>>> origin/feature/landing-and-student-revise

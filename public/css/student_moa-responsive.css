@@ -62,6 +62,13 @@ img {
         padding: 16px;
     }
 
+    .actions-cell {
+        display: inline-flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
     .action-buttons {
         flex-direction: row;
         flex-wrap: wrap;

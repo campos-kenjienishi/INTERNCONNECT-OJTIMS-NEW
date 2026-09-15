@@ -609,7 +609,84 @@
             border: 1px solid #fecaca;
         }
 
-        /* Action buttons */
+        /* Action buttons & Actions Cell */
+        .actions-cell {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
+            min-width: max-content !important;
+            width: max-content !important;
+        }
+
+        .icon-action-btn {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            min-height: 34px !important;
+            max-width: 34px !important;
+            max-height: 34px !important;
+            aspect-ratio: 1 / 1 !important;
+            flex-shrink: 0 !important;
+            flex-grow: 0 !important;
+            box-sizing: border-box !important;
+            padding: 0 !important;
+            border: none !important;
+            border-radius: 10px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #fff !important;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12) !important;
+            text-decoration: none !important;
+        }
+
+        .icon-action-btn:hover {
+            transform: translateY(-1px) !important;
+            filter: brightness(1.08) !important;
+            color: #fff !important;
+        }
+
+        .icon-action-btn:active {
+            transform: translateY(0) !important;
+        }
+
+        .icon-action-btn i {
+            font-size: 13px !important;
+            color: #ffffff !important;
+        }
+
+        .icon-action-btn.btn-download {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        }
+
+        .icon-action-btn.btn-voucher {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+        }
+
+        .icon-action-btn.btn-print {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+        }
+
+        .icon-action-btn.btn-edit {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+        }
+
+        .icon-action-btn.btn-remove,
+        .icon-action-btn.btn-request-unlock {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        }
+
+        .icon-action-btn.btn-unlock-pending {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            opacity: 0.85 !important;
+            cursor: not-allowed !important;
+        }
+
         .action-buttons {
             display: flex;
             align-items: center;
@@ -630,52 +707,6 @@
             transition: all 0.2s;
             border: 1.5px solid;
             text-decoration: none;
-        }
-
-        .btn-download {
-            background: #eff6ff;
-            border-color: #bfdbfe;
-            color: #2563eb;
-        }
-
-        .btn-download:hover {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #fff;
-        }
-
-        .btn-print {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            border: none;
-            color: #fff !important;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
-        }
-
-        .btn-print:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: #fff !important;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-            transform: translateY(-1px);
-        }
-
-        .btn-voucher {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-            border: none !important;
-            color: #fff !important;
-            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25) !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-
-        .btn-voucher:hover {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
-            color: #fff !important;
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.38) !important;
-            transform: translateY(-2px) !important;
-        }
-
-        .btn-voucher:active {
-            transform: translateY(0) !important;
-            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25) !important;
         }
 
         /* Empty state */

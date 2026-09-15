@@ -312,24 +312,29 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="action-buttons">
-                                    <a href="{{ url('/moa/download', $company->file) }}" class="btn-action btn-download">
-                                        <i class="fa fa-download"></i> Download
+                                <div class="actions-cell">
+                                    <a href="{{ url('/moa/download', $company->file) }}" class="icon-action-btn btn-download" title="Download MOA" aria-label="Download MOA">
+                                        <i class="fa fa-download"></i>
                                     </a>
                                     <button type="button"
-                                        class="btn-action btn-voucher"
+                                        class="icon-action-btn btn-voucher"
+                                        title="View Voucher"
+                                        aria-label="View Voucher"
                                         onclick="openVoucherModal('{{ route('voucher', $company->id) }}')">
-                                        <i class="fa fa-ticket-alt"></i> Voucher
+                                        <i class="fa fa-ticket-alt"></i>
                                     </button>
-                                    <button class="btn-action btn-print"
+                                    <button type="button" class="icon-action-btn btn-print"
+                                        title="Print PDF"
+                                        aria-label="Print PDF"
                                         onclick="openPdfPreview('{{ asset('assets/' . $company->file) }}')">
-                                        <i class="fa fa-print"></i> Print PDF
+                                        <i class="fa fa-print"></i>
                                     </button>
-                                     @php $companyHasEditUnlock = is_callable($hasApprovedEditUnlock) ? $hasApprovedEditUnlock($company->id) : !empty($hasApprovedEditUnlock); @endphp
-                                     @if($isOwner && (empty($isLocked) || $companyHasEditUnlock))
+                                    @php $companyHasEditUnlock = is_callable($hasApprovedEditUnlock) ? $hasApprovedEditUnlock($company->id) : !empty($hasApprovedEditUnlock); @endphp
+                                    @if($isOwner && (empty($isLocked) || $companyHasEditUnlock))
                                         <button type="button"
-                                            class="btn-action"
-                                            style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; border: none; box-shadow: 0 2px 6px rgba(37,99,235,0.28);"
+                                            class="icon-action-btn btn-edit"
+                                            title="Edit MOA Details"
+                                            aria-label="Edit MOA Details"
                                             data-update-url="{{ route('student.moa.update', $company->id) }}"
                                             data-company-name="{{ e($company->company_name) }}"
                                             data-company-address="{{ e($company->company_address) }}"
@@ -341,24 +346,28 @@
                                             data-valid-until="{{ $company->valid_until ? \Carbon\Carbon::parse($company->valid_until)->format('Y-m-d') : '' }}"
                                             data-file-name="{{ e($company->file) }}"
                                             onclick="openEditMoaModal(this)">
-                                            <i class="fa fa-edit"></i> Edit
+                                            <i class="fa fa-edit"></i>
                                         </button>
                                     @endif
                                     @if(!empty($isLocked))
                                         @if(!empty($unlockRequest) && $unlockRequest->status === 'pending')
-                                            <button type="button" class="btn-action" disabled style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; border: none; cursor: not-allowed; opacity: 0.9; box-shadow: 0 2px 6px rgba(245,158,11,0.28);" title="Your unlock request is pending coordinator approval.">
-                                                <i class="fa fa-clock me-1"></i> Unlock Request Pending
+                                            <button type="button" class="icon-action-btn btn-unlock-pending" disabled title="Unlock Request Pending" aria-label="Unlock Request Pending">
+                                                <i class="fa fa-clock"></i>
                                             </button>
                                         @else
-                                            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; border: none; box-shadow: 0 2px 6px rgba(220,38,38,0.28);"
+                                            <button type="button" class="icon-action-btn btn-request-unlock"
+                                                title="{{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}"
+                                                aria-label="{{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}"
                                                 onclick="openUnlockRequestModal('{{ $isOwner ? 'edit' : 'unlink' }}', {{ $isOwner ? 'true' : 'false' }})">
-                                                <i class="fa fa-key me-1"></i> {{ $isOwner ? 'Request Edit / Remove' : 'Request Unlink' }}
+                                                <i class="fa fa-key"></i>
                                             </button>
                                         @endif
                                     @else
-                                        <button type="button" class="btn-action" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; border: none; box-shadow: 0 2px 6px rgba(220,38,38,0.28);"
+                                        <button type="button" class="icon-action-btn btn-remove"
+                                            title="{{ $isOwner ? 'Remove MOA' : 'Unlink MOA' }}"
+                                            aria-label="{{ $isOwner ? 'Remove MOA' : 'Unlink MOA' }}"
                                             onclick="confirmStudentRemove({{ $company->id }}, '{{ addslashes($company->company_name) }}', {{ $isOwner ? 'true' : 'false' }})">
-                                            <i class="fa fa-trash"></i> {{ $isOwner ? 'Remove' : 'Unlink' }}
+                                            <i class="fa fa-trash"></i>
                                         </button>
                                         <form id="student-remove-form-{{ $company->id }}" action="{{ route('student.moa.remove', $company->id) }}" method="POST" style="display:none;">
                                             @csrf
