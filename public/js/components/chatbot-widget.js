@@ -306,21 +306,21 @@
             var isDragging = false;
             var suppressChipClick = false;
 
-            // Desktop Prev / Next scroll buttons
+            // Desktop & Mobile Prev / Next scroll buttons
             if (btnPrev && suggestions) {
                 btnPrev.addEventListener("click", function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    suggestions.scrollBy({ left: -220, behavior: "smooth" });
-                    setTimeout(function () { self.updateSuggestionNavState(); }, 250);
+                    suggestions.scrollBy({ left: -200, behavior: "smooth" });
+                    setTimeout(function () { self.updateSuggestionNavState(); }, 220);
                 });
             }
             if (btnNext && suggestions) {
                 btnNext.addEventListener("click", function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    suggestions.scrollBy({ left: 220, behavior: "smooth" });
-                    setTimeout(function () { self.updateSuggestionNavState(); }, 250);
+                    suggestions.scrollBy({ left: 200, behavior: "smooth" });
+                    setTimeout(function () { self.updateSuggestionNavState(); }, 220);
                 });
             }
 
@@ -329,7 +329,7 @@
                 var delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
                 if (delta !== 0) {
                     e.preventDefault();
-                    suggestions.scrollLeft += delta * 1.3;
+                    suggestions.scrollLeft += delta * 1.2;
                     self.updateSuggestionNavState();
                 }
             };
@@ -346,6 +346,35 @@
             if (suggestions) {
                 suggestions.addEventListener("scroll", function () {
                     self.updateSuggestionNavState();
+                }, { passive: true });
+
+                // Touch swipe handlers for mobile
+                var touchStartX = 0;
+                var touchScrollLeft = 0;
+                var isTouching = false;
+
+                suggestions.addEventListener("touchstart", function (e) {
+                    if (e.touches.length === 1) {
+                        isTouching = true;
+                        touchStartX = e.touches[0].pageX;
+                        touchScrollLeft = suggestions.scrollLeft;
+                    }
+                }, { passive: true });
+
+                suggestions.addEventListener("touchmove", function (e) {
+                    if (!isTouching || e.touches.length !== 1) return;
+                    var diffX = e.touches[0].pageX - touchStartX;
+                    if (Math.abs(diffX) > 6) {
+                        suppressChipClick = true;
+                    }
+                }, { passive: true });
+
+                suggestions.addEventListener("touchend", function () {
+                    isTouching = false;
+                    setTimeout(function () {
+                        suppressChipClick = false;
+                        self.updateSuggestionNavState();
+                    }, 80);
                 });
 
                 // Mouse drag-to-scroll
@@ -821,22 +850,22 @@
             var btnNext = document.getElementById("icSugNavNext");
             if (!box || !btnPrev || !btnNext) return;
 
-            var scrollLeft = Math.round(box.scrollLeft);
-            var maxScroll = Math.max(0, box.scrollWidth - box.clientWidth);
+            var scrollLeft = Math.ceil(box.scrollLeft);
+            var maxScroll = Math.floor(box.scrollWidth - box.clientWidth);
 
-            if (maxScroll <= 4) {
+            if (maxScroll <= 2) {
                 btnPrev.classList.remove("visible");
                 btnNext.classList.remove("visible");
                 return;
             }
 
-            if (scrollLeft > 4) {
+            if (scrollLeft > 6) {
                 btnPrev.classList.add("visible");
             } else {
                 btnPrev.classList.remove("visible");
             }
 
-            if (scrollLeft < maxScroll - 4) {
+            if (scrollLeft < maxScroll - 6) {
                 btnNext.classList.add("visible");
             } else {
                 btnNext.classList.remove("visible");

@@ -429,20 +429,25 @@
     align-items: center;
     overflow: hidden;
     padding: 0;
+    width: 100%;
+    min-width: 0;
 }
 
 .ic-chat-suggestions {
-    padding: 10px 12px;
+    padding: 10px 14px;
     background: transparent;
     display: flex;
     gap: 8px;
     overflow-x: auto;
     overflow-y: hidden;
-    flex-shrink: 0;
-    flex-grow: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 #f8fafc;
+    scrollbar-color: #cbd5e1 transparent;
     scroll-behavior: smooth;
     cursor: grab;
     user-select: none;
@@ -455,7 +460,7 @@
 }
 
 .ic-chat-suggestions::-webkit-scrollbar {
-    height: 5px;
+    height: 4px;
 }
 
 .ic-chat-suggestions::-webkit-scrollbar-thumb {
@@ -468,29 +473,29 @@
 }
 
 .ic-chat-suggestions::-webkit-scrollbar-track {
-    background: #f8fafc;
+    background: transparent;
     border-radius: 999px;
     margin: 0 10px;
 }
 
-/* Desktop Chevron Navigation Buttons */
+/* Desktop & Mobile Chevron Navigation Buttons */
 .ic-sug-nav-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background: #ffffff;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid #cbd5e1;
     color: #5c0606;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 12px;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
-    z-index: 20;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+    z-index: 30;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -504,11 +509,11 @@
 }
 
 .ic-sug-nav-btn.prev {
-    left: 6px;
+    left: 4px;
 }
 
 .ic-sug-nav-btn.next {
-    right: 6px;
+    right: 4px;
 }
 
 .ic-sug-nav-btn:hover {
