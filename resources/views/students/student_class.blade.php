@@ -154,13 +154,13 @@
             </div>
         @endif
 
-        <!-- Rooms Table Card -->
+        <!-- Classes Table Card -->
         <div class="table-card">
             <div class="table-card-header">
-                <div class="header-icon"><i class="fa fa-door-open"></i></div>
+                <div class="header-icon"><i class="fa fa-chalkboard"></i></div>
                 <div>
-                    <h2>{{ $currentClass ? 'Current Class' : 'Available Rooms' }}</h2>
-                    <p>{{ $currentClass ? 'View your assigned class information or leave this room' : 'Join or view your assigned class room' }}</p>
+                    <h2>{{ $currentClass ? 'Current Class' : 'Available Classes' }}</h2>
+                    <p>{{ $currentClass ? 'View your assigned class information or leave this class' : 'Join or view your assigned class' }}</p>
                 </div>
             </div>
             <div class="table-card-body">
@@ -190,7 +190,7 @@
                                     @endif
 
                                     <button class="btn-leave-class" onclick="leaveStudent()">
-                                        <i class="fa fa-sign-out-alt"></i> Leave Room
+                                        <i class="fa fa-sign-out-alt"></i> Leave Class
                                     </button>
                                 </div>
                             </div>
@@ -289,7 +289,7 @@
                     <thead>
                         <tr>
                             <th>Program</th>
-                            <th>Room</th>
+                            <th>Class</th>
                             <th>School Year</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -346,7 +346,7 @@
                                         <div class="modal-content">
                                              <div class="modal-header">
                                                 <h5 class="modal-title">
-                                                    <i class="fa fa-door-open"></i> Room Details
+                                                    <i class="fa fa-chalkboard"></i> Class Details
                                                 </h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
@@ -354,7 +354,7 @@
                                                 <div class="modal-detail-row">
                                                     <div class="modal-detail-icon"><i class="fa fa-chalkboard"></i></div>
                                                     <div>
-                                                        <div class="modal-detail-label">Room Name</div>
+                                                        <div class="modal-detail-label">Class Name</div>
                                                         <div class="modal-detail-value">{{ $classItem->room }}</div>
                                                     </div>
                                                 </div>
@@ -480,7 +480,7 @@
                             <i class="fa fa-bullhorn"></i>
                         </div>
                         <p>No class announcements posted yet.</p>
-                        <span class="empty-hint">Your adviser has not published any announcements for this room.</span>
+                        <span class="empty-hint">Your adviser has not published any announcements for this class.</span>
                     </div>
                 @else
                     <!-- Search & Filter Bar -->

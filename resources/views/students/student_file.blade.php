@@ -160,7 +160,7 @@
                         <div class="stat-num" style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">
                             {{ $currentClass ? $currentClass->room : 'No Class' }}
                         </div>
-                        <div class="stat-name">{{ $currentClass ? 'Enrolled Room' : 'Not Joined' }}</div>
+                        <div class="stat-name">{{ $currentClass ? 'Enrolled Class' : 'Not Joined' }}</div>
                     </div>
                 </div>
             </div>
@@ -273,10 +273,10 @@
                             <div class="class-empty-icon">
                                 <i class="fa fa-door-closed"></i>
                             </div>
-                            <h3 class="class-empty-title">You Haven't Joined a Class Room Yet</h3>
+                            <h3 class="class-empty-title">You Haven't Joined a Class Yet</h3>
                             <p class="class-empty-desc">
                                 Class templates and instructional rubrics are uploaded specifically by professors for enrolled students.
-                                Join your designated class room under the Class module to access your adviser's materials.
+                                Join your designated class under the Class module to access your adviser's materials.
                             </p>
                             <a href="{{ url('/student/class') }}" class="btn-class-join-link">
                                 <i class="fa fa-clipboard"></i> Go to Class Module
@@ -316,7 +316,7 @@
                             <div class="table-card-header-left">
                                 <div class="header-icon purple"><i class="fa fa-file-signature"></i></div>
                                 <div>
-                                    <h2>Class & Room Templates</h2>
+                                    <h2>Class Templates</h2>
                                     <p>Materials and templates uploaded by <strong>{{ $currentClass->adviser_name }}</strong> for <strong>{{ $currentClass->room }}</strong></p>
                                 </div>
                             </div>
@@ -334,7 +334,7 @@
                                     </div>
                                     <h4 class="class-empty-title" style="font-size: 17px;">No Class Templates Uploaded Yet</h4>
                                     <p class="class-empty-desc">
-                                        Your adviser (<strong>{{ $currentClass->adviser_name }}</strong>) has not uploaded any room-specific templates for <strong>{{ $currentClass->room }}</strong> yet.
+                                        Your adviser (<strong>{{ $currentClass->adviser_name }}</strong>) has not uploaded any class templates for <strong>{{ $currentClass->room }}</strong> yet.
                                     </p>
                                 </div>
                             @else
