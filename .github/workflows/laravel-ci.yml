@@ -1,0 +1,50 @@
+name: Laravel CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master", "dev", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "dev" ]
+  workflow_dispatch:
+
+jobs:
+  laravel-build-test:
+    name: Build & Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: 🐘 Setup PHP 8.2 Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, sqlite3, dom, filter, json, libxml, curl, gd
+          coverage: none
+
+      - name: 🚀 Install Composer Dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
+
+      - name: ⚡ Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 🎨 Install NPM Dependencies & Build Vite Assets
+        run: |
+          npm install
+          npm run build
+
+      - name: 🔑 Prepare Laravel Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: 🛡️ Verify Application Architecture
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: |
+          php artisan --version
+          php artisan about
