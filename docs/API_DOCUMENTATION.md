@@ -413,4 +413,4 @@ All JSON API responses return standard RFC 7807 problem details or standardized 
 ```
 
 ---
-*For support or integration questions, contact the INTERNCONNECT Development Team at `camposkenjienishi@gmail.com`.*
+*For support or integration questions, contact the INTERNCONNECT Development Team (Team Wards) at `internconnect.ojtims@gmail.com`.*
