@@ -275,12 +275,12 @@
 }
 
 .ic-bud-msg-icon {
-    width: 42px !important;
+    width: 46px !important;
     max-width: none !important;
     height: auto !important;
     display: block !important;
     object-fit: contain !important;
-    margin-bottom: 0 !important;
+    margin-bottom: -9px !important;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18)) !important;
 }
 
@@ -1086,12 +1086,12 @@ body.dark-mode .ic-typing-indicator {
 }
 
 .ic-bud-msg-icon {
-    width: 42px !important;
+    width: 46px !important;
     max-width: none !important;
     height: auto !important;
     display: block !important;
     object-fit: contain !important;
-    margin-bottom: 0 !important;
+    margin-bottom: -9px !important;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18)) !important;
 }
 
