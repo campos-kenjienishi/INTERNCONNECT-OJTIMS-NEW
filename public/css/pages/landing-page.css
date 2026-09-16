@@ -241,13 +241,30 @@
 
 .hero-subtitle {
     margin: 10px 0 0;
-    max-width: 620px;
-    font-size: clamp(1.6rem, 3.6vw, 2.6rem);
-    line-height: 1.15;
+    max-width: 780px;
+    font-size: clamp(1.35rem, 2.75vw, 2.35rem);
+    line-height: 1.2;
     font-weight: 800;
     color: #fff;
     text-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
     animation: heroTextRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+.hero-subtitle .line-ojt {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.hero-subtitle .line-system {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .hero-subtitle .line-ojt,
+    .hero-subtitle .line-system {
+        white-space: normal;
+    }
 }
 
         @keyframes heroCardEntrance {
