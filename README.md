@@ -267,13 +267,18 @@ For the complete REST API specification, external microservice endpoints, and re
 
 ---
 
-## 👥 Authors & Capstone Team
+## 👥 Authors & Capstone Research Team
 
-**INTERNCONNECT: OJTIMS** is developed by the Capstone Research Team at the **Department of Information Technology, Polytechnic University of the Philippines – Taguig Branch**.
+**INTERNCONNECT: OJTIMS** is developed by **Team Wards** from the Department of Information Technology, Polytechnic University of the Philippines – Taguig Branch.
 
-* **Kenji Enishi Campos** – Lead Full-Stack Developer & Repository Owner
-* **Capstone Research Team Members** – Polytechnic University of the Philippines Taguig
-* **Adviser & Panel Consultants** – PUP Taguig IT Department
+### 🚀 Research & Development Team
+* **Kenji Enishi Campos** – Project Lead & Full-Stack Developer
+* **Kian Benedict Miguel** – Frontend Developer & QA Tester
+* **Rica Genevive Salespara** – Document Analyst & Technical Writer
+
+### 🎓 Academic Adviser & Mentors
+* **Dr. Gecilie Almiranez** – Capstone Project Adviser
+* **Faculty & IT Department Consultants** – PUP Taguig Branch
 
 ---
 
