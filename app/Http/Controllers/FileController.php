@@ -94,7 +94,13 @@ class FileController extends Controller
         ]);
 
         $file = $request->file('file'); // properly get file
-        $filename = time().'.'.$file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
+        $rawName = trim((string) $request->name);
+        $sanitizedName = Str::slug(pathinfo($rawName, PATHINFO_FILENAME), '_');
+        if (empty($sanitizedName)) {
+            $sanitizedName = 'file';
+        }
+        $filename = $sanitizedName . '_' . time() . '.' . $extension;
         $file->move(public_path('assets'), $filename);
 
         $data = new UploadedFile();
@@ -129,8 +135,23 @@ class FileController extends Controller
 
     public function download(Request $request, $file)
     {   
-	    return response()->download(public_path('assets/'.$file));
+        $filePath = public_path('assets/' . $file);
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'File not found.');
+        }
 
+        $fileRecord = UploadedFile::where('file', $file)->first();
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+
+        if ($fileRecord && !empty($fileRecord->name)) {
+            $baseName = pathinfo($fileRecord->name, PATHINFO_FILENAME);
+            $cleanName = Str::slug($baseName, '_');
+            $downloadName = ($cleanName ?: 'file') . '.' . $ext;
+        } else {
+            $downloadName = $file;
+        }
+
+        return response()->download($filePath, $downloadName);
     }
 
 
@@ -283,28 +304,33 @@ class FileController extends Controller
     }
 
     public function downloadFile($file)
-{
-    $fileRecord = UploadedFile::where('file', $file)->first();
-
-    if ($fileRecord) {
-        // Check if the file is still valid
-        if ($fileRecord->valid_until && now()->gt($fileRecord->valid_until)) {
-            // File has expired, return a response indicating that
-            return response()->json(['message' => 'File has expired'], 403);
+    {
+        $filePath = public_path('assets/' . $file);
+        if (!file_exists($filePath)) {
+            return response()->json(['message' => 'File not found'], 404);
         }
 
-        // File is valid, allow download
-        $filePath = public_path('assets/' . $file);
-        $headers = [
-            'Content-Type' => 'application/pdf', // Adjust the content type as needed
-        ];
+        $fileRecord = UploadedFile::where('file', $file)->first();
 
-        return response()->download(public_path('assets/' . $file));
+        if ($fileRecord) {
+            // Check if the file is still valid
+            if ($fileRecord->valid_until && now()->gt($fileRecord->valid_until)) {
+                // File has expired, return a response indicating that
+                return response()->json(['message' => 'File has expired'], 403);
+            }
+        }
+
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+        if ($fileRecord && !empty($fileRecord->name)) {
+            $baseName = pathinfo($fileRecord->name, PATHINFO_FILENAME);
+            $cleanName = Str::slug($baseName, '_');
+            $downloadName = ($cleanName ?: 'file') . '.' . $ext;
+        } else {
+            $downloadName = $file;
+        }
+
+        return response()->download($filePath, $downloadName);
     }
-
-    // File not found, return a response indicating that
-    return response()->json(['message' => 'File not found'], 404);
-}
 
     public function viewFile($file)
     {

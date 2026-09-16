@@ -532,8 +532,10 @@ public function companyCreate(Request $request)
     }
 
         $file = $request->file;
-    $filename = time() . '.' . $file->getClientOriginalExtension();
-    $request->file->move('assets', $filename);
+    $companySlug = Str::slug($com->company_name ?: ($request->input('company_name') ?: 'Company'), '_');
+    $extension = $file->getClientOriginalExtension();
+    $filename = ($companySlug ?: 'Company') . '_MOA_' . time() . '.' . $extension;
+    $request->file->move(public_path('assets'), $filename);
     $com->file = $filename;
 
     // Set the uploader_name field based on the logged-in user's name
@@ -541,24 +543,18 @@ public function companyCreate(Request $request)
     $com->date_notarized = $request->input('date_notarized');
     $com->valid_until = $expirationDate;
 
-    
-
     // Upload File Requirement
-    $fileRequirement = $request->file;
-    $fileRequirementFilename = time() . '.' . $fileRequirement->getClientOriginalExtension();
-    
-
     // Create a new instance of FileRequirement model
     $fileup = new FileRequirement();
     $fileup->fileName = "Notarized MOA"; 
-    $fileup->file = $fileRequirementFilename;
+    $fileup->file = $filename;
     $fileup->status = 0;
     $fileup->adviser = $data->adviser_name;
     $fileup->uploadedBy = $data->full_name;
     $fileup->uploader_user_id = $data->id;
 
-// Save the model instance
-$res = $fileup->save();
+    // Save the model instance
+    $res = $fileup->save();
   
 
 
@@ -751,8 +747,10 @@ public function companyUpdate(Request $request, $id)
 
     if ($request->hasFile('file')) {
         $file = $request->file('file');
-        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $file->move('assets', $filename);
+        $companySlug = Str::slug($company->company_name ?: ($request->input('company_name') ?: 'Company'), '_');
+        $extension = $file->getClientOriginalExtension();
+        $filename = ($companySlug ?: 'Company') . '_MOA_' . time() . '.' . $extension;
+        $file->move(public_path('assets'), $filename);
 
         $oldFilePath = public_path('assets/' . $company->file);
         if (!empty($company->file) && file_exists($oldFilePath)) {

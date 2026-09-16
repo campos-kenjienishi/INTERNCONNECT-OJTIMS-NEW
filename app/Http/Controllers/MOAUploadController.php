@@ -258,26 +258,30 @@ class MOAUploadController extends Controller
 
     public function download(Request $request, $file)
     {   
-	    $fileRecord = Company::where('file', $file)->first();
+        $fileRecord = Company::where('file', $file)->first();
 
-    if ($fileRecord) {
-        // Check if the file is still valid
-        if ($fileRecord->valid_until && now()->gt($fileRecord->valid_until)) {
-            // File has expired, return a response indicating that
-            return response()->json(['message' => 'File has expired'], 403);
+        if ($fileRecord) {
+            // Check if the file is still valid
+            if ($fileRecord->valid_until && now()->gt($fileRecord->valid_until)) {
+                // File has expired, return a response indicating that
+                return response()->json(['message' => 'File has expired'], 403);
+            }
+
+            if (!$this->isReadableMoaFile($fileRecord)) {
+                return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 422);
+            }
+
+            $filePath = public_path('assets/' . $file);
+            $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+            $companyName = Str::slug($fileRecord->company_name ?: 'Company', '_');
+            $cleanDownloadName = ($companyName ?: 'Company') . '_Notarized_MOA.' . $ext;
+
+            // File is valid, allow download
+            return response()->download($filePath, $cleanDownloadName);
         }
 
-        if (!$this->isReadableMoaFile($fileRecord)) {
-            return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 422);
-        }
-
-        // File is valid, allow download
-        return response()->download(public_path('assets/' . $file));
-    }
-
-    // File not found, return a response indicating that
-    return response()->json(['message' => 'File not found'], 404);
-
+        // File not found, return a response indicating that
+        return response()->json(['message' => 'File not found'], 404);
     }
 
     public function remove($id)
@@ -379,32 +383,31 @@ public function view($id)
     }
 
     public function downloadFile($file)
-{
-    $fileRecord = Company::where('file', $file)->first();
+    {
+        $fileRecord = Company::where('file', $file)->first();
 
-    if ($fileRecord) {
-        // Check if the file is still valid
-        if ($fileRecord->valid_until && now()->gt($fileRecord->valid_until)) {
-            // File has expired, return a response indicating that
-            return response()->json(['message' => 'File has expired'], 403);
+        if ($fileRecord) {
+            // Check if the file is still valid
+            if ($fileRecord->valid_until && now()->gt($fileRecord->valid_until)) {
+                // File has expired, return a response indicating that
+                return response()->json(['message' => 'File has expired'], 403);
+            }
+
+            if (!$this->isReadableMoaFile($fileRecord)) {
+                return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 422);
+            }
+
+            $filePath = public_path('assets/' . $file);
+            $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+            $companyName = Str::slug($fileRecord->company_name ?: 'Company', '_');
+            $cleanDownloadName = ($companyName ?: 'Company') . '_Notarized_MOA.' . $ext;
+
+            return response()->download($filePath, $cleanDownloadName);
         }
 
-        if (!$this->isReadableMoaFile($fileRecord)) {
-            return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 422);
-        }
-
-        // File is valid, allow download
-        $filePath = public_path('assets/' . $file);
-        $headers = [
-            'Content-Type' => 'application/pdf', // Adjust the content type as needed
-        ];
-
-        return response()->download(public_path('assets/' . $file));
+        // File not found, return a response indicating that
+        return response()->json(['message' => 'File not found'], 404);
     }
-
-    // File not found, return a response indicating that
-    return response()->json(['message' => 'File not found'], 404);
-}
 
 public function printData(Company $company)
 {

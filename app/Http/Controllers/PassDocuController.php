@@ -574,10 +574,13 @@ public function fileReqCreate(Request $request){
     // Create a new instance of FileRequirement model
     $fileup = new FileRequirement();
     $fileup->fileName = $request->fileName; 
-    $file=$request->file;
-    $filename=time().'.'.$file->getClientOriginalExtension();
-    $request->file->move('assets',$filename);
-    $fileup->file=$filename;
+    $file = $request->file('file') ?? $request->file;
+    $extension = $file->getClientOriginalExtension();
+    $studentSlug = Str::slug($user->full_name, '_') ?: 'student';
+    $reqSlug = Str::slug($request->fileName, '_') ?: 'requirement';
+    $filename = $studentSlug . '_' . $reqSlug . '_' . time() . '.' . $extension;
+    $file->move(public_path('assets'), $filename);
+    $fileup->file = $filename;
     $fileup->status = 0;
     $fileup->adviser = $request->adviser;
     $fileup->uploadedBy = $user->full_name;
@@ -749,14 +752,18 @@ public function fileReqCreate(Request $request){
 
         $user = $sessionCheck;
 
-        $fileRequirement = FileRequirement::where('id', $id)
-            ->forUser($user)
-            ->firstOrFail();
+        $fileRequirement = is_numeric($id)
+            ? FileRequirement::where('id', $id)->forUser($user)->firstOrFail()
+            : FileRequirement::where('file', $id)->forUser($user)->firstOrFail();
 
         $filePath = public_path('assets/' . $fileRequirement->file);
 
         if (file_exists($filePath)) {
-            return response()->download($filePath, $fileRequirement->file);
+            $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+            $studentName = Str::slug($fileRequirement->uploadedBy ?: ($user->full_name ?? 'Student'), '_');
+            $reqName = Str::slug($fileRequirement->fileName ?: 'Requirement', '_');
+            $cleanDownloadName = ($studentName ? $studentName . '_' : '') . $reqName . '.' . $ext;
+            return response()->download($filePath, $cleanDownloadName);
         }
 
         return back()->with(['error' => 'File not found.'], 404);
@@ -910,20 +917,28 @@ public function fileReqCreate(Request $request){
 
      public function download($id)
     {
-        // Find the FileRequirement by ID
-        $fileRequirement = FileRequirement::findOrFail($id);
+        // Find the FileRequirement by ID or filename
+        $fileRequirement = is_numeric($id)
+            ? FileRequirement::find($id)
+            : FileRequirement::where('file', $id)->first();
 
-        // Get the file path
-        $filePath = public_path('assets/' . $fileRequirement->file);
-
-        // Check if the file exists
-        if (file_exists($filePath)) {
-            // Return the file as a download response
-            return response()->download($filePath, $fileRequirement->file);
+        if ($fileRequirement) {
+            $filePath = public_path('assets/' . $fileRequirement->file);
+            if (file_exists($filePath)) {
+                $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+                $studentName = Str::slug($fileRequirement->uploadedBy ?: 'Student', '_');
+                $reqName = Str::slug($fileRequirement->fileName ?: 'Requirement', '_');
+                $cleanDownloadName = ($studentName ? $studentName . '_' : '') . $reqName . '.' . $ext;
+                return response()->download($filePath, $cleanDownloadName);
+            }
         } else {
-            // File not found
-            return back()->with(['error' => 'File not found.'], 404);
+            $filePath = public_path('assets/' . $id);
+            if (file_exists($filePath)) {
+                return response()->download($filePath);
+            }
         }
+
+        return back()->with(['error' => 'File not found.'], 404);
     }
 
     public function coordinatorStudentRequirements(Request $request)
@@ -1150,11 +1165,18 @@ public function fileReqCreate(Request $request){
 
     public function coordinatorDownloadRequirement($id)
     {
-        $fileRequirement = FileRequirement::findOrFail($id);
+        $fileRequirement = is_numeric($id)
+            ? FileRequirement::findOrFail($id)
+            : FileRequirement::where('file', $id)->firstOrFail();
+
         $filePath = public_path('assets/' . $fileRequirement->file);
 
         if (file_exists($filePath)) {
-            return response()->download($filePath, $fileRequirement->file);
+            $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+            $studentName = Str::slug($fileRequirement->uploadedBy ?: 'Student', '_');
+            $reqName = Str::slug($fileRequirement->fileName ?: 'Requirement', '_');
+            $cleanDownloadName = ($studentName ? $studentName . '_' : '') . $reqName . '.' . $ext;
+            return response()->download($filePath, $cleanDownloadName);
         }
 
         return back()->with('error', 'File not found on server.');
