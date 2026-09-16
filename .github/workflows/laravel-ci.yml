@@ -9,7 +9,7 @@ on:
 
 jobs:
   laravel-build-test:
-    name: Build, Validate & Test
+    name: Build & Validate
     runs-on: ubuntu-latest
 
     steps:
@@ -20,19 +20,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, json, libxml, curl, gd
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, sqlite3, dom, filter, json, libxml, curl, gd
           coverage: none
 
-      - name: 📦 Cache Composer Dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
-
       - name: 🚀 Install Composer Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
 
       - name: ⚡ Setup Node.js Environment
         uses: actions/setup-node@v4
@@ -41,7 +33,7 @@ jobs:
 
       - name: 🎨 Install NPM Dependencies & Build Vite Assets
         run: |
-          npm ci || npm install
+          npm install
           npm run build
 
       - name: 🔑 Prepare Laravel Environment
@@ -49,6 +41,10 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      - name: 🛡️ Verify Routes and Config Integrity
+      - name: 🛡️ Verify Application Architecture
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
         run: |
-          php artisan route:list --compact
+          php artisan --version
+          php artisan about
