@@ -280,6 +280,9 @@ For the complete REST API specification, external microservice endpoints, and re
 * **Dr. Gecilie Almiranez** – Capstone Project Adviser
 * **Faculty & IT Department Consultants** – PUP Taguig Branch
 
+### 📬 Team Contact & Inquiries
+* **Email:** [`internconnect.ojtims@gmail.com`](mailto:internconnect.ojtims@gmail.com)
+
 ---
 
 ## 📄 License
