@@ -287,10 +287,17 @@
                             </td>
 
                             <!-- File -->
+                            @php
+                                $fileExt = strtolower(pathinfo($file->file, PATHINFO_EXTENSION));
+                                $isNumericFile = preg_match('/^\d+\.[a-zA-Z0-9]+$/', $file->file);
+                                $displayStudentFile = $isNumericFile
+                                    ? (\Illuminate\Support\Str::slug($file->fileName ?: 'Requirement', '_') . '.' . $fileExt)
+                                    : $file->file;
+                            @endphp
                             <td>
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <i class="fa fa-paperclip" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
-                                    <span class="file-name-text">{{ $file->file }}</span>
+                                    <span class="file-name-text">{{ $displayStudentFile }}</span>
                                 </div>
                             </td>
 

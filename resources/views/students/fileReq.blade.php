@@ -393,6 +393,13 @@
                     </thead>
                     <tbody>
                         @foreach($data as $files)
+                        @php
+                            $ext = strtolower(pathinfo($files->file, PATHINFO_EXTENSION));
+                            $isNumericFile = preg_match('/^\d+\.[a-zA-Z0-9]+$/', $files->file);
+                            $displayFileName = $isNumericFile
+                                ? (\Illuminate\Support\Str::slug($files->fileName ?: 'Requirement', '_') . '.' . $ext)
+                                : $files->file;
+                        @endphp
                         <tr>
                             <td>
                                 <div class="category-cell">
@@ -403,7 +410,7 @@
                             <td>
                                 <div class="file-cell">
                                     <i class="fa fa-paperclip"></i>
-                                    <span>{{ $files->file }}</span>
+                                    <span>{{ $displayFileName }}</span>
                                 </div>
                             </td>
                             <td>

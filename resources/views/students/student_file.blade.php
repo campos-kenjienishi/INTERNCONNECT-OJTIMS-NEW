@@ -220,6 +220,10 @@
                                         'zip', 'rar' => 'fa-file-archive',
                                         default => 'fa-file-alt'
                                     };
+                                    $isNumericFile = preg_match('/^\d+\.[a-zA-Z0-9]+$/', $file->file);
+                                    $displayFileName = ($isNumericFile && !empty($file->name))
+                                        ? (\Illuminate\Support\Str::slug(pathinfo($file->name, PATHINFO_FILENAME), '_') . '.' . $ext)
+                                        : $file->file;
                                 @endphp
                                 <tr>
                                     <td>
@@ -233,7 +237,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td style="color:#666; font-size:13px;">{{ $file->file }}</td>
+                                    <td style="color:#666; font-size:13px;">{{ $displayFileName }}</td>
                                     <td data-order="{{ \Carbon\Carbon::parse($file->created_at)->timestamp }}">
                                         {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
                                     </td>
@@ -361,6 +365,10 @@
                                                 'zip', 'rar' => 'fa-file-archive',
                                                 default => 'fa-file-alt'
                                             };
+                                            $isNumericFile = preg_match('/^\d+\.[a-zA-Z0-9]+$/', $file->file);
+                                            $displayFileName = ($isNumericFile && !empty($file->name))
+                                                ? (\Illuminate\Support\Str::slug(pathinfo($file->name, PATHINFO_FILENAME), '_') . '.' . $ext)
+                                                : $file->file;
                                         @endphp
                                         <tr>
                                             <td>
@@ -374,7 +382,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td style="color:#666; font-size:13px;">{{ $file->file }}</td>
+                                            <td style="color:#666; font-size:13px;">{{ $displayFileName }}</td>
                                             <td data-order="{{ \Carbon\Carbon::parse($file->created_at)->timestamp }}">
                                                 {{ \Carbon\Carbon::parse($file->created_at)->format('M d, Y') }}
                                             </td>

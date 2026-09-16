@@ -238,6 +238,10 @@
                                                 'xls', 'xlsx' => 'fa-file-excel',
                                                 default => 'fa-file-word',
                                             };
+                                            $isNumericFile = preg_match('/^\d+\.[a-zA-Z0-9]+$/', $file->file);
+                                            $displayFileName = ($isNumericFile && !empty($file->name))
+                                                ? (\Illuminate\Support\Str::slug(pathinfo($file->name, PATHINFO_FILENAME), '_') . '.' . $ext)
+                                                : $file->file;
                                         @endphp
                                         <i class="fa {{ $iconClass }}"></i>
                                     </div>
@@ -247,10 +251,10 @@
                                 </div>
                             </td>
 
-                            <!-- Raw filename -->
+                            <!-- Filename -->
                             <td>
-                                <span style="font-size:12.5px; color:#888; font-family:monospace;">
-                                    {{ $file->file }}
+                                <span style="font-size:12.5px; color:#666;">
+                                    {{ $displayFileName }}
                                 </span>
                             </td>
 
