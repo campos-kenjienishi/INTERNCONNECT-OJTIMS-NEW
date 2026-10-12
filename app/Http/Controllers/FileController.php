@@ -137,7 +137,9 @@ class FileController extends Controller
         if (!$saved) {
             $this->documents->delete(PrivateDocumentStorage::TEMPLATES, $storedUpload->filename);
 
-            return back()->withInput()->with('fail', 'The file could not be saved. Please try again.');
+            return back()->withInput()
+                ->with('fail', 'The file could not be saved. Please try again.')
+                ->with('upload_error', 'The file could not be saved. Please try again.');
         }
 
         $this->securityEvidence->link($storedUpload->securityRecordId, $data, $user->id ?? null);
@@ -151,7 +153,9 @@ class FileController extends Controller
             ['file' => $data->file, 'name' => $data->name]
         );
 
-        return redirect()->back()->with('success', 'File uploaded successfully!');
+        return redirect()->back()
+            ->with('success', 'File uploaded successfully!')
+            ->with('upload_success', 'The template passed validation and was uploaded successfully.');
     }
 
 

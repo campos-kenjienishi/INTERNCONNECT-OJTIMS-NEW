@@ -635,7 +635,9 @@ public function companyCreate(Request $request)
             $com->delete();
             $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
 
-            return back()->withInput()->with('fail', 'The MOA requirement record could not be saved.');
+            return back()->withInput()
+                ->with('fail', 'The MOA requirement record could not be saved.')
+                ->with('upload_error', 'The MOA requirement record could not be saved.');
         }
 
         $this->securityEvidence->link($storedUpload->securityRecordId, $com, $data->id);
@@ -666,13 +668,16 @@ public function companyCreate(Request $request)
 
         return back()
             ->with('success', 'Company and students have been successfully associated.')
+            ->with('upload_success', 'The MOA passed validation and was uploaded successfully.')
             ->with('showVoucherModal', route('voucher', $com->id));
     } 
     
     else {
         $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
 
-        return back()->with('fail', 'Something went wrong. Company and students could not be created.');
+        return back()
+            ->with('fail', 'Something went wrong. Company and students could not be created.')
+            ->with('upload_error', 'The MOA could not be saved. Please try again.');
     }
 }
 
@@ -895,7 +900,13 @@ public function companyUpdate(Request $request, $id)
             ]
         );
 
-        return back()->with('success', 'MOA updated successfully.');
+        $response = back()->with('success', 'MOA updated successfully.');
+
+        if ($storedUpload !== null) {
+            $response->with('upload_success', 'The replacement MOA passed validation and was uploaded successfully.');
+        }
+
+        return $response;
     }
 
     if ($newFileName !== $oldFileName) {

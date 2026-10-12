@@ -109,7 +109,7 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
 
     Route::get('/MOA', [CompanyController::class,'companies']);
     Route::get('/MOA/assignable-students', [CompanyController::class, 'assignableStudents'])->name('moa.assignableStudents');
-    Route::put('/company/{id}', [CompanyController::class,'companyUpdate'])->name('company.update');
+    Route::put('/company/{id}', [CompanyController::class,'companyUpdate'])->middleware('upload.lock')->name('company.update');
     Route::post('/uploadMOA', [MOAUploadController::class,'uploadfile']);
     Route::post('/moa/remove/{id}', [MOAUploadController::class,'remove']);
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');
@@ -151,7 +151,7 @@ Route::middleware([
     Route::put('/student/ojtEdit/{studentNum}', [StudentController::class,'ojt_edit']);
     Route::get('/student/MOA', [CompanyController::class,'companiesup']);
     Route::post('/student/MOA/link', [CompanyController::class,'linkExistingMoa'])->name('student.moa.link');
-    Route::put('/student/MOA/{id}', [CompanyController::class,'companyUpdate'])->name('student.moa.update');
+    Route::put('/student/MOA/{id}', [CompanyController::class,'companyUpdate'])->middleware('upload.lock')->name('student.moa.update');
     Route::post('/student/moa/remove/{id}', [MOAUploadController::class,'studentRemove'])->name('student.moa.remove');
     Route::post('/student/moa/request-unlock', [MOAUploadController::class, 'requestUnlock'])->name('student.moa.requestUnlock');
     Route::post('/student/moa/toggle-inhouse', [MOAUploadController::class, 'toggleInhouse'])->name('student.moa.toggleInhouse');
@@ -236,7 +236,7 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
         return redirect($fallbackPath)
             ->with('fail', 'The MOA upload link was reopened incorrectly. Please submit the notarized MOA from the form again if needed.');
     });
-    Route::post('/companyCreate', [CompanyController::class,'companyCreate'])->name('companyCreate');
+    Route::post('/companyCreate', [CompanyController::class,'companyCreate'])->middleware('upload.lock')->name('companyCreate');
     Route::get('/print-data/{company}', [MOAUploadController::class, 'printData'])->name('print-data');
     Route::get('/voucher/{company}', [CompanyController::class,'voucher'])->name('voucher');
     Route::post('/notify/{studentNum}', [StudentController::class, 'notify']);
@@ -258,7 +258,7 @@ Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ─────────────────
 
 Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
-    Route::post('/uploadfile', [FileController::class,'uploadfile']);
+    Route::post('/uploadfile', [FileController::class,'uploadfile'])->middleware('upload.lock');
     Route::get('/download/req/{file}', [PassDocuController::class,'download'])->middleware('throttle:document-downloads');
     Route::post('/coordinator/student/toggle-inhouse/{id}', [PassDocuController::class, 'toggleStudentInhouse'])->name('coordinator.student.toggleInhouse');
 });

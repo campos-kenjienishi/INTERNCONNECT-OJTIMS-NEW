@@ -262,7 +262,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
-                                            <form method="POST" action="{{ url('/uploadfile') }}" enctype="multipart/form-data">
+                                            <form method="POST" action="{{ url('/uploadfile') }}" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the class template file type, structure, size, and security requirements. Please keep this page open.">
                                                 @csrf
                                                 <input type="hidden" name="class_id" value="{{ $room->id }}">
                                                 <div class="modal-body template-modal-body">
@@ -842,6 +842,7 @@
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <script src="{{ vasset('js/professor/class.js') }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+@include('partials.upload-validation')
 @include('partials.password-setup-modal')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

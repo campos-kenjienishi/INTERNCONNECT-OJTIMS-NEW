@@ -72,63 +72,7 @@
             return String(name || '').trim().toLowerCase();
         })
     );
-    const requirementUploadForm = document.getElementById('requirementUploadForm');
-    const requirementUploadSubmit = document.getElementById('requirementUploadSubmit');
-    let requirementUploadSubmitting = false;
     let categoryHoverBubble = null;
-
-    function resetRequirementUploadButton() {
-        requirementUploadSubmitting = false;
-
-        if (!requirementUploadSubmit) {
-            return;
-        }
-
-        requirementUploadSubmit.disabled = false;
-        requirementUploadSubmit.removeAttribute('aria-busy');
-        requirementUploadSubmit.innerHTML = '<i class="fa fa-paper-plane me-1"></i> <span>Submit</span>';
-    }
-
-    if (requirementUploadForm) {
-        requirementUploadForm.addEventListener('submit', function (event) {
-            if (requirementUploadSubmitting) {
-                event.preventDefault();
-                return;
-            }
-
-            requirementUploadSubmitting = true;
-
-            if (requirementUploadSubmit) {
-                requirementUploadSubmit.disabled = true;
-                requirementUploadSubmit.setAttribute('aria-busy', 'true');
-                requirementUploadSubmit.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> <span>Validating...</span>';
-            }
-
-            Swal.fire({
-                title: 'Validating upload',
-                html: '<div style="color:#64748b;line-height:1.6;">Checking the file type, structure, size, and security requirements.<br>Please keep this page open.</div>',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                didOpen: function () {
-                    Swal.showLoading();
-                }
-            });
-        });
-
-        window.addEventListener('pageshow', resetRequirementUploadButton);
-    }
-
-    if (cfg.uploadFeedback) {
-        Swal.fire({
-            icon: cfg.uploadFeedback.type,
-            title: cfg.uploadFeedback.title,
-            text: cfg.uploadFeedback.message,
-            confirmButtonText: 'Okay',
-            confirmButtonColor: cfg.uploadFeedback.type === 'success' ? '#16a34a' : '#dc2626',
-            allowOutsideClick: false
-        });
-    }
 
     function normalizeRequirementName(value) {
         return String(value || '').trim().toLowerCase();

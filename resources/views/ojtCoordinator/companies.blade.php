@@ -570,7 +570,7 @@
                 <h5 class="modal-title"><i class="fa fa-building"></i> Add New Company</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the MOA PDF type, structure, size, and security requirements. Please keep this page open.">
                 @csrf
                 <div class="modal-body">
 
@@ -737,7 +737,7 @@
                 <h5 class="modal-title"><i class="fa fa-pen"></i> Edit MOA</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editCompanyForm" action="" method="post" enctype="multipart/form-data">
+            <form id="editCompanyForm" action="" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the replacement MOA PDF type, structure, size, and security requirements. Please keep this page open.">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -1082,6 +1082,7 @@
 </script>
 <script src="{{ vasset('js/coordinator/companies.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+@include('partials.upload-validation')
 
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 <script src="{{ vasset('js/mobile-utils.js') }}"></script>

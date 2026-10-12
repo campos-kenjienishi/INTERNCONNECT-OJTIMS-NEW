@@ -1,0 +1,11 @@
+form[data-upload-validation].is-upload-validating {
+    cursor: wait;
+}
+
+form[data-upload-validation].is-upload-validating button[type="submit"],
+form[data-upload-validation] button[type="submit"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.72;
+    pointer-events: none;
+    transform: none !important;
+}
