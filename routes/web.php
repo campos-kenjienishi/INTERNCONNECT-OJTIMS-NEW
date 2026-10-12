@@ -110,6 +110,7 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/MOA', [CompanyController::class,'companies']);
     Route::get('/MOA/assignable-students', [CompanyController::class, 'assignableStudents'])->name('moa.assignableStudents');
     Route::put('/company/{id}', [CompanyController::class,'companyUpdate'])->middleware('upload.lock')->name('company.update');
+    Route::post('/company/{id}/renew', [CompanyController::class, 'renewMoa'])->middleware('upload.lock')->name('company.renew');
     Route::post('/uploadMOA', [MOAUploadController::class,'uploadfile']);
     Route::post('/moa/remove/{id}', [MOAUploadController::class,'remove']);
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');

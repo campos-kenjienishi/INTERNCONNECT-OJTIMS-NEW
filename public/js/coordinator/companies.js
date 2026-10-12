@@ -818,6 +818,131 @@ function openEditCompanyModal(button) {
     }
 }
 
+function formatMoaDate(value) {
+    const normalized = normalizeDateInput(value);
+
+    if (!normalized) {
+        return 'Not recorded';
+    }
+
+    const parts = normalized.split('-');
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit'
+    });
+}
+
+function nextDay(value) {
+    const normalized = normalizeDateInput(value);
+
+    if (!normalized) {
+        return '';
+    }
+
+    const parts = normalized.split('-');
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    date.setDate(date.getDate() + 1);
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+    ].join('-');
+}
+
+function todayIsoDate() {
+    const today = new Date();
+
+    return [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, '0'),
+        String(today.getDate()).padStart(2, '0')
+    ].join('-');
+}
+
+function syncRenewalExpirationMinimum() {
+    const form = document.getElementById('renewMoaForm');
+    const notarizedInput = document.getElementById('renewalDateNotarized');
+    const expirationInput = document.getElementById('renewalValidUntil');
+
+    if (!form || !notarizedInput || !expirationInput) {
+        return;
+    }
+
+    const afterCurrentExpiration = nextDay(form.dataset.currentValidUntil);
+    const afterNotarization = nextDay(notarizedInput.value);
+    expirationInput.min = [afterCurrentExpiration, afterNotarization].filter(Boolean).sort().pop() || '';
+}
+
+function openRenewMoaModal(button) {
+    const dataset = button && button.dataset ? button.dataset : {};
+    const form = document.getElementById('renewMoaForm');
+    const config = window.companiesConfig || {};
+
+    if (!form) {
+        return;
+    }
+
+    form.reset();
+    form.dataset.renewalConfirmed = 'false';
+    form.dataset.currentValidUntil = normalizeDateInput(dataset.validUntil);
+    form.action = String(config.renewRouteTemplate || '/company/__ID__/renew')
+        .replace('__ID__', encodeURIComponent(dataset.companyId || ''));
+
+    const companyName = document.getElementById('renewMoaCompanyName');
+    const currentNotarized = document.getElementById('renewCurrentNotarized');
+    const currentExpiration = document.getElementById('renewCurrentExpiration');
+    const notarizedInput = document.getElementById('renewalDateNotarized');
+    const expirationInput = document.getElementById('renewalValidUntil');
+
+    if (companyName) companyName.textContent = dataset.companyName || 'Selected company';
+    if (currentNotarized) currentNotarized.textContent = formatMoaDate(dataset.dateNotarized);
+    if (currentExpiration) currentExpiration.textContent = formatMoaDate(dataset.validUntil);
+    if (notarizedInput) notarizedInput.value = todayIsoDate();
+    if (expirationInput) {
+        expirationInput.value = '';
+    }
+
+    syncRenewalExpirationMinimum();
+}
+
+const renewMoaForm = document.getElementById('renewMoaForm');
+if (renewMoaForm) {
+    document.getElementById('renewalDateNotarized')?.addEventListener('change', syncRenewalExpirationMinimum);
+
+    renewMoaForm.addEventListener('submit', function (event) {
+        if (this.dataset.renewalConfirmed === 'true') {
+            return;
+        }
+
+        event.preventDefault();
+        const companyName = document.getElementById('renewMoaCompanyName')?.textContent || 'this company';
+        const expiration = document.getElementById('renewalValidUntil')?.value || '';
+
+        Swal.fire({
+            title: 'Confirm MOA renewal',
+            html: 'Renew the MOA for <strong>' + companyName + '</strong> until <strong>' + formatMoaDate(expiration) + '</strong>?<br><br><span style="font-size:12px;color:#64748b;">The current document will be preserved in the renewal history.</span>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, renew MOA',
+            cancelButtonText: 'Review details',
+            confirmButtonColor: '#0f766e',
+            cancelButtonColor: '#64748b',
+            reverseButtons: true
+        }).then(function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            renewMoaForm.dataset.renewalConfirmed = 'true';
+            renewMoaForm.requestSubmit();
+        });
+    });
+}
+
 // Print functions
 function openViewModal(routeUrl) {
     document.getElementById('viewIframe').src = routeUrl;
