@@ -28,6 +28,16 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('document-downloads', function (Request $request) {
+            return Limit::perMinute((int) config('upload_security.download_rate_per_minute', 60))
+                ->by((string) ($request->session()->get('loginId') ?: $request->ip()));
+        });
+
+        RateLimiter::for('document-previews', function (Request $request) {
+            return Limit::perMinute((int) config('upload_security.preview_rate_per_minute', 120))
+                ->by((string) ($request->session()->get('loginId') ?: $request->ip()));
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

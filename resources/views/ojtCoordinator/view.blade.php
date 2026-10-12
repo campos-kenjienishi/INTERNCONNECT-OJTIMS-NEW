@@ -10,7 +10,7 @@
     <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
 <body>
-    <iframe height="945"  width="1905" src="/assets/{{$data->file}}"></iframe>
+    <iframe height="945" width="1905" src="{{ route('template.view', $data->file) }}"></iframe>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

@@ -209,7 +209,7 @@
                     </div>
                     @if($canPreview)
                         <div class="file-iframe-wrap">
-                            <iframe src="/assets/{{ $fileItem->file }}"
+                            <iframe src="{{ route('requirements.preview', $fileItem->id) }}"
                                     title="{{ $fileItem->file }}">
                             </iframe>
                         </div>

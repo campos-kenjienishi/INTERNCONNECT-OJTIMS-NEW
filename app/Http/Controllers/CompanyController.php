@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnsafeUploadException;
+use App\Services\PrivateDocumentStorage;
+use App\Services\SecureUploadService;
+use App\Services\UploadSecurityRecorder;
 use App\Models\User;
 use App\Models\Classes;
 use App\Models\Company;
@@ -25,6 +29,13 @@ use App\Helpers\AuditLogger;
 
 class CompanyController extends Controller
 {
+public function __construct(
+    private readonly SecureUploadService $secureUploads,
+    private readonly PrivateDocumentStorage $documents,
+    private readonly UploadSecurityRecorder $securityEvidence
+) {
+}
+
 private function normalizeCourseSelection($courseInput): array
 {
     if (is_array($courseInput)) {
@@ -531,30 +542,10 @@ public function companyCreate(Request $request)
         $com->course = implode(', ', $this->normalizeCourseSelection($request->input('course')));
     }
 
-        $file = $request->file;
-    $companySlug = Str::slug($com->company_name ?: ($request->input('company_name') ?: 'Company'), '_');
-    $extension = $file->getClientOriginalExtension();
-    $filename = ($companySlug ?: 'Company') . '_MOA_' . time() . '.' . $extension;
-    $request->file->move(public_path('assets'), $filename);
-    $com->file = $filename;
-
     // Set the uploader_name field based on the logged-in user's name
     $com->uploader_name = $data->full_name;
     $com->date_notarized = $request->input('date_notarized');
     $com->valid_until = $expirationDate;
-
-    // Upload File Requirement
-    // Create a new instance of FileRequirement model
-    $fileup = new FileRequirement();
-    $fileup->fileName = "Notarized MOA"; 
-    $fileup->file = $filename;
-    $fileup->status = 0;
-    $fileup->adviser = $data->adviser_name;
-    $fileup->uploadedBy = $data->full_name;
-    $fileup->uploader_user_id = $data->id;
-
-    // Save the model instance
-    $res = $fileup->save();
   
 
 
@@ -602,8 +593,52 @@ public function companyCreate(Request $request)
         }
     }
 
+    try {
+        $storedUpload = $this->secureUploads->store(
+            $request->file('file'),
+            'pdf',
+            PrivateDocumentStorage::MOA
+        );
+    } catch (UnsafeUploadException $exception) {
+        return back()->withInput()->withErrors(['file' => $exception->getMessage()]);
+    }
+
+    $com->file = $storedUpload->filename;
+
+    $fileup = new FileRequirement();
+    $fileup->fileName = 'Notarized MOA';
+    $fileup->file = $storedUpload->filename;
+    $fileup->status = 0;
+    $fileup->adviser = $data->adviser_name;
+    $fileup->uploadedBy = $data->full_name;
+    $fileup->uploader_user_id = $data->id;
+
+    try {
+        $companySaved = $com->save();
+    } catch (\Throwable $exception) {
+        $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+        throw $exception;
+    }
+
     // Save the company to the database
-    if ($com->save()) {
+    if ($companySaved) {
+
+        try {
+            $requirementSaved = $fileup->save();
+        } catch (\Throwable $exception) {
+            $com->delete();
+            $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+            throw $exception;
+        }
+
+        if (!$requirementSaved) {
+            $com->delete();
+            $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+
+            return back()->withInput()->with('fail', 'The MOA requirement record could not be saved.');
+        }
+
+        $this->securityEvidence->link($storedUpload->securityRecordId, $com, $data->id);
 
         // Attach the existing students to the company
         foreach ($existingStudents as $student) {
@@ -635,6 +670,8 @@ public function companyCreate(Request $request)
     } 
     
     else {
+        $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+
         return back()->with('fail', 'Something went wrong. Company and students could not be created.');
     }
 }
@@ -744,22 +781,7 @@ public function companyUpdate(Request $request, $id)
 
     $oldFileName = $company->file;
     $newFileName = $oldFileName;
-
-    if ($request->hasFile('file')) {
-        $file = $request->file('file');
-        $companySlug = Str::slug($company->company_name ?: ($request->input('company_name') ?: 'Company'), '_');
-        $extension = $file->getClientOriginalExtension();
-        $filename = ($companySlug ?: 'Company') . '_MOA_' . time() . '.' . $extension;
-        $file->move(public_path('assets'), $filename);
-
-        $oldFilePath = public_path('assets/' . $company->file);
-        if (!empty($company->file) && file_exists($oldFilePath)) {
-            @unlink($oldFilePath);
-        }
-
-        $company->file = $filename;
-        $newFileName = $filename;
-    }
+    $storedUpload = null;
 
     $selectedStudentNames = $request->input('student_names', []);
     $manualStudentNames = $request->input('manual_student_names', '');
@@ -805,7 +827,35 @@ public function companyUpdate(Request $request, $id)
         }
     }
 
-    if ($company->save()) {
+    if ($request->hasFile('file')) {
+        try {
+            $storedUpload = $this->secureUploads->store(
+                $request->file('file'),
+                'pdf',
+                PrivateDocumentStorage::MOA
+            );
+        } catch (UnsafeUploadException $exception) {
+            return back()->withInput()->withErrors(['file' => $exception->getMessage()]);
+        }
+
+        $company->file = $storedUpload->filename;
+        $newFileName = $storedUpload->filename;
+    }
+
+    try {
+        $companySaved = $company->save();
+    } catch (\Throwable $exception) {
+        if ($newFileName !== $oldFileName) {
+            $this->documents->delete(PrivateDocumentStorage::MOA, $newFileName);
+        }
+        throw $exception;
+    }
+
+    if ($companySaved) {
+        if ($storedUpload !== null) {
+            $this->securityEvidence->link($storedUpload->securityRecordId, $company, $data->id);
+        }
+
         if ($data->role != 0 && !empty($studentNames)) {
             $company->students()->sync($existingStudents->pluck('id')->all());
         }
@@ -821,6 +871,10 @@ public function companyUpdate(Request $request, $id)
             FileRequirement::whereIn('uploadedBy', $linkedStudentNames)
                 ->where('fileName', 'Notarized MOA')
                 ->update(['file' => $newFileName]);
+
+            if (!empty($oldFileName)) {
+                $this->documents->delete(PrivateDocumentStorage::MOA, $oldFileName);
+            }
         }
 
         AuditLogger::log(
@@ -842,6 +896,10 @@ public function companyUpdate(Request $request, $id)
         );
 
         return back()->with('success', 'MOA updated successfully.');
+    }
+
+    if ($newFileName !== $oldFileName) {
+        $this->documents->delete(PrivateDocumentStorage::MOA, $newFileName);
     }
 
     return back()->with('fail', 'Something went wrong. MOA could not be updated.');
