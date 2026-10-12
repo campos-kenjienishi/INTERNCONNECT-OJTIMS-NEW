@@ -29,5 +29,17 @@ class DocumentRouteSecurityTest extends TestCase
             'throttle:document-previews',
             Route::getRoutes()->getByName('requirements.preview')->gatherMiddleware()
         );
+        $this->assertContains(
+            'throttle:60,1',
+            Route::getRoutes()->getByName('moa.renewals.history')->gatherMiddleware()
+        );
+        $this->assertContains(
+            'throttle:document-previews',
+            Route::getRoutes()->getByName('moa.renewals.preview')->gatherMiddleware()
+        );
+        $this->assertContains(
+            'throttle:document-downloads',
+            Route::getRoutes()->getByName('moa.renewals.download')->gatherMiddleware()
+        );
     }
 }

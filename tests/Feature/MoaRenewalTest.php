@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\MOAUploadController;
 use App\Models\Company;
 use App\Models\MoaRenewal;
+use App\Services\DocumentAccessService;
 use App\Services\MoaValidityService;
 use App\Services\PrivateDocumentStorage;
+use App\Services\SecureDocumentResponse;
 use App\Services\SecureUploadService;
 use App\Services\UploadSecurityRecorder;
 use App\Services\Uploads\SecureUploadResult;
@@ -135,6 +138,54 @@ class MoaRenewalTest extends TestCase
         ]);
         $this->assertSame('original-moa.pdf', MoaRenewal::firstOrFail()->previous_file);
         $this->assertSame('renewed-moa.pdf', Company::findOrFail(12)->file);
+    }
+
+    public function test_authorized_user_can_read_the_complete_renewal_history(): void
+    {
+        DB::table('users')->insert([
+            'id' => 8,
+            'full_name' => 'OJT Coordinator',
+            'role' => 1,
+        ]);
+        DB::table('companies')->insert([
+            'id' => 13,
+            'company_name' => 'History Partner',
+            'file' => 'current.pdf',
+            'date_notarized' => '2026-10-01',
+            'valid_until' => '2029-10-01',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('moa_renewals')->insert([
+            'company_id' => 13,
+            'previous_date_notarized' => '2023-10-01',
+            'previous_valid_until' => '2026-10-01',
+            'previous_file' => 'previous.pdf',
+            'new_date_notarized' => '2026-10-01',
+            'new_valid_until' => '2029-10-01',
+            'new_file' => 'current.pdf',
+            'renewed_by' => 8,
+            'renewed_at' => '2026-10-12 10:00:00',
+            'notes' => 'Renewed after review.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Session::put('loginId', 8);
+
+        $controller = new MOAUploadController(
+            new PrivateDocumentStorage,
+            new DocumentAccessService(new MoaValidityService),
+            new SecureDocumentResponse
+        );
+        $payload = $controller->renewalHistory(Company::findOrFail(13))->getData(true);
+
+        $this->assertSame('History Partner', $payload['company']['name']);
+        $this->assertSame(1, $payload['company']['renewal_count']);
+        $this->assertSame('2026-10-01', $payload['renewals'][0]['previous_valid_until']);
+        $this->assertSame('2029-10-01', $payload['renewals'][0]['new_valid_until']);
+        $this->assertSame('OJT Coordinator', $payload['renewals'][0]['renewed_by']);
+        $this->assertSame('Renewed after review.', $payload['renewals'][0]['notes']);
     }
 
     private function createTables(): void

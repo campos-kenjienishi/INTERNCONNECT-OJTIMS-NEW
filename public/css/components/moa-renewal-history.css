@@ -1,0 +1,146 @@
+.moa-history-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.moa-history-summary-item {
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+    background: #f8fafc;
+}
+
+.moa-history-summary-item span {
+    display: block;
+    color: #64748b;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.moa-history-summary-item strong {
+    display: block;
+    margin-top: 4px;
+    color: #0f172a;
+    font-size: 13px;
+}
+
+.moa-history-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.moa-history-entry {
+    position: relative;
+    padding: 15px 15px 15px 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.moa-history-entry::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    bottom: 15px;
+    left: 0;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: #0f766e;
+}
+
+.moa-history-entry-head,
+.moa-history-periods,
+.moa-history-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.moa-history-entry-title {
+    color: #0f172a;
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.moa-history-entry-meta,
+.moa-history-notes {
+    color: #64748b;
+    font-size: 11.5px;
+}
+
+.moa-history-periods {
+    justify-content: flex-start;
+    margin: 12px 0;
+}
+
+.moa-history-period {
+    flex: 1;
+    min-width: 150px;
+    padding: 10px;
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.moa-history-period span {
+    display: block;
+    color: #64748b;
+    font-size: 10px;
+}
+
+.moa-history-period strong {
+    color: #334155;
+    font-size: 12px;
+}
+
+.moa-history-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.moa-history-action:hover {
+    border-color: #0f766e;
+    color: #0f766e;
+}
+
+.moa-history-state {
+    padding: 30px 16px;
+    color: #64748b;
+    text-align: center;
+}
+
+body.dark-mode .moa-history-summary-item,
+body.dark-mode .moa-history-period {
+    border-color: #3a3a3a;
+    background: #2a2a2a;
+}
+
+body.dark-mode .moa-history-summary-item strong,
+body.dark-mode .moa-history-entry-title,
+body.dark-mode .moa-history-period strong {
+    color: #e2e8f0;
+}
+
+body.dark-mode .moa-history-entry {
+    border-color: #3a3a3a;
+    background: #242424;
+}
+
+@media (max-width: 640px) {
+    .moa-history-summary {
+        grid-template-columns: 1fr;
+    }
+}

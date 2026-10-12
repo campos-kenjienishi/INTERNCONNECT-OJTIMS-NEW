@@ -324,7 +324,8 @@ public function companiesup(Request $request)
 
     $studentProfile = $this->studentProfileForUser($user);
 
-    $companies = Company::with('students')
+    $companies = Company::with(['students', 'latestRenewal.renewedBy'])
+        ->withCount('renewals')
         ->where(function ($query) use ($user, $studentProfile) {
             if ($studentProfile) {
                 $query->whereHas('students', function ($studentQuery) use ($studentProfile) {

@@ -143,6 +143,7 @@
             '<select id="statusFilter" class="custom-status-filter">' +
             '<option value="">All MOAs</option>' +
             '<option value="Active">Active</option>' +
+            '<option value="Expiring Soon">Expiring Soon</option>' +
             '<option value="Expired">Expired</option>' +
             '</select></label>'
         );
@@ -206,11 +207,14 @@
             const validityOfMoa    = getSY() === 'N/A' ? '' : getSY();
             const dateNotarizedRaw = tr.getAttribute('data-date-notarized') || '';
             const dateNotarized    = formatDateStr(dateNotarizedRaw);
-            const parsedValidity   = Date.parse(validityOfMoa);
-            const status           = !Number.isNaN(parsedValidity) && parsedValidity >= now.getTime() ? 'Active' : 'Expired';
+            const statusCell       = Array.from(tds).find(td => td.querySelector('.badge-active, .badge-expired'));
+            const statusText       = statusCell ? statusCell.textContent.trim() : 'Expired';
+            const status           = statusText.includes('Expiring') ? 'Expiring Soon' : (statusText.includes('Active') ? 'Active' : 'Expired');
             const statusBadge      = status === 'Active'
                 ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Active</span>`
-                : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expired</span>`;
+                : (status === 'Expiring Soon'
+                    ? `<span style="display:inline-block;background:#fef3c7;color:#b45309;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expiring Soon</span>`
+                    : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expired</span>`);
 
             rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">

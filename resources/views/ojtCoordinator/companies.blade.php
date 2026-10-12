@@ -460,6 +460,16 @@
                                         <i class="fa fa-eye"></i>
                                     </a>
 
+                                    @if($renewalCount > 0)
+                                        <button type="button"
+                                            class="btn-action-icon btn-view"
+                                            title="View Renewal History"
+                                            aria-label="View Renewal History"
+                                            onclick="openMoaRenewalHistory({{ $company->id }}, @js($company->company_name))">
+                                            <i class="fa fa-history"></i>
+                                        </button>
+                                    @endif
+
                                     <!-- Edit -->
                                     <button type="button"
                                         class="btn-action-icon btn-edit btn-open-edit"
@@ -1193,6 +1203,7 @@
 </script>
 <script src="{{ vasset('js/coordinator/companies.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+@include('partials.moa-renewal-history')
 @include('partials.upload-validation')
 
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>

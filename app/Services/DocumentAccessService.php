@@ -8,10 +8,13 @@ use App\Models\FileRequirement;
 use App\Models\Student;
 use App\Models\UploadedFile;
 use App\Models\User;
-use Carbon\Carbon;
 
 class DocumentAccessService
 {
+    public function __construct(private readonly MoaValidityService $moaValidity)
+    {
+    }
+
     public function canAccessTemplate(User $user, UploadedFile $file): bool
     {
         $classId = (int) ($file->class_id ?? 0);
@@ -110,15 +113,7 @@ class DocumentAccessService
 
     private function isActiveMoa(Company $company): bool
     {
-        if (empty($company->valid_until)) {
-            return true;
-        }
-
-        try {
-            return Carbon::parse($company->valid_until)->endOfDay()->isFuture();
-        } catch (\Throwable) {
-            return false;
-        }
+        return $this->moaValidity->isActive($company);
     }
 
     private function companyMatchesCourse(Company $company, ?string $course): bool

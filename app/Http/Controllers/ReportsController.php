@@ -20,11 +20,14 @@ use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 use App\Services\ReportAiInsightService;
 use App\Services\PrivateDocumentStorage;
+use App\Services\MoaValidityService;
 
 class ReportsController extends Controller
 {
-    public function __construct(private readonly PrivateDocumentStorage $documents)
-    {
+    public function __construct(
+        private readonly PrivateDocumentStorage $documents,
+        private readonly MoaValidityService $moaValidity
+    ) {
     }
 
     private function normalizeCourseSelection($courseInput): array
@@ -407,6 +410,7 @@ public function reportsExpired()
             });
         }
         $companies = $this->annotateNatureOfBusiness($companies);
+        $companies = $this->prepareMoaReportCompanies($companies);
 
         $campusName = config('campus.name', 'PUP Taguig Campus');
 
@@ -453,6 +457,7 @@ public function reportsExpired()
     })->values();
     $companies = $this->annotateMoaFileStatus($companies);
     $companies = $this->annotateNatureOfBusiness($companies);
+    $companies = $this->prepareMoaReportCompanies($companies);
     $companyNames = $companies->pluck('company_name')->toArray();
 
     $campusName = config('campus.name', 'PUP Taguig Campus');
@@ -603,8 +608,6 @@ public function reportsExpiredProf()
 
         $companyNames = $companies->pluck('company_name')->toArray();
 
-        $reportInsights = $this->buildMoaReportInsights($companies, $selectedCourse ?: null);
-    
         // Retrieve students under the specified companies using where and get
         // $students = Student::whereHas('companies', function ($query) use ($companyNames, $course) {
         //     $query->whereIn('company_name', $companyNames)
@@ -613,6 +616,9 @@ public function reportsExpiredProf()
     
         $companies = $this->annotateMoaFileStatus($companies);
         $companies = $this->annotateNatureOfBusiness($companies);
+        $companies = $this->prepareMoaReportCompanies($companies);
+
+        $reportInsights = $this->buildMoaReportInsights($companies, $selectedCourse ?: null);
 
         $campusName = config('campus.name', 'PUP Taguig Campus');
 
@@ -663,6 +669,7 @@ public function reportsExpiredProf()
 
     $companies = $this->annotateMoaFileStatus($companies);
     $companies = $this->annotateNatureOfBusiness($companies);
+    $companies = $this->prepareMoaReportCompanies($companies);
 
     $campusName = config('campus.name', 'PUP Taguig Campus');
 
@@ -723,11 +730,9 @@ public function reportsExpiredProf()
         $expired = 0;
 
         foreach ($items as $company) {
-            $parts = explode('-', (string) ($company->school_year ?? '0-0'));
-            $startYear = (int) ($parts[0] ?? 0);
-            $difference = now()->year - $startYear;
+            $status = ($company->moa_validity ?? $this->moaValidity->describe($company))['status'];
 
-            if ($difference > 3) {
+            if (in_array($status, [MoaValidityService::STATUS_EXPIRED, MoaValidityService::STATUS_UNKNOWN], true)) {
                 $expired++;
             } else {
                 $active++;
@@ -756,6 +761,17 @@ public function reportsExpiredProf()
             'expired_moa' => $expired,
             'course' => $course,
         ], $highlights, $watchouts, $actions);
+    }
+
+    private function prepareMoaReportCompanies($companies)
+    {
+        return collect($companies)->map(function ($company) {
+            $company->loadMissing('latestRenewal.renewedBy');
+            $company->loadCount('renewals');
+            $company->setAttribute('moa_validity', $this->moaValidity->describe($company));
+
+            return $company;
+        })->values();
     }
 
     private function annotateMoaFileStatus($companies)

@@ -206,9 +206,12 @@
             $activeMOA  = 0;
             $expiredMOA = 0;
             foreach ($companies as $c) {
-                [$sy, $ey] = array_pad(explode('-', (string) ($c->school_year ?? '0-0')), 2, '');
-                $diff = now()->year - (int)$sy;
-                if ($diff > 3) $expiredMOA++; else $activeMOA++;
+                $validityStatus = $c->moa_validity['status'] ?? 'unknown';
+                if (in_array($validityStatus, ['expired', 'unknown'], true)) {
+                    $expiredMOA++;
+                } else {
+                    $activeMOA++;
+                }
             }
         @endphp
 
@@ -384,8 +387,15 @@
                     <tbody>
                         @foreach ($companies as $company)
                         @php
-                            $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
-                            $status = ($validUntil && now()->lte($validUntil)) ? 'Active' : 'Expired';
+                            $validity = $company->moa_validity ?? ['status' => 'unknown', 'valid_until' => null];
+                            $validUntil = $validity['valid_until'];
+                            $status = match ($validity['status']) {
+                                'active' => 'Active',
+                                'expiring_soon' => 'Expiring Soon',
+                                default => 'Expired',
+                            };
+                            $latestRenewal = $company->latestRenewal;
+                            $renewalCount = (int) ($company->renewals_count ?? 0);
                             $dateNotarizedFormatted = $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('M d, Y') : '';
                         @endphp
                         <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}">
@@ -393,7 +403,16 @@
                             <td class="company-name-cell">
                                 <div class="company-cell">
                                     <div class="company-icon-box"><i class="fa fa-building"></i></div>
-                                    <span class="company-name-text">{{ $company->company_name }}</span>
+                                    <div>
+                                        <span class="company-name-text">{{ $company->company_name }}</span>
+                                        @if($latestRenewal)
+                                            <div style="margin-top:4px; font-size:10px; color:#047857; font-weight:700;">
+                                                <i class="fa fa-sync-alt"></i>
+                                                Renewed {{ $renewalCount }} {{ $renewalCount === 1 ? 'time' : 'times' }}
+                                                &middot; {{ $latestRenewal->renewed_at->format('M d, Y') }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
                             <td>
@@ -429,6 +448,8 @@
                             <td>
                                 @if($status === 'Active')
                                     <span class="badge-active"><i class="fa fa-circle"></i> Active</span>
+                                @elseif($status === 'Expiring Soon')
+                                    <span class="badge-active" style="background:#fef3c7;color:#b45309;"><i class="fa fa-clock"></i> Expiring Soon</span>
                                 @else
                                     <span class="badge-expired"><i class="fa fa-times-circle"></i> Expired</span>
                                 @endif
@@ -454,6 +475,12 @@
                                         <span class="btn-moa-action btn-moa-print is-disabled" title="This MOA file is empty or unavailable">
                                             <i class="fa fa-print"></i> Print
                                         </span>
+                                    @endif
+                                    @if($renewalCount > 0)
+                                        <button type="button" class="btn-moa-action"
+                                            onclick="openMoaRenewalHistory({{ $company->id }}, @js($company->company_name))">
+                                            <i class="fa fa-history"></i> History
+                                        </button>
                                     @endif
                                 </div>
                                 @if($company->file && !empty($company->moa_file_empty))
@@ -546,5 +573,6 @@
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 @include('partials.password-setup-modal')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
+@include('partials.moa-renewal-history')
 </body>
 </html>

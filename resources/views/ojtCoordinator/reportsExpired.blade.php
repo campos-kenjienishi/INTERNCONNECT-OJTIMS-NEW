@@ -166,9 +166,9 @@
             $expiredMOA = 0;
 
             foreach ($companies as $company) {
-                $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
+                $validityStatus = $company->moa_validity['status'] ?? 'unknown';
 
-                if (!$validUntil || now()->gt($validUntil)) {
+                if (in_array($validityStatus, ['expired', 'unknown'], true)) {
                     $expiredMOA++;
                 } else {
                     $activeMOA++;
@@ -403,8 +403,15 @@
                     <tbody>
                         @foreach ($companies as $company)
                         @php
-                            $validUntil = $company->valid_until ? \Carbon\Carbon::parse($company->valid_until) : null;
-                            $status = ($validUntil && now()->lte($validUntil)) ? 'Active' : 'Expired';
+                            $validity = $company->moa_validity ?? ['status' => 'unknown', 'valid_until' => null];
+                            $validUntil = $validity['valid_until'];
+                            $status = match ($validity['status']) {
+                                'active' => 'Active',
+                                'expiring_soon' => 'Expiring Soon',
+                                default => 'Expired',
+                            };
+                            $latestRenewal = $company->latestRenewal;
+                            $renewalCount = (int) ($company->renewals_count ?? 0);
                             $dateNotarizedFormatted = $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('M d, Y') : '';
                         @endphp
                         <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}">
@@ -444,8 +451,19 @@
                             <td>
                                 @if($status === 'Active')
                                     <span class="badge-active"><i class="fa fa-circle"></i> Active</span>
+                                @elseif($status === 'Expiring Soon')
+                                    <span class="badge-active" style="background:#fef3c7;color:#b45309;"><i class="fa fa-clock"></i> Expiring Soon</span>
                                 @else
                                     <span class="badge-expired"><i class="fa fa-times-circle"></i> Expired</span>
+                                @endif
+                                @if($latestRenewal)
+                                    <div style="margin-top:6px; font-size:10px; color:#047857; font-weight:700;">
+                                        <i class="fa fa-sync-alt"></i> Renewed {{ $renewalCount }} {{ $renewalCount === 1 ? 'time' : 'times' }}
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" style="margin-top:5px; font-size:10px;"
+                                        onclick="openMoaRenewalHistory({{ $company->id }}, @js($company->company_name))">
+                                        <i class="fa fa-history"></i> History
+                                    </button>
                                 @endif
                             </td>
                         </tr>
@@ -545,5 +563,6 @@
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
+@include('partials.moa-renewal-history')
 </body>
 </html>

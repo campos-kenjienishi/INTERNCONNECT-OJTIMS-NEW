@@ -274,7 +274,11 @@
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
-                        @php $isOwner = $company->uploader_name === $user->full_name; @endphp
+                        @php
+                            $isOwner = $company->uploader_name === $user->full_name;
+                            $latestRenewal = $company->latestRenewal;
+                            $renewalCount = (int) ($company->renewals_count ?? 0);
+                        @endphp
                         <tr>
                             <td>
                                 <div class="company-cell">
@@ -291,6 +295,13 @@
                                                 </span>
                                             @endif
                                         </div>
+                                        @if($latestRenewal)
+                                            <div class="company-sub" style="margin-top:4px; color:#047857; font-weight:700;">
+                                                <i class="fa fa-sync-alt"></i>
+                                                Renewed {{ $renewalCount }} {{ $renewalCount === 1 ? 'time' : 'times' }}
+                                                &middot; {{ $latestRenewal->renewed_at->format('M d, Y') }}
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -330,6 +341,14 @@
                                         onclick="openPdfPreview('{{ route('moa.file.preview', $company->id) }}')">
                                         <i class="fa fa-print"></i>
                                     </button>
+                                    @if($renewalCount > 0)
+                                        <button type="button" class="icon-action-btn btn-voucher"
+                                            title="View Renewal History"
+                                            aria-label="View Renewal History"
+                                            onclick="openMoaRenewalHistory({{ $company->id }}, @js($company->company_name))">
+                                            <i class="fa fa-history"></i>
+                                        </button>
+                                    @endif
                                     @php $companyHasEditUnlock = is_callable($hasApprovedEditUnlock) ? $hasApprovedEditUnlock($company->id) : !empty($hasApprovedEditUnlock); @endphp
                                     @if($isOwner && (empty($isLocked) || $companyHasEditUnlock))
                                         <button type="button"
@@ -921,6 +940,7 @@
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 
+    @include('partials.moa-renewal-history')
     @include('partials.upload-validation')
     <script src="{{ vasset('js/student/companies.js') }}?v={{ time() }}" defer></script>
 </body>
