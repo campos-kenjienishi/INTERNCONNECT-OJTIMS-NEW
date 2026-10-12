@@ -31,10 +31,15 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        if (!config('app.debug')) {
+        $response = parent::render($request, $e);
+
+        if (! config('app.debug')
+            && ! $request->expectsJson()
+            && ! $response->isRedirection()
+            && $response->getStatusCode() >= 400) {
             $statusCode = $e instanceof HttpExceptionInterface
                 ? $e->getStatusCode()
-                : 500;
+                : $response->getStatusCode();
 
             return response()->view(
                 'errors.something-went-wrong',
@@ -43,6 +48,6 @@ class Handler extends ExceptionHandler
             );
         }
 
-        return parent::render($request, $e);
+        return $response;
     }
 }
