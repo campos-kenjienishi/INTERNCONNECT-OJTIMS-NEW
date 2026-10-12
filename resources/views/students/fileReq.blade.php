@@ -497,7 +497,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form action="{{ url('/uploadReq') }}" method="post" enctype="multipart/form-data" class="upload-modal-form" id="requirementUploadForm">
+            <form action="{{ url('/uploadReq') }}" method="post" enctype="multipart/form-data" class="upload-modal-form" id="requirementUploadForm" data-upload-validation>
                 @csrf
 
                 <div class="modal-body upload-modal-body">
@@ -774,30 +774,6 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
-@php
-    $uploadFeedback = null;
-
-    if (session('success')) {
-        $uploadFeedback = [
-            'type' => 'success',
-            'title' => 'Upload successful',
-            'message' => session('success'),
-        ];
-    } elseif ($errors->any()) {
-        $uploadFeedback = [
-            'type' => 'error',
-            'title' => 'Upload rejected',
-            'message' => $errors->first(),
-        ];
-    } elseif (session('fail')) {
-        $uploadFeedback = [
-            'type' => 'error',
-            'title' => 'Upload unsuccessful',
-            'message' => session('fail'),
-        ];
-    }
-@endphp
-
     <script>
     window.studentFileReqConfig = {
         basicCategories: @json($basicCategories->map(fn ($category) => ['fileName' => $category->fileName])->values()),
@@ -805,10 +781,10 @@
         otherRequirementsUnlocked: @json($otherRequirementsUnlocked),
         missingBasicCategories: @json($missingBasicCategories->pluck('fileName')->values()),
         hasSubmittedNotarizedMoa: @json($hasSubmittedNotarizedMoa),
-        submittedRequirementNames: @json($submittedRequirementNames->values()),
-        uploadFeedback: @json($uploadFeedback)
+        submittedRequirementNames: @json($submittedRequirementNames->values())
     };
 </script>
+    @include('partials.upload-validation')
     <script src="{{ vasset('js/student/file-req.js') }}?v={{ time() }}" defer></script>
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>

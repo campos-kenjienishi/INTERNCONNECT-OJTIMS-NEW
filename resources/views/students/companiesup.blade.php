@@ -432,7 +432,7 @@
                 <input type="hidden" name="company_id" id="linkExistingMoaCompanyId">
             </form>
 
-            <form id="studentMoaForm" action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data">
+            <form id="studentMoaForm" action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the MOA PDF type, structure, size, and security requirements. Please keep this page open.">
                 @csrf
                 <div class="modal-body">
 
@@ -638,7 +638,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form id="editMoaForm" method="post" enctype="multipart/form-data">
+            <form id="editMoaForm" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the replacement MOA PDF type, structure, size, and security requirements. Please keep this page open.">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -921,6 +921,7 @@
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 
+    @include('partials.upload-validation')
     <script src="{{ vasset('js/student/companies.js') }}?v={{ time() }}" defer></script>
 </body>
 </html>

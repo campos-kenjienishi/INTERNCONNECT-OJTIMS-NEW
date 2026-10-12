@@ -382,7 +382,7 @@ $(document).ready(function () {
                 if (linkForm) linkForm.submit();
             } else if (pendingFormType === 'create') {
                 window.moaLockConfirmed = true;
-                if (studentMoaForm) studentMoaForm.submit();
+                if (studentMoaForm) studentMoaForm.requestSubmit();
             }
         });
     }
@@ -417,8 +417,14 @@ document.addEventListener('click', function(e) {
 (function() {
     const cfg = window.companiesConfig || {};
     if (cfg.showVoucherModal) {
-        window.addEventListener('load', function () {
+        const openVoucher = function () {
             window.openVoucherModal(cfg.showVoucherModal);
-        });
+        };
+
+        if (window.uploadValidationFeedback) {
+            document.addEventListener('upload-validation:feedback-closed', openVoucher, { once: true });
+        } else {
+            window.addEventListener('load', openVoucher);
+        }
     }
 })();

@@ -121,7 +121,7 @@
             </div>
 
           
-            <form action="{{url('/uploadfile')}}" method="post" enctype="multipart/form-data">
+            <form action="{{url('/uploadfile')}}" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the template file type, structure, size, and security requirements. Please keep this page open.">
 
                 @csrf
         
@@ -258,6 +258,7 @@
     <!-- ====== ionicons ======= -->
     <script src="{{ vasset('js/coordinator/search.js') }}?v={{ time() }}" defer></script>
     <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+    @include('partials.upload-validation')
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

@@ -553,7 +553,9 @@ public function fileReqCreate(Request $request){
     $adviserName = trim((string) ($student->adviser_name ?? $user->adviser_name ?? ''));
 
     if (empty($adviserName) || $adviserName === 'Not Assigned') {
-        return back()->with('fail', 'You must select/assign a professor under Class or Account settings before uploading requirements.');
+        return back()
+            ->with('fail', 'You must select/assign a professor under Class or Account settings before uploading requirements.')
+            ->with('upload_error', 'You must select or assign a professor before uploading requirements.');
     }
 
     $professor = $student ? Professor::where('full_name', $student->adviser_name)->first() : null;
@@ -564,17 +566,23 @@ public function fileReqCreate(Request $request){
     });
 
     if (!$category) {
-        return back()->with('fail', 'Selected requirement category is not assigned to your professor.');
+        return back()
+            ->with('fail', 'Selected requirement category is not assigned to your professor.')
+            ->with('upload_error', 'The selected requirement category is not assigned to your professor.');
     }
 
     $categoryPhase = $this->normalizeRequirementPhase($category->phase ?? null);
 
     if ($request->phase !== $categoryPhase) {
-        return back()->with('fail', 'Selected requirement category does not belong to the chosen phase.');
+        return back()
+            ->with('fail', 'Selected requirement category does not belong to the chosen phase.')
+            ->with('upload_error', 'The selected requirement category does not belong to the chosen phase.');
     }
 
     if ($categoryPhase === 'other' && !$phaseState['otherRequirementsUnlocked']) {
-        return back()->with('fail', 'Submit all basic requirements and your Notarized MOA first before uploading other requirements.');
+        return back()
+            ->with('fail', 'Submit all basic requirements and your Notarized MOA first before uploading other requirements.')
+            ->with('upload_error', 'Submit all basic requirements and your Notarized MOA before uploading other requirements.');
     }
 
     $normalizedCategoryName = mb_strtolower(trim((string) $request->fileName));
@@ -591,7 +599,9 @@ public function fileReqCreate(Request $request){
             ->contains($normalizedCategoryName);
 
         if ($alreadySubmitted) {
-            return back()->withInput()->with('fail', 'This requirement is already submitted. Remove the existing submission first before uploading another file for it.');
+            return back()->withInput()
+                ->with('fail', 'This requirement is already submitted. Remove the existing submission first before uploading another file for it.')
+                ->with('upload_error', 'This requirement is already submitted. Remove it before uploading another file.');
         }
 
         try {
@@ -631,12 +641,16 @@ public function fileReqCreate(Request $request){
                 ['fileName' => $fileup->fileName, 'phase' => $categoryPhase, 'file' => $fileup->file, 'uploadedBy' => $fileup->uploadedBy]
             );
 
-            return back()->with('success', 'File uploaded successfully!');
+            return back()
+                ->with('success', 'File uploaded successfully!')
+                ->with('upload_success', 'The requirement passed validation and was uploaded successfully.');
         }
 
         $this->documents->delete(PrivateDocumentStorage::REQUIREMENTS, $storedUpload->filename);
 
-        return back()->with('fail', 'Failed to upload file.');
+        return back()
+            ->with('fail', 'Failed to upload file.')
+            ->with('upload_error', 'The requirement could not be saved. Please try again.');
     } finally {
         $uploadLock->release();
     }
