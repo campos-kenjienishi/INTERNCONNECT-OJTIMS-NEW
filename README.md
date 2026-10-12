@@ -248,6 +248,7 @@ INTERNCONNECT-OJTIMS/
    php artisan storage:link
    ```
 4. **Security Enforcement:** Enforced 256-bit SSL/TLS (HTTPS) certificate.
+5. **Upload Security:** Configure ClamAV using the [Upload Security Guide](docs/UPLOAD_SECURITY.md), then follow the copy-only [Legacy Upload Migration Runbook](docs/LEGACY_UPLOAD_MIGRATION.md).
 
 ---
 

@@ -117,10 +117,10 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::post('/moa/unlock-requests/{id}/approve', [MOAUploadController::class, 'approveUnlock'])->name('coordinator.moa.approveUnlock');
     Route::post('/moa/unlock-requests/{id}/deny', [MOAUploadController::class, 'denyUnlock'])->name('coordinator.moa.denyUnlock');
     Route::get('/coordinator/student-requirements', [PassDocuController::class, 'coordinatorStudentRequirements'])->name('coordinator.studentRequirements');
-    Route::get('/coordinator/requirements/view/{id}', [PassDocuController::class, 'coordinatorViewRequirement'])->name('coordinator.requirements.view');
-    Route::get('/coordinator/requirements/download/{id}', [PassDocuController::class, 'coordinatorDownloadRequirement'])->name('coordinator.requirements.download');
+    Route::get('/coordinator/requirements/view/{id}', [PassDocuController::class, 'coordinatorViewRequirement'])->name('coordinator.requirements.view')->middleware('throttle:document-previews');
+    Route::get('/coordinator/requirements/download/{id}', [PassDocuController::class, 'coordinatorDownloadRequirement'])->name('coordinator.requirements.download')->middleware('throttle:document-downloads');
     Route::post('/sendFile', [MOAUploadController::class,'sendFiles']);
-    Route::get('/send/download/{file}', [MOAUploadController::class, 'downloadFile'])->name('download.file');
+    Route::get('/send/download/{file}', [MOAUploadController::class, 'downloadFile'])->name('download.file')->middleware('throttle:document-downloads');
     Route::post('/status/{studentNum}', [StudentController::class,'update']);
     Route::get('/studentLists', [StudentController::class,'StuList']);
     Route::get('/ojt-report', [OJTController::class, 'showForm'])->name('ojt.report.form');
@@ -158,8 +158,8 @@ Route::middleware([
     Route::get('/student/pending', [CompanyController::class,'pending']);
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
-    Route::get('/student/requirements/view/{id}', [PassDocuController::class,'viewFile']);
-    Route::get('/student/requirements/download/{id}', [PassDocuController::class,'downloadStudent']);
+    Route::get('/student/requirements/view/{id}', [PassDocuController::class,'viewFile'])->middleware('throttle:document-previews');
+    Route::get('/student/requirements/download/{id}', [PassDocuController::class,'downloadStudent'])->middleware('throttle:document-downloads');
     Route::post('/remove/filesReq/{id}', [PassDocuController::class,'removeFile']);
     Route::get('/student/evaluation', [EvaluationController::class, 'studentIndex'])->name('student.evaluation');
     Route::post('/student/evaluation/send', [EvaluationController::class, 'sendEvaluationForm'])->name('student.evaluation.send');
@@ -224,8 +224,8 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
 // ─── SHARED: ALL AUTHENTICATED USERS (roles 0, 1 & 2) ──────────────
 
 Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
-    Route::get('/download/{file}', [FileController::class,'download']);
-    Route::get('/view/file/{file}', [FileController::class, 'viewFile'])->name('template.view');
+    Route::get('/download/{file}', [FileController::class,'download'])->middleware('throttle:document-downloads');
+    Route::get('/view/file/{file}', [FileController::class, 'viewFile'])->name('template.view')->middleware('throttle:document-previews');
     Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::post('/change_password/verify-current/{id}', [AccountInfo::class,'verifyCurrentPassword']);
     Route::post('/announcements', [AnnouncementController::class,'announcement']);
@@ -240,7 +240,8 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::get('/print-data/{company}', [MOAUploadController::class, 'printData'])->name('print-data');
     Route::get('/voucher/{company}', [CompanyController::class,'voucher'])->name('voucher');
     Route::post('/notify/{studentNum}', [StudentController::class, 'notify']);
-    Route::get('/moa/download/{file}', [MOAUploadController::class,'download']);
+    Route::get('/moa/download/{file}', [MOAUploadController::class,'download'])->middleware('throttle:document-downloads');
+    Route::get('/moa/file/{company}/preview', [MOAUploadController::class, 'preview'])->name('moa.file.preview')->middleware('throttle:document-previews');
 });
 
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ── Reports ───────
@@ -251,13 +252,14 @@ Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
     Route::post('/reportsExpired/send-email', [ReportsController::class, 'sendEmailExpired'])->name('reportsExpired.send.email');
     Route::post('/reports/ai/ask', [ReportsController::class, 'askAi'])->name('reports.ai.ask');
     Route::post('/reports/ai/insight', [ReportsController::class, 'generateAiInsight'])->name('reports.ai.insight');
+    Route::get('/requirements/preview/{id}', [PassDocuController::class, 'previewRequirement'])->name('requirements.preview')->middleware('throttle:document-previews');
 });
 
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ─────────────────
 
 Route::middleware(['auth.session.custom', 'role:1,2'])->group(function () {
     Route::post('/uploadfile', [FileController::class,'uploadfile']);
-    Route::get('/download/req/{file}', [PassDocuController::class,'download']);
+    Route::get('/download/req/{file}', [PassDocuController::class,'download'])->middleware('throttle:document-downloads');
     Route::post('/coordinator/student/toggle-inhouse/{id}', [PassDocuController::class, 'toggleStudentInhouse'])->name('coordinator.student.toggleInhouse');
 });
 

@@ -503,7 +503,7 @@
                                         <button class="btn-action-icon btn-print"
                                             title="Print MOA"
                                             aria-label="Print MOA"
-                                            onclick="printUploadedMoa('{{ asset('assets/' . $company->file) }}')">
+                                            onclick="printUploadedMoa('{{ route('moa.file.preview', $company->id) }}')">
                                             <i class="fa fa-print"></i>
                                         </button>
                                     @else

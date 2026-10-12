@@ -148,6 +148,11 @@
             </button>
         </div>
 
+        @if($errors->any())
+            <div role="alert" style="background:#fee2e2; border:1px solid #fecaca; color:#991b1b; padding:12px 16px; border-radius:12px; font-size:13.5px; margin-bottom:18px; font-weight:500;">
+                <i class="fa fa-exclamation-circle me-1"></i> {{ $errors->first() }}
+            </div>
+        @endif
         @if(session('fail'))
             <div style="background:#fee2e2; border:1px solid #fecaca; color:#991b1b; padding:12px 16px; border-radius:12px; font-size:13.5px; margin-bottom:18px; font-weight:500;">
                 <i class="fa fa-exclamation-circle me-1"></i> {{ session('fail') }}
@@ -396,7 +401,8 @@
                         @php
                             $ext = strtolower(pathinfo($files->file, PATHINFO_EXTENSION));
                             $isNumericFile = preg_match('/^\d+\.[a-zA-Z0-9]+$/', $files->file);
-                            $displayFileName = $isNumericFile
+                            $isUuidFile = preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.[a-zA-Z0-9]+$/i', $files->file);
+                            $displayFileName = ($isNumericFile || $isUuidFile)
                                 ? (\Illuminate\Support\Str::slug($files->fileName ?: 'Requirement', '_') . '.' . $ext)
                                 : $files->file;
                         @endphp
@@ -491,7 +497,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form action="{{ url('/uploadReq') }}" method="post" enctype="multipart/form-data" class="upload-modal-form">
+            <form action="{{ url('/uploadReq') }}" method="post" enctype="multipart/form-data" class="upload-modal-form" id="requirementUploadForm">
                 @csrf
 
                 <div class="modal-body upload-modal-body">
@@ -600,8 +606,8 @@
                     <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
                         <i class="fa fa-times me-1"></i> Close
                     </button>
-                    <button type="submit" class="btn-modal-submit">
-                        <i class="fa fa-paper-plane me-1"></i> Submit
+                    <button type="submit" class="btn-modal-submit" id="requirementUploadSubmit">
+                        <i class="fa fa-paper-plane me-1"></i> <span>Submit</span>
                     </button>
                 </div>
 
@@ -768,6 +774,30 @@
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
+@php
+    $uploadFeedback = null;
+
+    if (session('success')) {
+        $uploadFeedback = [
+            'type' => 'success',
+            'title' => 'Upload successful',
+            'message' => session('success'),
+        ];
+    } elseif ($errors->any()) {
+        $uploadFeedback = [
+            'type' => 'error',
+            'title' => 'Upload rejected',
+            'message' => $errors->first(),
+        ];
+    } elseif (session('fail')) {
+        $uploadFeedback = [
+            'type' => 'error',
+            'title' => 'Upload unsuccessful',
+            'message' => session('fail'),
+        ];
+    }
+@endphp
+
     <script>
     window.studentFileReqConfig = {
         basicCategories: @json($basicCategories->map(fn ($category) => ['fileName' => $category->fileName])->values()),
@@ -775,7 +805,8 @@
         otherRequirementsUnlocked: @json($otherRequirementsUnlocked),
         missingBasicCategories: @json($missingBasicCategories->pluck('fileName')->values()),
         hasSubmittedNotarizedMoa: @json($hasSubmittedNotarizedMoa),
-        submittedRequirementNames: @json($submittedRequirementNames->values())
+        submittedRequirementNames: @json($submittedRequirementNames->values()),
+        uploadFeedback: @json($uploadFeedback)
     };
 </script>
     <script src="{{ vasset('js/student/file-req.js') }}?v={{ time() }}" defer></script>

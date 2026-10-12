@@ -191,6 +191,99 @@
             </div>
         </div>
 
+        @if($securitySummary !== null)
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa fa-shield-alt"></i></div>
+                <div>
+                    <div class="stat-num">{{ $securitySummary['active'] }}</div>
+                    <div class="stat-name">Protected Files</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa fa-check-circle"></i></div>
+                <div>
+                    <div class="stat-num">{{ $securitySummary['clean'] }}</div>
+                    <div class="stat-name">Synchronous Clean Scans</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber"><i class="fa fa-server"></i></div>
+                <div>
+                    <div class="stat-num">{{ $securitySummary['unscanned'] }}</div>
+                    <div class="stat-name">No Synchronous Scan</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red"><i class="fa fa-exclamation-triangle"></i></div>
+                <div>
+                    <div class="stat-num">{{ $securitySummary['issues'] }}</div>
+                    <div class="stat-name">Integrity Issues</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card" style="margin-bottom: 24px;">
+            <div class="table-card-header">
+                <div class="table-card-header-left">
+                    <div class="header-icon"><i class="fa fa-shield-alt"></i></div>
+                    <div>
+                        <h2>Upload Security Evidence</h2>
+                        <p>Latest validation, scanner, hosting-protection, and integrity records</p>
+                    </div>
+                </div>
+            </div>
+            <div class="table-card-body">
+                @if($securityRecords->isEmpty())
+                    <div class="empty-state">
+                        <i class="fa fa-shield-alt"></i>
+                        <p>No upload security evidence recorded yet.</p>
+                    </div>
+                @else
+                    <div class="audit-table-wrapper" style="overflow-x: auto;">
+                        <table class="dataTable display" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Recorded</th>
+                                    <th>Document</th>
+                                    <th>Validation</th>
+                                    <th>Application Scan</th>
+                                    <th>Hosting-Level Scanner</th>
+                                    <th>Integrity</th>
+                                    <th>SHA-256</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($securityRecords as $securityRecord)
+                                    <tr>
+                                        <td>{{ optional($securityRecord->created_at)->format('M d, Y h:i A') }}</td>
+                                        <td>
+                                            <strong>{{ strtoupper($securityRecord->extension) }}</strong><br>
+                                            <small>{{ $securityRecord->source_type ? class_basename($securityRecord->source_type) : $securityRecord->origin }}</small>
+                                        </td>
+                                        <td>{{ ucfirst($securityRecord->validation_status) }}</td>
+                                        <td>
+                                            {{ ucfirst($securityRecord->scan_status) }}
+                                            <small>({{ $securityRecord->scanner_driver }})</small>
+                                        </td>
+                                        <td>
+                                            {{ $securityRecord->hosting_scanner ? ucfirst($securityRecord->hosting_scanner) : 'None' }}
+                                            @if($securityRecord->hosting_scan_status)
+                                                <small>({{ str_replace('_', ' ', $securityRecord->hosting_scan_status) }})</small>
+                                            @endif
+                                        </td>
+                                        <td>{{ ucwords(str_replace('_', ' ', $securityRecord->lifecycle_status)) }}</td>
+                                        <td><code title="{{ $securityRecord->sha256 }}">{{ substr($securityRecord->sha256, 0, 12) }}…</code></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <!-- Audit Log Table -->
         <div class="table-card">
             <div class="table-card-header">

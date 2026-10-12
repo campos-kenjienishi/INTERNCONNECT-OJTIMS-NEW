@@ -19,9 +19,14 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use App\Helpers\AuditLogger;
 use App\Services\ReportAiInsightService;
+use App\Services\PrivateDocumentStorage;
 
 class ReportsController extends Controller
 {
+    public function __construct(private readonly PrivateDocumentStorage $documents)
+    {
+    }
+
     private function normalizeCourseSelection($courseInput): array
     {
         if (is_array($courseInput)) {
@@ -756,9 +761,10 @@ public function reportsExpiredProf()
     private function annotateMoaFileStatus($companies)
     {
         return collect($companies)->map(function ($company) {
-            $filePath = !empty($company->file) ? public_path('assets/' . $company->file) : null;
-            $fileExists = $filePath && file_exists($filePath);
-            $fileSize = $fileExists ? filesize($filePath) : 0;
+            $fileSize = !empty($company->file)
+                ? $this->documents->size(PrivateDocumentStorage::MOA, $company->file)
+                : 0;
+            $fileExists = $fileSize > 0;
 
             $company->moa_file_ready = $fileExists && $fileSize > 0;
             $company->moa_file_empty = !empty($company->file) && (!$fileExists || $fileSize === 0);

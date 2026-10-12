@@ -20,6 +20,12 @@ class Kernel extends ConsoleKernel
                 ->dailyAt('01:30')
                 ->withoutOverlapping();
         }
+
+        if (config('upload_security.integrity_check_enabled', true)) {
+            $schedule->command('uploads:verify-security')
+                ->weeklyOn(1, '02:30')
+                ->withoutOverlapping();
+        }
     }
 
     /**

@@ -327,7 +327,7 @@
                                     <button type="button" class="icon-action-btn btn-print"
                                         title="Print PDF"
                                         aria-label="Print PDF"
-                                        onclick="openPdfPreview('{{ asset('assets/' . $company->file) }}')">
+                                        onclick="openPdfPreview('{{ route('moa.file.preview', $company->id) }}')">
                                         <i class="fa fa-print"></i>
                                     </button>
                                     @php $companyHasEditUnlock = is_callable($hasApprovedEditUnlock) ? $hasApprovedEditUnlock($company->id) : !empty($hasApprovedEditUnlock); @endphp
@@ -472,7 +472,7 @@
                                         <div class="existing-moa-buttons">
                                             <button type="button"
                                                 class="btn-modal-close view-btn"
-                                                data-url="{{ asset('assets/' . $linkableCompany->file) }}">
+                                                data-url="{{ route('moa.file.preview', $linkableCompany->id) }}">
                                                 <i class="fa fa-eye me-1"></i> View MOA
                                             </button>
                                             <button type="button"

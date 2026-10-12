@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnsafeUploadException;
+use App\Services\DocumentAccessService;
+use App\Services\PrivateDocumentStorage;
+use App\Services\RequirementUploadLock;
+use App\Services\SecureDocumentResponse;
+use App\Services\SecureUploadService;
+use App\Services\UploadSecurityRecorder;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Enroll;
@@ -32,6 +39,16 @@ use App\Helpers\AuditLogger;
 
 class PassDocuController extends Controller
 {
+    public function __construct(
+        private readonly SecureUploadService $secureUploads,
+        private readonly PrivateDocumentStorage $documents,
+        private readonly RequirementUploadLock $requirementUploadLock,
+        private readonly DocumentAccessService $documentAccess,
+        private readonly SecureDocumentResponse $documentResponse,
+        private readonly UploadSecurityRecorder $securityEvidence
+    ) {
+    }
+
     private function resolveUserFromStudent(Student $student): ?User
     {
         $student->loadMissing('user');
@@ -435,10 +452,7 @@ class PassDocuController extends Controller
         }
 
         if (!empty($data->file)) {
-            $filePath = public_path('assets/' . $data->file);
-            if (file_exists($filePath)) {
-                @unlink($filePath);
-            }
+            $this->documents->delete(PrivateDocumentStorage::REQUIREMENTS, $data->file);
         }
     
         $data->delete();
@@ -531,7 +545,7 @@ public function fileReqCreate(Request $request){
         'uploadedBy' => 'required|string',
         'adviser' => 'required|string',
     ], [
-        'file.mimes' => 'Only PDF files are accepted for requirement uploads.',
+        'file.mimes' => 'Upload rejected: the file content does not match the .pdf extension. Renaming a non-PDF file to .pdf is not allowed.',
     ]);
 
     $user = $sessionCheck;
@@ -564,46 +578,67 @@ public function fileReqCreate(Request $request){
     }
 
     $normalizedCategoryName = mb_strtolower(trim((string) $request->fileName));
-    $alreadySubmitted = $phaseState['submittedRequirementNames']
-        ->contains($normalizedCategoryName);
+    $uploadLock = $this->requirementUploadLock->create((int) $user->id, $normalizedCategoryName);
 
-    if ($alreadySubmitted) {
-        return back()->withInput()->with('fail', 'This requirement is already submitted. Remove the existing submission first before uploading another file for it.');
+    if (! $uploadLock->get()) {
+        return back()->withInput()->withErrors([
+            'file' => 'This requirement upload is already being validated. Please wait for it to finish before trying again.',
+        ]);
     }
-    
-    // Create a new instance of FileRequirement model
-    $fileup = new FileRequirement();
-    $fileup->fileName = $request->fileName; 
-    $file = $request->file('file') ?? $request->file;
-    $extension = $file->getClientOriginalExtension();
-    $studentSlug = Str::slug($user->full_name, '_') ?: 'student';
-    $reqSlug = Str::slug($request->fileName, '_') ?: 'requirement';
-    $filename = $studentSlug . '_' . $reqSlug . '_' . time() . '.' . $extension;
-    $file->move(public_path('assets'), $filename);
-    $fileup->file = $filename;
-    $fileup->status = 0;
-    $fileup->adviser = $request->adviser;
-    $fileup->uploadedBy = $user->full_name;
-    $fileup->uploader_user_id = $user->id;
-    
-    // Save the model instance
-    $res = $fileup->save();
 
-    if($res){
-        $user->touchActivity();
-        AuditLogger::log(
-            'PassDocu',
-            'Upload',
-            'Uploaded file: ' . $fileup->fileName,
-            Session::get('loginId') ?? null,
-            null,
-            ['fileName' => $fileup->fileName, 'phase' => $categoryPhase, 'file' => $fileup->file, 'uploadedBy' => $fileup->uploadedBy]
-        );
-        return back()->with('success', 'File uploaded successfully!');
-    } else {
-        // If saving fails, delete the uploaded file
-        Storage::delete('assets/' . $filename);
+    try {
+        $alreadySubmitted = $phaseState['submittedRequirementNames']
+            ->contains($normalizedCategoryName);
+
+        if ($alreadySubmitted) {
+            return back()->withInput()->with('fail', 'This requirement is already submitted. Remove the existing submission first before uploading another file for it.');
+        }
+
+        try {
+            $storedUpload = $this->secureUploads->store(
+                $request->file('file'),
+                'pdf',
+                PrivateDocumentStorage::REQUIREMENTS
+            );
+        } catch (UnsafeUploadException $exception) {
+            return back()->withInput()->withErrors(['file' => $exception->getMessage()]);
+        }
+
+        $fileup = new FileRequirement();
+        $fileup->fileName = $request->fileName;
+        $fileup->file = $storedUpload->filename;
+        $fileup->status = 0;
+        $fileup->adviser = $request->adviser;
+        $fileup->uploadedBy = $user->full_name;
+        $fileup->uploader_user_id = $user->id;
+
+        try {
+            $res = $fileup->save();
+        } catch (\Throwable $exception) {
+            $this->documents->delete(PrivateDocumentStorage::REQUIREMENTS, $storedUpload->filename);
+            throw $exception;
+        }
+
+        if ($res) {
+            $this->securityEvidence->link($storedUpload->securityRecordId, $fileup, $user->id);
+            $user->touchActivity();
+            AuditLogger::log(
+                'PassDocu',
+                'Upload',
+                'Uploaded file: ' . $fileup->fileName,
+                Session::get('loginId') ?? null,
+                null,
+                ['fileName' => $fileup->fileName, 'phase' => $categoryPhase, 'file' => $fileup->file, 'uploadedBy' => $fileup->uploadedBy]
+            );
+
+            return back()->with('success', 'File uploaded successfully!');
+        }
+
+        $this->documents->delete(PrivateDocumentStorage::REQUIREMENTS, $storedUpload->filename);
+
         return back()->with('fail', 'Failed to upload file.');
+    } finally {
+        $uploadLock->release();
     }
 }
 
@@ -677,9 +712,8 @@ public function fileReqCreate(Request $request){
                         $ownerRequirement->delete();
                     }
 
-                    $filePath = public_path('assets/' . $company->file);
-                    if (!empty($company->file) && file_exists($filePath)) {
-                        @unlink($filePath);
+                    if (!empty($company->file)) {
+                        $this->documents->delete(PrivateDocumentStorage::MOA, $company->file);
                     }
 
                     $company->delete();
@@ -699,6 +733,12 @@ public function fileReqCreate(Request $request){
             }
         }
     
+        if ($data->fileName !== 'Notarized MOA') {
+            $this->documents->delete(PrivateDocumentStorage::REQUIREMENTS, $data->file);
+        } elseif (!Company::where('file', $data->file)->exists()) {
+            $this->documents->delete(PrivateDocumentStorage::MOA, $data->file);
+        }
+
         $data->delete();
         AuditLogger::log(
             'PassDocu',
@@ -733,13 +773,16 @@ public function fileReqCreate(Request $request){
             ->forUser($user)
             ->firstOrFail();
 
-        $filePath = public_path('assets/' . $fileRequirement->file);
+        $filePath = $this->documents->resolve(
+            $this->documents->requirementDirectory($fileRequirement->fileName),
+            $fileRequirement->file
+        );
 
-        if (!file_exists($filePath)) {
+        if ($filePath === null) {
             return back()->with('error', 'File not found.');
         }
 
-        return response()->file($filePath);
+        return $this->documentResponse->inlinePdf($filePath, $fileRequirement->fileName.'.pdf');
     }
 
     public function downloadStudent($id)
@@ -756,14 +799,17 @@ public function fileReqCreate(Request $request){
             ? FileRequirement::where('id', $id)->forUser($user)->firstOrFail()
             : FileRequirement::where('file', $id)->forUser($user)->firstOrFail();
 
-        $filePath = public_path('assets/' . $fileRequirement->file);
+        $filePath = $this->documents->resolve(
+            $this->documents->requirementDirectory($fileRequirement->fileName),
+            $fileRequirement->file
+        );
 
-        if (file_exists($filePath)) {
+        if ($filePath !== null) {
             $ext = pathinfo($filePath, PATHINFO_EXTENSION);
             $studentName = Str::slug($fileRequirement->uploadedBy ?: ($user->full_name ?? 'Student'), '_');
             $reqName = Str::slug($fileRequirement->fileName ?: 'Requirement', '_');
             $cleanDownloadName = ($studentName ? $studentName . '_' : '') . $reqName . '.' . $ext;
-            return response()->download($filePath, $cleanDownloadName);
+            return $this->documentResponse->download($filePath, $cleanDownloadName);
         }
 
         return back()->with(['error' => 'File not found.'], 404);
@@ -915,27 +961,27 @@ public function fileReqCreate(Request $request){
                     
                     }
 
-     public function download($id)
+    public function download($id)
     {
-        // Find the FileRequirement by ID or filename
+        $user = User::find(Session::get('loginId'));
         $fileRequirement = is_numeric($id)
             ? FileRequirement::find($id)
             : FileRequirement::where('file', $id)->first();
 
-        if ($fileRequirement) {
-            $filePath = public_path('assets/' . $fileRequirement->file);
-            if (file_exists($filePath)) {
-                $ext = pathinfo($filePath, PATHINFO_EXTENSION);
-                $studentName = Str::slug($fileRequirement->uploadedBy ?: 'Student', '_');
-                $reqName = Str::slug($fileRequirement->fileName ?: 'Requirement', '_');
-                $cleanDownloadName = ($studentName ? $studentName . '_' : '') . $reqName . '.' . $ext;
-                return response()->download($filePath, $cleanDownloadName);
-            }
-        } else {
-            $filePath = public_path('assets/' . $id);
-            if (file_exists($filePath)) {
-                return response()->download($filePath);
-            }
+        abort_unless($user && $fileRequirement && $this->documentAccess->canAccessRequirement($user, $fileRequirement), 404);
+
+        $filePath = $this->documents->resolve(
+            $this->documents->requirementDirectory($fileRequirement->fileName),
+            $fileRequirement->file
+        );
+
+        if ($filePath !== null) {
+            $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+            $studentName = Str::slug($fileRequirement->uploadedBy ?: 'Student', '_');
+            $reqName = Str::slug($fileRequirement->fileName ?: 'Requirement', '_');
+            $cleanDownloadName = ($studentName ? $studentName . '_' : '') . $reqName . '.' . $ext;
+
+            return $this->documentResponse->download($filePath, $cleanDownloadName);
         }
 
         return back()->with(['error' => 'File not found.'], 404);
@@ -1154,13 +1200,35 @@ public function fileReqCreate(Request $request){
     public function coordinatorViewRequirement($id)
     {
         $fileRequirement = FileRequirement::findOrFail($id);
-        $filePath = public_path('assets/' . $fileRequirement->file);
+        $filePath = $this->documents->resolve(
+            $this->documents->requirementDirectory($fileRequirement->fileName),
+            $fileRequirement->file
+        );
 
-        if (!file_exists($filePath)) {
+        if ($filePath === null) {
             return back()->with('error', 'File not found on server.');
         }
 
-        return response()->file($filePath);
+        return $this->documentResponse->inlinePdf($filePath, $fileRequirement->fileName.'.pdf');
+    }
+
+    public function previewRequirement($id)
+    {
+        $user = User::find(Session::get('loginId'));
+        $fileRequirement = FileRequirement::findOrFail($id);
+
+        abort_unless($user && $this->documentAccess->canAccessRequirement($user, $fileRequirement), 404);
+
+        $filePath = $this->documents->resolve(
+            $this->documents->requirementDirectory($fileRequirement->fileName),
+            $fileRequirement->file
+        );
+
+        if ($filePath === null) {
+            return back()->with('error', 'File not found on server.');
+        }
+
+        return $this->documentResponse->inlinePdf($filePath, $fileRequirement->fileName.'.pdf');
     }
 
     public function coordinatorDownloadRequirement($id)
@@ -1169,14 +1237,17 @@ public function fileReqCreate(Request $request){
             ? FileRequirement::findOrFail($id)
             : FileRequirement::where('file', $id)->firstOrFail();
 
-        $filePath = public_path('assets/' . $fileRequirement->file);
+        $filePath = $this->documents->resolve(
+            $this->documents->requirementDirectory($fileRequirement->fileName),
+            $fileRequirement->file
+        );
 
-        if (file_exists($filePath)) {
+        if ($filePath !== null) {
             $ext = pathinfo($filePath, PATHINFO_EXTENSION);
             $studentName = Str::slug($fileRequirement->uploadedBy ?: 'Student', '_');
             $reqName = Str::slug($fileRequirement->fileName ?: 'Requirement', '_');
             $cleanDownloadName = ($studentName ? $studentName . '_' : '') . $reqName . '.' . $ext;
-            return response()->download($filePath, $cleanDownloadName);
+            return $this->documentResponse->download($filePath, $cleanDownloadName);
         }
 
         return back()->with('error', 'File not found on server.');

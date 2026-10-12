@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DocumentAccessService;
+use App\Services\PrivateDocumentStorage;
+use App\Services\SecureDocumentResponse;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -25,6 +28,13 @@ use App\Helpers\AuditLogger;
 
 class MOAUploadController extends Controller
 {
+    public function __construct(
+        private readonly PrivateDocumentStorage $documents,
+        private readonly DocumentAccessService $documentAccess,
+        private readonly SecureDocumentResponse $documentResponse
+    ) {
+    }
+
     private function resolveUserFromStudent(Student $student): ?User
     {
         $student->loadMissing('user');
@@ -188,10 +198,7 @@ class MOAUploadController extends Controller
             $otherCompanyUsingFile = Company::where('file', $company->file)->where('id', '!=', $company->id)->exists();
             if (!$otherCompanyUsingFile) {
                 FileRequirement::where('file', $company->file)->delete();
-                $filePath = public_path('assets/' . $company->file);
-                if (file_exists($filePath)) {
-                    @unlink($filePath);
-                }
+                $this->documents->delete(PrivateDocumentStorage::MOA, $company->file);
             }
         }
 
@@ -251,14 +258,15 @@ class MOAUploadController extends Controller
             return false;
         }
 
-        $filePath = public_path('assets/' . $company->file);
-
-        return file_exists($filePath) && filesize($filePath) > 0;
+        return $this->documents->size(PrivateDocumentStorage::MOA, $company->file) > 0;
     }
 
     public function download(Request $request, $file)
     {   
-        $fileRecord = Company::where('file', $file)->first();
+        $user = User::find(Session::get('loginId'));
+        $fileRecord = Company::where('file', $file)
+            ->get()
+            ->first(fn (Company $company) => $user && $this->documentAccess->canAccessMoa($user, $company));
 
         if ($fileRecord) {
             // Check if the file is still valid
@@ -271,13 +279,16 @@ class MOAUploadController extends Controller
                 return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 422);
             }
 
-            $filePath = public_path('assets/' . $file);
+            $filePath = $this->documents->resolve(PrivateDocumentStorage::MOA, $file);
+            if ($filePath === null) {
+                return response()->json(['message' => 'File not found'], 404);
+            }
             $ext = pathinfo($filePath, PATHINFO_EXTENSION);
             $companyName = Str::slug($fileRecord->company_name ?: 'Company', '_');
             $cleanDownloadName = ($companyName ?: 'Company') . '_Notarized_MOA.' . $ext;
 
             // File is valid, allow download
-            return response()->download($filePath, $cleanDownloadName);
+            return $this->documentResponse->download($filePath, $cleanDownloadName);
         }
 
         // File not found, return a response indicating that
@@ -292,10 +303,7 @@ class MOAUploadController extends Controller
         $this->deleteAllLinkedNotarizedRequirements($company);
 
         if (!empty($company->file)) {
-            $filePath = public_path('assets/' . $company->file);
-            if (file_exists($filePath)) {
-                @unlink($filePath);
-            }
+            $this->documents->delete(PrivateDocumentStorage::MOA, $company->file);
         }
 
         // Get the associated students
@@ -384,7 +392,10 @@ public function view($id)
 
     public function downloadFile($file)
     {
-        $fileRecord = Company::where('file', $file)->first();
+        $user = User::find(Session::get('loginId'));
+        $fileRecord = Company::where('file', $file)
+            ->get()
+            ->first(fn (Company $company) => $user && $this->documentAccess->canAccessMoa($user, $company));
 
         if ($fileRecord) {
             // Check if the file is still valid
@@ -397,16 +408,34 @@ public function view($id)
                 return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 422);
             }
 
-            $filePath = public_path('assets/' . $file);
+            $filePath = $this->documents->resolve(PrivateDocumentStorage::MOA, $file);
+            if ($filePath === null) {
+                return response()->json(['message' => 'File not found'], 404);
+            }
             $ext = pathinfo($filePath, PATHINFO_EXTENSION);
             $companyName = Str::slug($fileRecord->company_name ?: 'Company', '_');
             $cleanDownloadName = ($companyName ?: 'Company') . '_Notarized_MOA.' . $ext;
 
-            return response()->download($filePath, $cleanDownloadName);
+            return $this->documentResponse->download($filePath, $cleanDownloadName);
         }
 
         // File not found, return a response indicating that
         return response()->json(['message' => 'File not found'], 404);
+    }
+
+    public function preview(Company $company)
+    {
+        $user = User::find(Session::get('loginId'));
+
+        abort_unless($user && $this->documentAccess->canAccessMoa($user, $company), 404);
+
+        if (!$this->isReadableMoaFile($company)) {
+            return response()->json(['message' => 'The uploaded MOA file is empty or unavailable.'], 404);
+        }
+
+        $filePath = $this->documents->resolve(PrivateDocumentStorage::MOA, $company->file);
+
+        return $this->documentResponse->inlinePdf($filePath, 'moa.pdf');
     }
 
 public function printData(Company $company)

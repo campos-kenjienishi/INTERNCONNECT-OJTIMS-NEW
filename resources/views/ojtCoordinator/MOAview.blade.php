@@ -428,7 +428,7 @@
                     </div>
                 </div>
                 <div class="moa-iframe-wrap">
-                    <iframe src="/assets/{{ $company->file }}"
+                    <iframe src="{{ route('moa.file.preview', $company->id) }}"
                             title="MOA Document">
                     </iframe>
                 </div>

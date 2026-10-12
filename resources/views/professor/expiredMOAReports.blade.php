@@ -444,7 +444,7 @@
                                         </a>
                                         <button type="button"
                                                 class="btn-moa-action btn-moa-print"
-                                                onclick="printUploadedMoa('{{ asset('assets/' . $company->file) }}')">
+                                                onclick="printUploadedMoa('{{ route('moa.file.preview', $company->id) }}')">
                                             <i class="fa fa-print"></i> Print
                                         </button>
                                     @elseif($company->file)
