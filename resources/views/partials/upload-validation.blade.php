@@ -1,13 +1,27 @@
 @php
     $uploadValidationFeedback = null;
     $uploadValidationSuccess = session('upload_success');
+    $renewalValidationSuccess = session('renewal_success');
     $uploadValidationError = $errors->first('file') ?: session('upload_error');
+    $renewalValidationError = session('renewal_error');
 
-    if ($uploadValidationSuccess) {
+    if ($renewalValidationSuccess) {
+        $uploadValidationFeedback = [
+            'type' => 'success',
+            'title' => 'MOA renewed',
+            'message' => $renewalValidationSuccess,
+        ];
+    } elseif ($uploadValidationSuccess) {
         $uploadValidationFeedback = [
             'type' => 'success',
             'title' => 'Upload successful',
             'message' => $uploadValidationSuccess,
+        ];
+    } elseif ($renewalValidationError) {
+        $uploadValidationFeedback = [
+            'type' => 'error',
+            'title' => 'Renewal rejected',
+            'message' => $renewalValidationError,
         ];
     } elseif ($uploadValidationError) {
         $uploadValidationFeedback = [

@@ -458,6 +458,37 @@
             font-size: 11.5px; font-weight: 600;
         }
 
+        .status-expiring {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #fef3c7; color: #b45309;
+            border-radius: 20px; padding: 4px 10px;
+            font-size: 11.5px; font-weight: 600;
+        }
+
+        .status-unknown {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #f1f5f9; color: #64748b;
+            border-radius: 20px; padding: 4px 10px;
+            font-size: 11.5px; font-weight: 600;
+        }
+
+        .moa-status-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            min-width: 140px;
+        }
+
+        .renewal-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+            font-size: 10.5px;
+            line-height: 1.35;
+        }
+
         /* Action buttons */
         .actions-wrap {
             display: grid;
@@ -503,6 +534,14 @@
         .btn-action-icon.btn-edit:hover,
         .btn-action-icon.btn-open-edit:hover,
         .btn-edit:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(245,158,11,0.4) !important; }
+
+        .btn-action-icon.btn-renew,
+        .btn-renew {
+            border: none !important; color: #fff !important; background: linear-gradient(135deg, #0f766e 0%, #115e59 100%) !important;
+            box-shadow: 0 2px 6px rgba(15,118,110,0.3) !important;
+        }
+        .btn-action-icon.btn-renew:hover,
+        .btn-renew:hover { background: linear-gradient(135deg, #115e59 0%, #134e4a 100%) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(15,118,110,0.4) !important; }
 
         .btn-action-icon.btn-download,
         .btn-download {
@@ -621,6 +660,75 @@
             display: flex; align-items: center; gap: 8px;
         }
         .modal-section i { color: var(--red); font-size: 12px; }
+
+        .renewal-company-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
+            border: 1px solid #ccfbf1;
+            border-radius: 12px;
+            background: #f0fdfa;
+        }
+
+        .renewal-company-icon {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #0f766e;
+            color: #fff;
+        }
+
+        .renewal-company-label {
+            color: #64748b;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .renewal-company-name {
+            color: #134e4a;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .renewal-current-period {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            margin-bottom: 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .renewal-current-period div {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .renewal-current-period span {
+            color: #64748b;
+            font-size: 10.5px;
+        }
+
+        .renewal-current-period strong {
+            color: #1e293b;
+            font-size: 12.5px;
+        }
+
+        .renewal-current-period > i {
+            color: #0f766e;
+        }
 
         .modal-footer {
             background: #fafafa; border-top: 1px solid #f0f0f0;
@@ -820,6 +928,13 @@ body.dark-mode .student-pill:hover {
 /* Status badge */
 body.dark-mode .status-active { background: rgba(22,163,74,0.15); color: #6ee7b7; }
 body.dark-mode .status-expired { background: rgba(220,38,38,0.2); color: #fca5a5; }
+body.dark-mode .status-expiring { background: rgba(217,119,6,0.2); color: #fcd34d; }
+body.dark-mode .status-unknown { background: rgba(100,116,139,0.2); color: #cbd5e1; }
+body.dark-mode .renewal-meta { color: #94a3b8; }
+body.dark-mode .renewal-company-banner { background: rgba(15,118,110,0.15); border-color: rgba(45,212,191,0.25); }
+body.dark-mode .renewal-company-name { color: #99f6e4; }
+body.dark-mode .renewal-current-period { background: #2a2a2a; border-color: #3a3a3a; }
+body.dark-mode .renewal-current-period strong { color: #e2e8f0; }
 
         /* Cards */
         body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }

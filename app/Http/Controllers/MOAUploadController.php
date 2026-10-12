@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\FileRequirement;
 use App\Models\MoaUnlockRequest;
+use App\Models\MoaRenewal;
 use App\Helpers\AuditLogger;
 
 class MOAUploadController extends Controller
@@ -194,6 +195,8 @@ class MOAUploadController extends Controller
     {
         $this->deleteAllLinkedNotarizedRequirements($company);
 
+        $this->deleteRenewalFiles($company);
+
         if (!empty($company->file)) {
             $otherCompanyUsingFile = Company::where('file', $company->file)->where('id', '!=', $company->id)->exists();
             if (!$otherCompanyUsingFile) {
@@ -207,6 +210,32 @@ class MOAUploadController extends Controller
             ->delete();
 
         $company->delete();
+    }
+
+    private function deleteRenewalFiles(Company $company): void
+    {
+        $currentFile = trim((string) $company->file);
+        $historyFiles = $company->renewals()
+            ->get(['previous_file', 'new_file'])
+            ->flatMap(fn (MoaRenewal $renewal) => [$renewal->previous_file, $renewal->new_file])
+            ->map(fn ($filename) => trim((string) $filename))
+            ->filter(fn ($filename) => $filename !== '' && $filename !== $currentFile)
+            ->unique();
+
+        foreach ($historyFiles as $filename) {
+            $usedByAnotherCompany = Company::where('id', '!=', $company->id)
+                ->where('file', $filename)
+                ->exists();
+            $usedByAnotherRenewal = MoaRenewal::where('company_id', '!=', $company->id)
+                ->where(function ($query) use ($filename) {
+                    $query->where('previous_file', $filename)->orWhere('new_file', $filename);
+                })
+                ->exists();
+
+            if (!$usedByAnotherCompany && !$usedByAnotherRenewal) {
+                $this->documents->delete(PrivateDocumentStorage::MOA, $filename);
+            }
+        }
     }
 
     private function deleteLinkedNotarizedRequirement(?Company $company): void
@@ -300,25 +329,8 @@ class MOAUploadController extends Controller
     $company = Company::find($id);
 
     if ($company) {
-        $this->deleteAllLinkedNotarizedRequirements($company);
-
-        if (!empty($company->file)) {
-            $this->documents->delete(PrivateDocumentStorage::MOA, $company->file);
-        }
-
-        // Get the associated students
         $students = $company->students;
-
-        // Detach the students from the company in the pivot table (companystudent)
-        DB::table('company_student')
-            ->where('company_id', $company->id)
-            ->whereIn('student_id', $students->pluck('id'))
-            ->delete();
-
-       
-
-        // Delete the company
-        $company->delete();
+        $this->deleteCompanyAssets($company);
         AuditLogger::log(
             'MOA Upload',
             'Delete',
@@ -351,6 +363,72 @@ public function view($id)
 
 
     return view('ojtCoordinator.MOAview', compact('company', 'user'));
+}
+
+public function renewalHistory(Company $company)
+{
+    $user = User::find(Session::get('loginId'));
+
+    abort_unless($user && $this->documentAccess->canAccessMoa($user, $company), 404);
+
+    $company->load(['renewals.renewedBy']);
+
+    return response()->json([
+        'company' => [
+            'id' => $company->id,
+            'name' => $company->company_name,
+            'date_notarized' => $company->date_notarized,
+            'valid_until' => $company->valid_until,
+            'renewal_count' => $company->renewals->count(),
+        ],
+        'renewals' => $company->renewals->map(function (MoaRenewal $renewal) {
+            return [
+                'id' => $renewal->id,
+                'previous_date_notarized' => $renewal->previous_date_notarized?->toDateString(),
+                'previous_valid_until' => $renewal->previous_valid_until?->toDateString(),
+                'new_date_notarized' => $renewal->new_date_notarized->toDateString(),
+                'new_valid_until' => $renewal->new_valid_until->toDateString(),
+                'renewed_at' => $renewal->renewed_at->toIso8601String(),
+                'renewed_by' => $renewal->renewedBy->full_name ?? 'Former user',
+                'notes' => $renewal->notes,
+            ];
+        })->values(),
+    ]);
+}
+
+public function renewalPreview(MoaRenewal $renewal, string $version)
+{
+    return $this->renewalDocumentResponse($renewal, $version, false);
+}
+
+public function renewalDownload(MoaRenewal $renewal, string $version)
+{
+    return $this->renewalDocumentResponse($renewal, $version, true);
+}
+
+private function renewalDocumentResponse(MoaRenewal $renewal, string $version, bool $download)
+{
+    abort_unless(in_array($version, ['previous', 'new'], true), 404);
+
+    $user = User::find(Session::get('loginId'));
+    $company = $renewal->company;
+
+    abort_unless($user && $company && $this->documentAccess->canAccessMoa($user, $company), 404);
+
+    $filename = $version === 'previous' ? $renewal->previous_file : $renewal->new_file;
+    $filePath = $this->documents->resolve(PrivateDocumentStorage::MOA, $filename);
+
+    abort_if($filePath === null || $this->documents->size(PrivateDocumentStorage::MOA, $filename) < 1, 404);
+
+    $companyName = Str::slug($company->company_name ?: 'Company', '_') ?: 'Company';
+    $period = $version === 'previous'
+        ? ($renewal->previous_valid_until?->format('Y-m-d') ?? 'previous')
+        : $renewal->new_valid_until->format('Y-m-d');
+    $downloadName = $companyName.'_MOA_'.$period.'.pdf';
+
+    return $download
+        ? $this->documentResponse->download($filePath, $downloadName)
+        : $this->documentResponse->inlinePdf($filePath, $downloadName);
 }
 
 

@@ -98,7 +98,7 @@ class DocumentAccessServiceTest extends TestCase
 
     private function service(): DocumentAccessService
     {
-        return new DocumentAccessService;
+        return new DocumentAccessService(new \App\Services\MoaValidityService);
     }
 
     private function user(int $role, int $id = 1, string $name = 'Test User'): User

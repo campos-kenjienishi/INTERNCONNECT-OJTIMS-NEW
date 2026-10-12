@@ -317,7 +317,13 @@
                                 'manual_students' => $manualStudentNames->values(),
                             ];
 
-                            $isActive = $validUntil && now()->lte($validUntil);
+                            $moaValidity = $company->moa_validity ?? [
+                                'status' => 'unknown',
+                                'label' => 'Unknown',
+                                'days_remaining' => null,
+                            ];
+                            $latestRenewal = $company->latestRenewal;
+                            $renewalCount = (int) ($company->renewals_count ?? 0);
                         @endphp
                         <tr>
                             <td style="display:none;">{{ $company->id }}</td>
@@ -414,15 +420,32 @@
 
                             <!-- Status -->
                             <td>
-                                @if ($isActive)
+                                <div class="moa-status-stack">
+                                @if ($moaValidity['status'] === 'active')
                                     <span class="status-active">
                                         <i class="fa fa-circle" style="font-size:7px;"></i> Active
                                     </span>
-                                @else
+                                @elseif ($moaValidity['status'] === 'expiring_soon')
+                                    <span class="status-expiring">
+                                        <i class="fa fa-clock" style="font-size:11px;"></i> Expiring Soon
+                                    </span>
+                                @elseif ($moaValidity['status'] === 'expired')
                                     <span class="status-expired">
                                         <i class="fa fa-times-circle" style="font-size:11px;"></i> Expired
                                     </span>
+                                @else
+                                    <span class="status-unknown">
+                                        <i class="fa fa-question-circle" style="font-size:11px;"></i> Unknown
+                                    </span>
                                 @endif
+                                @if ($latestRenewal)
+                                    <span class="renewal-meta" title="Last renewed by {{ $latestRenewal->renewedBy->full_name ?? 'Former user' }}">
+                                        <i class="fa fa-sync-alt"></i>
+                                        Renewed {{ $renewalCount }} {{ $renewalCount === 1 ? 'time' : 'times' }}
+                                        &middot; {{ $latestRenewal->renewed_at->format('M d, Y') }}
+                                    </span>
+                                @endif
+                                </div>
                             </td>
 
                             <!-- Actions -->
@@ -436,6 +459,16 @@
                                        aria-label="View MOA">
                                         <i class="fa fa-eye"></i>
                                     </a>
+
+                                    @if($renewalCount > 0)
+                                        <button type="button"
+                                            class="btn-action-icon btn-view"
+                                            title="View Renewal History"
+                                            aria-label="View Renewal History"
+                                            onclick="openMoaRenewalHistory({{ $company->id }}, @js($company->company_name))">
+                                            <i class="fa fa-history"></i>
+                                        </button>
+                                    @endif
 
                                     <!-- Edit -->
                                     <button type="button"
@@ -466,6 +499,22 @@
                                         data-edit-payload='@json($companyEditPayload)'
                                         onclick="openEditCompanyModal(this)">
                                         <i class="fa fa-pen"></i>
+                                    </button>
+
+                                    <!-- Renew -->
+                                    <button type="button"
+                                        class="btn-action-icon btn-renew"
+                                        title="Renew MOA"
+                                        aria-label="Renew MOA"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#renewMoaModal"
+                                        data-company-id="{{ $company->id }}"
+                                        data-company-name="{{ $company->company_name }}"
+                                        data-date-notarized="{{ $dateNotarized ? $dateNotarized->format('Y-m-d') : '' }}"
+                                        data-valid-until="{{ $validUntil ? $validUntil->format('Y-m-d') : '' }}"
+                                        data-renewal-count="{{ $renewalCount }}"
+                                        onclick="openRenewMoaModal(this)">
+                                        <i class="fa fa-sync-alt"></i>
                                     </button>
 
                                     <!-- Download -->
@@ -883,6 +932,77 @@
     </div>
 </div>
 
+<!-- =============== RENEW MOA MODAL =============== -->
+<div class="modal fade" id="renewMoaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-sync-alt"></i> Renew MOA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="renewMoaForm" action="" method="post" enctype="multipart/form-data" data-upload-validation data-upload-title="Validating renewed MOA" data-upload-description="Checking the renewed MOA PDF type, structure, size, and security requirements. Please keep this page open.">
+                @csrf
+                <div class="modal-body">
+                    <div class="renewal-company-banner">
+                        <div class="renewal-company-icon"><i class="fa fa-building"></i></div>
+                        <div>
+                            <div class="renewal-company-label">Partner Company</div>
+                            <div id="renewMoaCompanyName" class="renewal-company-name">&mdash;</div>
+                        </div>
+                    </div>
+
+                    <div class="renewal-current-period">
+                        <div>
+                            <span>Current notarization</span>
+                            <strong id="renewCurrentNotarized">Not recorded</strong>
+                        </div>
+                        <i class="fa fa-arrow-right"></i>
+                        <div>
+                            <span>Current expiration</span>
+                            <strong id="renewCurrentExpiration">Not recorded</strong>
+                        </div>
+                    </div>
+
+                    <div class="modal-section"><i class="fa fa-calendar-check"></i> New Validity Period</div>
+
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label"><i class="fa fa-stamp"></i> New Notarization Date <span style="color:var(--red);">*</span></label>
+                            <input id="renewalDateNotarized" class="field-input" type="date" name="renewal_date_notarized" max="{{ now()->format('Y-m-d') }}" required>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label"><i class="fa fa-hourglass-end"></i> New Expiration Date <span style="color:var(--red);">*</span></label>
+                            <input id="renewalValidUntil" class="field-input" type="date" name="renewal_valid_until" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-section"><i class="fa fa-shield-alt"></i> Renewed Document</div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-file-pdf"></i> Renewed Notarized MOA PDF <span style="color:var(--red);">*</span></label>
+                        <input id="renewalMoaFile" class="field-input" type="file" name="file" data-max-size-mb="30" accept="application/pdf,.pdf" required style="padding:8px 13px;">
+                        <div style="font-size:12px; color:#777; margin-top:7px;">The current PDF will be preserved in the renewal history. PDF only, maximum 30 MB.</div>
+                        <div class="file-size-error" style="display:none; margin-top:6px; color:#b91c1c; font-size:12px; font-weight:600;"></div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label"><i class="fa fa-clipboard"></i> Renewal Notes <span style="color:#888; font-weight:400;">(Optional)</span></label>
+                        <textarea class="field-input" name="notes" rows="3" maxlength="2000" placeholder="Reference number, renewal remarks, or supporting details" style="resize:vertical; min-height:88px;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-modal-close" type="button" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-modal-submit">
+                        <i class="fa fa-sync-alt me-1"></i> Renew MOA
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- =============== ASSIGN STUDENTS MODAL =============== -->
 <div class="modal fade" id="assignStudentsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -1077,11 +1197,13 @@
     window.companiesConfig = {
         assignStudentsUrl: @json(route('moa.assignableStudents')),
         selectedCreateEndYear: @json($selectedCreateEndYear ?? ''),
-        fileError: @json($errors->first('file'))
+        fileError: @json($errors->first('file')),
+        renewRouteTemplate: @json(route('company.renew', ['id' => '__ID__']))
     };
 </script>
 <script src="{{ vasset('js/coordinator/companies.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+@include('partials.moa-renewal-history')
 @include('partials.upload-validation')
 
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>

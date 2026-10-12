@@ -110,6 +110,7 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::get('/MOA', [CompanyController::class,'companies']);
     Route::get('/MOA/assignable-students', [CompanyController::class, 'assignableStudents'])->name('moa.assignableStudents');
     Route::put('/company/{id}', [CompanyController::class,'companyUpdate'])->middleware('upload.lock')->name('company.update');
+    Route::post('/company/{id}/renew', [CompanyController::class, 'renewMoa'])->middleware('upload.lock')->name('company.renew');
     Route::post('/uploadMOA', [MOAUploadController::class,'uploadfile']);
     Route::post('/moa/remove/{id}', [MOAUploadController::class,'remove']);
     Route::get('/moa/view/{companyId}', [MOAUploadController::class, 'view'])->name('moa.view');
@@ -242,6 +243,9 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::post('/notify/{studentNum}', [StudentController::class, 'notify']);
     Route::get('/moa/download/{file}', [MOAUploadController::class,'download'])->middleware('throttle:document-downloads');
     Route::get('/moa/file/{company}/preview', [MOAUploadController::class, 'preview'])->name('moa.file.preview')->middleware('throttle:document-previews');
+    Route::get('/moa/{company}/renewals', [MOAUploadController::class, 'renewalHistory'])->name('moa.renewals.history')->middleware('throttle:60,1');
+    Route::get('/moa/renewals/{renewal}/{version}/preview', [MOAUploadController::class, 'renewalPreview'])->name('moa.renewals.preview')->middleware('throttle:document-previews');
+    Route::get('/moa/renewals/{renewal}/{version}/download', [MOAUploadController::class, 'renewalDownload'])->name('moa.renewals.download')->middleware('throttle:document-downloads');
 });
 
 // ─── SHARED: COORDINATOR + PROFESSOR (roles 1 & 2) ── Reports ───────
