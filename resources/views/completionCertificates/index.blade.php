@@ -334,6 +334,25 @@
             </section>
         @endif
     </div>
+
+    <footer class="dashboard-footer">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <img src="{{ vasset('images/final-puptg_logo-ojtims_nbg.png') }}" class="footer-logo" alt="PUP">
+            <span class="footer-copy">
+                &copy; 1998&ndash;{{ date('Y') }} <span>Polytechnic University of the Philippines</span>
+            </span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.pup.edu.ph/" target="_blank" rel="noopener noreferrer">
+                <i class="fa fa-external-link-alt" style="font-size:10px; margin-right:3px;"></i>
+                PUP Website
+            </a>
+            <span class="divider">|</span>
+            <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+            <span class="divider">|</span>
+            <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+        </div>
+    </footer>
 </main>
 
 <div class="modal fade coc-pdf-modal" id="cocPdfModal" tabindex="-1" aria-labelledby="cocPdfModalTitle" aria-hidden="true">

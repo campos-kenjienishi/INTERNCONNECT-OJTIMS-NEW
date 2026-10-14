@@ -95,7 +95,7 @@ test('coverage includes uploads, evaluations, sync, passwords and bulk reviews; 
     assert.equal(api.classify('/student/edit/1', 'PUT').mode, 'toast');
     assert.equal(api.classify('/login-user', 'POST').mode, 'none');
     assert.equal(api.classify('/dashboard', 'GET').read, true);
-    for (const path of ['https://external.example/upload', '/chatbot/message', '/change_password/verify-current/1', '/reports/ai/ask']) assert.equal(api.classify(path, 'POST'), null);
+    for (const path of ['https://external.example/upload', '/chatbot/message', '/student/accept-terms', '/change_password/verify-current/1', '/reports/ai/ask']) assert.equal(api.classify(path, 'POST'), null);
 });
 
 test('success requires server confirmation; business failures and validation errors never become success', () => {

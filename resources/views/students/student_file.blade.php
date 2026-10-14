@@ -45,7 +45,7 @@
         </a>
 
         <a href="{{ url('/student/accountinfo') }}" class="sidebar-user">
-            <div class="user-avatar"><i class="fa fa-user"></i></div>
+            <div class="user-avatar"><i class="fa fa-user-graduate"></i></div>
             <div class="user-info">
                 <span class="user-name">{{ $user->full_name }}</span>
                 <span class="user-role">Student</span>
