@@ -345,11 +345,16 @@
             });
         }
         setTimeout(() => {
-            if (flash && saved?.dismissFlash === flash.message) return;
+            const feedbackClosed = () => {
+                if (window.uploadValidationFeedback) document.dispatchEvent(new CustomEvent('upload-validation:feedback-closed', {
+                    detail: window.uploadValidationFeedback,
+                }));
+            };
+            if (flash && saved?.dismissFlash === flash.message) { feedbackClosed(); return; }
             const result = flash || saved?.result;
             if (!result) return;
             if (lastAlert && lastAlert.type === result.type && (lastAlert.message.includes(result.message) || result.message.includes(lastAlert.message))) return;
-            showResult(result, result.type === 'error' ? 'modal' : saved?.intent || saved?.mode || 'toast');
+            showResult(result, result.type === 'error' ? 'modal' : saved?.intent || saved?.mode || 'toast').then(feedbackClosed);
         }, 250);
         if (window.jQuery) {
             window.jQuery(document).on('processing.dt.icFeedback', function (event, settings, processing) {

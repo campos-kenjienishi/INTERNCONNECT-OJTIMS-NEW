@@ -96,6 +96,19 @@ class ProcessFeedbackTest extends TestCase
         $this->assertTrue($response->getData(true)['success']);
     }
 
+    public function test_dev_upload_and_renewal_flash_keys_are_supported(): void
+    {
+        foreach (['upload_success' => true, 'renewal_success' => true, 'upload_error' => false, 'renewal_error' => false] as $key => $success) {
+            $request = $this->uploadRequest();
+            $response = (new InjectProcessFeedback)->handle($request, function () use ($request, $key) {
+                $request->session()->flash($key, 'Document processing result');
+                return redirect('/student/company');
+            });
+            $this->assertSame($success, $response->getData(true)['success']);
+            $this->assertSame($success ? 200 : 422, $response->getStatusCode());
+        }
+    }
+
     public function test_upload_validation_and_business_failures_preserve_error_messages(): void
     {
         $request = $this->uploadRequest();

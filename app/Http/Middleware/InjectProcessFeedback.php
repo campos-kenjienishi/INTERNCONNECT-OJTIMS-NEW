@@ -81,7 +81,8 @@ class InjectProcessFeedback
         }
         $session = $request->session();
         $newKeys = $session->get('_flash.new', []);
-        foreach (['fail' => 'error', 'error' => 'error', 'success' => 'success'] as $key => $type) {
+        foreach (['fail' => 'error', 'error' => 'error', 'upload_error' => 'error', 'renewal_error' => 'error',
+            'success' => 'success', 'upload_success' => 'success', 'renewal_success' => 'success'] as $key => $type) {
             if ($newOnly && !in_array($key, $newKeys, true)) {
                 continue;
             }
