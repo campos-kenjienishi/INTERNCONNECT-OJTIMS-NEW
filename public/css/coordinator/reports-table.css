@@ -201,7 +201,7 @@
         /* Cell styles */
         .name-cell { display: flex; align-items: center; gap: 8px; }
         .name-avatar { width: 30px; height: 30px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 11px; font-weight: 700; flex-shrink: 0; }
-        .name-text { font-weight: 600; color: #1a1a1a; }
+        .name-text { font-size: 12px; font-weight: 600; color: #1a1a1a; line-height: 1.45; }
         .level-badge { display: inline-flex; align-items: center; background: #dbeafe; color: #2563eb; border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
         .date-badge { display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; color: #16a34a; border-radius: 20px; padding: 3px 10px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
         .ojt-company-wrap,
@@ -460,6 +460,8 @@
 }
 
 .program-cell,
+.section-cell,
+.company-name-cell,
 .department-cell,
 .role-cell,
 .report-time-cell,
