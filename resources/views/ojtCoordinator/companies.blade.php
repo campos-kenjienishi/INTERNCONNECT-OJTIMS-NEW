@@ -427,7 +427,14 @@
                                     </span>
                                 @elseif ($moaValidity['status'] === 'expiring_soon')
                                     <span class="status-expiring">
-                                        <i class="fa fa-clock" style="font-size:11px;"></i> Expiring Soon
+                                        <i class="fa fa-clock" style="font-size:11px;"></i>
+                                        Expiring Soon
+                                        &middot;
+                                        @if((int) $moaValidity['days_remaining'] === 0)
+                                            Expires today
+                                        @else
+                                            {{ $moaValidity['days_remaining'] }} {{ (int) $moaValidity['days_remaining'] === 1 ? 'day' : 'days' }} left
+                                        @endif
                                     </span>
                                 @elseif ($moaValidity['status'] === 'expired')
                                     <span class="status-expired">

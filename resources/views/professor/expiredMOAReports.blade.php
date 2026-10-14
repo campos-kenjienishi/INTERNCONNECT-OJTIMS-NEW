@@ -394,11 +394,15 @@
                                 'expiring_soon' => 'Expiring Soon',
                                 default => 'Expired',
                             };
+                            $daysRemaining = max(0, (int) ($validity['days_remaining'] ?? 0));
+                            $expiryCountdown = $daysRemaining === 0
+                                ? 'Expires today'
+                                : $daysRemaining.' '.($daysRemaining === 1 ? 'day' : 'days').' left';
                             $latestRenewal = $company->latestRenewal;
                             $renewalCount = (int) ($company->renewals_count ?? 0);
                             $dateNotarizedFormatted = $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('M d, Y') : '';
                         @endphp
-                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}">
+                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}" data-moa-status="{{ $validity['status'] }}" data-days-remaining="{{ $daysRemaining }}">
                             <td>{{ $company->id }}</td>
                             <td class="company-name-cell">
                                 <div class="company-cell">
@@ -449,7 +453,7 @@
                                 @if($status === 'Active')
                                     <span class="badge-active"><i class="fa fa-circle"></i> Active</span>
                                 @elseif($status === 'Expiring Soon')
-                                    <span class="badge-active" style="background:#fef3c7;color:#b45309;"><i class="fa fa-clock"></i> Expiring Soon</span>
+                                    <span class="badge-active" style="background:#fef3c7;color:#b45309;"><i class="fa fa-clock"></i> Expiring Soon &middot; {{ $expiryCountdown }}</span>
                                 @else
                                     <span class="badge-expired"><i class="fa fa-times-circle"></i> Expired</span>
                                 @endif

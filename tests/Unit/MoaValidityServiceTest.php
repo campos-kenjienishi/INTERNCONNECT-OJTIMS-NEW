@@ -34,6 +34,7 @@ class MoaValidityServiceTest extends TestCase
         $result = $this->service->describe($company);
 
         $this->assertSame(MoaValidityService::STATUS_EXPIRING_SOON, $result['status']);
+        $this->assertSame(0, $result['days_remaining']);
         $this->assertTrue($this->service->isActive($company));
     }
 
@@ -42,10 +43,10 @@ class MoaValidityServiceTest extends TestCase
         $company = new Company();
         $company->valid_until = '2026-11-15';
 
-        $this->assertSame(
-            MoaValidityService::STATUS_EXPIRING_SOON,
-            $this->service->describe($company)['status']
-        );
+        $result = $this->service->describe($company);
+
+        $this->assertSame(MoaValidityService::STATUS_EXPIRING_SOON, $result['status']);
+        $this->assertSame(34, $result['days_remaining']);
     }
 
     public function test_it_distinguishes_active_expired_and_unknown_moas(): void
