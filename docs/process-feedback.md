@@ -31,6 +31,8 @@ claim completion because the browser does not expose whether a download was save
 - Multipart POST forms opt into `X-InternConnect-Upload: 1` and retain CSRF fields.
   Middleware translates explicit success/error redirect flash messages into JSON.
   Validation errors return HTTP 422; a redirect without new success flash is not success.
+- Upload forms retain their `data-upload-title` and `data-upload-description` text.
+  Specific upload and MOA renewal feedback takes priority over generic flash messages.
 - Uploads retain inputs/files on validation, transport or business failure. They
   navigate to the server-provided same-origin redirect only after acknowledgment.
 - AJAX responses are observed without consuming the caller's original body or

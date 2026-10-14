@@ -15,8 +15,7 @@ class InjectProcessFeedback
     {
         // Only the shared upload client opts into this redirect-to-JSON contract.
         $upload = $request->header('X-InternConnect-Upload') === '1'
-            && in_array($request->method(), ['POST', 'PUT', 'PATCH'], true)
-            && count($request->allFiles()) > 0;
+            && in_array($request->method(), ['POST', 'PUT', 'PATCH'], true);
 
         try {
             $response = $next($request);
@@ -26,6 +25,7 @@ class InjectProcessFeedback
             }
             return response()->json([
                 'success' => false,
+                'title' => 'Upload rejected',
                 'message' => collect($exception->errors())->flatten()->first(),
                 'errors' => $exception->errors(),
             ], 422);
@@ -36,6 +36,7 @@ class InjectProcessFeedback
             if ($flash) {
                 return response()->json([
                     'success' => $flash['type'] === 'success',
+                    'title' => $flash['title'],
                     'message' => $flash['message'],
                     'redirect' => $response->getTargetUrl(),
                 ], $flash['type'] === 'success' ? 200 : 422);
@@ -43,6 +44,7 @@ class InjectProcessFeedback
             // A redirect alone is not proof that an upload succeeded (e.g. login).
             return response()->json([
                 'success' => false,
+                'title' => 'Upload unsuccessful',
                 'message' => 'The upload was not confirmed. Please check your session and try again.',
                 'redirect' => $response->getTargetUrl(),
             ], 409);
@@ -81,20 +83,29 @@ class InjectProcessFeedback
         }
         $session = $request->session();
         $newKeys = $session->get('_flash.new', []);
-        foreach (['fail' => 'error', 'error' => 'error', 'upload_error' => 'error', 'renewal_error' => 'error',
-            'success' => 'success', 'upload_success' => 'success', 'renewal_success' => 'success'] as $key => $type) {
+        $feedbackKeys = [
+            'renewal_error' => ['error', 'Renewal rejected'],
+            'upload_error' => ['error', 'Upload rejected'],
+            'renewal_success' => ['success', 'MOA renewed'],
+            'upload_success' => ['success', 'Upload successful'],
+            'fail' => ['error', 'Unable to complete'],
+            'error' => ['error', 'Unable to complete'],
+            'success' => ['success', 'Completed successfully'],
+        ];
+
+        foreach ($feedbackKeys as $key => [$type, $title]) {
             if ($newOnly && !in_array($key, $newKeys, true)) {
                 continue;
             }
             $message = $session->get($key);
             if (is_string($message) && trim($message) !== '') {
-                return ['type' => $type, 'message' => $message];
+                return ['type' => $type, 'title' => $title, 'message' => $message];
             }
         }
         $errors = $session->get('errors');
         if ((!$newOnly || in_array('errors', $newKeys, true)) && $errors instanceof \Illuminate\Support\ViewErrorBag
             && $errors->any()) {
-            return ['type' => 'error', 'message' => $errors->first()];
+            return ['type' => 'error', 'title' => 'Upload rejected', 'message' => $errors->first()];
         }
         return null;
     }

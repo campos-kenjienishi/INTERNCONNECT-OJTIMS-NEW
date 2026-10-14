@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Company;
 use App\Services\MoaValidityService;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tests\TestCase;
 
 class MoaValidityServiceTest extends TestCase
@@ -15,13 +15,13 @@ class MoaValidityServiceTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow('2026-10-12 12:00:00');
+        CarbonImmutable::setTestNow('2026-10-12 12:00:00');
         $this->service = new MoaValidityService();
     }
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
 
         parent::tearDown();
     }

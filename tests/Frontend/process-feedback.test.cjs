@@ -103,6 +103,7 @@ test('success requires server confirmation; business failures and validation err
     assert.equal(api.resultOf(200, null), null);
     assert.equal(api.resultOf(200, { answer: 'hello' }), null);
     assert.equal(api.resultOf(200, { success: true, message: 'Uploaded' }).type, 'success');
+    assert.equal(api.resultOf(200, { success: true, title: 'Upload successful', message: 'Uploaded' }).title, 'Upload successful');
     assert.equal(api.resultOf(200, { success: false, message: 'Duplicate' }).type, 'error');
     assert.equal(api.resultOf(422, { errors: { file: ['Only PDFs'], name: ['Required'] } }).message, 'Only PDFs\nRequired');
     assert.match(api.resultOf(419, null).message, /session expired/i);
@@ -173,18 +174,24 @@ test('ordinary forms preserve native submission and block repeated submits', () 
 test('file upload reports real transfer progress, waits for confirmation, then redirects', async () => {
     const e = environment(); e.run(); e.ready();
     const form = new e.Form('/uploadReq', [{ files: [{ name: 'requirements.pdf' }] }]);
+    form.dataset.uploadTitle = 'Validating requirement';
+    form.dataset.uploadDescription = 'Checking the requirement PDF securely.';
     const button = new e.Element(); button.name = 'action'; button.value = 'upload';
     let prevented = false;
     e.windowEvents.submit({ target: form, submitter: button, defaultPrevented: false, preventDefault() { prevented = true; } });
     assert.equal(prevented, true); assert.equal(form.nativeCalls, 0);
     const xhr = e.XHR.instances[0];
     assert.equal(xhr.headers['X-InternConnect-Upload'], '1'); assert.equal(xhr.body.fields[0][1], 'upload');
+    e.flush(180);
+    assert.equal(e.document.body.querySelector('h2').textContent, 'Validating requirement');
+    assert.equal(e.document.body.querySelector('p').textContent, 'Checking the requirement PDF securely.');
     xhr.uploadListeners.progress({ lengthComputable: true, loaded: 100, total: 100 });
     assert.equal(e.alerts.length, 0);
-    assert.match(e.document.body.querySelector('h2').textContent, /Processing uploaded file/);
-    xhr.status = 200; xhr.responseText = JSON.stringify({ success: true, message: 'Uploaded', redirect: '/student/files' }); xhr.emit('load');
+    assert.equal(e.document.body.querySelector('h2').textContent, 'Validating requirement');
+    xhr.status = 200; xhr.responseText = JSON.stringify({ success: true, title: 'Upload successful', message: 'Uploaded', redirect: '/student/files' }); xhr.emit('load');
     await Promise.resolve();
     assert.equal(button.disabled, false); assert.match(e.alerts[0].text, /requirements.pdf/);
+    assert.equal(e.alerts[0].title, 'Upload successful');
     assert.equal(e.location.assigned, 'http://localhost/student/files');
 });
 

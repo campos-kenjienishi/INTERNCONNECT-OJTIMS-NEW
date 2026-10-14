@@ -71,6 +71,7 @@ class ProcessFeedbackTest extends TestCase
         });
         $this->assertSame(200, $response->getStatusCode());
         $this->assertTrue($response->getData(true)['success']);
+        $this->assertSame('Completed successfully', $response->getData(true)['title']);
         $this->assertStringEndsWith('/student/files', $response->getData(true)['redirect']);
     }
 
@@ -98,15 +99,53 @@ class ProcessFeedbackTest extends TestCase
 
     public function test_dev_upload_and_renewal_flash_keys_are_supported(): void
     {
-        foreach (['upload_success' => true, 'renewal_success' => true, 'upload_error' => false, 'renewal_error' => false] as $key => $success) {
+        $cases = [
+            'upload_success' => [true, 'Upload successful'],
+            'renewal_success' => [true, 'MOA renewed'],
+            'upload_error' => [false, 'Upload rejected'],
+            'renewal_error' => [false, 'Renewal rejected'],
+        ];
+
+        foreach ($cases as $key => [$success, $title]) {
             $request = $this->uploadRequest();
             $response = (new InjectProcessFeedback)->handle($request, function () use ($request, $key) {
                 $request->session()->flash($key, 'Document processing result');
                 return redirect('/student/company');
             });
             $this->assertSame($success, $response->getData(true)['success']);
+            $this->assertSame($title, $response->getData(true)['title']);
             $this->assertSame($success ? 200 : 422, $response->getStatusCode());
         }
+    }
+
+    public function test_specific_renewal_feedback_takes_priority_over_generic_success(): void
+    {
+        $request = $this->uploadRequest();
+        $response = (new InjectProcessFeedback)->handle($request, function () use ($request) {
+            $request->session()->flash('success', 'MOA renewed successfully.');
+            $request->session()->flash('upload_success', 'The renewed PDF passed validation.');
+            $request->session()->flash('renewal_success', 'The MOA renewal was recorded successfully.');
+
+            return redirect('/MOA');
+        });
+
+        $this->assertSame('MOA renewed', $response->getData(true)['title']);
+        $this->assertSame('The MOA renewal was recorded successfully.', $response->getData(true)['message']);
+    }
+
+    public function test_explicit_upload_header_keeps_json_contract_when_php_has_no_parsed_file(): void
+    {
+        $request = $this->uploadRequest();
+        $request->files->remove('file');
+        $response = (new InjectProcessFeedback)->handle($request, function () use ($request) {
+            $request->session()->flash('upload_error', 'The upload exceeded the server limit.');
+
+            return redirect('/student/files');
+        });
+
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame('Upload rejected', $response->getData(true)['title']);
+        $this->assertSame('The upload exceeded the server limit.', $response->getData(true)['message']);
     }
 
     public function test_upload_validation_and_business_failures_preserve_error_messages(): void
@@ -117,6 +156,7 @@ class ProcessFeedbackTest extends TestCase
         });
         $this->assertSame(422, $response->getStatusCode());
         $this->assertFalse($response->getData(true)['success']);
+        $this->assertSame('Upload rejected', $response->getData(true)['title']);
         $this->assertSame('Only PDF files are accepted.', $response->getData(true)['message']);
         $response = (new InjectProcessFeedback)->handle($request, function () use ($request) {
             $request->session()->flash('fail', 'Requirement already submitted.');

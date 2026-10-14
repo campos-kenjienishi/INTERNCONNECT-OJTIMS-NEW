@@ -46,6 +46,7 @@
         return { mode: 'toast', title: 'Saving changes…' };
     }
     function resultOf(status, data) {
+        const title = data && typeof data.title === 'string' && data.title.trim() ? data.title.trim() : null;
         if (status < 200 || status >= 300 || (data && (data.success === false || data.success === 0
             || data.status === false || data.status === 'error' || data.status === 'failed' || data.error))) {
             let message = data && (data.message || (typeof data.error === 'string' ? data.error : ''));
@@ -53,13 +54,13 @@
             if (status === 419) message = 'Your session expired. Refresh the page before trying again.';
             if (status === 401) message = 'Please sign in again to continue.';
             if (status === 413) message = 'This file is too large. Choose a smaller file and try again.';
-            return { type: 'error', message: String(message || (status === 0
+            return { type: 'error', title, message: String(message || (status === 0
                 ? 'Connection interrupted. Check your connection and try again.'
                 : 'The request could not be completed. Please try again.')) };
         }
         // HTML redirects, HTTP 200 alone, and unconfirmed payloads are not success.
         if (data && (data.success === true || typeof data.message === 'string')) {
-            return { type: 'success', message: data.message || 'Changes saved successfully.' };
+            return { type: 'success', title, message: data.message || 'Changes saved successfully.' };
         }
         return null;
     }
@@ -102,9 +103,10 @@
     }
     function showResult(result, mode) {
         patchSwal();
+        const title = result.title || (result.type === 'success' ? 'Completed successfully' : 'Unable to complete');
         if (window.Swal) {
             return window.Swal.fire({
-                icon: result.type, title: result.type === 'success' ? 'Completed successfully' : 'Unable to complete',
+                icon: result.type, title,
                 text: result.message, toast: mode === 'toast', position: mode === 'toast' ? 'top-end' : 'center',
                 showConfirmButton: mode !== 'toast', confirmButtonText: 'Okay',
                 timer: mode === 'toast' && result.type !== 'error' ? 4500 : undefined,
@@ -132,7 +134,7 @@
             dialog.setAttribute('role', 'dialog'); dialog.setAttribute('aria-modal', 'true'); dialog.setAttribute('aria-labelledby', 'ic-feedback-result-title');
             const panel = document.createElement('div'); panel.className = 'ic-feedback-panel';
             panel.appendChild(textElement('div', result.type === 'success' ? '✓' : '!', 'ic-feedback-result-icon' + (result.type === 'error' ? ' is-error' : '')));
-            const title = textElement('h2', result.type === 'success' ? 'Completed successfully' : 'Unable to complete'); title.id = 'ic-feedback-result-title'; panel.appendChild(title);
+            const titleElement = textElement('h2', title); titleElement.id = 'ic-feedback-result-title'; panel.appendChild(titleElement);
             panel.appendChild(textElement('p', result.message));
             const close = textElement('button', 'Okay', 'ic-feedback-dismiss'); close.type = 'button';
             const dismiss = () => { dialog.remove(); dialog = null; previous?.focus(); resolve(); };
@@ -276,7 +278,9 @@
             // Construct before disabling the submitter; preserve multipart fields and CSRF.
             const body = new FormData(form);
             if (submitter?.name) body.append(submitter.name, submitter.value);
-            const op = begin({ ...info, title: 'Uploading file…', mode: 'modal', progress: 0 }, form, submitter);
+            const uploadTitle = form.dataset.uploadTitle || 'Uploading file…';
+            const uploadDescription = form.dataset.uploadDescription || 'Checking the file type, structure, size, and security requirements. Please keep this page open.';
+            const op = begin({ ...info, title: uploadTitle, description: uploadDescription, mode: 'modal', progress: 0 }, form, submitter);
             busyForms.set(form, op);
             const xhr = new XMLHttpRequest(); xhr.__icOwnUpload = true;
             xhr.open('POST', form.action || location.href);
@@ -285,8 +289,8 @@
             xhr.upload.addEventListener('progress', event => {
                 if (!event.lengthComputable) return;
                 op.progress = Math.round(event.loaded / event.total * 100);
-                op.title = op.progress >= 100 ? 'Processing uploaded file…' : 'Uploading file…';
-                op.description = op.progress >= 100 ? 'Upload transferred. Waiting for server confirmation.' : `${op.progress}% transferred`;
+                op.title = op.progress >= 100 ? uploadTitle : 'Uploading file…';
+                op.description = op.progress >= 100 ? uploadDescription : `${op.progress}% transferred`;
                 renderLoading();
             });
             xhr.addEventListener('load', () => {
