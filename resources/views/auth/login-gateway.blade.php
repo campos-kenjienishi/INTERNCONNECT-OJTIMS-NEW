@@ -34,18 +34,20 @@
 </head>
 
 <body class="auth-centered-page">
-    <a class="back-to-landing" href="{{ route('landing') }}">
-        <i class="fa fa-arrow-left"></i>
-        Back to Landing Page
-    </a>
 <div class="main-wrapper">
     <div class="login-container">
         <!-- RIGHT PANEL / CARD -->
         <div class="right-panel">
-            <div id="topBackBtnWrap" style="width: 100%; margin-bottom: 12px; text-align: left; display: none;">
-                <button type="button" class="btn-switch-portal" onclick="resetPortalSelection()">
-                    <i class="fa fa-arrow-left"></i> Change User Portal
-                </button>
+            <div class="auth-card-navigation">
+                <div id="topBackBtnWrap" style="display: none;">
+                    <button type="button" class="btn-switch-portal" onclick="resetPortalSelection()" aria-label="Change User Portal" title="Change User Portal">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                        <span>Change User Portal</span>
+                    </button>
+                </div>
+                <a class="back-to-landing" href="{{ route('landing') }}" aria-label="Back to Landing Page" title="Back to Landing Page">
+                    <i class="fa fa-home" aria-hidden="true"></i>
+                </a>
             </div>
 
             <div class="auth-brand">

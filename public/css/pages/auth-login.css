@@ -81,6 +81,49 @@ body::after {
     transform: translateX(-2px);
 }
 
+.auth-card-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.auth-card-navigation .back-btn-pill {
+    min-width: 0;
+    white-space: normal !important;
+}
+
+body.auth-centered-page .auth-home-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    border-radius: 14px;
+    border: 1px solid rgba(248, 198, 43, 0.35);
+    color: #fbbf24 !important;
+    background: linear-gradient(180deg, rgba(248, 198, 43, 0.2), rgba(255, 255, 255, 0.06));
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+    font-size: 20px;
+    text-decoration: none !important;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+body.auth-centered-page .auth-home-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(248, 198, 43, 0.25);
+    border-color: #fbbf24;
+}
+
+.auth-home-btn:focus-visible {
+    outline: 3px solid #fbbf24;
+    outline-offset: 4px;
+}
+
 body.auth-centered-page {
     position: relative !important;
     min-height: 100vh !important;

@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
     <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
-<body>
+<body class="landing-page">
     <header class="topbar">
     <div class="topbar-inner">
         <div class="brand">
@@ -177,6 +177,99 @@
                     </div>
                 </article>
             </div>
+
+            <!-- ==================== BUD AI VIRTUAL ASSISTANT SHOWCASE ==================== -->
+            <div class="bud-spotlight-card reveal" data-reveal="slide">
+                <div class="bud-spotlight-glow" aria-hidden="true"></div>
+
+                <div class="bud-spotlight-layout">
+                    <!-- LEFT COLUMN: Introductory Statements & Features -->
+                    <div class="bud-spotlight-content">
+                        <div class="bud-pill-badge">
+                            <i class="fa fa-paw" aria-hidden="true"></i>
+                            <span>MEET BUD &bull; YOUR OJT BUDDY</span>
+                        </div>
+
+                        <h3 class="bud-spotlight-title">
+                            A little guidance.<br>
+                            <span>A smoother OJT journey.</span>
+                        </h3>
+
+                        <p class="bud-spotlight-desc">
+                            Meet <strong>Bud</strong>, your always-ready companion inside InternConnect. Get clear answers, find your next step, and navigate your internship with confidence.
+                        </p>
+
+                        <div class="bud-feature-grid">
+                            <div class="bud-feature-item">
+                                <div class="bud-feature-icon">
+                                    <i class="fa fa-comments"></i>
+                                </div>
+                                <div class="bud-feature-text">
+                                    <h4>Instant OJT Q&A</h4>
+                                    <p>Clear answers on requirements, MOA, OJT hours, and clearance.</p>
+                                </div>
+                            </div>
+
+                            <div class="bud-feature-item">
+                                <div class="bud-feature-icon">
+                                    <i class="fa fa-language"></i>
+                                </div>
+                                <div class="bud-feature-text">
+                                    <h4>Your Language, Your Pace</h4>
+                                    <p>Ask in English, Tagalog, or Taglish. Bud understands.</p>
+                                </div>
+                            </div>
+
+                            <div class="bud-feature-item">
+                                <div class="bud-feature-icon">
+                                    <i class="fa fa-compass"></i>
+                                </div>
+                                <div class="bud-feature-text">
+                                    <h4>Step-by-Step Navigation</h4>
+                                    <p>Find your way through profile syncing, rooms, and evaluations.</p>
+                                </div>
+                            </div>
+
+                            <div class="bud-feature-item">
+                                <div class="bud-feature-icon">
+                                    <i class="fa fa-user-shield"></i>
+                                </div>
+                                <div class="bud-feature-text">
+                                    <h4>Guidance for Your Role</h4>
+                                    <p>Support for students, class advisers, and OJT coordinators.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bud-spotlight-footer">
+                            <a href="{{ route('login.gateway') }}" class="bud-try-btn">
+                                <i class="fa fa-paw"></i>
+                                <span>Try Bud in the Portal</span>
+                                <i class="fa fa-arrow-right"></i>
+                            </a>
+                            <div class="bud-live-status">
+                                <span class="bud-pulse-dot"></span>
+                                <span>Available 24/7 in all portals</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Unobstructed mascot illustration -->
+                    <div class="bud-spotlight-visual">
+                        <div class="bud-mascot-wrapper">
+                            <!-- Decorative Halo Ring Backdrop -->
+                            <div class="bud-halo-ring" aria-hidden="true"></div>
+                            <div class="bud-halo-glow" aria-hidden="true"></div>
+
+                            <!-- Mascot Image -->
+                            <button type="button" class="bud-img-container" aria-label="Toggle Bud's cheering pose" aria-pressed="false" data-bud-toggle data-bud-original="{{ vasset('images/mascot/bud_happy_wave.png') }}" data-bud-cheering="{{ vasset('images/mascot/bud_cheering.png') }}">
+                                <img src="{{ vasset('images/mascot/bud_happy_wave.png') }}" alt="Bud, your friendly OJT buddy, waving hello" class="bud-mascot-img" loading="lazy" decoding="async" width="420" height="420" draggable="false">
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -303,6 +396,7 @@
                 </a>
             </div>
         </div>
+    </footer>
     <script src="{{ vasset('js/pages/landing-page.js') }}"></script>
     <script src="{{ vasset('js/components/chatbot-widget.js') }}"></script>
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
