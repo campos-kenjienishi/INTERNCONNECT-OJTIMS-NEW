@@ -377,10 +377,10 @@
                             <th>Company Name</th>
                             <th>Address</th>
                             <th>Representative</th>
-                            <th>Contact No.</th>
+                            <th class="contact-column">Contact No.</th>
                             <th>Email</th>
                             <th>Validity</th>
-                            <th>Status</th>
+                            <th class="status-column">Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -431,10 +431,10 @@
                                     <span class="rep-name-text">{{ $company->company_rep }}</span>
                                 </div>
                             </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <i class="fa fa-phone" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
-                                    {{ $company->companyNo }}
+                            <td class="contact-cell">
+                                <div class="contact-wrap">
+                                    <i class="fa fa-phone"></i>
+                                    <span>{{ $company->companyNo ?: '—' }}</span>
                                 </div>
                             </td>
                             <td class="email-cell">
@@ -449,7 +449,7 @@
                                     {{ $validUntil ? $validUntil->format('M d, Y') : 'N/A' }}
                                 </div>
                             </td>
-                            <td>
+                            <td class="status-cell">
                                 @if($status === 'Active')
                                     <span class="badge-active"><i class="fa fa-circle"></i> Active</span>
                                 @elseif($status === 'Expiring Soon')
