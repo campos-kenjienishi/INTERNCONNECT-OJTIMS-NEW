@@ -1,6 +1,10 @@
 (function () {
     'use strict';
 
+    // The shared client owns progress, recovery and completion when available.
+    // Keep this implementation as the fallback for standalone pages.
+    if (window.InternConnectFeedback) return;
+
     const forms = new Set();
 
     function hasSelectedFile(form) {

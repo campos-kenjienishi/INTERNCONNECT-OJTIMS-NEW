@@ -579,7 +579,8 @@ class EvaluationController extends Controller
             $requestRow->student_id
         );
 
-        return redirect()->route('evaluation.form.thankyou');
+        return redirect()->route('evaluation.form.thankyou')
+            ->with('success', 'Your evaluation was submitted successfully.');
     }
 
     protected function validateSupervisorPayload(Request $request, OjtEvaluationRequest $requestRow, $isReviewStep = true)

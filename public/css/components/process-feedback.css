@@ -1,0 +1,108 @@
+/* Shared process feedback across all InternConnect portals. */
+:root {
+    --ic-feedback-bg: #fff;
+    --ic-feedback-text: #1e293b;
+    --ic-feedback-muted: #64748b;
+    --ic-feedback-border: #e2e8f0;
+    --ic-feedback-accent: #8f1111;
+}
+html.dark-mode, body.dark-mode {
+    --ic-feedback-bg: #181b21;
+    --ic-feedback-text: #f3f4f6;
+    --ic-feedback-muted: #cbd5e1;
+    --ic-feedback-border: #354052;
+    --ic-feedback-accent: #f8c62b;
+}
+.ic-feedback-loading {
+    position: fixed; inset: 0; z-index: 1055;
+    display: grid; place-items: center; padding: 20px;
+    background: rgba(15, 18, 25, .46);
+    font-family: 'Poppins', sans-serif;
+}
+.ic-feedback-loading[hidden], .ic-feedback-dialog[hidden] { display: none; }
+/* Existing confirmations and result dialogs remain above the loading surface. */
+body:has(.swal2-container:not(.swal2-top-end):not(.swal2-top-start)) .ic-feedback-loading { visibility: hidden; }
+.ic-feedback-panel {
+    width: min(100%, 370px); padding: 30px; text-align: center;
+    border: 1px solid var(--ic-feedback-border); border-radius: 20px;
+    background: var(--ic-feedback-bg); color: var(--ic-feedback-text);
+    box-shadow: 0 24px 80px rgba(0,0,0,.24);
+}
+.ic-feedback-panel h2, .ic-feedback-popup .swal2-title {
+    color: var(--ic-feedback-text) !important;
+    font-size: 20px !important; font-weight: 700; margin: 16px 0 8px;
+}
+.ic-feedback-panel p, .ic-feedback-popup .swal2-html-container {
+    color: var(--ic-feedback-muted) !important;
+    font-size: 14px; line-height: 1.65; margin: 0;
+}
+.ic-feedback-spinner {
+    display: inline-block; width: 38px; height: 38px;
+    border: 3px solid var(--ic-feedback-border);
+    border-top-color: var(--ic-feedback-accent); border-radius: 50%;
+    animation: icFeedbackSpin .8s linear infinite;
+}
+.ic-feedback-button-spinner {
+    display: inline-block; width: 14px; height: 14px; flex-shrink: 0;
+    border: 2px solid currentColor; border-right-color: transparent;
+    border-radius: 50%; margin-right: 8px; vertical-align: middle;
+    animation: icFeedbackSpin .8s linear infinite;
+}
+[data-ic-busy] { cursor: wait !important; }
+.ic-feedback-progress { width: 100%; height: 7px; margin-top: 18px; accent-color: #8f1111; }
+.ic-feedback-progress[hidden] { display: none; }
+.ic-feedback-popup.swal2-popup {
+    background: var(--ic-feedback-bg) !important; color: var(--ic-feedback-text) !important;
+    border: 1px solid var(--ic-feedback-border); border-radius: 20px !important;
+    font-family: 'Poppins', sans-serif;
+}
+.ic-feedback-confirm, .ic-feedback-dismiss {
+    background: #8f1111 !important; color: #fff !important;
+    border: 0; border-radius: 10px !important; padding: 11px 24px;
+    font: 600 14px 'Poppins', sans-serif; cursor: pointer;
+}
+.ic-feedback-cancel { background: #475569 !important; border-radius: 10px !important; }
+.ic-feedback-confirm:focus-visible, .ic-feedback-dismiss:focus-visible { outline: 3px solid #f8c62b; outline-offset: 3px; }
+.ic-feedback-dialog {
+    position: fixed; inset: 0; z-index: 11000; display: grid;
+    place-items: center; padding: 20px; background: rgba(15,18,25,.55);
+    font-family: 'Poppins', sans-serif;
+}
+.ic-feedback-result-icon {
+    display: grid; place-items: center; margin: 0 auto;
+    width: 58px; height: 58px; border-radius: 50%;
+    background: #dcfce7; color: #15803d; font-size: 30px;
+}
+.ic-feedback-result-icon.is-error { background: #fee2e2; color: #b91c1c; }
+.ic-feedback-dialog .ic-feedback-dismiss { margin-top: 22px; }
+.ic-feedback-toasts {
+    position: fixed; top: 20px; right: 20px; z-index: 11001;
+    width: min(380px, calc(100vw - 40px)); display: grid; gap: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+.ic-feedback-toast {
+    display: flex; align-items: center; gap: 12px; padding: 15px 18px;
+    color: var(--ic-feedback-text); background: var(--ic-feedback-bg);
+    border: 1px solid var(--ic-feedback-border); border-left: 4px solid #16a34a;
+    border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    font-size: 13px; line-height: 1.6;
+}
+.ic-feedback-toast.is-error { border-left-color: #dc2626; }
+.ic-feedback-toast button {
+    background: transparent; color: var(--ic-feedback-muted); border: 0;
+    padding: 6px; margin-left: auto; cursor: pointer; font-size: 20px;
+}
+.ic-feedback-skeleton { position: relative; min-height: 100px; }
+.ic-feedback-skeleton::after {
+    content: ''; position: absolute; inset: 0; z-index: 3; border-radius: inherit;
+    background: linear-gradient(100deg, transparent 25%, rgba(148,163,184,.18) 50%, transparent 75%),
+        repeating-linear-gradient(180deg, var(--ic-feedback-bg) 0 16px, var(--ic-feedback-border) 16px 30px, var(--ic-feedback-bg) 30px 46px);
+    background-size: 200% 100%, 100% 100%;
+    animation: icFeedbackShimmer 1.5s linear infinite;
+    pointer-events: none;
+}
+@keyframes icFeedbackSpin { to { transform: rotate(360deg); } }
+@keyframes icFeedbackShimmer { to { background-position: -200% 0, 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+    .ic-feedback-spinner, .ic-feedback-button-spinner, .ic-feedback-skeleton::after { animation: none; }
+}
