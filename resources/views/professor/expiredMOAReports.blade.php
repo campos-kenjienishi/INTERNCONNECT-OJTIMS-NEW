@@ -374,12 +374,12 @@
                     <thead>
                         <tr>
                             <th>id</th>
-                            <th>Company Name</th>
-                            <th>Address</th>
-                            <th>Representative</th>
+                            <th class="company-name-column">Company Name</th>
+                            <th class="address-column">Address</th>
+                            <th class="representative-column">Representative</th>
                             <th class="contact-column">Contact No.</th>
-                            <th>Email</th>
-                            <th>Validity</th>
+                            <th class="email-column">Email</th>
+                            <th class="validity-column">Validity</th>
                             <th class="status-column">Status</th>
                             <th>Actions</th>
                         </tr>
@@ -419,7 +419,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
+                            <td class="company-address-cell">
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <i class="fa fa-map-marker-alt" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
                                     {{ $company->company_address }}
@@ -443,7 +443,7 @@
                                     {{ $company->company_email }}
                                 </div>
                             </td>
-                            <td>
+                            <td class="validity-cell">
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <i class="fa fa-calendar" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
                                     {{ $validUntil ? $validUntil->format('M d, Y') : 'N/A' }}

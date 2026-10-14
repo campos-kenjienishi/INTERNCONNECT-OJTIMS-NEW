@@ -391,12 +391,12 @@
                     <thead>
                         <tr>
                             <th style="display:none;">ID</th>
-                            <th>Company Name</th>
-                            <th>Company Address</th>
-                            <th>Representative</th>
+                            <th class="company-name-column">Company Name</th>
+                            <th class="address-column">Company Address</th>
+                            <th class="representative-column">Representative</th>
                             <th class="contact-column">Contact No.</th>
-                            <th>Email</th>
-                            <th>Validity</th>
+                            <th class="email-column">Email</th>
+                            <th class="validity-column">Validity</th>
                             <th class="status-column">Status</th>
                         </tr>
                     </thead>
@@ -420,7 +420,7 @@
                         @endphp
                         <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}" data-moa-status="{{ $validity['status'] }}" data-days-remaining="{{ $daysRemaining }}">
                             <td style="display:none;">{{ $company->id }}</td>
-                            <td>
+                            <td class="company-name-cell">
                                 <div class="company-cell">
                                     <div class="company-avatar"><i class="fa fa-building"></i></div>
                                     <span class="company-name-text">{{ $company->company_name }}</span>
@@ -448,7 +448,7 @@
                                     <span>{{ $company->company_email ?: '—' }}</span>
                                 </div>
                             </td>
-                            <td>
+                            <td class="validity-cell">
                                 <span class="school-year-badge">
                                     <i class="fa fa-calendar-alt" style="font-size:10px;"></i>
                                     {{ $validUntil ? $validUntil->format('M d, Y') : 'N/A' }}

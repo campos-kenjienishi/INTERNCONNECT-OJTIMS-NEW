@@ -217,7 +217,7 @@
             font-size: 13px;
         }
         .table-card-body { padding-bottom: 8px !important; }
-        .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
+        .table-card-body table.dataTable { width: 100% !important; min-width: 1275px; border-collapse: collapse; table-layout: fixed; }
         .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap; }
         .table-card-body table.dataTable tbody td { padding: 12px 12px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
@@ -242,16 +242,22 @@
         .company-avatar { width: 32px; height: 32px; border-radius: 9px; background: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 13px; flex-shrink: 0; }
         .company-name-text { font-weight: 600; color: #1a1a1a; font-size: 13px; }
         .company-name-cell { color: #1a1a1a !important; }
-        .company-address-cell { max-width: 160px; word-break: break-word; font-size: 12.5px; }
-        .company-rep-cell { max-width: 175px; word-break: break-word; font-size: 12px; line-height: 1.45; }
+        .table-card-body table.dataTable .company-name-column,
+        .table-card-body table.dataTable .company-name-cell { width: 180px !important; }
+        .table-card-body table.dataTable .address-column,
+        .table-card-body table.dataTable .company-address-cell { width: 220px !important; }
+        .table-card-body table.dataTable .representative-column,
+        .table-card-body table.dataTable .company-rep-cell { width: 170px !important; }
+        .company-address-cell { overflow-wrap: anywhere; word-break: normal; font-size: 12px; line-height: 1.45; }
+        .company-rep-cell { overflow-wrap: anywhere; word-break: normal; font-size: 12px; line-height: 1.45; }
         .rep-wrap { display: flex; align-items: flex-start; gap: 6px; }
         .rep-wrap i { color: var(--red); font-size: 11px; margin-top: 3px; flex-shrink: 0; }
         .rep-name-text { font-size: 12px; font-weight: 500; color: #374151; line-height: 1.45; }
         .table-card-body table.dataTable thead th.contact-column,
         .table-card-body table.dataTable tbody td.contact-cell {
-            width: 165px !important;
-            min-width: 165px;
-            max-width: 165px;
+            width: 175px !important;
+            min-width: 175px;
+            max-width: 175px;
         }
         .contact-wrap {
             display: flex;
@@ -266,9 +272,11 @@
         .contact-wrap i { color: var(--red); font-size: 10px; flex-shrink: 0; }
         .contact-wrap span { overflow-wrap: anywhere; word-break: normal; }
         .table-card-body table.dataTable tbody td.email-cell {
-            max-width: 175px;
-            width: 175px;
+            width: 200px !important;
+            min-width: 200px;
+            max-width: 200px;
         }
+        .table-card-body table.dataTable thead th.email-column { width: 200px !important; }
         .email-wrap {
             display: flex;
             align-items: flex-start;
@@ -277,7 +285,7 @@
             line-height: 1.45;
             white-space: normal;
             overflow-wrap: anywhere;
-            word-break: break-all;
+            word-break: normal;
         }
         .email-wrap i {
             color: var(--red);
@@ -286,15 +294,20 @@
             flex-shrink: 0;
         }
         .email-wrap span {
-            word-break: break-all;
+            word-break: normal;
             overflow-wrap: anywhere;
             min-width: 0;
+        }
+        .table-card-body table.dataTable thead th.validity-column,
+        .table-card-body table.dataTable tbody td.validity-cell {
+            width: 120px !important;
+            min-width: 120px;
         }
         .school-year-badge { display: inline-flex; align-items: center; gap: 5px; background: #fef9c3; color: #ca8a04; border-radius: 20px; padding: 3px 10px; font-size: 11.5px; font-weight: 600; }
         .table-card-body table.dataTable thead th.status-column,
         .table-card-body table.dataTable tbody td.status-cell {
-            width: 190px !important;
-            min-width: 190px;
+            width: 210px !important;
+            min-width: 210px;
         }
         .status-cell { font-size: 12px !important; line-height: 1.4; }
         .status-cell .badge-active,
@@ -474,7 +487,7 @@ body.dark-mode .card { background: #2a2a2a; border: 1px solid #3a3a3a; }
 }
 
 .table-card-body table.dataTable {
-    min-width: 900px;
+    min-width: 1275px;
     margin: 0 !important;
 }
 
