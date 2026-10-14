@@ -105,7 +105,7 @@
             @if($user && !empty($user->profile_photo))
                 <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Profile">
             @else
-                <i class="fa {{ $role === 'coordinator' ? 'fa-user-tie' : 'fa-user' }}"></i>
+                <i class="fa {{ $role === 'student' ? 'fa-user-graduate' : 'fa-user-tie' }}"></i>
             @endif
         </div>
         <div class="user-info">
