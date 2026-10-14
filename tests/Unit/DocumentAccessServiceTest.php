@@ -3,7 +3,9 @@
 namespace Tests\Unit;
 
 use App\Models\Company;
+use App\Models\CompletionCertificate;
 use App\Models\FileRequirement;
+use App\Models\Professor;
 use App\Models\Student;
 use App\Models\UploadedFile;
 use App\Models\User;
@@ -70,6 +72,33 @@ class DocumentAccessServiceTest extends TestCase
 
         $this->assertTrue($this->service()->canAccessMoa($user, $linkedCompany));
         $this->assertFalse($this->service()->canAccessMoa($user, $otherCompany));
+    }
+
+    public function test_completion_certificate_access_is_owner_professor_or_coordinator_scoped(): void
+    {
+        $studentProfile = new Student(['adviser_name' => 'Professor Assigned']);
+        $certificate = new CompletionCertificate([
+            'student_user_id' => 50,
+            'professor_id' => 7,
+        ]);
+        $certificate->setRelation('student', $studentProfile);
+
+        $student = $this->user(0, 50, 'Student Owner');
+        $otherStudent = $this->user(0, 51, 'Other Student');
+        $professor = $this->user(2, 60, 'Professor Assigned');
+        $professorProfile = new Professor;
+        $professorProfile->id = 7;
+        $professor->setRelation('professorInfo', $professorProfile);
+        $otherProfessor = $this->user(2, 61, 'Other Professor');
+        $otherProfessorProfile = new Professor;
+        $otherProfessorProfile->id = 8;
+        $otherProfessor->setRelation('professorInfo', $otherProfessorProfile);
+
+        $this->assertTrue($this->service()->canAccessCompletionCertificate($student, $certificate));
+        $this->assertFalse($this->service()->canAccessCompletionCertificate($otherStudent, $certificate));
+        $this->assertTrue($this->service()->canAccessCompletionCertificate($professor, $certificate));
+        $this->assertFalse($this->service()->canAccessCompletionCertificate($otherProfessor, $certificate));
+        $this->assertTrue($this->service()->canAccessCompletionCertificate($this->user(1), $certificate));
     }
 
     public function test_unlinked_students_can_preview_active_course_matching_moas(): void

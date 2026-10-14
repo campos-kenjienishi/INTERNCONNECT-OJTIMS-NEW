@@ -88,6 +88,11 @@
             <span class="nav-label">MOA</span>
             <span class="tooltip-label">MOA</span>
         </a>
+        <a href="{{ route('coordinator.completion-certificates.index') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-certificate"></i></span>
+            <span class="nav-label">COC Validation</span>
+            <span class="tooltip-label">COC Validation</span>
+        </a>
         <div class="nav-group-reports">
             <a href="{{ url('/reports') }}" class="nav-item nav-item-reports">
                 <span class="nav-icon"><i class="fa fa-chart-bar"></i></span>

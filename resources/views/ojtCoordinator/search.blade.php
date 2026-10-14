@@ -88,6 +88,14 @@
                         <span class="title">MOA</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('coordinator.completion-certificates.index') }}">
+                        <span class="icon">
+                            <ion-icon name="ribbon-outline"></ion-icon>
+                        </span>
+                        <span class="title">COC Validation</span>
+                    </a>
+                </li>
 
 
                 

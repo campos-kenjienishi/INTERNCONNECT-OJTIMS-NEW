@@ -128,6 +128,14 @@
                             <span class="title">Requirements</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('student.completion-certificate.index') }}">
+                            <span class="icon">
+                                <ion-icon name="ribbon-outline"></ion-icon>
+                            </span>
+                            <span class="title">Completion Certificate</span>
+                        </a>
+                    </li>
 
                     <li>
                         <a href="{{ url('/logout') }}">

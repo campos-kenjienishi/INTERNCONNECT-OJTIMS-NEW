@@ -564,6 +564,9 @@ public function requirementStatusClasses()
     $monitoredCategoryNames = $professor
         ? FileCategory::where('professor_id', $professor->id)->pluck('fileName')->values()
         : collect();
+    $monitoredCategoryNames = $monitoredCategoryNames
+        ->reject(fn ($name) => in_array(mb_strtolower(trim((string) $name)), ['certificate of completion', 'completion certificate'], true))
+        ->values();
 
     if (!$monitoredCategoryNames->map(fn ($n) => mb_strtolower(trim((string) $n)))->contains('notarized moa')) {
         $monitoredCategoryNames->push('Notarized MOA');
@@ -606,6 +609,7 @@ public function requirementStatusClasses()
                     ->orWhere('adviser', '');
             })
             ->whereIn('uploadedBy', $studentNames)
+            ->whereRaw("LOWER(TRIM(fileName)) NOT IN ('certificate of completion', 'completion certificate')")
             ->select('uploadedBy', 'fileName')
             ->get()
             ->groupBy('uploadedBy');
@@ -696,6 +700,7 @@ public function requirementStatus(Request $request, $roomId)
         : collect();
 
     $categories = $categories
+        ->reject(fn ($category) => in_array(mb_strtolower(trim((string) $category->fileName)), ['certificate of completion', 'completion certificate'], true))
         ->sortBy('fileName', SORT_NATURAL | SORT_FLAG_CASE)
         ->values();
 
@@ -733,6 +738,7 @@ public function requirementStatus(Request $request, $roomId)
                 ->orWhere('adviser', '');
         })
         ->whereIn('uploadedBy', $students->pluck('full_name')->filter()->values())
+        ->whereRaw("LOWER(TRIM(fileName)) NOT IN ('certificate of completion', 'completion certificate')")
         ->get()
         ->groupBy('uploadedBy');
 

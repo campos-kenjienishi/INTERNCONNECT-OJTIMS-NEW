@@ -47,6 +47,11 @@ class Student extends Model
         return $this->belongsTo(Professor::class, 'adviser_name', 'full_name');
     }
 
+    public function completionCertificates()
+    {
+        return $this->hasMany(CompletionCertificate::class);
+    }
+
     protected function getNameAttributeFromUser(string $column, $fallback = null)
     {
         $user = $this->relationLoaded('user') ? $this->user : $this->user()->first();
