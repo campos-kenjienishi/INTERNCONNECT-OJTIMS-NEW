@@ -373,32 +373,19 @@
             <div class="table-card-body">
                 <div class="table-scroll">
                     <table id="fileTable" class="display ojt-report-table" style="width:100%">
-                        <colgroup>
-                            <col class="col-student">
-                            <col class="col-program">
-                            <col class="col-section">
-                            <col class="col-company">
-                            <col class="col-department">
-                            <col class="col-role">
-                            <col class="col-date">
-                            <col class="col-date">
-                            <col class="col-reporting-time">
-                            <col class="col-contact-name">
-                            <col class="col-contact-number">
-                        </colgroup>
                         <thead>
                             <tr>
-                                <th>Student Name</th>
-                                <th>Program / Major</th>
-                                <th>Section</th>
-                                <th>Company Name</th>
-                                <th>Assigned Dept.</th>
-                                <th>Role</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Reporting Time</th>
-                                <th>Contact Name</th>
-                                <th>Contact No.</th>
+                                <th class="student-name-column">Student Name</th>
+                                <th class="program-column">Program / Major</th>
+                                <th class="section-column">Section</th>
+                                <th class="company-column">Company Name</th>
+                                <th class="department-column">Assigned Dept.</th>
+                                <th class="role-column">Role</th>
+                                <th class="date-column">Start Date</th>
+                                <th class="date-column">End Date</th>
+                                <th class="reporting-time-column">Reporting Time</th>
+                                <th class="contact-name-column">Contact Name</th>
+                                <th class="contact-number-column">Contact No.</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -408,27 +395,31 @@
                                     data-section="{{ $data['student']->year_and_section ?? '' }}"
                                     data-department="{{ $data['ojt']->assigned_department ?? '' }}"
                                     data-role="{{ $data['ojt']->student_role ?? '' }}">
-                                    <td>
+                                    <td class="student-name-cell">
                                         <div class="name-cell">
                                             <div class="name-avatar">{{ strtoupper(substr($data['student']->full_name, 0, 1)) }}</div>
                                             <span class="name-text">{{ $data['student']->full_name }}</span>
                                         </div>
                                     </td>
-                                    <td>{{ $data['student']->course ?? '—' }}</td>
-                                    <td>{{ $data['student']->year_and_section ?? '—' }}</td>
-                                    <td>
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                    <td class="program-cell">{{ $data['student']->course ?? '—' }}</td>
+                                    <td class="section-cell">{{ $data['student']->year_and_section ?? '—' }}</td>
+                                    <td class="company-name-cell">
+                                        <div class="ojt-company-wrap">
                                             <i class="fa fa-building" style="color:var(--red); font-size:11px;"></i>
                                             {{ $data['ojt']->company_name }}
                                         </div>
                                     </td>
-                                    <td>{{ $data['ojt']->assigned_department ?? '' }}</td>
-                                    <td>{{ $data['ojt']->student_role ?? '' }}</td>
-                                    <td><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date }}</span></td>
-                                    <td><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date }}</span></td>
-                                    <td class="report-time-cell" style="white-space:nowrap;"><i class="fa fa-clock" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->report_time }}</td>
-                                    <td style="font-weight:600;">{{ $data['ojt']->contact_name }}</td>
-                                    <td style="white-space:nowrap;"><i class="fa fa-phone" style="color:var(--red); font-size:11px; margin-right:4px;"></i>{{ $data['ojt']->contact_number }}</td>
+                                    <td class="department-cell">{{ $data['ojt']->assigned_department ?? '' }}</td>
+                                    <td class="role-cell">{{ $data['ojt']->student_role ?? '' }}</td>
+                                    <td class="date-cell"><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date }}</span></td>
+                                    <td class="date-cell"><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date }}</span></td>
+                                    <td class="report-time-cell">
+                                        <div class="report-time-wrap"><i class="fa fa-clock"></i><span>{{ $data['ojt']->report_time }}</span></div>
+                                    </td>
+                                    <td class="contact-name-cell">{{ $data['ojt']->contact_name }}</td>
+                                    <td class="contact-number-cell">
+                                        <div class="contact-number-wrap"><i class="fa fa-phone"></i><span>{{ $data['ojt']->contact_number }}</span></div>
+                                    </td>
                                 </tr>
                                 @endif
                             @endforeach

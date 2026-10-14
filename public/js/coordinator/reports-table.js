@@ -127,6 +127,7 @@ $(document).ready(function () {
     $('#fileTable').DataTable({
         order: [],
         scrollX: true,
+        scrollCollapse: true,
         autoWidth: false
     });
 });
