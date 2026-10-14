@@ -372,20 +372,33 @@
 
             <div class="table-card-body">
                 <div class="table-scroll">
-                    <table id="fileTable" class="display" style="width:100%">
+                    <table id="fileTable" class="display ojt-report-table" style="width:100%">
+                        <colgroup>
+                            <col class="col-student">
+                            <col class="col-program">
+                            <col class="col-section">
+                            <col class="col-company">
+                            <col class="col-department">
+                            <col class="col-role">
+                            <col class="col-date">
+                            <col class="col-date">
+                            <col class="col-reporting-time">
+                            <col class="col-contact-name">
+                            <col class="col-contact-number">
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th style="white-space:nowrap; min-width:140px;">Student Name</th>
-                                <th style="white-space:nowrap; min-width:130px;">Program / Major</th>
-                                <th style="white-space:nowrap; min-width:70px;">Section</th>
-                                <th style="white-space:nowrap; min-width:160px;">Company Name</th>
-                                <th style="white-space:nowrap; min-width:120px;">Assigned Dept.</th>
-                                <th style="white-space:nowrap; min-width:110px;">Role</th>
-                                <th style="white-space:nowrap; min-width:100px;">Start Date</th>
-                                <th style="white-space:nowrap; min-width:100px;">End Date</th>
-                                <th style="white-space:nowrap; min-width:150px;">Reporting Time</th>
-                                <th style="white-space:nowrap; min-width:120px;">Contact Name</th>
-                                <th style="white-space:nowrap; min-width:110px;">Contact No.</th>
+                                <th>Student Name</th>
+                                <th>Program / Major</th>
+                                <th>Section</th>
+                                <th>Company Name</th>
+                                <th>Assigned Dept.</th>
+                                <th>Role</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Reporting Time</th>
+                                <th>Contact Name</th>
+                                <th>Contact No.</th>
                             </tr>
                         </thead>
                         <tbody>

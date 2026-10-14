@@ -186,8 +186,8 @@
             font-size: 13px;
         }
         .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
-        .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; border-top: none; white-space: nowrap; }
-        .table-card-body table.dataTable tbody td { padding: 11px 12px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13px; vertical-align: middle; }
+        .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.35px; line-height: 1.25; padding: 10px 9px; border-bottom: 1px solid #f0f0f0; border-top: none; white-space: normal; }
+        .table-card-body table.dataTable tbody td { padding: 11px 9px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 12px; line-height: 1.45; vertical-align: middle; overflow-wrap: anywhere; word-break: normal; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
         .dataTables_filter label { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: #555; }
@@ -413,8 +413,40 @@
 }
 
 .table-card-body table.dataTable {
-    min-width: 1000px;
+    min-width: 1450px;
+    table-layout: fixed;
     margin: 0 !important; /* remove DataTables auto margin */
+}
+
+.ojt-report-table .col-student { width: 165px; }
+.ojt-report-table .col-program { width: 185px; }
+.ojt-report-table .col-section { width: 75px; }
+.ojt-report-table .col-company { width: 185px; }
+.ojt-report-table .col-department { width: 130px; }
+.ojt-report-table .col-role { width: 105px; }
+.ojt-report-table .col-date { width: 112px; }
+.ojt-report-table .col-reporting-time { width: 135px; }
+.ojt-report-table .col-contact-name { width: 130px; }
+.ojt-report-table .col-contact-number { width: 125px; }
+
+.table-card-body .ojt-report-table th:nth-child(3),
+.table-card-body .ojt-report-table td:nth-child(3),
+.table-card-body .ojt-report-table th:nth-child(7),
+.table-card-body .ojt-report-table td:nth-child(7),
+.table-card-body .ojt-report-table th:nth-child(8),
+.table-card-body .ojt-report-table td:nth-child(8) {
+    text-align: center;
+}
+
+.table-card-body .ojt-report-table td:nth-child(10) {
+    font-weight: 600;
+}
+
+.table-card-body .ojt-report-table td:nth-child(7),
+.table-card-body .ojt-report-table td:nth-child(8),
+.table-card-body .ojt-report-table td:nth-child(9),
+.table-card-body .ojt-report-table td:nth-child(11) {
+    white-space: nowrap;
 }
 
 /* ── RESET all columns ── */
