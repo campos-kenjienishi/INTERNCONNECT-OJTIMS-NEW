@@ -120,7 +120,7 @@ class ChatbotAiService
   2. MY CLASS & ADVISER: Viewing enrolled class section, course schedule, room assignment, and designated OJT Faculty Adviser (/student/class).
   3. NOTARIZED MOA & PARTNER COMPANIES: Submitting a new Notarized MOA PDF, linking to an active partner company, or declaring School In-House OJT (/student/MOA). Requesting coordinator unlock for approved MOAs.
   4. OJT PLACEMENT INFO: Encoding host company address, assigned department, internship role, supervisor contact (name, email, phone), work modality (Onsite/Hybrid/Remote), and weekly training schedule (/student/ojtinfo).
-  5. REQUIREMENTS SUBMISSION & 2 PHASES: The student requirements process is divided into 2 distinct phases: (1) Basic Phase (Basic Requirements: Resume, Medical Clearance, Good Moral, Consent Form, Endorsement Letter, Acceptance Letter + submitting Notarized MOA or In-House OJT), which is always open; and (2) Other Phase (Other Requirements: DTRs, Weekly Reports, Certificate of Completion, Final Narrative Report), which is gated and unlocks automatically once all Basic Requirements and Notarized MOA are completed. Handling denied requirements by reviewing professor remarks and re-uploading.
+  5. REQUIREMENTS AND COMPLETION: Student documents are separated into Basic Requirements, Other Requirements, Notarized MOA, and a dedicated Certificate of Completion module. COC validation is sequential: professor review first, then final coordinator review. Handling denied documents includes reviewing remarks and uploading a corrected copy.
   6. SUPERVISOR EVALUATION: Sending the digital evaluation form link to the company supervisor's email (/student/evaluation), resending if not received, and viewing released evaluation grades.
   7. DOWNLOADABLE FORMS & CLASS FILES: Official templates and institutional forms uploaded by your OJT Coordinator can be accessed and downloaded on the Downloadable Files page (/student/files). Meanwhile, class-specific files, announcements, and syllabus materials uploaded by your Professor can be viewed on your My Class page (/student/class).
 - FORBIDDEN TOPICS: Coordinator administrative tools (FLSS faculty sync, global MOA partner creation, database backups, audit logs, student directory cohort sync, system maintenance), faculty class management. If asked, you MUST DECLINE and set escalate: true.",
@@ -1194,7 +1194,7 @@ PROMPT;
             }
 
             return [
-                'reply' => "InternConnect organizes document submissions into **2 distinct phases**:\n\n1. 🟢 **Basic Phase (Basic Requirements)**: These are **always open** and required before starting your internship. They include your prerequisite clearances (*Resume, Medical Clearance, Good Moral, Consent Form, Endorsement Letter, Acceptance Letter*) plus submitting your **Notarized MOA** (or declaring **School In-House OJT**).\n\n2. 🔒 **Other Phase (Other Requirements)**: These are **locked by default** and will **automatically unlock** once all Basic Requirements and your Notarized MOA are completed. They include your ongoing training and completion documents (*DTRs, Weekly Reports, Certificate of Completion, Final Narrative Report*).",
+                'reply' => "InternConnect separates important OJT documents into dedicated workflows:\n\n1. 🟢 **Basic Requirements**: Resume, Medical Clearance, Good Moral, Consent Form, Endorsement Letter, and Acceptance Letter.\n\n2. 📄 **Notarized MOA**: Submitted through its own secure module.\n\n3. 🔒 **Other Requirements**: During-OJT and supporting documents such as DTRs, Weekly Reports, and the Final Narrative Report.\n\n4. 🏅 **Certificate of Completion**: Submitted through its own module. Your professor validates it first, then the OJT coordinator performs the final approval.",
                 'actions' => $actions,
                 'suggestions' => [
                     'How do I submit my MOA?',
@@ -1318,8 +1318,26 @@ PROMPT;
             ];
         }
 
+        // Module 4: Certificate of Completion
+        if (str_contains($lower, 'certificate of completion') || str_contains($lower, 'completion certificate') || preg_match('/\bcoc\b/', $lower)) {
+            $actions = match (true) {
+                $isStudent => [['label' => 'Open Certificate of Completion', 'url' => '/student/completion-certificate', 'icon' => 'fas fa-certificate']],
+                $isProfessor => [['label' => 'Open COC Validation', 'url' => '/professor/completion-certificates', 'icon' => 'fas fa-user-check']],
+                $userRole === 'coordinator' || $userRole === '1' => [['label' => 'Open COC Final Validation', 'url' => '/coordinator/completion-certificates', 'icon' => 'fas fa-user-shield']],
+                default => [['label' => 'Launch Portal', 'url' => '/login-gateway', 'icon' => 'fas fa-sign-in-alt']],
+            };
+
+            return [
+                'reply' => 'The **Certificate of Completion** uses a dedicated two-level validation process. The student uploads the official PDF, the assigned professor reviews it first, and the OJT coordinator performs the final approval. Rejected submissions include remarks and can be corrected and resubmitted.',
+                'actions' => $actions,
+                'suggestions' => ['Who validates the COC?', 'What if my COC is rejected?', 'Where can I see my COC status?'],
+                'escalate' => false,
+                'source' => 'system',
+            ];
+        }
+
         // Module 5: General Requirements Upload & Category Tracking
-        if (str_contains($lower, 'requirement') || str_contains($lower, 'submit requirement') || str_contains($lower, 'upload requirement') || str_contains($lower, 'medical clearance') || str_contains($lower, 'endorsement letter') || str_contains($lower, 'dtr') || str_contains($lower, 'parent consent') || str_contains($lower, 'insurance') || str_contains($lower, 'narrative report') || str_contains($lower, 'completion certificate') || str_contains($lower, 'upload document')) {
+        if (str_contains($lower, 'requirement') || str_contains($lower, 'submit requirement') || str_contains($lower, 'upload requirement') || str_contains($lower, 'medical clearance') || str_contains($lower, 'endorsement letter') || str_contains($lower, 'dtr') || str_contains($lower, 'parent consent') || str_contains($lower, 'insurance') || str_contains($lower, 'narrative report') || str_contains($lower, 'upload document')) {
             $actions = [];
             if ($isStudent) {
                 $actions = [['label' => 'Go to Requirements Submission', 'url' => '/student/requirements', 'icon' => 'fas fa-cloud-upload-alt']];

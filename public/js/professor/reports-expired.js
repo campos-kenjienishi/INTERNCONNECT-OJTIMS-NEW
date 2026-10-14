@@ -207,13 +207,14 @@
             const validityOfMoa    = getSY() === 'N/A' ? '' : getSY();
             const dateNotarizedRaw = tr.getAttribute('data-date-notarized') || '';
             const dateNotarized    = formatDateStr(dateNotarizedRaw);
-            const statusCell       = Array.from(tds).find(td => td.querySelector('.badge-active, .badge-expired'));
-            const statusText       = statusCell ? statusCell.textContent.trim() : 'Expired';
-            const status           = statusText.includes('Expiring') ? 'Expiring Soon' : (statusText.includes('Active') ? 'Active' : 'Expired');
+            const statusCode       = tr.getAttribute('data-moa-status') || 'expired';
+            const daysRemaining    = Math.max(0, Number(tr.getAttribute('data-days-remaining')) || 0);
+            const expiryCountdown  = daysRemaining === 0 ? 'Expires today' : `${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} left`;
+            const status           = statusCode === 'expiring_soon' ? 'Expiring Soon' : (statusCode === 'active' ? 'Active' : 'Expired');
             const statusBadge      = status === 'Active'
                 ? `<span style="display:inline-block;background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Active</span>`
                 : (status === 'Expiring Soon'
-                    ? `<span style="display:inline-block;background:#fef3c7;color:#b45309;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expiring Soon</span>`
+                    ? `<span style="display:inline-block;background:#fef3c7;color:#b45309;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expiring Soon · ${expiryCountdown}</span>`
                     : `<span style="display:inline-block;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;">Expired</span>`);
 
             rowsHTML += `

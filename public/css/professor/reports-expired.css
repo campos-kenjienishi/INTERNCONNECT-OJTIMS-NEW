@@ -261,15 +261,17 @@
 
         /* DataTables */
         .table-card-body .dataTables_wrapper { padding: 16px 22px; font-family: 'Poppins', sans-serif; font-size: 13.5px; }
-        .table-card-body table.dataTable { width: 100% !important; border-collapse: collapse; }
+        .table-card-body table.dataTable { width: 100% !important; min-width: 1455px; border-collapse: collapse; table-layout: fixed; }
         .table-card-body table.dataTable thead th { background: #fafafa; color: #555; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; border-bottom: 1px solid #f0f0f0; border-top: none; }
         .table-card-body table.dataTable tbody td { padding: 14px; color: #333; border-bottom: 1px solid #f9f9f9; font-size: 13.5px; vertical-align: middle; }
         .table-card-body table.dataTable tbody tr:hover td { background: #fff5f5; }
         .table-card-body table.dataTable tbody tr:last-child td { border-bottom: none; }
         .table-card-body table.dataTable tbody td.email-cell {
-            max-width: 175px;
-            width: 175px;
+            width: 200px !important;
+            min-width: 200px;
+            max-width: 200px;
         }
+        .table-card-body table.dataTable thead th.email-column { width: 200px !important; }
         .table-card-body table.dataTable tbody td.email-cell .email-wrap {
             display: flex;
             align-items: flex-start;
@@ -278,7 +280,7 @@
             min-width: 0;
             white-space: normal;
             overflow-wrap: anywhere;
-            word-break: break-all;
+            word-break: normal;
             line-height: 1.45;
         }
         .table-card-body table.dataTable tbody td.email-cell .email-wrap i {
@@ -288,11 +290,41 @@
             flex-shrink: 0;
         }
         .table-card-body table.dataTable tbody td.email-cell .email-wrap span {
-            word-break: break-all;
+            word-break: normal;
             overflow-wrap: anywhere;
             min-width: 0;
         }
-        .table-card-body table.dataTable tbody td.company-name-cell { min-width: 200px; }
+        .table-card-body table.dataTable .company-name-column,
+        .table-card-body table.dataTable tbody td.company-name-cell { width: 190px !important; }
+        .table-card-body table.dataTable .address-column,
+        .table-card-body table.dataTable tbody td.company-address-cell { width: 220px !important; }
+        .table-card-body table.dataTable .representative-column,
+        .table-card-body table.dataTable tbody td.company-rep-cell { width: 170px !important; }
+        .company-address-cell,
+        .company-rep-cell { overflow-wrap: anywhere; word-break: normal; font-size: 12px; line-height: 1.45; }
+        .table-card-body table.dataTable thead th.contact-column,
+        .table-card-body table.dataTable tbody td.contact-cell {
+            width: 175px !important;
+            min-width: 175px;
+            max-width: 175px;
+        }
+        .contact-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+        .contact-wrap i { color: var(--red); font-size: 10px; flex-shrink: 0; }
+        .contact-wrap span { overflow-wrap: anywhere; word-break: normal; }
+        .table-card-body table.dataTable thead th.validity-column,
+        .table-card-body table.dataTable tbody td.validity-cell {
+            width: 120px !important;
+            min-width: 120px;
+        }
         .dataTables_wrapper { color: #333 !important; }
         .dataTables_length { color: #333 !important; background: transparent !important; padding: 0 !important; display: inline-flex; align-items: center; margin-bottom: 12px; }
         .dataTables_length label { color: #555 !important; font-weight: 500; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
@@ -318,6 +350,14 @@
         .rep-name-text { font-size: 12px; font-weight: 500; color: #374151; line-height: 1.45; }
 
         /* Status badges */
+        .table-card-body table.dataTable thead th.status-column,
+        .table-card-body table.dataTable tbody td.status-cell {
+            width: 210px !important;
+            min-width: 210px;
+        }
+        .status-cell { font-size: 12px !important; line-height: 1.4; }
+        .status-cell .badge-active,
+        .status-cell .badge-expired { white-space: nowrap; padding: 4px 10px; font-size: 11px; }
         .badge-active { display: inline-flex; align-items: center; gap: 5px; background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
         .badge-expired { display: inline-flex; align-items: center; gap: 5px; background: #fee2e2; color: var(--red); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
         .badge-active i, .badge-expired i { font-size: 10px; }
@@ -349,6 +389,7 @@
 
         /* Dark mode status badges */
         body.dark-mode .badge-active { background: rgba(22,163,74,0.2); color: #4ade80; }
+        body.dark-mode .contact-wrap { color: #e5e7eb; }
         body.dark-mode .badge-expired { background: rgba(220,38,38,0.2); color: #ff6b6b; }
         body.dark-mode .btn-moa-download { background: rgba(37,99,235,0.18); color: #93c5fd; border-color: rgba(96,165,250,0.3); }
         body.dark-mode .btn-moa-download:hover { background: rgba(37,99,235,0.28); color: #bfdbfe; }

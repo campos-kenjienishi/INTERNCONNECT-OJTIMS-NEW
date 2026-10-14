@@ -64,9 +64,12 @@
                 $activePortal = request()->query('portal', session('target_login_portal', 'student'));
             @endphp
 
-            <div style="width: 100%; margin-bottom: 12px; text-align: left;">
+            <div class="auth-card-navigation">
                 <a href="{{ url('/login-gateway?portal=' . $activePortal) }}" class="back-btn-pill">
                     <i class="fa fa-arrow-left"></i> Back to Sign-In Options
+                </a>
+                <a href="{{ route('landing') }}" class="auth-home-btn" aria-label="Back to Landing Page" title="Back to Landing Page">
+                    <i class="fa fa-home" aria-hidden="true"></i>
                 </a>
             </div>
 

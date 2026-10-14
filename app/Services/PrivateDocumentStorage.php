@@ -11,6 +11,8 @@ class PrivateDocumentStorage
 
     public const MOA = 'moa';
 
+    public const COMPLETION_CERTIFICATES = 'completion-certificates';
+
     public const TEMPLATES = 'templates';
 
     public function __construct(private readonly ?UploadSecurityRecorder $securityRecorder = null) {}

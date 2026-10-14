@@ -65,6 +65,11 @@
             <span class="nav-label">Requirement Status</span>
             <span class="tooltip-label">Requirement Status</span>
         </a>
+        <a href="{{ route('professor.completion-certificates.index') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-certificate"></i></span>
+            <span class="nav-label">COC Validation</span>
+            <span class="tooltip-label">COC Validation</span>
+        </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
             <span class="nav-label">Analytics</span>

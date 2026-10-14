@@ -3,6 +3,36 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ── Reveal on Scroll (IntersectionObserver) ──
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const budToggle = document.querySelector('[data-bud-toggle]');
+
+    if (budToggle) {
+        const budImage = budToggle.querySelector('.bud-mascot-img');
+        const cheeringImage = new Image();
+        cheeringImage.src = budToggle.dataset.budCheering;
+        const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let cheering = false;
+        let reactionAnimation;
+
+        budToggle.addEventListener('click', () => {
+            cheering = !cheering;
+            budImage.src = cheering ? budToggle.dataset.budCheering : budToggle.dataset.budOriginal;
+            budImage.alt = cheering
+                ? 'Bud smiling with both paws raised'
+                : 'Bud, your friendly OJT buddy, waving hello';
+            budToggle.setAttribute('aria-pressed', String(cheering));
+
+            reactionAnimation?.cancel();
+            if (!motionPreference.matches && typeof budImage.animate === 'function') {
+                reactionAnimation = budImage.animate([
+                    { transform: 'scale(1) rotate(0deg)' },
+                    { transform: 'scale(0.94) rotate(-3deg)', offset: 0.25 },
+                    { transform: 'scale(1.06) rotate(3deg)', offset: 0.6 },
+                    { transform: 'scale(1) rotate(0deg)' },
+                ], { duration: 450, easing: 'ease-out' });
+            }
+        });
+    }
+
     const revealTargets = document.querySelectorAll('.reveal');
 
     if (reduceMotion || !('IntersectionObserver' in window)) {

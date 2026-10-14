@@ -11,6 +11,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\PassDocuController;
 use App\Http\Controllers\MOAUploadController;
+use App\Http\Controllers\CompletionCertificateController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\ForgotPassController;
 use App\Http\Controllers\CoursePerSYController;
@@ -76,6 +77,8 @@ Route::middleware(['auth.session.custom'])->group(function () {
     Route::match(['get', 'post'], '/logout',[AuthController::class, 'logout']);
     Route::post('/auth/set-local-password', [AuthController::class, 'setLocalPassword'])->name('auth.setLocalPassword');
     Route::post('/student/accept-terms', [StudentController::class, 'acceptTerms'])->name('student.acceptTerms');
+    Route::get('/completion-certificates/{certificate}/view', [CompletionCertificateController::class, 'view'])->name('completion-certificates.view')->middleware('throttle:document-previews');
+    Route::get('/completion-certificates/{certificate}/download', [CompletionCertificateController::class, 'download'])->name('completion-certificates.download')->middleware('throttle:document-downloads');
 });
 
 // ─── OJT COORDINATOR (role 1) ───────────────────────────────────────
@@ -118,6 +121,9 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::post('/moa/unlock-requests/{id}/approve', [MOAUploadController::class, 'approveUnlock'])->name('coordinator.moa.approveUnlock');
     Route::post('/moa/unlock-requests/{id}/deny', [MOAUploadController::class, 'denyUnlock'])->name('coordinator.moa.denyUnlock');
     Route::get('/coordinator/student-requirements', [PassDocuController::class, 'coordinatorStudentRequirements'])->name('coordinator.studentRequirements');
+    Route::get('/coordinator/completion-certificates', [CompletionCertificateController::class, 'coordinatorIndex'])->name('coordinator.completion-certificates.index');
+    Route::post('/coordinator/completion-certificates/{certificate}/approve', [CompletionCertificateController::class, 'coordinatorApprove'])->name('coordinator.completion-certificates.approve');
+    Route::post('/coordinator/completion-certificates/{certificate}/reject', [CompletionCertificateController::class, 'coordinatorReject'])->name('coordinator.completion-certificates.reject');
     Route::get('/coordinator/requirements/view/{id}', [PassDocuController::class, 'coordinatorViewRequirement'])->name('coordinator.requirements.view')->middleware('throttle:document-previews');
     Route::get('/coordinator/requirements/download/{id}', [PassDocuController::class, 'coordinatorDownloadRequirement'])->name('coordinator.requirements.download')->middleware('throttle:document-downloads');
     Route::post('/sendFile', [MOAUploadController::class,'sendFiles']);
@@ -158,6 +164,8 @@ Route::middleware([
     Route::post('/student/moa/toggle-inhouse', [MOAUploadController::class, 'toggleInhouse'])->name('student.moa.toggleInhouse');
     Route::get('/student/pending', [CompanyController::class,'pending']);
     Route::get('/student/requirements', [PassDocuController::class,'fileReq']);
+    Route::get('/student/completion-certificate', [CompletionCertificateController::class, 'studentIndex'])->name('student.completion-certificate.index');
+    Route::post('/student/completion-certificate', [CompletionCertificateController::class, 'upload'])->name('student.completion-certificate.upload');
     Route::post('/uploadReq', [PassDocuController::class,'fileReqCreate']);
     Route::get('/student/requirements/view/{id}', [PassDocuController::class,'viewFile'])->middleware('throttle:document-previews');
     Route::get('/student/requirements/download/{id}', [PassDocuController::class,'downloadStudent'])->middleware('throttle:document-downloads');
@@ -188,6 +196,9 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::get('/professor/classList/{roomId}', [ProfessorController::class,'show_list']);
     Route::get('/professor/requirement-status', [ProfessorController::class,'requirementStatusClasses'])->name('professor.requirementStatus.classes');
     Route::get('/professor/requirement-status/{roomId}', [ProfessorController::class,'requirementStatus'])->name('professor.requirementStatus');
+    Route::get('/professor/completion-certificates', [CompletionCertificateController::class, 'professorIndex'])->name('professor.completion-certificates.index');
+    Route::post('/professor/completion-certificates/{certificate}/approve', [CompletionCertificateController::class, 'professorApprove'])->name('professor.completion-certificates.approve');
+    Route::post('/professor/completion-certificates/{certificate}/reject', [CompletionCertificateController::class, 'professorReject'])->name('professor.completion-certificates.reject');
     Route::post('/professor/approve/{email}', [ProfessorController::class,'approve']);
     Route::post('/professor/approve-all/{roomId}', [ProfessorController::class,'approveAll']);
     Route::post('/professor/deny/{email}', [ProfessorController::class,'deny']);

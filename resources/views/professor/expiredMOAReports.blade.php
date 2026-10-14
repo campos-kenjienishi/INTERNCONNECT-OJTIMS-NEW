@@ -76,6 +76,11 @@
             <span class="nav-label">Requirement Status</span>
             <span class="tooltip-label">Requirement Status</span>
         </a>
+        <a href="{{ route('professor.completion-certificates.index') }}" class="nav-item">
+            <span class="nav-icon"><i class="fa fa-certificate"></i></span>
+            <span class="nav-label">COC Validation</span>
+            <span class="tooltip-label">COC Validation</span>
+        </a>
         <a href="{{ url('/professor/analytics') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-chart-line"></i></span>
             <span class="nav-label">Analytics</span>
@@ -374,13 +379,13 @@
                     <thead>
                         <tr>
                             <th>id</th>
-                            <th>Company Name</th>
-                            <th>Address</th>
-                            <th>Representative</th>
-                            <th>Contact No.</th>
-                            <th>Email</th>
-                            <th>Validity</th>
-                            <th>Status</th>
+                            <th class="company-name-column">Company Name</th>
+                            <th class="address-column">Address</th>
+                            <th class="representative-column">Representative</th>
+                            <th class="contact-column">Contact No.</th>
+                            <th class="email-column">Email</th>
+                            <th class="validity-column">Validity</th>
+                            <th class="status-column">Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -394,11 +399,15 @@
                                 'expiring_soon' => 'Expiring Soon',
                                 default => 'Expired',
                             };
+                            $daysRemaining = max(0, (int) ($validity['days_remaining'] ?? 0));
+                            $expiryCountdown = $daysRemaining === 0
+                                ? 'Expires today'
+                                : $daysRemaining.' '.($daysRemaining === 1 ? 'day' : 'days').' left';
                             $latestRenewal = $company->latestRenewal;
                             $renewalCount = (int) ($company->renewals_count ?? 0);
                             $dateNotarizedFormatted = $company->date_notarized ? \Carbon\Carbon::parse($company->date_notarized)->format('M d, Y') : '';
                         @endphp
-                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}">
+                        <tr data-nature-of-bus="{{ $company->nature_of_bus ?? '' }}" data-date-notarized="{{ $dateNotarizedFormatted }}" data-moa-status="{{ $validity['status'] }}" data-days-remaining="{{ $daysRemaining }}">
                             <td>{{ $company->id }}</td>
                             <td class="company-name-cell">
                                 <div class="company-cell">
@@ -415,7 +424,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
+                            <td class="company-address-cell">
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <i class="fa fa-map-marker-alt" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
                                     {{ $company->company_address }}
@@ -427,10 +436,10 @@
                                     <span class="rep-name-text">{{ $company->company_rep }}</span>
                                 </div>
                             </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <i class="fa fa-phone" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
-                                    {{ $company->companyNo }}
+                            <td class="contact-cell">
+                                <div class="contact-wrap">
+                                    <i class="fa fa-phone"></i>
+                                    <span>{{ $company->companyNo ?: '—' }}</span>
                                 </div>
                             </td>
                             <td class="email-cell">
@@ -439,17 +448,17 @@
                                     {{ $company->company_email }}
                                 </div>
                             </td>
-                            <td>
+                            <td class="validity-cell">
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <i class="fa fa-calendar" style="color:var(--red);font-size:12px;flex-shrink:0;"></i>
                                     {{ $validUntil ? $validUntil->format('M d, Y') : 'N/A' }}
                                 </div>
                             </td>
-                            <td>
+                            <td class="status-cell">
                                 @if($status === 'Active')
                                     <span class="badge-active"><i class="fa fa-circle"></i> Active</span>
                                 @elseif($status === 'Expiring Soon')
-                                    <span class="badge-active" style="background:#fef3c7;color:#b45309;"><i class="fa fa-clock"></i> Expiring Soon</span>
+                                    <span class="badge-active" style="background:#fef3c7;color:#b45309;"><i class="fa fa-clock"></i> Expiring Soon &middot; {{ $expiryCountdown }}</span>
                                 @else
                                     <span class="badge-expired"><i class="fa fa-times-circle"></i> Expired</span>
                                 @endif

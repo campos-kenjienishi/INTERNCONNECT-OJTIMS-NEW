@@ -70,6 +70,14 @@ class PassDocuController extends Controller
         return $phase === 'basic' ? 'basic' : 'other';
     }
 
+    private function isCompletionCertificateName(?string $name): bool
+    {
+        return in_array(mb_strtolower(trim((string) $name)), [
+            'certificate of completion',
+            'completion certificate',
+        ], true);
+    }
+
     private function sortCategoriesByPhaseAndName($categories)
     {
         return $categories
@@ -116,6 +124,10 @@ class PassDocuController extends Controller
             )
             : collect();
 
+        $fileCategories = $fileCategories
+            ->reject(fn ($category) => $this->isCompletionCertificateName($category->fileName ?? null))
+            ->values();
+
         if ($fileCategories->isEmpty() && !$professor) {
             $defaultBasicNames = [
                 'Resume',
@@ -143,7 +155,9 @@ class PassDocuController extends Controller
             ->filter(fn ($category) => $this->normalizeRequirementPhase($category->phase ?? null) !== 'basic')
             ->values();
 
-        $submittedRequirements = FileRequirement::forUser($user)->get();
+        $submittedRequirements = FileRequirement::forUser($user)->get()
+            ->reject(fn ($requirement) => $this->isCompletionCertificateName($requirement->fileName ?? null))
+            ->values();
         $submittedRequirementNames = $submittedRequirements
             ->pluck('fileName')
             ->filter()
@@ -388,7 +402,7 @@ class PassDocuController extends Controller
         $files = $professor
             ? $this->sortCategoriesByPhaseAndName(
                 FileCategory::where('professor_id', $professor->id)->get()
-            )
+            )->reject(fn ($category) => $this->isCompletionCertificateName($category->fileName ?? null))->values()
             : collect();
 
         return view('professor.fileCategory', compact('data', 'userName', 'files'));
@@ -404,6 +418,10 @@ class PassDocuController extends Controller
         $user = User::where('id', Session::get('loginId'))->first();
         $professor = Professor::where('user_id', $user->id)->first();
         $trimmedName = trim((string)$request->fileName);
+
+        if ($this->isCompletionCertificateName($trimmedName)) {
+            return back()->with('fail', 'Certificate of Completion is managed through its dedicated validation module.');
+        }
 
         $existing = FileCategory::where(function($q) use ($professor) {
                 if ($professor) {
@@ -486,6 +504,10 @@ class PassDocuController extends Controller
         }
 
         $trimmedName = trim((string)$request->fileName);
+
+        if ($this->isCompletionCertificateName($trimmedName)) {
+            return back()->with('fail', 'Certificate of Completion is managed through its dedicated validation module.');
+        }
         $existing = FileCategory::where('professor_id', $category->professor_id)
             ->where('id', '!=', $id)
             ->whereRaw('LOWER(TRIM(fileName)) = ?', [mb_strtolower($trimmedName)])
@@ -547,6 +569,10 @@ public function fileReqCreate(Request $request){
     ], [
         'file.mimes' => 'Upload rejected: the file content does not match the .pdf extension. Renaming a non-PDF file to .pdf is not allowed.',
     ]);
+
+    if ($this->isCompletionCertificateName($request->fileName)) {
+        return back()->with('upload_error', 'Use the dedicated Certificate of Completion page for this document.');
+    }
 
     $user = $sessionCheck;
     $student = Student::where('user_id', $user->id)->first();
@@ -674,6 +700,16 @@ public function fileReqCreate(Request $request){
                 return response()->json(['success' => false, 'message' => 'File not found.'], 404);
             }
             return redirect()->back()->with('error', 'File not found.');
+        }
+
+        if ($this->isCompletionCertificateName($data->fileName)) {
+            $message = 'Certificate of Completion records are protected and managed through the dedicated COC module.';
+
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 422);
+            }
+
+            return redirect()->route('student.completion-certificate.index')->with('error', $message);
         }
 
         $isOwner = false;
@@ -852,6 +888,7 @@ public function fileReqCreate(Request $request){
         }
         $files = FileRequirement::where('adviser', '=', $data->full_name)
             ->forUser($student)
+            ->whereRaw("LOWER(TRIM(fileName)) NOT IN ('certificate of completion', 'completion certificate')")
             ->get();
         
         return view('professor.studentRequire', compact('data','files', 'value','course', 'roomId'));
@@ -866,6 +903,10 @@ public function fileReqCreate(Request $request){
         
                 // Find the file requirement by ID
                 $fileRequirement = FileRequirement::findOrFail($id);
+
+                if ($this->isCompletionCertificateName($fileRequirement->fileName)) {
+                    return back()->with('error', 'Use the dedicated COC Validation module for this document.');
+                }
         
                 // Update the status based on the request data
                 $this->propagateSharedNotarizedMoaStatus($fileRequirement, 1);
@@ -900,6 +941,7 @@ public function fileReqCreate(Request $request){
                 $files = FileRequirement::where('adviser', $data->full_name)
                     ->where('uploadedBy', $request->student_name)
                     ->whereNotIn('status', [1, 2])
+                    ->whereRaw("LOWER(TRIM(fileName)) NOT IN ('certificate of completion', 'completion certificate')")
                     ->get();
 
                 if ($files->isEmpty()) {
@@ -929,6 +971,10 @@ public function fileReqCreate(Request $request){
         
                 // Find the file requirement by ID
                 $fileRequirement = FileRequirement::findOrFail($id);
+
+                if ($this->isCompletionCertificateName($fileRequirement->fileName)) {
+                    return back()->with('error', 'Use the dedicated COC Validation module for this document.');
+                }
         
                 // Update the status based on the request data
                 $this->propagateSharedNotarizedMoaStatus($fileRequirement, 2, $validated['reason']);
@@ -968,6 +1014,7 @@ public function fileReqCreate(Request $request){
                 $files=FileRequirement::where('adviser', '=',$data->full_name)
                                         ->where('uploadedBy', '=', $value)
                                         ->where('fileName', '=', $file)
+                                        ->whereRaw("LOWER(TRIM(fileName)) NOT IN ('certificate of completion', 'completion certificate')")
                                         ->get();
                 
                 return view('professor.requireView', compact('data','files','value','file','roomId'));
@@ -1095,7 +1142,9 @@ public function fileReqCreate(Request $request){
             if (!empty($userNames)) {
                 $q->orWhereIn('uploadedBy', $userNames);
             }
-        })->get();
+        })
+            ->whereRaw("LOWER(TRIM(fileName)) NOT IN ('certificate of completion', 'completion certificate')")
+            ->get();
 
         $studentMatrix = $students->map(function ($student) use ($allRequirements) {
             $studentUser = $student->user;

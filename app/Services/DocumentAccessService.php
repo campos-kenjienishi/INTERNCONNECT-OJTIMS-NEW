@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Classes;
 use App\Models\Company;
+use App\Models\CompletionCertificate;
 use App\Models\FileRequirement;
 use App\Models\Student;
 use App\Models\UploadedFile;
@@ -100,6 +101,31 @@ class DocumentAccessService
         }
 
         return $this->companyMatchesCourse($company, $student->course);
+    }
+
+    public function canAccessCompletionCertificate(User $user, CompletionCertificate $certificate): bool
+    {
+        if ((int) $user->role === 1) {
+            return true;
+        }
+
+        if ((int) $user->role === 0) {
+            return (int) $certificate->student_user_id === (int) $user->id;
+        }
+
+        if ((int) $user->role !== 2) {
+            return false;
+        }
+
+        $professor = $user->professorInfo;
+
+        if ($professor && ! empty($certificate->professor_id)) {
+            return (int) $certificate->professor_id === (int) $professor->id;
+        }
+
+        $certificate->loadMissing('student');
+
+        return trim((string) $certificate->student?->adviser_name) === trim((string) $user->full_name);
     }
 
     private function studentFor(User $user): ?Student

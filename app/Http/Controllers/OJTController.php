@@ -37,6 +37,8 @@ class OJTController extends Controller
             ];
         }
 
+        $request->session()->flash('success', 'Report generated successfully. '.count($studentData).' student record(s) included.');
+
         return view('ojtCoordinator.report_form', compact('studentData'));
     }
 }

@@ -83,6 +83,11 @@
                 <span class="nav-label">Requirements</span>
                 <span class="tooltip-label">Requirements</span>
             </a>
+            <a href="{{ route('student.completion-certificate.index') }}" class="nav-item">
+                <span class="nav-icon"><i class="fa fa-certificate"></i></span>
+                <span class="nav-label">Completion Certificate</span>
+                <span class="tooltip-label">Completion Certificate</span>
+            </a>
             <a href="{{ url('/student/evaluation') }}" class="nav-item">
                 <span class="nav-icon"><i class="fa fa-star-half-alt"></i></span>
                 <span class="nav-label">Evaluation</span>
