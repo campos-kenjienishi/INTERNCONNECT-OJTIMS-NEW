@@ -281,13 +281,13 @@
                                         <a href="{{ route('completion-certificates.download', $certificate) }}" class="icon-btn download" title="Download"><i class="fa fa-download"></i></a>
                                         @if($portal === 'professor' && $certificate->status === 'pending_professor')
                                             <form method="POST" action="{{ route('professor.completion-certificates.approve', $certificate) }}" data-review-confirm data-confirm-title="Approve this certificate?" data-confirm-message="This will forward the Certificate of Completion to the OJT coordinator for final validation." data-confirm-button="Approve and Forward" data-confirm-color="#16a34a">@csrf<button class="icon-btn approve" title="Approve"><i class="fa fa-check"></i></button></form>
-                                            <details class="reject-details"><summary class="icon-btn reject" title="Reject"><i class="fa fa-times"></i></summary><form method="POST" action="{{ route('professor.completion-certificates.reject', $certificate) }}" data-review-confirm data-confirm-title="Reject this certificate?" data-confirm-message="The student will be asked to correct and resubmit the Certificate of Completion." data-confirm-button="Reject Certificate" data-confirm-color="#dc2626" data-confirm-icon="warning">@csrf<textarea name="remarks" maxlength="1000" required placeholder="Explain what the student must correct"></textarea><button type="submit" class="coc-btn danger">Confirm Rejection</button></form></details>
+                                            <button type="button" class="icon-btn reject" title="Reject" aria-label="Reject certificate" data-bs-toggle="modal" data-bs-target="#cocRejectModal" data-reject-action="{{ route('professor.completion-certificates.reject', $certificate) }}" data-student-name="{{ $certificate->student?->full_name ?: 'this student' }}"><i class="fa fa-times"></i></button>
                                         @elseif($portal === 'coordinator' && in_array($certificate->status, ['pending_professor', 'pending_coordinator'], true))
                                             @php
                                                 $requiresProfessorBypass = ! $certificate->hasProfessorValidation();
                                             @endphp
                                             <form method="POST" action="{{ route('coordinator.completion-certificates.approve', $certificate) }}" data-review-confirm data-confirm-title="{{ $requiresProfessorBypass ? 'Professor validation is still pending' : 'Final-approve this certificate?' }}" data-confirm-message="{{ $requiresProfessorBypass ? 'This COC has not been validated by a professor. Professor validation is optional. Are you sure you want to complete the required coordinator validation?' : 'This confirms that the student\'s Certificate of Completion passed both validation levels.' }}" data-confirm-button="{{ $requiresProfessorBypass ? 'Validate Without Professor' : 'Final Approve' }}" data-confirm-color="{{ $requiresProfessorBypass ? '#d97706' : '#16a34a' }}" data-confirm-icon="{{ $requiresProfessorBypass ? 'warning' : 'question' }}">@csrf<button class="icon-btn approve" title="{{ $requiresProfessorBypass ? 'Validate without professor review' : 'Final Approve' }}"><i class="fa fa-check-double"></i></button></form>
-                                            <details class="reject-details"><summary class="icon-btn reject" title="Reject"><i class="fa fa-times"></i></summary><form method="POST" action="{{ route('coordinator.completion-certificates.reject', $certificate) }}" data-review-confirm data-confirm-title="Reject this certificate?" data-confirm-message="The student will be asked to correct and resubmit the Certificate of Completion." data-confirm-button="Reject Certificate" data-confirm-color="#dc2626" data-confirm-icon="warning">@csrf<textarea name="remarks" maxlength="1000" required placeholder="Explain what the student must correct"></textarea><button type="submit" class="coc-btn danger">Confirm Rejection</button></form></details>
+                                            <button type="button" class="icon-btn reject" title="Reject" aria-label="Reject certificate" data-bs-toggle="modal" data-bs-target="#cocRejectModal" data-reject-action="{{ route('coordinator.completion-certificates.reject', $certificate) }}" data-student-name="{{ $certificate->student?->full_name ?: 'this student' }}"><i class="fa fa-times"></i></button>
                                         @endif
                                     </div>
                                     @if($certificate->professor_remarks || $certificate->coordinator_remarks)<div class="table-remarks"><i class="fa fa-comment-alt"></i> {{ $certificate->coordinator_remarks ?: $certificate->professor_remarks }}</div>@endif
@@ -354,6 +354,41 @@
         </div>
     </footer>
 </main>
+
+@if($portal !== 'student')
+<div class="modal fade coc-reject-modal" id="cocRejectModal" tabindex="-1" aria-labelledby="cocRejectModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-eyebrow">Certificate Review</span>
+                    <h2 class="modal-title" id="cocRejectModalTitle"><i class="fa fa-times-circle"></i> Reason for Rejection</h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="" data-coc-reject-form>
+                @csrf
+                <div class="modal-body">
+                    <div class="reject-student-banner">
+                        <span class="reject-student-icon"><i class="fa fa-user-graduate"></i></span>
+                        <div>
+                            <strong data-reject-student>Student</strong>
+                            <span>The student will be asked to correct and resubmit the certificate.</span>
+                        </div>
+                    </div>
+                    <label for="cocRejectRemarks"><i class="fa fa-comment-alt"></i> Reason for rejection</label>
+                    <textarea id="cocRejectRemarks" name="remarks" rows="5" maxlength="1000" required placeholder="Explain what the student must correct before resubmitting..."></textarea>
+                    <div class="remarks-counter"><span data-remarks-count>0</span>/1000 characters</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="coc-btn secondary" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+                    <button type="submit" class="coc-btn danger"><i class="fa fa-ban"></i> Reject Certificate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 <div class="modal fade coc-pdf-modal" id="cocPdfModal" tabindex="-1" aria-labelledby="cocPdfModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -423,6 +458,34 @@ document.addEventListener('DOMContentLoaded', function () {
             }).then(function (result) {
                 if (result.isConfirmed) submitReview();
             });
+        });
+    });
+
+    const rejectModal = document.getElementById('cocRejectModal');
+    const rejectForm = rejectModal?.querySelector('[data-coc-reject-form]');
+    const rejectStudent = rejectModal?.querySelector('[data-reject-student]');
+    const rejectRemarks = rejectModal?.querySelector('#cocRejectRemarks');
+    const remarksCount = rejectModal?.querySelector('[data-remarks-count]');
+
+    rejectModal?.addEventListener('show.bs.modal', function (event) {
+        const trigger = event.relatedTarget;
+        rejectForm.action = trigger?.dataset.rejectAction || '';
+        rejectStudent.textContent = trigger?.dataset.studentName || 'Student';
+        rejectRemarks.value = '';
+        remarksCount.textContent = '0';
+    });
+
+    rejectModal?.addEventListener('shown.bs.modal', function () {
+        rejectRemarks?.focus();
+    });
+
+    rejectRemarks?.addEventListener('input', function () {
+        remarksCount.textContent = String(rejectRemarks.value.length);
+    });
+
+    rejectForm?.addEventListener('submit', function () {
+        rejectForm.querySelectorAll('button').forEach(function (button) {
+            button.disabled = true;
         });
     });
 
