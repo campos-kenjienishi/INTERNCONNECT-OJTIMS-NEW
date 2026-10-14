@@ -1680,6 +1680,13 @@
             box-shadow: 0 6px 18px rgba(220,38,38,0.3);
         }
 
+        .btn-modal-submit:disabled {
+            cursor: wait;
+            opacity: 0.72;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Mobile overlay */
         .sidebar-overlay {
             display: none;

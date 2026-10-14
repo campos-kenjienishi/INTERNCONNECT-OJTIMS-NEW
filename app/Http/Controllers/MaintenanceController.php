@@ -132,8 +132,22 @@ class MaintenanceController extends Controller
         // Fetch all audit logs for display in coordinator tab, latest first
         $logs = \App\Models\AuditLog::orderBy('created_at', 'desc')->get();
 
+        $securitySummary = null;
+        $securityRecords = collect();
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('upload_security_records')) {
+            $securityQuery = \App\Models\UploadSecurityRecord::query();
+            $securitySummary = [
+                'active' => (clone $securityQuery)->where('lifecycle_status', 'active')->count(),
+                'clean' => (clone $securityQuery)->where('lifecycle_status', 'active')->where('scan_status', 'clean')->count(),
+                'unscanned' => (clone $securityQuery)->where('lifecycle_status', 'active')->where('scan_status', 'disabled')->count(),
+                'issues' => (clone $securityQuery)->whereIn('lifecycle_status', ['missing', 'integrity_failed', 'unreadable'])->count(),
+            ];
+            $securityRecords = $securityQuery->latest()->limit(100)->get();
+        }
+
         // Return the coordinator audit log view
-        return view('ojtCoordinator.audit', compact('logs', 'data'));
+        return view('ojtCoordinator.audit', compact('logs', 'data', 'securitySummary', 'securityRecords'));
     }
 
     /**

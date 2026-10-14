@@ -274,7 +274,11 @@
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
-                        @php $isOwner = $company->uploader_name === $user->full_name; @endphp
+                        @php
+                            $isOwner = $company->uploader_name === $user->full_name;
+                            $latestRenewal = $company->latestRenewal;
+                            $renewalCount = (int) ($company->renewals_count ?? 0);
+                        @endphp
                         <tr>
                             <td>
                                 <div class="company-cell">
@@ -291,6 +295,13 @@
                                                 </span>
                                             @endif
                                         </div>
+                                        @if($latestRenewal)
+                                            <div class="company-sub" style="margin-top:4px; color:#047857; font-weight:700;">
+                                                <i class="fa fa-sync-alt"></i>
+                                                Renewed {{ $renewalCount }} {{ $renewalCount === 1 ? 'time' : 'times' }}
+                                                &middot; {{ $latestRenewal->renewed_at->format('M d, Y') }}
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -327,9 +338,17 @@
                                     <button type="button" class="icon-action-btn btn-print"
                                         title="Print PDF"
                                         aria-label="Print PDF"
-                                        onclick="openPdfPreview('{{ asset('assets/' . $company->file) }}')">
+                                        onclick="openPdfPreview('{{ route('moa.file.preview', $company->id) }}')">
                                         <i class="fa fa-print"></i>
                                     </button>
+                                    @if($renewalCount > 0)
+                                        <button type="button" class="icon-action-btn btn-voucher"
+                                            title="View Renewal History"
+                                            aria-label="View Renewal History"
+                                            onclick="openMoaRenewalHistory({{ $company->id }}, @js($company->company_name))">
+                                            <i class="fa fa-history"></i>
+                                        </button>
+                                    @endif
                                     @php $companyHasEditUnlock = is_callable($hasApprovedEditUnlock) ? $hasApprovedEditUnlock($company->id) : !empty($hasApprovedEditUnlock); @endphp
                                     @if($isOwner && (empty($isLocked) || $companyHasEditUnlock))
                                         <button type="button"
@@ -432,7 +451,7 @@
                 <input type="hidden" name="company_id" id="linkExistingMoaCompanyId">
             </form>
 
-            <form id="studentMoaForm" action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data">
+            <form id="studentMoaForm" action="{{ url('/companyCreate') }}" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the MOA PDF type, structure, size, and security requirements. Please keep this page open.">
                 @csrf
                 <div class="modal-body">
 
@@ -472,7 +491,7 @@
                                         <div class="existing-moa-buttons">
                                             <button type="button"
                                                 class="btn-modal-close view-btn"
-                                                data-url="{{ asset('assets/' . $linkableCompany->file) }}">
+                                                data-url="{{ route('moa.file.preview', $linkableCompany->id) }}">
                                                 <i class="fa fa-eye me-1"></i> View MOA
                                             </button>
                                             <button type="button"
@@ -638,7 +657,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form id="editMoaForm" method="post" enctype="multipart/form-data">
+            <form id="editMoaForm" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the replacement MOA PDF type, structure, size, and security requirements. Please keep this page open.">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -921,6 +940,8 @@
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 
+    @include('partials.moa-renewal-history')
+    @include('partials.upload-validation')
     <script src="{{ vasset('js/student/companies.js') }}?v={{ time() }}" defer></script>
 </body>
 </html>

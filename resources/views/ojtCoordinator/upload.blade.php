@@ -328,7 +328,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="uploadForm" action="{{ url('/uploadfile') }}" method="post" enctype="multipart/form-data">
+            <form id="uploadForm" action="{{ url('/uploadfile') }}" method="post" enctype="multipart/form-data" data-upload-validation data-upload-description="Checking the template file type, structure, size, and security requirements. Please keep this page open.">
                 @csrf
                 <div class="modal-body">
 
@@ -412,6 +412,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ vasset('js/coordinator/upload.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('assets/js/upload-size-guard.js') }}"></script>
+@include('partials.upload-validation')
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

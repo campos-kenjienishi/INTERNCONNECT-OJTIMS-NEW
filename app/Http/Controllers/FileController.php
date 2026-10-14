@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Exceptions\UnsafeUploadException;
+use App\Services\DocumentAccessService;
+use App\Services\PrivateDocumentStorage;
+use App\Services\SecureDocumentResponse;
+use App\Services\SecureUploadService;
+use App\Services\UploadSecurityRecorder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -30,6 +35,15 @@ use Illuminate\Database\Eloquent\Builder;
 
 class FileController extends Controller
 {
+    public function __construct(
+        private readonly SecureUploadService $secureUploads,
+        private readonly PrivateDocumentStorage $documents,
+        private readonly DocumentAccessService $documentAccess,
+        private readonly SecureDocumentResponse $documentResponse,
+        private readonly UploadSecurityRecorder $securityEvidence
+    ) {
+    }
+
     protected function getLoggedInUser()
     {
         if (!Session::has('loginId')) {
@@ -93,18 +107,18 @@ class FileController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $file = $request->file('file'); // properly get file
-        $extension = $file->getClientOriginalExtension();
-        $rawName = trim((string) $request->name);
-        $sanitizedName = Str::slug(pathinfo($rawName, PATHINFO_FILENAME), '_');
-        if (empty($sanitizedName)) {
-            $sanitizedName = 'file';
+        try {
+            $storedUpload = $this->secureUploads->store(
+                $request->file('file'),
+                'template',
+                PrivateDocumentStorage::TEMPLATES
+            );
+        } catch (UnsafeUploadException $exception) {
+            return back()->withInput()->withErrors(['file' => $exception->getMessage()]);
         }
-        $filename = $sanitizedName . '_' . time() . '.' . $extension;
-        $file->move(public_path('assets'), $filename);
 
         $data = new UploadedFile();
-        $data->file = $filename;
+        $data->file = $storedUpload->filename;
         $data->name = $request->name;
         $data->uploader_name = $user->full_name;
         if (Schema::hasColumn('uploaded_files', 'uploader_user_id')) {
@@ -113,7 +127,22 @@ class FileController extends Controller
         if (Schema::hasColumn('uploaded_files', 'class_id')) {
             $data->class_id = $request->filled('class_id') ? $request->class_id : null;
         }
-        $data->save();
+        try {
+            $saved = $data->save();
+        } catch (\Throwable $exception) {
+            $this->documents->delete(PrivateDocumentStorage::TEMPLATES, $storedUpload->filename);
+            throw $exception;
+        }
+
+        if (!$saved) {
+            $this->documents->delete(PrivateDocumentStorage::TEMPLATES, $storedUpload->filename);
+
+            return back()->withInput()
+                ->with('fail', 'The file could not be saved. Please try again.')
+                ->with('upload_error', 'The file could not be saved. Please try again.');
+        }
+
+        $this->securityEvidence->link($storedUpload->securityRecordId, $data, $user->id ?? null);
 
         AuditLogger::log(
             'Upload Templates',
@@ -124,7 +153,9 @@ class FileController extends Controller
             ['file' => $data->file, 'name' => $data->name]
         );
 
-        return redirect()->back()->with('success', 'File uploaded successfully!');
+        return redirect()->back()
+            ->with('success', 'File uploaded successfully!')
+            ->with('upload_success', 'The template passed validation and was uploaded successfully.');
     }
 
 
@@ -135,12 +166,16 @@ class FileController extends Controller
 
     public function download(Request $request, $file)
     {   
-        $filePath = public_path('assets/' . $file);
-        if (!file_exists($filePath)) {
+        $user = $this->getLoggedInUser();
+        $fileRecord = UploadedFile::where('file', $file)->first();
+
+        abort_unless($user && $fileRecord && $this->documentAccess->canAccessTemplate($user, $fileRecord), 404);
+
+        $filePath = $this->documents->resolve(PrivateDocumentStorage::TEMPLATES, $fileRecord->file);
+        if ($filePath === null) {
             return redirect()->back()->with('error', 'File not found.');
         }
 
-        $fileRecord = UploadedFile::where('file', $file)->first();
         $ext = pathinfo($filePath, PATHINFO_EXTENSION);
 
         if ($fileRecord && !empty($fileRecord->name)) {
@@ -151,7 +186,7 @@ class FileController extends Controller
             $downloadName = $file;
         }
 
-        return response()->download($filePath, $downloadName);
+        return $this->documentResponse->download($filePath, $downloadName);
     }
 
 
@@ -186,10 +221,7 @@ class FileController extends Controller
         }
 
         if (!empty($data->file)) {
-            $filePath = public_path('assets/' . $data->file);
-            if (file_exists($filePath)) {
-                @unlink($filePath);
-            }
+            $this->documents->delete(PrivateDocumentStorage::TEMPLATES, $data->file);
         }
     
         $data->delete();
@@ -235,10 +267,7 @@ class FileController extends Controller
         ];
 
         if (!empty($file->file)) {
-            $filePath = public_path('assets/' . $file->file);
-            if (file_exists($filePath)) {
-                @unlink($filePath);
-            }
+            $this->documents->delete(PrivateDocumentStorage::TEMPLATES, $file->file);
         }
 
         $file->delete();
@@ -290,7 +319,11 @@ class FileController extends Controller
             return back()->with('error', 'File not found.');
         }
     
-        $attachmentPath = public_path('assets/' . $file->file_name); // Move this line after defining $file
+        $attachmentPath = $this->documents->resolve(PrivateDocumentStorage::TEMPLATES, $file->file);
+
+        if ($attachmentPath === null) {
+            return back()->with('error', 'File not found.');
+        }
     
         try {
             Mail::to($request->email)->send(new SendTempNotif($attachmentPath, $file->file));
@@ -305,12 +338,15 @@ class FileController extends Controller
 
     public function downloadFile($file)
     {
-        $filePath = public_path('assets/' . $file);
-        if (!file_exists($filePath)) {
+        $user = $this->getLoggedInUser();
+        $fileRecord = UploadedFile::where('file', $file)->first();
+
+        abort_unless($user && $fileRecord && $this->documentAccess->canAccessTemplate($user, $fileRecord), 404);
+
+        $filePath = $this->documents->resolve(PrivateDocumentStorage::TEMPLATES, $fileRecord->file);
+        if ($filePath === null) {
             return response()->json(['message' => 'File not found'], 404);
         }
-
-        $fileRecord = UploadedFile::where('file', $file)->first();
 
         if ($fileRecord) {
             // Check if the file is still valid
@@ -329,38 +365,28 @@ class FileController extends Controller
             $downloadName = $file;
         }
 
-        return response()->download($filePath, $downloadName);
+        return $this->documentResponse->download($filePath, $downloadName);
     }
 
     public function viewFile($file)
     {
-        $filePath = public_path('assets/' . $file);
+        $user = $this->getLoggedInUser();
+        $fileRecord = UploadedFile::where('file', $file)->first();
 
-        if (!file_exists($filePath)) {
+        abort_unless($user && $fileRecord && $this->documentAccess->canAccessTemplate($user, $fileRecord), 404);
+
+        $filePath = $this->documents->resolve(PrivateDocumentStorage::TEMPLATES, $fileRecord->file);
+
+        if ($filePath === null) {
             return redirect()->back()->with('error', 'File not found.');
         }
 
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-        $viewableExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'svg'];
 
-        if (!in_array($ext, $viewableExtensions)) {
-            return response()->download($filePath, $file);
+        if ($ext !== 'pdf') {
+            return $this->documentResponse->download($filePath, $fileRecord->name ?: $fileRecord->file);
         }
 
-        $mimeTypes = [
-            'pdf'  => 'application/pdf',
-            'png'  => 'image/png',
-            'jpg'  => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'gif'  => 'image/gif',
-            'webp' => 'image/webp',
-            'txt'  => 'text/plain',
-            'svg'  => 'image/svg+xml',
-        ];
-
-        return response()->file($filePath, [
-            'Content-Type'        => $mimeTypes[$ext] ?? 'application/octet-stream',
-            'Content-Disposition' => 'inline; filename="' . $file . '"',
-        ]);
+        return $this->documentResponse->inlinePdf($filePath, $fileRecord->name ?: $fileRecord->file);
     }
 }

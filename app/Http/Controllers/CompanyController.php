@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnsafeUploadException;
+use App\Services\PrivateDocumentStorage;
+use App\Services\SecureUploadService;
+use App\Services\UploadSecurityRecorder;
+use App\Services\MoaValidityService;
 use App\Models\User;
 use App\Models\Classes;
 use App\Models\Company;
@@ -15,16 +20,27 @@ use Illuminate\Http\Request;
 use App\Models\OJTInformation;
 use App\Models\FileRequirement;
 use App\Models\MoaUnlockRequest;
+use App\Models\MoaRenewal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use App\Helpers\AuditLogger;
 
 class CompanyController extends Controller
 {
+public function __construct(
+    private readonly SecureUploadService $secureUploads,
+    private readonly PrivateDocumentStorage $documents,
+    private readonly UploadSecurityRecorder $securityEvidence,
+    private readonly MoaValidityService $moaValidity
+) {
+}
+
 private function normalizeCourseSelection($courseInput): array
 {
     if (is_array($courseInput)) {
@@ -58,18 +74,7 @@ private function isMoaActive(?Company $company): bool
         return false;
     }
 
-    if (!empty($company->valid_until)) {
-        try {
-            return !\Carbon\Carbon::parse($company->valid_until)->isPast();
-        } catch (\Throwable $e) {
-            return false;
-        }
-    }
-
-    $parts = explode('-', str_replace(' ', '', (string) ($company->school_year ?? '0-0')));
-    $startYear = (int) ($parts[0] ?? 0);
-
-    return $startYear > 0 && ((now()->year - $startYear) <= 3);
+    return $this->moaValidity->isActive($company);
 }
 
 private function studentProfileForUser(User $user): ?Student
@@ -181,11 +186,10 @@ private function requireStudentSession()
 
         
     
-        // Get the current year
-        $currentYear = now()->year;
-    
         // Retrieve the selected company or companies
-        $companies = Company::with(['students', 'vouchers'])->get(); // Get all companies
+        $companies = Company::with(['students', 'vouchers', 'latestRenewal.renewedBy'])
+            ->withCount('renewals')
+            ->get();
         $schoolYears = Company::whereNotNull('school_year')
             ->pluck('school_year')
             ->filter()
@@ -208,19 +212,6 @@ private function requireStudentSession()
             ->sortDesc()
             ->values();
     
-        // Filter companies based on the start year of "school_year"
-        $companies = $companies->filter(function ($company) use ($currentYear) {
-            // Extract the start year from the "school_year" format
-            list($startYear, $endYear) = explode('-', $company->school_year);
-    
-            // Convert them to integers
-            $startYear = (int) $startYear;
-            $endYear = (int) $endYear;
-    
-          
-            return $currentYear >= $startYear && $currentYear <= $startYear + 3;
-        });
-
         if (!empty($selectedCourse)) {
             $companies = $companies->filter(function ($company) use ($selectedCourse) {
                 return $this->companyMatchesCourse($company, $selectedCourse);
@@ -239,6 +230,10 @@ private function requireStudentSession()
             $parts = explode('-', $normalizedYear);
             return (int) ($parts[0] ?? 0);
         })->values();
+
+        $companies->each(function ($company) {
+            $company->setAttribute('moa_validity', $this->moaValidity->describe($company));
+        });
     
         $companyNames = $companies->pluck('company_name')->toArray();
     
@@ -329,7 +324,8 @@ public function companiesup(Request $request)
 
     $studentProfile = $this->studentProfileForUser($user);
 
-    $companies = Company::with('students')
+    $companies = Company::with(['students', 'latestRenewal.renewedBy'])
+        ->withCount('renewals')
         ->where(function ($query) use ($user, $studentProfile) {
             if ($studentProfile) {
                 $query->whereHas('students', function ($studentQuery) use ($studentProfile) {
@@ -531,30 +527,10 @@ public function companyCreate(Request $request)
         $com->course = implode(', ', $this->normalizeCourseSelection($request->input('course')));
     }
 
-        $file = $request->file;
-    $companySlug = Str::slug($com->company_name ?: ($request->input('company_name') ?: 'Company'), '_');
-    $extension = $file->getClientOriginalExtension();
-    $filename = ($companySlug ?: 'Company') . '_MOA_' . time() . '.' . $extension;
-    $request->file->move(public_path('assets'), $filename);
-    $com->file = $filename;
-
     // Set the uploader_name field based on the logged-in user's name
     $com->uploader_name = $data->full_name;
     $com->date_notarized = $request->input('date_notarized');
     $com->valid_until = $expirationDate;
-
-    // Upload File Requirement
-    // Create a new instance of FileRequirement model
-    $fileup = new FileRequirement();
-    $fileup->fileName = "Notarized MOA"; 
-    $fileup->file = $filename;
-    $fileup->status = 0;
-    $fileup->adviser = $data->adviser_name;
-    $fileup->uploadedBy = $data->full_name;
-    $fileup->uploader_user_id = $data->id;
-
-    // Save the model instance
-    $res = $fileup->save();
   
 
 
@@ -602,8 +578,54 @@ public function companyCreate(Request $request)
         }
     }
 
+    try {
+        $storedUpload = $this->secureUploads->store(
+            $request->file('file'),
+            'pdf',
+            PrivateDocumentStorage::MOA
+        );
+    } catch (UnsafeUploadException $exception) {
+        return back()->withInput()->withErrors(['file' => $exception->getMessage()]);
+    }
+
+    $com->file = $storedUpload->filename;
+
+    $fileup = new FileRequirement();
+    $fileup->fileName = 'Notarized MOA';
+    $fileup->file = $storedUpload->filename;
+    $fileup->status = 0;
+    $fileup->adviser = $data->adviser_name;
+    $fileup->uploadedBy = $data->full_name;
+    $fileup->uploader_user_id = $data->id;
+
+    try {
+        $companySaved = $com->save();
+    } catch (\Throwable $exception) {
+        $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+        throw $exception;
+    }
+
     // Save the company to the database
-    if ($com->save()) {
+    if ($companySaved) {
+
+        try {
+            $requirementSaved = $fileup->save();
+        } catch (\Throwable $exception) {
+            $com->delete();
+            $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+            throw $exception;
+        }
+
+        if (!$requirementSaved) {
+            $com->delete();
+            $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+
+            return back()->withInput()
+                ->with('fail', 'The MOA requirement record could not be saved.')
+                ->with('upload_error', 'The MOA requirement record could not be saved.');
+        }
+
+        $this->securityEvidence->link($storedUpload->securityRecordId, $com, $data->id);
 
         // Attach the existing students to the company
         foreach ($existingStudents as $student) {
@@ -631,11 +653,16 @@ public function companyCreate(Request $request)
 
         return back()
             ->with('success', 'Company and students have been successfully associated.')
+            ->with('upload_success', 'The MOA passed validation and was uploaded successfully.')
             ->with('showVoucherModal', route('voucher', $com->id));
     } 
     
     else {
-        return back()->with('fail', 'Something went wrong. Company and students could not be created.');
+        $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+
+        return back()
+            ->with('fail', 'Something went wrong. Company and students could not be created.')
+            ->with('upload_error', 'The MOA could not be saved. Please try again.');
     }
 }
 
@@ -709,6 +736,17 @@ public function companyUpdate(Request $request, $id)
             ->withInput();
     }
 
+    $currentValidUntil = $this->moaValidity->parseDate($company->valid_until);
+    $requestedValidUntil = $this->moaValidity->parseDate($request->input('valid_until'));
+
+    if ($currentValidUntil && $requestedValidUntil && $requestedValidUntil->isAfter($currentValidUntil)) {
+        return back()
+            ->withInput()
+            ->withErrors([
+                'valid_until' => 'Use the Renew MOA action to extend the validity period so the renewal is recorded in the official history.',
+            ]);
+    }
+
     $oldValues = [
         'company_name' => $company->company_name,
         'company_address' => $company->company_address,
@@ -744,22 +782,7 @@ public function companyUpdate(Request $request, $id)
 
     $oldFileName = $company->file;
     $newFileName = $oldFileName;
-
-    if ($request->hasFile('file')) {
-        $file = $request->file('file');
-        $companySlug = Str::slug($company->company_name ?: ($request->input('company_name') ?: 'Company'), '_');
-        $extension = $file->getClientOriginalExtension();
-        $filename = ($companySlug ?: 'Company') . '_MOA_' . time() . '.' . $extension;
-        $file->move(public_path('assets'), $filename);
-
-        $oldFilePath = public_path('assets/' . $company->file);
-        if (!empty($company->file) && file_exists($oldFilePath)) {
-            @unlink($oldFilePath);
-        }
-
-        $company->file = $filename;
-        $newFileName = $filename;
-    }
+    $storedUpload = null;
 
     $selectedStudentNames = $request->input('student_names', []);
     $manualStudentNames = $request->input('manual_student_names', '');
@@ -805,7 +828,35 @@ public function companyUpdate(Request $request, $id)
         }
     }
 
-    if ($company->save()) {
+    if ($request->hasFile('file')) {
+        try {
+            $storedUpload = $this->secureUploads->store(
+                $request->file('file'),
+                'pdf',
+                PrivateDocumentStorage::MOA
+            );
+        } catch (UnsafeUploadException $exception) {
+            return back()->withInput()->withErrors(['file' => $exception->getMessage()]);
+        }
+
+        $company->file = $storedUpload->filename;
+        $newFileName = $storedUpload->filename;
+    }
+
+    try {
+        $companySaved = $company->save();
+    } catch (\Throwable $exception) {
+        if ($newFileName !== $oldFileName) {
+            $this->documents->delete(PrivateDocumentStorage::MOA, $newFileName);
+        }
+        throw $exception;
+    }
+
+    if ($companySaved) {
+        if ($storedUpload !== null) {
+            $this->securityEvidence->link($storedUpload->securityRecordId, $company, $data->id);
+        }
+
         if ($data->role != 0 && !empty($studentNames)) {
             $company->students()->sync($existingStudents->pluck('id')->all());
         }
@@ -821,6 +872,10 @@ public function companyUpdate(Request $request, $id)
             FileRequirement::whereIn('uploadedBy', $linkedStudentNames)
                 ->where('fileName', 'Notarized MOA')
                 ->update(['file' => $newFileName]);
+
+            if (!empty($oldFileName)) {
+                $this->documents->delete(PrivateDocumentStorage::MOA, $oldFileName);
+            }
         }
 
         AuditLogger::log(
@@ -841,10 +896,143 @@ public function companyUpdate(Request $request, $id)
             ]
         );
 
-        return back()->with('success', 'MOA updated successfully.');
+        $response = back()->with('success', 'MOA updated successfully.');
+
+        if ($storedUpload !== null) {
+            $response->with('upload_success', 'The replacement MOA passed validation and was uploaded successfully.');
+        }
+
+        return $response;
+    }
+
+    if ($newFileName !== $oldFileName) {
+        $this->documents->delete(PrivateDocumentStorage::MOA, $newFileName);
     }
 
     return back()->with('fail', 'Something went wrong. MOA could not be updated.');
+}
+
+public function renewMoa(Request $request, $id)
+{
+    $user = User::whereKey(Session::get('loginId'))->first();
+
+    if (!$user || (string) $user->role !== '1') {
+        return response()->view('errors.something-went-wrong', ['statusCode' => 403], 403);
+    }
+
+    $company = Company::find($id);
+
+    if (!$company) {
+        return back()->with('renewal_error', 'The MOA record could not be found.');
+    }
+
+    $validator = Validator::make($request->all(), [
+        'renewal_date_notarized' => 'required|date|before_or_equal:today',
+        'renewal_valid_until' => 'required|date|after:renewal_date_notarized',
+        'file' => 'required|mimes:pdf|max:30720',
+        'notes' => 'nullable|string|max:2000',
+    ]);
+
+    $validator->after(function ($validator) use ($request, $company) {
+        $currentValidUntil = $this->moaValidity->parseDate($company->valid_until);
+        $newValidUntil = $this->moaValidity->parseDate($request->input('renewal_valid_until'));
+
+        if ($currentValidUntil && $newValidUntil && !$newValidUntil->isAfter($currentValidUntil)) {
+            $validator->errors()->add(
+                'renewal_valid_until',
+                'The renewed validity date must be later than the current expiration date.'
+            );
+        }
+    });
+
+    if ($validator->fails()) {
+        return back()
+            ->withErrors($validator, 'renewal')
+            ->withInput()
+            ->with('renewal_error', $validator->errors()->first());
+    }
+
+    try {
+        $storedUpload = $this->secureUploads->store(
+            $request->file('file'),
+            'pdf',
+            PrivateDocumentStorage::MOA
+        );
+    } catch (UnsafeUploadException $exception) {
+        return back()
+            ->withInput()
+            ->withErrors(['file' => $exception->getMessage()], 'renewal')
+            ->with('renewal_error', $exception->getMessage());
+    }
+
+    try {
+        $renewal = DB::transaction(function () use ($company, $request, $storedUpload, $user) {
+            $lockedCompany = Company::whereKey($company->id)->lockForUpdate()->firstOrFail();
+            $currentValidUntil = $this->moaValidity->parseDate($lockedCompany->valid_until);
+            $newValidUntil = $this->moaValidity->parseDate($request->input('renewal_valid_until'));
+
+            if ($newValidUntil === null || ($currentValidUntil && !$newValidUntil->isAfter($currentValidUntil))) {
+                throw ValidationException::withMessages([
+                    'renewal_valid_until' => 'The MOA validity was changed by another request. Review the latest expiration date and try again.',
+                ]);
+            }
+
+            $previousFile = $lockedCompany->file;
+            $previousNotarized = $this->moaValidity->parseDate($lockedCompany->date_notarized);
+
+            $renewal = MoaRenewal::create([
+                'company_id' => $lockedCompany->id,
+                'previous_date_notarized' => $previousNotarized?->toDateString(),
+                'previous_valid_until' => $currentValidUntil?->toDateString(),
+                'previous_file' => $previousFile,
+                'new_date_notarized' => $request->input('renewal_date_notarized'),
+                'new_valid_until' => $newValidUntil->toDateString(),
+                'new_file' => $storedUpload->filename,
+                'renewed_by' => $user->id,
+                'renewed_at' => now(),
+                'notes' => $request->filled('notes') ? trim((string) $request->input('notes')) : null,
+            ]);
+
+            $lockedCompany->date_notarized = $request->input('renewal_date_notarized');
+            $lockedCompany->valid_until = $newValidUntil->toDateString();
+            $lockedCompany->file = $storedUpload->filename;
+            $lockedCompany->save();
+
+            FileRequirement::where('fileName', 'Notarized MOA')
+                ->where('file', $previousFile)
+                ->update(['file' => $storedUpload->filename]);
+
+            $this->securityEvidence->link($storedUpload->securityRecordId, $renewal, $user->id);
+
+            return $renewal;
+        });
+    } catch (ValidationException $exception) {
+        $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+
+        return back()
+            ->withInput()
+            ->withErrors($exception->errors(), 'renewal')
+            ->with('renewal_error', collect($exception->errors())->flatten()->first());
+    } catch (\Throwable $exception) {
+        $this->documents->delete(PrivateDocumentStorage::MOA, $storedUpload->filename);
+        report($exception);
+
+        return back()
+            ->withInput()
+            ->with('renewal_error', 'The MOA could not be renewed. No existing document or record was changed.');
+    }
+
+    AuditLogger::log(
+        'MOA Renewal',
+        'Renew',
+        'Renewed MOA for '.$company->company_name.' until '.$renewal->new_valid_until->format('M d, Y'),
+        $user->id
+    );
+
+    return back()
+        ->with('success', 'MOA renewed successfully.')
+        ->with('upload_success', 'The renewed MOA passed validation and was recorded successfully.')
+        ->with('renewal_success', 'The MOA renewal was recorded successfully.');
 }
 
 

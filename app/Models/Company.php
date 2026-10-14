@@ -24,6 +24,16 @@ public function latestVoucher()
     return $this->hasOne(Voucher::class, 'company_id')->latestOfMany();
 }
 
+public function renewals()
+{
+    return $this->hasMany(MoaRenewal::class)->latest('renewed_at');
+}
+
+public function latestRenewal()
+{
+    return $this->hasOne(MoaRenewal::class)->latestOfMany('renewed_at');
+}
+
 public function scopeFiltered($query, $schoolYear, $course)
     {
         return $query->where('school_year', $schoolYear)
