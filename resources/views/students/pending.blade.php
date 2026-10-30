@@ -19,8 +19,6 @@
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
 
 
-    <script src="js/jquery.printPage.js"></script>
-    
     <link rel="stylesheet" href="{{ vasset('css/student/pending.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
     <script src="{{ vasset('js/darkmode.js') }}"></script>

@@ -85,7 +85,10 @@ class AuthController extends Controller
             Session::put('target_login_portal', $portal);
         }
 
-        return redirect()->away($this->idpService->getAuthorizeUrl());
+        $state = Str::random(64);
+        $request->session()->put('idp_oauth_state', $state);
+
+        return redirect()->away($this->idpService->getAuthorizeUrl($state));
     }
 
     public function handleIdpCallback(Request $request, FacultyApiService $flssApi)
@@ -96,6 +99,19 @@ class AuthController extends Controller
             return view('auth.idp-transition', [
                 'error' => 'Authorization code was not provided by Identity Provider.'
             ]);
+        }
+
+        if (config('services.idp.enforce_state', true)) {
+            $expectedState = $request->session()->pull('idp_oauth_state');
+            $providedState = $request->query('state');
+
+            if (!is_string($expectedState)
+                || !is_string($providedState)
+                || !hash_equals($expectedState, $providedState)) {
+                return view('auth.idp-transition', [
+                    'error' => 'The authentication response could not be verified. Please try signing in again.'
+                ]);
+            }
         }
 
         try {
@@ -287,6 +303,7 @@ class AuthController extends Controller
 
     protected function loginLocalUser(User $user, Request $request)
     {
+        $request->session()->regenerate();
         $request->session()->put('loginId', $user->id);
         $request->session()->put('show_terms', true);
 
@@ -685,6 +702,7 @@ class AuthController extends Controller
                     return back()->with('fail', 'Student accounts must log in under the Student Portal.');
                 }
 
+                $request->session()->regenerate();
                 $request->session()->put('loginId',$user->id);
                 $request->session()->put('show_terms', true);
                 Cache::put(
@@ -719,11 +737,11 @@ class AuthController extends Controller
                 }
             }
             else{
-                return back()->with('fail','Password does not match.');
+                return back()->with('fail','The provided credentials are incorrect.');
             }
         }
         else{
-            return back()->with('fail','Email is not registered.');
+            return back()->with('fail','The provided credentials are incorrect.');
         }
     }
 
@@ -1375,23 +1393,22 @@ class AuthController extends Controller
         return $months;
     }
 
-    public function logout(){
-        if(Session::has('loginId')){
-            $id = Session::get('loginId');
+    public function logout(Request $request){
+        if($request->session()->has('loginId')){
+            $id = $request->session()->get('loginId');
             
             // Perform IdP logout if token is present
-            if (Session::has('idp_access_token')) {
-                $token = Session::get('idp_access_token');
+            if ($request->session()->has('idp_access_token')) {
+                $token = $request->session()->get('idp_access_token');
                 $this->idpService->logout($token);
-                Session::forget('idp_access_token');
             }
 
-            Session::pull('loginId');
-            Session::forget('termsAccepted');
-            Session::forget('show_password_setup');
             Cache::forget('active_session_id:' . $id);
-            return redirect()->route('login.gateway');
         }
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('login.gateway');
     }
 
