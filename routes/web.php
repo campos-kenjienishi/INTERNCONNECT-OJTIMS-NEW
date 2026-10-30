@@ -51,7 +51,7 @@ Route::get('/registration', [AuthController::class,'registration']);
 Route::get('/check-email-availability', [AuthController::class, 'checkEmailAvailability'])->name('check-email-availability');
 Route::post('/register-user', [AuthController::class,'registerUser'])->name('register-user');
 Route::get('/fetch-professors/{semester}/{startYear}/{endYear}', [ProfessorController::class,'fetchProfessors'])->name('fetch.professors');
-Route::post('/login-user',[AuthController::class,'loginUser'])->name('login-user');
+Route::post('/login-user',[AuthController::class,'loginUser'])->name('login-user')->middleware('throttle:login');
 Route::get('/reset', [ForgotPassController::class,'resetP']);
 Route::get('/forgot', [ForgotPassController::class,'forgotP']);
 Route::post('/forgotPass', [ForgotPassController::class,'forgotPass'])->name('forgotPass');

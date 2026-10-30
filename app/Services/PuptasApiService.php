@@ -13,6 +13,7 @@ class PuptasApiService
     protected string $clientSecret;
     protected string $scope;
     protected int $cacheTtl;
+    protected bool $verifyTls;
     protected ?string $lastAuthError = null;
 
     public function __construct()
@@ -22,6 +23,7 @@ class PuptasApiService
         $this->clientSecret = config('services.puptas.client_secret') ?: env('PUPTAS_CLIENT_SECRET', '');
         $this->scope = config('services.puptas.scope') ?: env('PUPTAS_SCOPE', 'program-read');
         $this->cacheTtl = (int) (config('services.puptas.cache_ttl') ?: env('PUPTAS_CACHE_TTL', 86400));
+        $this->verifyTls = (bool) config('services.puptas.verify_tls', true);
     }
 
     /**
@@ -49,7 +51,7 @@ class PuptasApiService
             $endpoint = $this->baseUrl . '/oauth/token';
 
             $response = Http::asForm()
-                ->withOptions(['verify' => false])
+                ->withOptions(['verify' => $this->verifyTls])
                 ->timeout(10)
                 ->connectTimeout(5)
                 ->withHeaders([
@@ -124,7 +126,7 @@ class PuptasApiService
         try {
             $endpoint = $this->baseUrl . '/api/v1/programs';
 
-            $response = Http::withOptions(['verify' => false])
+            $response = Http::withOptions(['verify' => $this->verifyTls])
                 ->timeout(15)
                 ->connectTimeout(6)
                 ->withHeaders([

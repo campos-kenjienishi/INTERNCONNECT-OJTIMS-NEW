@@ -7,6 +7,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -36,6 +37,17 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('document-previews', function (Request $request) {
             return Limit::perMinute((int) config('upload_security.preview_rate_per_minute', 120))
                 ->by((string) ($request->session()->get('loginId') ?: $request->ip()));
+        });
+
+        RateLimiter::for('login', function (Request $request) {
+            $identity = Str::lower(trim((string) $request->input('email')));
+
+            return [
+                Limit::perMinute((int) config('security.login_attempts_per_minute', 5))
+                    ->by($identity.'|'.$request->ip()),
+                Limit::perMinute((int) config('security.login_ip_attempts_per_minute', 30))
+                    ->by($request->ip()),
+            ];
         });
 
         $this->routes(function () {

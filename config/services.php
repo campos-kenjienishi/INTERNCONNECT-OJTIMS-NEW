@@ -62,13 +62,15 @@ return [
         'session_cookie' => env('IDP_SESSION_COOKIE'),
         'callback_url'  => env('IDP_CALLBACK_URL', env('APP_URL', 'http://127.0.0.1:8000') . '/auth/callback'),
         'verify_tls'    => filter_var(env('IDP_VERIFY_TLS', true), FILTER_VALIDATE_BOOL),
+        'enforce_state' => filter_var(env('IDP_ENFORCE_STATE', true), FILTER_VALIDATE_BOOL),
     ],
 
     'guisis' => [
         'base_url' => env('GUISIS_BASE_URL', 'https://api-guisis.dllbsit2027.com/api/v1'),
         'api_key' => env('GUISIS_API_KEY', ''),
-        'client_id' => env('GUISIS_CLIENT_ID', '40284c44-2d44-42ce-88bc-b4e5cc9e8be7'),
-        'client_secret' => env('GUISIS_CLIENT_SECRET', '6f99e1b82ddb71d40b5f5dc30d7ef8e755455982c2bbb92ba68322278adf05fa'),
+        'client_id' => env('GUISIS_CLIENT_ID', ''),
+        'client_secret' => env('GUISIS_CLIENT_SECRET', ''),
+        'verify_tls' => filter_var(env('GUISIS_VERIFY_TLS', true), FILTER_VALIDATE_BOOL),
     ],
 
     'flss' => [
@@ -82,6 +84,7 @@ return [
         'client_secret' => env('PUPTAS_CLIENT_SECRET', ''),
         'scope'         => env('PUPTAS_SCOPE', 'program-read'),
         'cache_ttl'     => (int) env('PUPTAS_CACHE_TTL', 86400),
+        'verify_tls'    => filter_var(env('PUPTAS_VERIFY_TLS', true), FILTER_VALIDATE_BOOL),
     ],
 
 ];

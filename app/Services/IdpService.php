@@ -40,12 +40,18 @@ class IdpService
     /**
      * Build the URL to redirect the user to the IDP's authorization page.
      */
-    public function getAuthorizeUrl(): string
+    public function getAuthorizeUrl(?string $state = null): string
     {
-        return $this->authorizeUrl . '?' . http_build_query([
+        $parameters = [
             'client_id'    => $this->clientId,
             'redirect_uri' => $this->callbackUrl,
-        ]);
+        ];
+
+        if ($state !== null && $state !== '') {
+            $parameters['state'] = $state;
+        }
+
+        return $this->authorizeUrl . '?' . http_build_query($parameters);
     }
 
     /**

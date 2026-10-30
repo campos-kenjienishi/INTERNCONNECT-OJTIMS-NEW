@@ -11,12 +11,14 @@ class GuidanceApiService
     protected string $baseUrl;
     protected string $clientId;
     protected string $clientSecret;
+    protected bool $verifyTls;
 
     public function __construct()
     {
         $this->baseUrl = rtrim(config('services.guisis.base_url') ?: env('GUISIS_BASE_URL', 'https://api-guisis.dllbsit2027.com/api/v1'), '/');
-        $this->clientId = config('services.guisis.client_id') ?: env('GUISIS_CLIENT_ID', '40284c44-2d44-42ce-88bc-b4e5cc9e8be7');
-        $this->clientSecret = config('services.guisis.client_secret') ?: env('GUISIS_CLIENT_SECRET', '6f99e1b82ddb71d40b5f5dc30d7ef8e755455982c2bbb92ba68322278adf05fa');
+        $this->clientId = config('services.guisis.client_id') ?: env('GUISIS_CLIENT_ID', '');
+        $this->clientSecret = config('services.guisis.client_secret') ?: env('GUISIS_CLIENT_SECRET', '');
+        $this->verifyTls = (bool) config('services.guisis.verify_tls', true);
     }
 
     /**
@@ -27,7 +29,7 @@ class GuidanceApiService
         return Cache::remember('guisis_m2m_token', 3000, function () {
             try {
                 $endpoint = $this->baseUrl . '/auth/m2m/token';
-                $response = Http::withOptions(['verify' => false])
+                $response = Http::withOptions(['verify' => $this->verifyTls])
                     ->timeout(6)
                     ->connectTimeout(3)
                     ->withHeaders([
@@ -85,7 +87,7 @@ class GuidanceApiService
                 return true;
             }
 
-            $healthRes = Http::withOptions(['verify' => false])
+            $healthRes = Http::withOptions(['verify' => $this->verifyTls])
                 ->timeout(3)
                 ->connectTimeout(2)
                 ->get($this->baseUrl . '/health');
@@ -106,7 +108,7 @@ class GuidanceApiService
             $endpoint = $this->baseUrl . '/integrations/students/profiles';
             $headers = $this->getHeaders();
 
-            $response = Http::withOptions(['verify' => false])
+            $response = Http::withOptions(['verify' => $this->verifyTls])
                 ->timeout(8)
                 ->connectTimeout(3)
                 ->withHeaders($headers)
@@ -273,7 +275,7 @@ class GuidanceApiService
             $endpoint = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber);
             $headers = $this->getHeaders();
 
-            $response = Http::withOptions(['verify' => false])
+            $response = Http::withOptions(['verify' => $this->verifyTls])
                 ->timeout(5)
                 ->connectTimeout(2)
                 ->withHeaders($headers)
@@ -305,7 +307,7 @@ class GuidanceApiService
             $endpoint = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber) . '/addresses';
             $headers = $this->getHeaders();
 
-            $response = Http::withOptions(['verify' => false])
+            $response = Http::withOptions(['verify' => $this->verifyTls])
                 ->timeout(5)
                 ->connectTimeout(2)
                 ->withHeaders($headers)
@@ -337,7 +339,7 @@ class GuidanceApiService
             $endpoint = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber) . '/personal-info';
             $headers = $this->getHeaders();
 
-            $response = Http::withOptions(['verify' => false])
+            $response = Http::withOptions(['verify' => $this->verifyTls])
                 ->timeout(5)
                 ->connectTimeout(2)
                 ->withHeaders($headers)
