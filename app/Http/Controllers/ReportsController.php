@@ -215,8 +215,9 @@ class ReportsController extends Controller
 
         $reportInsights = $this->buildStudentReportInsights($studentData, null);
         $selectedSemester = '1st Semester';
+        $selectedCourse = '';
     
-        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSemester'))
+        return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSemester', 'selectedCourse'))
             ->with('selectedSchoolYear', null);
 
     }
@@ -227,7 +228,7 @@ class ReportsController extends Controller
     {
         $selectedSchoolYear = trim((string) $request->input('school_year'));
         $selectedSemester = trim((string) $request->input('semester', '1st Semester')) ?: '1st Semester';
-        $coursed = $request->input('course');
+        $selectedCourse = trim((string) $request->input('course', ''));
         $course = Courses::all();
 
         // Get the current user
@@ -263,8 +264,10 @@ class ReportsController extends Controller
         // Query users based on criteria
         $students = User::where('role', 0)
                         ->where('status', 1)
-                        ->whereHas('studentInfo', function ($query) use ($coursed, $schoolYearStart, $schoolYearEnd) {
-                            $query->where('course', $coursed);
+                        ->whereHas('studentInfo', function ($query) use ($selectedCourse, $schoolYearStart, $schoolYearEnd) {
+                            if ($selectedCourse !== '') {
+                                $query->where('course', $selectedCourse);
+                            }
                             if (!empty($schoolYearStart) && !empty($schoolYearEnd)) {
                                 $query->where('school_year_start', $schoolYearStart)
                                     ->where('school_year_end', $schoolYearEnd);
@@ -310,17 +313,17 @@ class ReportsController extends Controller
                             ];
                         }
 
-            $reportInsights = $this->buildStudentReportInsights($studentData, $coursed);
+            $reportInsights = $this->buildStudentReportInsights($studentData, $selectedCourse ?: null);
             
         AuditLogger::log(
             'Reports',
             'Generate',
-            'Generated Student OJT Information report for ' . ($coursed ?: 'all courses') . ' (' . ($selectedSchoolYear ?: 'all school years') . ')',
+            'Generated Student OJT Information report for ' . ($selectedCourse ?: 'all programs') . ' (' . ($selectedSchoolYear ?: 'all school years') . ')',
             Session::get('loginId') ?? null
         );
     
         // Pass the course variable to the view
-            return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSchoolYear', 'selectedSemester'));
+            return view('ojtCoordinator.reportsT', compact('studentData', 'user', 'subjectData','course', 'reportInsights', 'schoolYears', 'selectedSchoolYear', 'selectedSemester', 'selectedCourse'));
     }
 
 
@@ -402,6 +405,7 @@ public function reportsExpired()
             ->values();
 
         $selectedSchoolYear = $schoolYears->first();
+        $selectedCourse = '';
 
         $companies = Company::all();
         if ($selectedSchoolYear) {
@@ -414,9 +418,9 @@ public function reportsExpired()
 
         $campusName = config('campus.name', 'PUP Taguig Campus');
 
-        $reportInsights = $this->buildMoaReportInsights($companies, $course->first()->course ?? null);
+        $reportInsights = $this->buildMoaReportInsights($companies, null);
 
-        return view('ojtCoordinator.reportsExpired', compact('companies', 'user', 'course', 'schoolYears', 'selectedSchoolYear', 'reportInsights', 'campusName'));
+        return view('ojtCoordinator.reportsExpired', compact('companies', 'user', 'course', 'schoolYears', 'selectedSchoolYear', 'selectedCourse', 'reportInsights', 'campusName'));
     }
 
 
@@ -424,11 +428,12 @@ public function reportsExpired()
 {
     $validatedData = $request->validate([
         'school_year' => 'nullable|string',
-        'course' => 'required',
+        'course' => 'nullable|string',
     ]);
 
     $schoolYear = $this->normalizeSchoolYearValue($validatedData['school_year'] ?? null);
     $selectedSchoolYear = $schoolYear;
+    $selectedCourse = trim((string) ($validatedData['course'] ?? ''));
 
     $user = User::find(Session::get('loginId'));
     $course = Courses::all();
@@ -446,13 +451,17 @@ public function reportsExpired()
         $companies->whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear]);
     }
 
-    $companies = $companies->get()->filter(function ($company) use ($validatedData) {
-        if ($this->companyMatchesCourse($company, $validatedData['course'])) {
-            return true;
-        }
+    $companies = $companies->get();
+    if ($selectedCourse !== '') {
+        $companies = $companies->filter(function ($company) use ($selectedCourse) {
+            if ($this->companyMatchesCourse($company, $selectedCourse)) {
+                return true;
+            }
 
-        return $company->students()->where('course', $validatedData['course'])->exists();
-    })->sortByDesc(function ($company) {
+            return $company->students()->where('course', $selectedCourse)->exists();
+        });
+    }
+    $companies = $companies->sortByDesc(function ($company) {
         return optional($company->created_at)->timestamp ?? $company->id;
     })->values();
     $companies = $this->annotateMoaFileStatus($companies);
@@ -465,20 +474,22 @@ public function reportsExpired()
     // Retrieve students under the specified companies using where and get
     $students = Student::whereHas('companies', function ($query) use ($companyNames) {
         $query->whereIn('company_name', $companyNames);
-    })
-    ->where('course', $validatedData['course'])
-    ->get();
+    });
+    if ($selectedCourse !== '') {
+        $students->where('course', $selectedCourse);
+    }
+    $students = $students->get();
 
     AuditLogger::log(
         'Reports',
         'Generate',
-        'Generated MOA report for ' . $validatedData['course'] . ' (' . ($schoolYear ?: 'All school years') . ')',
+        'Generated MOA report for ' . ($selectedCourse ?: 'all programs') . ' (' . ($schoolYear ?: 'All school years') . ')',
         Session::get('loginId') ?? null
     );
 
-    $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
+    $reportInsights = $this->buildMoaReportInsights($companies, $selectedCourse ?: null);
 
-    return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user', 'course', 'schoolYears', 'selectedSchoolYear', 'reportInsights', 'campusName'));
+    return view('ojtCoordinator.reportsExpired', compact('companies', 'students', 'user', 'course', 'schoolYears', 'selectedSchoolYear', 'selectedCourse', 'reportInsights', 'campusName'));
 }
 
 public function sendEmailExpired(Request $request)
@@ -630,7 +641,7 @@ public function reportsExpiredProf()
 {
     $validatedData = $request->validate([
         'school_year' => 'nullable|string',
-        'course' => 'required',
+        'course' => 'nullable|string',
     ]);
 
     $schoolYear = $this->normalizeSchoolYearValue($validatedData['school_year'] ?? null);
@@ -638,7 +649,7 @@ public function reportsExpiredProf()
     $filters = $this->buildProfessorMoaFilters($user);
     $courseAll = $filters['courseAll'];
     $schoolYears = $filters['schoolYears'];
-    $selectedCourse = trim((string) $validatedData['course']);
+    $selectedCourse = trim((string) ($validatedData['course'] ?? ''));
     $selectedSchoolYear = $schoolYear;
 
     $companies = Company::query();
@@ -647,14 +658,18 @@ public function reportsExpiredProf()
         $companies->whereRaw("REPLACE(COALESCE(school_year, ''), ' ', '') = ?", [$schoolYear]);
     }
 
-    $companies = $companies->get()->filter(function ($company) use ($validatedData) {
-        if ($this->companyMatchesCourse($company, $validatedData['course'])) {
-            return true;
-        }
+    $companies = $companies->get();
+    if ($selectedCourse !== '') {
+        $companies = $companies->filter(function ($company) use ($selectedCourse) {
+            if ($this->companyMatchesCourse($company, $selectedCourse)) {
+                return true;
+            }
 
-        // Backward compatibility for older records that only had student links.
-        return $company->students()->where('course', $validatedData['course'])->exists();
-    })->sortByDesc(function ($company) {
+            // Backward compatibility for older records that only had student links.
+            return $company->students()->where('course', $selectedCourse)->exists();
+        });
+    }
+    $companies = $companies->sortByDesc(function ($company) {
         return optional($company->created_at)->timestamp ?? $company->id;
     })->values();
     $companies = $this->annotateMoaFileStatus($companies);
@@ -663,9 +678,11 @@ public function reportsExpiredProf()
     // Retrieve students under the specified companies using where and get
     $students = Student::whereHas('companies', function ($query) use ($companyNames) {
         $query->whereIn('company_name', $companyNames);
-    })
-    ->where('course', $validatedData['course'])
-    ->get();
+    });
+    if ($selectedCourse !== '') {
+        $students->where('course', $selectedCourse);
+    }
+    $students = $students->get();
 
     $companies = $this->annotateMoaFileStatus($companies);
     $companies = $this->annotateNatureOfBusiness($companies);
@@ -673,12 +690,12 @@ public function reportsExpiredProf()
 
     $campusName = config('campus.name', 'PUP Taguig Campus');
 
-    $reportInsights = $this->buildMoaReportInsights($companies, $validatedData['course']);
+    $reportInsights = $this->buildMoaReportInsights($companies, $selectedCourse ?: null);
 
     AuditLogger::log(
         'Reports',
         'Generate',
-        'Generated professor MOA report for ' . $validatedData['course'] . ' (' . ($schoolYear ?: 'All school years') . ')',
+        'Generated professor MOA report for ' . ($selectedCourse ?: 'all programs') . ' (' . ($schoolYear ?: 'All school years') . ')',
         Session::get('loginId') ?? null
     );
 

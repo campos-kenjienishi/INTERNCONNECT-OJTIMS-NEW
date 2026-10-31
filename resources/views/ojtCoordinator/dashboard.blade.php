@@ -25,6 +25,7 @@
         </script>
 
     <link rel="stylesheet" href="{{ vasset('css/coordinator/dashboard.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/announcement-audience.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}?v={{ time() }}">
     <script src="{{ vasset('js/darkmode.js') }}"></script>
 </head>
@@ -491,13 +492,12 @@
                         </div>
                         <div>
                             <h2>Create Announcement</h2>
-                            <p>Broadcast a message to all students</p>
+                            <p>Reach selected students and OJT professors</p>
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ url('/announcements') }}">
+                    <form method="POST" action="{{ url('/announcements') }}" id="targetedAnnouncementForm" data-feedback="off">
                         @csrf
-                        <input type="hidden" name="audience" value="all_students">
                         <div class="panel-card-body">
 
                             <div class="field-group">
@@ -506,7 +506,7 @@
                                 </label>
                                 <input class="field-input" type="text" id="title" name="title"
                                     placeholder="e.g. OJT Orientation Schedule"
-                                    required>
+                                    value="{{ old('title') }}" maxlength="255" required>
                             </div>
 
                             <div class="field-group">
@@ -516,14 +516,16 @@
                                 <textarea class="field-input" id="content" name="content"
                                         rows="5"
                                         placeholder="Write your announcement message here..."
-                                        required></textarea>
+                                        maxlength="20000" required>{{ old('content') }}</textarea>
                             </div>
+
+                            @include('partials.announcement-audience')
 
                         </div>
 
                         <div class="panel-card-footer">
-                            <button type="submit" class="btn-submit">
-                                <i class="fa fa-paper-plane"></i> Post Announcement
+                            <button type="submit" class="btn-submit" @disabled(!$announcementOptions['ready'])>
+                                <i class="fa fa-paper-plane"></i> Preview and Publish
                             </button>
                         </div>
                     </form>
@@ -533,6 +535,8 @@
                 <x-dashboard-ai-hero :role="'coordinator'" />
 
             </div>
+
+            @include('partials.announcement-designations')
 
             <div class="panel-card" style="margin-top:22px;">
                 <div class="panel-card-header">
@@ -572,8 +576,28 @@
                                     <td class="announcement-title-cell">
                                         <strong>{{ $announcement->title }}</strong>
                                         <span>{{ Str::limit($announcement->content, 90) }}</span>
+                                        @if($announcement->email_payload)
+                                            <div class="announcement-email-status">
+                                                <strong><i class="fa fa-envelope"></i> Email notifications</strong>
+                                                @foreach(['queued' => 'Queued', 'sending' => 'Processing', 'sent' => 'Sent', 'captured' => 'Captured (test)', 'failed' => 'Failed', 'skipped' => 'Skipped', 'uncertain' => 'Needs review'] as $status => $label)
+                                                    @if(($announcement->email_summary[$status] ?? 0) > 0)
+                                                        <small>{{ $label }}: {{ $announcement->email_summary[$status] }}</small>
+                                                    @endif
+                                                @endforeach
+                                                <small>Sent means mail-service acceptance, not guaranteed inbox delivery or a read receipt. Refresh to update counts.</small>
+                                                @if(($announcement->email_summary['uncertain'] ?? 0) > 0)
+                                                    <small>Some delivery results are unknown. Review the mail provider's records before considering another email; these are not retried automatically.</small>
+                                                @endif
+                                            </div>
+                                        @endif
                                     </td>
-                                    <td>All students</td>
+                                    <td>{{ $announcement->audience_label }}
+                                        @if($announcement->targeting)
+                                            <span class="announcement-recipient-summary">{{ implode(', ', $announcement->targeting['programs'] ?? []) ?: 'All Programs' }}</span>
+                                            <span class="announcement-recipient-summary">{{ $announcement->targeting['school_year'] ?: 'All School Years' }} · {{ $announcement->targeting['semester'] ?: 'All Semesters' }}</span>
+                                            <span class="announcement-recipient-summary">{{ $announcement->targeting['student_count'] }} students · {{ $announcement->targeting['professor_count'] }} professors</span>
+                                        @endif
+                                    </td>
                                     <td data-order="{{ \Carbon\Carbon::parse($announcement->created_at)->timestamp }}">
                                         {{ \Carbon\Carbon::parse($announcement->created_at)->format('M d, Y h:i A') }}
                                     </td>
@@ -595,6 +619,12 @@
                                                 <i class="fa fa-trash"></i> Delete
                                             </button>
                                         </form>
+                                        @if(($announcement->email_summary['failed'] ?? 0) > 0)
+                                            <form method="POST" action="{{ route('announcements.emails.retry', $announcement->id) }}" class="retry-announcement-email-form">
+                                                @csrf
+                                                <button type="submit" class="announcement-email-retry"><i class="fa fa-redo"></i> Retry failed emails</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -617,6 +647,7 @@
                         @csrf
                         @method('PUT')
                         <div class="modal-body">
+                            <p class="announcement-audience-hint">Editing changes the message only. The original recipients stay unchanged. To reach a different audience, create a new announcement.</p>
                             <label class="field-label">
                                 <i class="fa fa-heading"></i> Announcement Title
                             </label>
@@ -688,6 +719,7 @@
         };
     </script>
     <script src="{{ vasset('js/coordinator/dashboard.js') }}?v={{ time() }}"></script>
+    <script src="{{ vasset('js/coordinator/announcement-audience.js') }}"></script>
     <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
     <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
     <script src="{{ vasset('assets/js/voice-input.js') }}"></script>

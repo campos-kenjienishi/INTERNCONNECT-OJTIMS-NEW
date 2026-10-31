@@ -345,9 +345,10 @@
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-graduation-cap"></i> Program</label>
-                            <select class="field-select" id="course" name="course" required>
+                            <select class="field-select" id="course" name="course">
+                                <option value="" {{ empty($selectedCourse) ? 'selected' : '' }}>All Programs</option>
                                 @foreach ($course as $c)
-                                <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
+                                <option value="{{ $c->course }}" {{ ($selectedCourse ?? request('course')) === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -551,7 +552,7 @@
             total_moa: @json($totalMOA ?? 0),
             active_moa: @json($activeMOA ?? 0),
             expired_moa: @json($expiredMOA ?? 0),
-            course: @json(request('course') ?: (isset($course) && $course->first() ? $course->first()->course : null))
+            course: @json($selectedCourse ?: null)
         },
         insight: @json($reportInsights ?? []),
         askUrl: @json(route('reports.ai.ask')),

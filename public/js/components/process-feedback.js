@@ -34,7 +34,7 @@
         const path = parsed.pathname.toLowerCase();
         const write = !['GET', 'HEAD', 'OPTIONS'].includes(String(method || 'GET').toUpperCase());
         // These already have local typing/validation feedback, not success dialogs.
-        if (/chatbot\/message|student\/accept-terms|verify-current|check-email|reports\/ai\/(ask|insight)/.test(path)) return null;
+        if (/chatbot\/message|student\/accept-terms|verify-current|check-email|reports\/ai\/(ask|insight)|announcements\/audience\/(professors|preview)/.test(path)) return null;
         if (!write) return { read: true, mode: 'none', title: 'Loading…' };
         if (/upload|companycreate|student\/moa\//.test(path)) return { mode: 'modal', title: 'Processing document…' };
         if (/evaluation/.test(path)) return { mode: 'modal', title: /send|resend/.test(path) ? 'Sending evaluation…' : 'Processing evaluation…' };

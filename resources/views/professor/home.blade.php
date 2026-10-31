@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ vasset('css/dashboard-global.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/professor/home.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ vasset('css/components/announcement-audience.css') }}">
     <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/dark-mode.css') }}?v={{ time() }}">
     <script src="{{ vasset('assets/js/dark-mode.js') }}"></script>
@@ -176,6 +177,27 @@
                 <i class="fa fa-chalkboard-teacher"></i>
             </div>
         </div>
+
+        <section class="coordinator-announcement-feed" aria-label="Coordinator announcements">
+            <h2><i class="fa fa-bullhorn"></i> Coordinator Announcements</h2>
+            @forelse($coordinatorAnnouncements as $announcement)
+                <article>
+                    <small>{{ $announcement->announcer }} · OJT Coordinator</small>
+                    <h3>{{ $announcement->title }}</h3>
+                    <time datetime="{{ $announcement->created_at->toIso8601String() }}">{{ $announcement->created_at->format('M d, Y h:i A') }}</time>
+                    <p>{{ $announcement->content }}</p>
+                </article>
+            @empty
+                <p>No coordinator announcements for you yet.</p>
+            @endforelse
+            @if($coordinatorAnnouncements->hasPages())
+                <nav class="announcement-pagination" aria-label="Announcement pages">
+                    @if(!$coordinatorAnnouncements->onFirstPage())<a href="{{ $coordinatorAnnouncements->previousPageUrl() }}">Previous</a>@endif
+                    <span>Page {{ $coordinatorAnnouncements->currentPage() }} of {{ $coordinatorAnnouncements->lastPage() }}</span>
+                    @if($coordinatorAnnouncements->hasMorePages())<a href="{{ $coordinatorAnnouncements->nextPageUrl() }}">Next</a>@endif
+                </nav>
+            @endif
+        </section>
 
         <!-- Stats Cards -->
         <div class="stats-grid">

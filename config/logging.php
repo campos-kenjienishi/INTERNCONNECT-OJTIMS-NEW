@@ -52,6 +52,12 @@ return [
     */
 
     'channels' => [
+        'announcement_mail' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/announcement-mail.log'),
+            'level' => 'debug',
+            'days' => 7,
+        ],
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],

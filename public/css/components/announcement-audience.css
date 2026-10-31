@@ -1,0 +1,46 @@
+.announcement-targeting .field-group { margin-top: 16px; }
+.announcement-targeting .field-input { width: 100%; min-width: 0; }
+.announcement-period-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.announcement-checklist { margin-top: 10px; max-height: 220px; overflow-y: auto; border: 1px solid var(--border, #e5e7eb); border-radius: 12px; padding: 8px; }
+.announcement-checklist label { display: flex; gap: 10px; align-items: flex-start; padding: 10px; cursor: pointer; font-size: 13px; overflow-wrap: anywhere; }
+.announcement-checklist input { margin-top: 4px; accent-color: #b91c1c; flex-shrink: 0; }
+.announcement-checklist small { display: block; opacity: .7; font-size: 11px; margin-top: 3px; }
+.announcement-audience-hint { font-size: 12px; line-height: 1.7; opacity: .75; margin: 12px 0; }
+.announcement-audience-error { color: #b91c1c; background: #fff1f2; padding: 12px; border-radius: 10px; font-size: 13px; }
+.announcement-targeting [hidden] { display: none !important; }
+.announcement-designations { margin-top: 22px; }
+.announcement-designations summary { padding: 20px 24px; font-weight: 700; cursor: pointer; }
+.announcement-designations summary span { display: block; font-size: 12px; opacity: .7; font-weight: 400; margin-top: 5px; }
+.announcement-designation-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: end; }
+.announcement-designation-form label { min-width: 0; font-size: 12px; font-weight: 600; }
+.announcement-designation-form .field-input { width: 100%; margin-top: 6px; }
+.announcement-designation-list { max-height: 320px; overflow: auto; margin-top: 18px; }
+.announcement-designation-row { display: flex; justify-content: space-between; gap: 16px; align-items: center; border-top: 1px solid var(--border, #e5e7eb); padding: 12px 0; font-size: 13px; }
+.announcement-designation-row span { display: block; font-size: 12px; opacity: .75; overflow-wrap: anywhere; }
+.announcement-preview { text-align: left; font-size: 14px; }
+.announcement-preview p { margin: 10px 0; overflow-wrap: anywhere; }
+.announcement-preview details { margin: 12px 0; }
+.announcement-preview ul { max-height: 180px; overflow-y: auto; padding-left: 24px; }
+.announcement-recipient-summary { display: block; margin-top: 5px; font-size: 11px; opacity: .75; overflow-wrap: anywhere; }
+.announcement-email-option { border: 1px solid var(--border, #e5e7eb); border-radius: 12px; padding: 14px; margin-top: 18px; }
+.announcement-email-option > label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; }
+.announcement-email-option input { flex-shrink: 0; margin-top: 4px; accent-color: #b91c1c; }
+.announcement-email-option small { display: block; opacity: .75; font-size: 11px; line-height: 1.7; margin-top: 4px; }
+.announcement-email-status { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border, #e5e7eb); font-size: 12px; }
+.announcement-email-status small { display: block; font-size: 11px; line-height: 1.7; opacity: .8; white-space: normal; }
+.announcement-email-retry { border: 1px solid #d97706; background: transparent; color: #b45309; border-radius: 8px; padding: 7px 10px; font-size: 11px; cursor: pointer; margin-top: 8px; }
+.announcement-email-retry:disabled { opacity: .5; cursor: wait; }
+.coordinator-announcement-feed { margin: 22px 0; padding: 24px; border-radius: 18px; background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb); }
+.coordinator-announcement-feed h2 { font-size: 18px; margin: 0 0 16px; }
+.coordinator-announcement-feed article { padding: 16px 0; border-top: 1px solid var(--border, #e5e7eb); }
+.coordinator-announcement-feed h3 { font-size: 15px; margin: 8px 0; overflow-wrap: anywhere; }
+.coordinator-announcement-feed p { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.8; }
+.coordinator-announcement-feed time, .coordinator-announcement-feed small { font-size: 12px; opacity: .75; }
+body.dark-mode .coordinator-announcement-feed { background: #18181b; border-color: #34343a; color: #e5e7eb; }
+body.dark-mode .announcement-audience-error { background: #451a24; color: #fecdd3; }
+.announcement-pagination { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font-size: 13px; padding-top: 12px; }
+@media (max-width: 600px) {
+    .announcement-period-grid, .announcement-designation-form { grid-template-columns: minmax(0, 1fr); }
+    .announcement-designation-row { align-items: flex-start; flex-direction: column; gap: 8px; }
+    .coordinator-announcement-feed { padding: 18px; }
+}

@@ -330,9 +330,10 @@
                         </div>
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-graduation-cap"></i> Program</label>
-                            <select class="field-select" id="course" name="course" required>
+                            <select class="field-select" id="course" name="course">
+                                <option value="" {{ empty($selectedCourse) ? 'selected' : '' }}>All Programs</option>
                                 @foreach ($course as $c)
-                                <option value="{{ $c->course }}" {{ request('course') === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
+                                <option value="{{ $c->course }}" {{ ($selectedCourse ?? request('course')) === $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -481,7 +482,7 @@
 
 <form id="sendEmailForm" action="{{ url('/reportsExpired/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
     @csrf
-    <input type="hidden" id="courseHidden" name="course" value="{{ $course ?? '' }}">
+    <input type="hidden" id="courseHidden" name="course" value="{{ $selectedCourse ?? '' }}">
     <input type="hidden" id="emailHidden"  name="email"  value="{{ $user->email ?? '' }}">
 </form>
 
@@ -497,7 +498,7 @@
             total_companies: @json(collect($studentData)->pluck('ojt.company_name')->filter()->unique()->count()),
             records_with_ojt: @json(collect($studentData)->filter(fn ($row) => !empty($row['ojt']))->count()),
             missing_ojt: @json(count($studentData) - collect($studentData)->filter(fn ($row) => !empty($row['ojt']))->count()),
-            course: @json(request('course') ?: null),
+            course: @json($selectedCourse ?: null),
             school_year: @json($selectedSchoolYear ?? null)
         },
         insight: @json($reportInsights ?? []),
@@ -515,7 +516,7 @@
         campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Campus')),
         coordinatorName: @json($coordinatorFullName ?: 'OJT Coordinator'),
         schoolYear: @json($selectedSchoolYear ?? request('school_year') ?? ''),
-        course: @json(request('course') ?? ''),
+        course: @json($selectedCourse ?? ''),
         semester: @json($selectedSemester ?? request('semester') ?? '1st Semester')
     };
     window.reportConfig = window.__reportsConfig;
