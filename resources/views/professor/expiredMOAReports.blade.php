@@ -180,7 +180,8 @@
                     </div>
                     <div class="filter-group">
                         <label class="filter-label"><i class="fa fa-graduation-cap"></i> Program</label>
-                        <select class="filter-select" name="course" id="courseSelect" required>
+                        <select class="filter-select" name="course" id="courseSelect">
+                            <option value="" {{ empty($selectedCourse) ? 'selected' : '' }}>All Programs</option>
                             @foreach ($courseAll as $c)
                                 <option value="{{ $c->course }}" {{ (string) ($selectedCourse ?? '') === (string) $c->course ? 'selected' : '' }}>{{ $c->course }}</option>
                             @endforeach

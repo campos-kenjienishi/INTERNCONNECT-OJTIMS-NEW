@@ -53,35 +53,7 @@ private function requireStudentSession()
 
 private function coordinatorAnnouncementsForStudent($data)
 {
-    $coordinatorNames = User::where('role', 1)->pluck('full_name')->filter()->values()->all();
-    $coordinatorIds = User::where('role', 1)->pluck('id')->filter()->values()->all();
-    $hasAnnouncerUserIdColumn = Schema::hasColumn('announcements', 'announcer_user_id');
-    $hasAudienceColumn = Schema::hasColumn('announcements', 'audience');
-
-    return Announcements::where(function ($query) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn, $hasAudienceColumn) {
-        if ($hasAudienceColumn) {
-            $query->where(function ($q) use ($coordinatorNames, $coordinatorIds, $hasAnnouncerUserIdColumn) {
-                $q->where('audience', 'all_students')
-                  ->orWhereNull('audience');
-
-                if ($hasAnnouncerUserIdColumn && !empty($coordinatorIds)) {
-                    $q->where(function ($inner) use ($coordinatorIds, $coordinatorNames) {
-                        $inner->whereIn('announcer_user_id', $coordinatorIds)
-                              ->orWhereIn('announcer', $coordinatorNames);
-                    });
-                } else {
-                    $q->whereIn('announcer', $coordinatorNames);
-                }
-            });
-        } else {
-            if ($hasAnnouncerUserIdColumn && !empty($coordinatorIds)) {
-                $query->whereIn('announcer_user_id', $coordinatorIds)
-                      ->orWhereIn('announcer', $coordinatorNames);
-            } else {
-                $query->whereIn('announcer', $coordinatorNames);
-            }
-        }
-    })->latest()->get();
+    return app(\App\Services\AnnouncementAudienceService::class)->visibleTo($data)->latest()->get();
 }
 
 private function classAnnouncementsForStudent($data, $classRoomNames = [])

@@ -746,6 +746,7 @@ class AuthController extends Controller
     }
 
     public function dashboard(){
+        $announcementOptions = app(\App\Services\AnnouncementAudienceService::class)->formOptions();
         $sixMonthsAgo = Carbon::now()->subMonths(6);
         $roleCount = User::where('role', 0)
             ->where('created_at', '>=', $sixMonthsAgo)
@@ -775,6 +776,7 @@ class AuthController extends Controller
             ->get();
 
         $pendingStudents = User::where('role', 0)->where('status', 0)->count();
+        app(\App\Services\AnnouncementEmailService::class)->attachSummaries($announcements);
         $approvedStudents = User::where('role', 0)->where('status', 1)->count();
         $pendingRequirements = FileRequirement::where('status', 0)->count();
         $partnerCompanies = Company::count();
@@ -801,6 +803,7 @@ class AuthController extends Controller
             'roleCountP',
             'fileCount',
             'announcements',
+            'announcementOptions',
             'dashboardInsights',
             'pendingStudents',
             'approvedStudents',
@@ -1808,7 +1811,10 @@ class AuthController extends Controller
             ];
         })->values();
 
-        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount', 'class', 'approvedStudents', 'pendingApprovals', 'deniedStudents', 'inactiveStudents', 'monthlyActivity'));
+        $coordinatorAnnouncements = app(\App\Services\AnnouncementAudienceService::class)->visibleTo($data)
+            ->latest()->paginate(5, ['*'], 'announcement_page');
+
+        return view('professor.home', compact('companies','data', 'roleCount', 'fileCount', 'class', 'approvedStudents', 'pendingApprovals', 'deniedStudents', 'inactiveStudents', 'monthlyActivity', 'coordinatorAnnouncements'));
     }
 
     public function professorAnalytics()

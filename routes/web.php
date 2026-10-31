@@ -241,6 +241,11 @@ Route::middleware(['auth.session.custom', 'role:0,1,2'])->group(function () {
     Route::put('/change_password/{id}', [AccountInfo::class,'change_password']);
     Route::post('/change_password/verify-current/{id}', [AccountInfo::class,'verifyCurrentPassword']);
     Route::post('/announcements', [AnnouncementController::class,'announcement']);
+    Route::post('/announcements/audience/professors', [\App\Http\Controllers\TargetedAnnouncementController::class, 'professors'])->middleware('throttle:60,1')->name('announcements.professors');
+    Route::post('/announcements/audience/preview', [\App\Http\Controllers\TargetedAnnouncementController::class, 'preview'])->middleware('throttle:30,1')->name('announcements.preview');
+    Route::post('/announcements/{id}/retry-emails', [\App\Http\Controllers\TargetedAnnouncementController::class, 'retryEmails'])->middleware('throttle:10,1')->name('announcements.emails.retry');
+    Route::post('/announcements/ojt-professors', [\App\Http\Controllers\TargetedAnnouncementController::class, 'designate'])->name('announcements.designate');
+    Route::delete('/announcements/ojt-professors/{id}', [\App\Http\Controllers\TargetedAnnouncementController::class, 'removeDesignation'])->name('announcements.designations.destroy');
     Route::get('/companyCreate', function () {
         $user = User::where('id', session('loginId'))->first();
         $fallbackPath = $user && (int) $user->role === 0 ? '/student/MOA' : '/MOA';

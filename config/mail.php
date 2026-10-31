@@ -34,6 +34,10 @@ return [
     */
 
     'mailers' => [
+        'announcement_log' => [
+            'transport' => 'log',
+            'channel' => 'announcement_mail',
+        ],
         'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),

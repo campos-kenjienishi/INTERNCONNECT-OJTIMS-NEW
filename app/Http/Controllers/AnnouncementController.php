@@ -51,6 +51,10 @@ class AnnouncementController extends Controller
             abort(403, 'Only coordinators and professors can post announcements.');
         }
 
+        if ((string) $user->role === '1') {
+            return app(TargetedAnnouncementController::class)->publish($request);
+        }
+
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
