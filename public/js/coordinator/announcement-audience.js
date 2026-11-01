@@ -117,26 +117,91 @@
     });
 
     function previewContent(data) {
-        const panel = document.createElement('div'); panel.className = 'announcement-preview';
-        const add = message => { const paragraph = document.createElement('p'); paragraph.textContent = message; panel.appendChild(paragraph); };
-        add(`Title: ${form.elements.title.value}`);
-        add(`Programs: ${programMode.value === 'all' ? 'All Programs' : [...programs.querySelectorAll('input:checked')].map(input => input.value).join(', ')}`);
-        add(`Period: ${form.elements.school_year.value || 'All School Years'} · ${form.elements.semester.value || 'All Semesters'}`);
-        add(`${data.students.length} student(s) and ${data.professors.length} OJT professor(s).`);
-        for (const [heading, recipients] of [['Students', data.students], ['OJT Professors', data.professors]]) {
+        const element = (tag, className, text) => {
+            const node = document.createElement(tag);
+            node.className = className;
+            if (text !== undefined) node.textContent = text;
+            return node;
+        };
+        const icon = className => {
+            const node = element('i', `fa ${className}`);
+            node.setAttribute('aria-hidden', 'true');
+            return node;
+        };
+        const panel = element('div', 'announcement-preview');
+        panel.appendChild(element('p', 'announcement-preview-intro', 'Check the message, audience, and delivery options before publishing.'));
+
+        const message = element('section', 'announcement-preview-message');
+        message.append(element('span', 'announcement-preview-label', 'Announcement'), element('h3', '', form.elements.title.value));
+        message.appendChild(element('p', 'announcement-preview-message-body', form.elements.content.value));
+        panel.appendChild(message);
+
+        const scope = element('dl', 'announcement-preview-scope');
+        const programField = element('div', 'announcement-preview-field');
+        const programLabel = element('dt', 'announcement-preview-label', 'Programs');
+        programLabel.prepend(icon('fa-graduation-cap'));
+        const chips = element('dd', 'announcement-preview-chips');
+        const selectedPrograms = programMode.value === 'all' ? ['All Programs']
+            : [...programs.querySelectorAll('input:checked')].map(input => input.value);
+        selectedPrograms.forEach(program => chips.appendChild(element('span', 'announcement-preview-chip', program)));
+        programField.append(programLabel, chips);
+        const periodField = element('div', 'announcement-preview-field');
+        const periodLabel = element('dt', 'announcement-preview-label', 'Academic period');
+        periodLabel.prepend(icon('fa-calendar-alt'));
+        const period = element('dd', 'announcement-preview-period');
+        period.append(element('strong', '', form.elements.school_year.value || 'All School Years'),
+            element('span', '', form.elements.semester.value || 'All Semesters'));
+        periodField.append(periodLabel, period);
+        scope.append(programField, periodField);
+        panel.appendChild(scope);
+
+        const recipientHeader = element('div', 'announcement-preview-recipient-heading');
+        recipientHeader.append(element('h3', '', 'Recipients'), element('span', 'announcement-preview-total', `${data.students.length + data.professors.length} total`));
+        panel.appendChild(recipientHeader);
+        const metrics = element('div', 'announcement-preview-metrics');
+        const groups = [['Students', data.students, 'fa-user-graduate'], ['OJT Professors', data.professors, 'fa-chalkboard-teacher']];
+        for (const [heading, recipients, iconClass] of groups) {
+            const metric = element('div', `announcement-preview-metric${recipients.length ? '' : ' is-empty'}`);
+            const badge = element('span', 'announcement-preview-metric-icon');
+            badge.appendChild(icon(iconClass));
+            const value = element('div', 'announcement-preview-metric-value');
+            value.append(element('strong', '', String(recipients.length)), element('span', '', heading));
+            metric.append(badge, value);
+            metrics.appendChild(metric);
+        }
+        panel.appendChild(metrics);
+
+        const lists = element('div', 'announcement-preview-recipient-lists');
+        for (const [heading, recipients, iconClass] of groups) {
             if (!recipients.length) continue;
-            const details = document.createElement('details');
-            const summary = document.createElement('summary'); summary.textContent = `${heading} (${recipients.length})`;
-            const names = document.createElement('ul');
-            recipients.forEach(recipient => { const item = document.createElement('li'); item.textContent = recipient.name || recipient.full_name; names.appendChild(item); });
-            details.append(summary, names); panel.appendChild(details);
+            const details = element('details', 'announcement-preview-recipient-group');
+            const summary = element('summary', '');
+            summary.append(icon(iconClass), element('span', '', `View ${heading.toLowerCase()} (${recipients.length})`));
+            const names = element('ul', 'announcement-preview-names');
+            recipients.forEach(recipient => names.appendChild(element('li', '', recipient.name || recipient.full_name)));
+            details.append(summary, names);
+            lists.appendChild(details);
         }
+        panel.appendChild(lists);
+
+        const delivery = element('section', `announcement-preview-delivery${data.email ? ' has-email' : ''}`);
+        const deliveryIcon = element('span', 'announcement-preview-delivery-icon');
+        deliveryIcon.appendChild(icon(data.email ? 'fa-envelope' : 'fa-desktop'));
+        const deliveryText = element('div', 'announcement-preview-delivery-text');
         if (data.email) {
-            add(`Email notifications: ${data.email.valid} queued after publication; ${data.email.skipped} skipped because of missing or invalid email addresses.`);
-            if (data.email.capture) add('Test capture mode: no real recipient emails will be sent.');
+            deliveryText.append(element('strong', '', data.email.capture ? 'Email test capture enabled' : 'Email notifications enabled'),
+                element('p', '', `${data.email.valid} email notification(s) will be queued after publication.`));
+            if (data.email.skipped) deliveryText.appendChild(element('p', '', `${data.email.skipped} recipient(s) have missing or invalid email addresses and will receive the in-app announcement only.`));
+            if (data.email.capture) deliveryText.appendChild(element('span', 'announcement-preview-capture', 'Test mode: no real emails will be sent.'));
         } else {
-            add('In-app announcement only. No email notifications will be sent.');
+            deliveryText.append(element('strong', '', 'In-app announcement only'),
+                element('p', '', 'No email notifications will be sent.'));
         }
+        delivery.append(deliveryIcon, deliveryText);
+        panel.appendChild(delivery);
+        const privacy = element('p', 'announcement-preview-privacy');
+        privacy.append(icon('fa-lock'), element('span', '', 'Only the listed recipients will see this announcement.'));
+        panel.appendChild(privacy);
         return panel.outerHTML;
     }
 
@@ -155,9 +220,17 @@
             const data = await post(root.dataset.previewUrl);
             if (snapshot !== JSON.stringify(filters())) throw new Error('The form changed. Preview the announcement again.');
             const result = await Swal.fire({
-                title: 'Publish announcement?', html: previewContent(data), icon: 'question',
+                title: 'Publish announcement?', html: previewContent(data),
                 showCancelButton: true, confirmButtonText: 'Publish Announcement', cancelButtonText: 'Keep Editing',
-                confirmButtonColor: '#b91c1c', focusCancel: true, width: 640
+                confirmButtonColor: '#b91c1c', focusCancel: true, width: 720,
+                showCloseButton: true, closeButtonAriaLabel: 'Close preview and keep editing',
+                reverseButtons: true, heightAuto: false,
+                customClass: {
+                    popup: 'announcement-preview-popup', title: 'announcement-preview-title',
+                    htmlContainer: 'announcement-preview-content', actions: 'announcement-preview-actions',
+                    confirmButton: 'announcement-preview-confirm', cancelButton: 'announcement-preview-cancel',
+                    closeButton: 'announcement-preview-close'
+                }
             });
             if (!result.isConfirmed) return;
             if (snapshot !== JSON.stringify(filters())) throw new Error('The form changed. Preview the announcement again.');
