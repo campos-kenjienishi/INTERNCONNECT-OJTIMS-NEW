@@ -83,7 +83,7 @@
                 <span class="line-system">Information Management System</span>
             </h2>
             <p class="hero-copy">
-                A centralized and secure platform for OJT management, including MOA management, OJT requirements tracking, and company evaluations for PUP&ndash;Taguig Campus.
+                A centralized platform for PUP&ndash;Taguig Campus OJT management, featuring OJT requirement submission and tracking, Memorandum of Agreement (MOA) management, company evaluations, system report generation, and Certificate of Completion (COC) submission and validation.
             </p>
         </div>
     </div>
@@ -111,10 +111,7 @@
     <section id="Features" class="section section-centered features-section">
         <div class="section-inner">
             <div class="section-label reveal" data-reveal="fade"><i class="fa fa-info-circle"></i> Features</div>
-            <h2 class="reveal" data-reveal="slide">Built for students, coordinators, and professors.</h2>
-            <p class="reveal" data-reveal="fade">
-                InternConnect brings OJT workflows into one place so users can submit requirements, track approvals, and manage training progress without the usual paper chase.
-            </p>
+            <h2 class="reveal" data-reveal="slide">Built for Students, Professors, and Coordinator</h2>
 
             <div class="feature-grid">
                 <!-- 1. Student Experience Card -->
@@ -127,13 +124,13 @@
                         <div class="feature-icon icon-student">
                             <i class="fa fa-file-upload"></i>
                         </div>
-                        <h3>Document Submission</h3>
+                        <h3>Document Submission &amp; Tracking</h3>
                     </div>
-                    <p>Upload requirements quickly through a clear portal flow designed for mobile and desktop users.</p>
+                    <p>Submit PDF OJT requirements, track approval statuses, and upload your Certificate of Completion for validation.</p>
                     <div class="feature-tag-list">
-                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Mobile & Desktop Flow</span>
-                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Instant Status Tracking</span>
-                        <span class="feature-tag"><i class="fa fa-check-circle"></i> PDF & Image Submissions</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> PDF Requirement Submissions</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Requirement Status Tracking</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Certificate of Completion Validation</span>
                     </div>
                 </article>
 
@@ -141,7 +138,7 @@
                 <article class="feature-card reveal" data-reveal="bounce">
                     <span class="feature-watermark">02</span>
                     <div class="feature-role-pill role-professor">
-                        <i class="fa fa-chalkboard-teacher"></i> Professor Hub
+                        <i class="fa fa-chalkboard-teacher"></i> Professor Portal
                     </div>
                     <div class="feature-title-row">
                         <div class="feature-icon icon-professor">
@@ -161,7 +158,7 @@
                 <article class="feature-card reveal" data-reveal="slide">
                     <span class="feature-watermark">03</span>
                     <div class="feature-role-pill role-coordinator">
-                        <i class="fa fa-user-shield"></i> Coordinator Deck
+                        <i class="fa fa-user-shield"></i> Coordinator Portal
                     </div>
                     <div class="feature-title-row">
                         <div class="feature-icon icon-coordinator">
@@ -169,11 +166,11 @@
                         </div>
                         <h3>Program Management</h3>
                     </div>
-                    <p>Keep students, companies, and coordinators aligned inside one system that follows the workflow.</p>
+                    <p>Oversee OJT operations by managing Memorandum of Agreement (MOA) records, monitoring advisees, and generating comprehensive system reports.</p>
                     <div class="feature-tag-list">
-                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Company MoA Tracking</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Company MOA Tracking</span>
                         <span class="feature-tag"><i class="fa fa-check-circle"></i> Bulk Advisee Auditing</span>
-                        <span class="feature-tag"><i class="fa fa-check-circle"></i> Analytics & Class Control</span>
+                        <span class="feature-tag"><i class="fa fa-check-circle"></i> System Report Generation</span>
                     </div>
                 </article>
             </div>
@@ -187,16 +184,16 @@
                     <div class="bud-spotlight-content">
                         <div class="bud-pill-badge">
                             <i class="fa fa-paw" aria-hidden="true"></i>
-                            <span>MEET BUD &bull; YOUR OJT BUDDY</span>
+                            <span>MEET BUD &bull; YOUR AI OJT BUDDY</span>
                         </div>
 
                         <h3 class="bud-spotlight-title">
-                            A little guidance.<br>
-                            <span>A smoother OJT journey.</span>
+                            A Little Guidance.<br>
+                            <span>A Smoother OJT Journey.</span>
                         </h3>
 
                         <p class="bud-spotlight-desc">
-                            Meet <strong>Bud</strong>, your always-ready companion inside InternConnect. Get clear answers, find your next step, and navigate your internship with confidence.
+                            Meet <strong>Bud</strong>, your always-ready virtual AI buddy inside InternConnect: OJTIMS. Get instant answers on OJT requirements, find your next steps, and navigate your journey with ease.
                         </p>
 
                         <div class="bud-feature-grid">
@@ -206,7 +203,7 @@
                                 </div>
                                 <div class="bud-feature-text">
                                     <h4>Instant OJT Q&A</h4>
-                                    <p>Clear answers on requirements, MOA, OJT hours, and clearance.</p>
+                                    <p>Guidance on requirements, notarized MOAs, certificates of completion, and supervisor evaluations.</p>
                                 </div>
                             </div>
 
@@ -226,7 +223,7 @@
                                 </div>
                                 <div class="bud-feature-text">
                                     <h4>Step-by-Step Navigation</h4>
-                                    <p>Find your way through profile syncing, rooms, and evaluations.</p>
+                                    <p>Guided walk-throughs for profile updates, evaluations, and portal features.</p>
                                 </div>
                             </div>
 
@@ -236,7 +233,7 @@
                                 </div>
                                 <div class="bud-feature-text">
                                     <h4>Guidance for Your Role</h4>
-                                    <p>Support for students, class advisers, and OJT coordinators.</p>
+                                    <p>Tailored support for Students, OJT Subject Professors, and OJT Coordinator.</p>
                                 </div>
                             </div>
                         </div>
@@ -249,7 +246,7 @@
                             </a>
                             <div class="bud-live-status">
                                 <span class="bud-pulse-dot"></span>
-                                <span>Available 24/7 in all portals</span>
+                                <span>Available 24/7 in All Portals</span>
                             </div>
                         </div>
                     </div>
@@ -276,9 +273,9 @@
     <section id="Contact Us" class="section alt section-centered contact-section">
         <div class="section-inner">
             <div class="section-label reveal" data-reveal="fade"><i class="fa fa-headset"></i> Contact Us</div>
-            <h2 class="reveal" data-reveal="slide">Need help getting started?</h2>
+            <h2 class="reveal" data-reveal="slide">Need Help Getting Started?</h2>
             <p class="contact-intro reveal" data-reveal="fade">
-                Reach out if you need help with submissions, account access, or follow-up questions about your OJT requirements. We keep support simple: quick messages through Facebook Messenger, or a direct email if you need a formal concern documented.
+                Reach out for assistance with document submissions, account access, or general OJT inquiries. Get quick support via Facebook Messenger or Email.
             </p>
 
             <div class="contact-highlights">
@@ -290,7 +287,7 @@
                         </div>
                         <strong>Campus Office</strong>
                     </div>
-                    <span>PUP Taguig Campus, for on-site coordination and office visits when needed.</span>
+                    <span>Visit PUP Taguig Campus for in-person consultations, document submissions, and office inquiries.</span>
                     <a href="https://maps.google.com/?q=PUP+Taguig+Campus" target="_blank" rel="noopener noreferrer" class="contact-action-btn btn-location">
                         <span><i class="fa fa-directions"></i> View Map</span>
                         <i class="fa fa-arrow-right"></i>
@@ -305,7 +302,7 @@
                         </div>
                         <strong>Messenger Support</strong>
                     </div>
-                    <span>Use Facebook Messenger for fast concerns or real-time requirement guidance.</span>
+                    <span>Connect via Facebook Messenger for quick inquiries and real-time guidance.</span>
                     <a href="https://www.facebook.com/profile.php?id=61593939354633" target="_blank" rel="noopener noreferrer" class="contact-action-btn btn-messenger">
                         <span><i class="fab fa-facebook-f"></i> Message Us</span>
                         <i class="fa fa-arrow-right"></i>
@@ -320,7 +317,7 @@
                         </div>
                         <strong>Email Support Desk</strong>
                     </div>
-                    <span>Use email for formal concerns, attachments, or issues that need a written record.</span>
+                    <span>Send an email for formal requests or concerns requiring a written record.</span>
                     <a href="mailto:internconnect.ojtims@gmail.com" class="contact-action-btn btn-email">
                         <span><i class="fa fa-paper-plane"></i> Send Email</span>
                         <i class="fa fa-arrow-right"></i>
@@ -335,18 +332,18 @@
                         </div>
                         <strong>Operating Hours</strong>
                     </div>
-                    <span>Support team replies during active campus office hours on school days.</span>
+                    <span>Support team is active during official campus office hours on regular school days.</span>
                     <div class="contact-status-chip">
                         <span class="status-pulse-dot"></span>
-                        <span>Mon–Fri • 8:00 AM – 5:00 PM</span>
+                        <span>Monday &ndash; Friday | 8:00 AM &ndash; 5:00 PM</span>
                     </div>
                 </div>
             </div>
 
                         <div class="contact-card reveal" data-reveal="bounce">
                 <div class="contact-card-left">
-                    <h3>Reach us directly</h3>
-                    <p>Message us on Facebook or send an email and we'll get back to you as soon as we can.</p>
+                    <h3>Reach Us Directly</h3>
+                    <p>Send us a message on Facebook or via Email, and our team will get back to you as soon as we can.</p>
                 </div>
 
                 <div class="contact-card-divider"></div>
@@ -361,7 +358,7 @@
 
                     <a class="contact-info-row" href="https://www.facebook.com/profile.php?id=61593939354633" target="_blank" rel="noopener noreferrer">
                         <span class="contact-info-icon"><i class="fab fa-facebook-f"></i></span>
-                        <span class="contact-info-text">InternConnect: On-the-Job Training (OJT) Information Management System</span>
+                        <span class="contact-info-text">InternConnect: An On-the-Job Training (OJT) Information Management System</span>
                     </a>
                 </div>
             </div>
