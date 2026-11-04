@@ -36,6 +36,7 @@ class Handler extends ExceptionHandler
         if (! config('app.debug')
             && ! $request->expectsJson()
             && ! $response->isRedirection()
+            && $response->getStatusCode() !== 503
             && $response->getStatusCode() >= 400) {
             $statusCode = $e instanceof HttpExceptionInterface
                 ? $e->getStatusCode()
