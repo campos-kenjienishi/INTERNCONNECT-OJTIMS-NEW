@@ -176,21 +176,21 @@
             <div class="stat-card">
                 <div class="stat-icon green"><i class="fa fa-plus-circle"></i></div>
                 <div>
-                    <div class="stat-num">{{ $logs->where('action', 'create')->count() }}</div>
+                    <div class="stat-num">{{ $actionCounts->get('create', 0) }}</div>
                     <div class="stat-name">Create Actions</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon amber"><i class="fa fa-edit"></i></div>
                 <div>
-                    <div class="stat-num">{{ $logs->where('action', 'update')->count() }}</div>
+                    <div class="stat-num">{{ $actionCounts->get('update', 0) }}</div>
                     <div class="stat-name">Update Actions</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon red"><i class="fa fa-trash"></i></div>
                 <div>
-                    <div class="stat-num">{{ $logs->where('action', 'delete')->count() }}</div>
+                    <div class="stat-num">{{ $actionCounts->get('delete', 0) }}</div>
                     <div class="stat-name">Delete Actions</div>
                 </div>
             </div>

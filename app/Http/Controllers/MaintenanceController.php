@@ -131,6 +131,7 @@ class MaintenanceController extends Controller
 
         // Fetch all audit logs for display in coordinator tab, latest first
         $logs = \App\Models\AuditLog::orderBy('created_at', 'desc')->get();
+        $actionCounts = $logs->countBy(fn ($log) => strtolower(trim((string) $log->action)));
 
         $securitySummary = null;
         $securityRecords = collect();
@@ -147,7 +148,7 @@ class MaintenanceController extends Controller
         }
 
         // Return the coordinator audit log view
-        return view('ojtCoordinator.audit', compact('logs', 'data', 'securitySummary', 'securityRecords'));
+        return view('ojtCoordinator.audit', compact('logs', 'actionCounts', 'data', 'securitySummary', 'securityRecords'));
     }
 
     /**
