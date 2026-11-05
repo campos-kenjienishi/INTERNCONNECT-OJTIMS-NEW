@@ -218,7 +218,7 @@ class AuthController extends Controller
                 $user->save();
 
                 // Log in existing user
-                return $this->loginLocalUser($user, $request);
+                return $this->completeLogin($user, $request, 'idp');
             }
 
             // --- NEW USER HANDLING BASED ON TARGET PORTAL ---
@@ -273,7 +273,7 @@ class AuthController extends Controller
                         $user->id
                     );
 
-                    return $this->loginLocalUser($user, $request);
+                    return $this->completeLogin($user, $request, 'idp');
                 }
 
                 // If not found in FLSS API
@@ -301,14 +301,15 @@ class AuthController extends Controller
         }
     }
 
-    protected function loginLocalUser(User $user, Request $request)
+    protected function completeLogin(User $user, Request $request, string $method)
     {
         $request->session()->regenerate();
         $request->session()->put('loginId', $user->id);
         $request->session()->put('show_terms', true);
+        $request->session()->put('authentication_method', $method);
 
         // Prompt for local password setup if they don't have one set up yet
-        if (!$user->has_local_password) {
+        if ($method === 'idp' && !$user->has_local_password) {
             $request->session()->put('show_password_setup', true);
         }
 
@@ -333,7 +334,7 @@ class AuthController extends Controller
         AuditLogger::log(
             'Authentication',
             'login',
-            'User logged in via Identity Provider: ' . $user->email,
+            'User logged in via ' . ($method === 'idp' ? 'Identity Provider (IdP)' : 'Local Sign-in') . ': ' . $user->email,
             $user->id
         );
 
@@ -476,7 +477,7 @@ class AuthController extends Controller
             $user->id
         );
 
-        return $this->loginLocalUser($user, $request);
+        return $this->completeLogin($user, $request, 'idp');
     }
 
     public function setLocalPassword(Request $request)
@@ -702,39 +703,7 @@ class AuthController extends Controller
                     return back()->with('fail', 'Student accounts must log in under the Student Portal.');
                 }
 
-                $request->session()->regenerate();
-                $request->session()->put('loginId',$user->id);
-                $request->session()->put('show_terms', true);
-                Cache::put(
-                    'active_session_id:' . $user->id,
-                    $request->session()->getId(),
-                    now()->addMinutes((int) config('session.lifetime', 120))
-                );
-
-                try {
-                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_login_at')) {
-                        $user->last_login_at = now();
-                    }
-                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_activity_at')) {
-                        $user->last_activity_at = now();
-                    }
-                    $user->saveQuietly();
-                } catch (\Throwable $e) {
-                    // Safe fallback if staging DB has not migrated new columns yet
-                }
-
-                if ($user->role == 0) {
-                    return redirect()->route('student_home');
-                } 
-                else if ($user->role == 2) {
-                    return redirect()->route('professor_home');
-                }
-                else if($user->role == 1) {
-                    return redirect('dashboard');
-                }
-                else {
-                    return redirect('/login');
-                }
+                return $this->completeLogin($user, $request, 'local');
             }
             else{
                 return back()->with('fail','The provided credentials are incorrect.');
@@ -1399,6 +1368,18 @@ class AuthController extends Controller
     public function logout(Request $request){
         if($request->session()->has('loginId')){
             $id = $request->session()->get('loginId');
+            $method = match ($request->session()->get('authentication_method')) {
+                'idp' => 'Identity Provider (IdP)',
+                'local' => 'Local Sign-in',
+                default => 'Unknown (session started before method tracking)',
+            };
+
+            AuditLogger::log(
+                'Authentication',
+                'logout',
+                'User logged out; sign-in method: ' . $method,
+                $id
+            );
             
             // Perform IdP logout if token is present
             if ($request->session()->has('idp_access_token')) {
