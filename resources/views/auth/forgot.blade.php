@@ -61,7 +61,7 @@
                 </h1>
 
                 <p class="hero-desc">
-                    No worries, it happens to everyone. Enter your registered email and we'll send you a secure link to reset your InternConnect password right away.
+                    Enter your registered email to request an InternConnect local password reset. Institutional IdP passwords must be recovered through the Identity Provider.
                 </p>
 
                 <div class="steps-list">
@@ -110,8 +110,8 @@
 
             @if(!Session::has('success'))
             <div class="forgot-header">
-                <h2>Forgot Password?</h2>
-                <p>Enter your registered email address and we'll send you a link to reset your password.</p>
+                <h2>Forgot Local Password?</h2>
+                <p>Request a reset link for your local sign-in credentials. For your institutional password, use the IdP recovery process.</p>
             </div>
             @endif
 
@@ -124,7 +124,7 @@
                         <div class="reset-success-icon">
                             <i class="fa fa-check"></i>
                         </div>
-                        <div class="reset-success-title">Email Sent!</div>
+                        <div class="reset-success-title">Request Received</div>
                         <div class="reset-success-msg">{{ Session::get('success') }}</div>
                         <div class="reset-success-note">
                             <i class="fa fa-info-circle"></i>
@@ -138,12 +138,15 @@
                     @if(Session::has('fail'))
                         <div class="alert alert-danger">{{ Session::get('fail') }}</div>
                     @endif
+                    @if($errors->any())
+                        <div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>
+                    @endif
 
                     <div class="field-group">
                         <label class="form-label">E-mail Address</label>
                         <div class="input-wrap">
                             <i class="fa fa-envelope i-icon"></i>
-                            <input type="text" placeholder="Enter your registered email" name="email" autocomplete="email">
+                            <input type="email" placeholder="Enter your registered email" name="email" autocomplete="email" maxlength="254" required>
                         </div>
                     </div>
 

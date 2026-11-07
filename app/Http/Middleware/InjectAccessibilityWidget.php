@@ -25,7 +25,7 @@ class InjectAccessibilityWidget
         }
 
         // Do not inject on voucher or print/preview pages
-        if ($request->is('voucher*', '*/voucher*', '*print*', '*/print*', 'view/file*') || $request->routeIs('voucher', '*.print')) {
+        if ($request->is('reset', 'voucher*', '*/voucher*', '*print*', '*/print*', 'view/file*') || $request->routeIs('voucher', '*.print')) {
             return $response;
         }
 
