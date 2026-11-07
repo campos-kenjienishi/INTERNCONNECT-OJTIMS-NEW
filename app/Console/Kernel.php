@@ -15,7 +15,6 @@ class Kernel extends ConsoleKernel
         if (config('announcement_email.enabled')) {
             $schedule->command('announcements:send-emails')->everyMinute()->withoutOverlapping(10);
         }
-        $schedule->command('app:delete-old-users')->daily(); // Corrected command signature
         $schedule->command('flss:sync-faculty')->monthlyOn(1, '02:00')->withoutOverlapping();
 
         if (config('audit.prune_enabled', true)) {

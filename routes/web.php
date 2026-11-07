@@ -99,6 +99,10 @@ Route::middleware(['auth.session.custom', 'role:1'])->group(function () {
     Route::post('/coordinator/transfer-role', [AuthController::class, 'transferCoordinatorRole'])->name('coordinator.transferRole');
     Route::put('/updateProfessor', [ProfessorController::class, 'update'])->name('updateProfessor');
     Route::get('/maintenance',[MaintenanceController::class,'maintenance']);
+    Route::post('/coordinator/retention/state', [\App\Http\Controllers\DataRetentionController::class, 'update'])->name('retention.update');
+    Route::post('/coordinator/retention/preview', [\App\Http\Controllers\DataRetentionController::class, 'preview'])->name('retention.preview');
+    Route::post('/coordinator/retention/dispose', [\App\Http\Controllers\DataRetentionController::class, 'dispose'])->middleware('throttle:5,1')->name('retention.dispose');
+    Route::post('/coordinator/retention/{disposal}/retry', [\App\Http\Controllers\DataRetentionController::class, 'retry'])->middleware('throttle:5,1')->name('retention.retry');
     Route::post('/coordinator/sync-programs-puptas', [MaintenanceController::class, 'syncProgramsFromPuptas'])->name('coordinator.syncProgramsPuptas');
     Route::post('/remove/course/{id}', [MaintenanceController::class,'remove']);
     Route::post('/courses', [MaintenanceController::class,'courses'])->name('courses');

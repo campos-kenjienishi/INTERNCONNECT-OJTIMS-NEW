@@ -178,6 +178,7 @@
         </div>
 
         <!-- Stats Row -->
+        @include('partials.data-retention')
         @php $totalCourses = count($data); @endphp
         <div class="stats-row">
             <div class="stat-card">
@@ -391,6 +392,7 @@
 </script>
 <script src="{{ vasset('js/components/sync-alerts.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/coordinator/maintenance.js') }}?v={{ time() }}"></script>
+<script src="{{ vasset('js/coordinator/data-retention.js') }}" defer></script>
 <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>
