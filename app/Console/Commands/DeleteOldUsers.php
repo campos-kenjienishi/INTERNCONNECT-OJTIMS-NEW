@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User; // Import the User model
 use Illuminate\Console\Command;
 
 class DeleteOldUsers extends Command
@@ -19,18 +18,15 @@ class DeleteOldUsers extends Command
      *
      * @var string
      */
-    protected $description = 'Delete users older than one year';
+    protected $description = 'Disabled legacy cleanup; use the retention preview instead';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $yearAgo = now()->subYear();
-        User::where('created_at', '<=', $yearAgo)
-            ->where('role', 0) // 0 indicates student role
-            ->delete();
+        $this->warn('Account-age deletion is disabled. No records were deleted. Use retention:preview and the coordinator retention workspace.');
 
-        $this->info('Old student users deleted successfully.');
+        return self::SUCCESS;
     }
 }

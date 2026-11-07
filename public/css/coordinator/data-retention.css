@@ -1,0 +1,109 @@
+.retention-workspace { margin-bottom: 24px; border: 1px solid #eadfe0; border-radius: 16px; background: #fff; box-shadow: 0 6px 20px #40050506; scroll-margin-top: 100px; }
+.retention-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 22px; cursor: pointer; list-style: none; }
+.retention-heading::-webkit-details-marker { display: none; }
+.retention-heading h2 { margin: 4px 0 0; font-size: 17px; font-weight: 800; color: #491414; }
+.retention-heading-actions { display: flex; align-items: center; gap: 16px; }
+.retention-chevron { color: #8e7777; font-size: 12px; }
+.retention-workspace[open] > .retention-heading .retention-chevron { transform: rotate(180deg); }
+.retention-eyebrow { color: #9b2020; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.3px; }
+.retention-mode, .retention-tag { display: inline-block; padding: 5px 9px; border-radius: 25px; background: #fff2ca; color: #74500c; font-size: 10px; font-weight: 600; line-height: 1.5; }
+.retention-tag.neutral { background: #f0f2f6; color: #58677e; }
+.retention-body { padding: 0 22px 18px; border-top: 1px solid #f0e7e7; }
+.retention-intro { margin: 14px 0 10px; font-size: 12px; line-height: 1.7; color: #647084; }
+.retention-policy-details > summary { font-size: 11px; font-weight: 600; color: #8b2424; cursor: pointer; margin-bottom: 10px; }
+.retention-policy { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.retention-policy span { padding: 10px; border: 1px solid #efe3e3; background: #fff9f9; border-radius: 8px; font-size: 10px; line-height: 1.6; }
+.retention-policy strong { display: block; color: #861b1b; font-size: 13px; margin-bottom: 3px; }
+.retention-note { font-size: 11px; color: #647084; line-height: 1.7; margin: 12px 0; }
+.retention-filters { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+.retention-filters label, .retention-state-form > label { display: flex; flex-direction: column; gap: 7px; font-size: 12px; font-weight: 600; }
+.retention-filters input, .retention-filters select, .retention-state-form input:not([type=checkbox]), .retention-category { padding: 8px 10px; border: 1px solid #dce0e7; border-radius: 8px; font: inherit; background: #fff; color: #263449; min-width: 0; width: 100%; }
+.retention-category { font-size: 11px; width: 100%; }
+.retention-button { padding: 8px 11px; border: 1px solid #781616; border-radius: 8px; background: #781616; color: white; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.retention-button.secondary { background: #fff; color: #781616; border-color: #dfc8c8; }
+.retention-button:disabled { opacity: .6; cursor: wait; }
+.retention-button:focus-visible, .retention-workspace summary:focus-visible, .retention-category:focus-visible { outline: 3px solid #d9ae27; outline-offset: 3px; }
+.retention-record-name { display: block; font-size: 12px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.retention-record-meta { display: block; font-size: 10px; line-height: 1.6; color: #738095; margin-top: 4px; overflow-wrap: anywhere; }
+.retention-row-actions { display: flex; align-items: center; gap: 6px; }
+.retention-state-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 22px; }
+.retention-state-form .retention-check { grid-column: 1 / -1; display: flex; flex-direction: row; align-items: flex-start; line-height: 1.7; font-weight: 400; }
+.retention-check input { margin-top: 4px; }
+.retention-state-form .retention-note { grid-column: 1 / -1; margin: 0; }
+.retention-history { border-top: 1px solid #ececf0; margin-top: 16px; padding-top: 14px; }
+.retention-history-title { font-size: 12px; font-weight: 600; cursor: pointer; }
+.retention-history-count { font-size: 10px; padding: 3px 8px; background: #f1f2f5; color: #647084; border-radius: 20px; margin-left: 8px; }
+.retention-table-wrap { overflow-x: auto; }
+.retention-table { width: 100%; min-width: 680px; font-size: 11px; border-collapse: collapse; }
+.retention-table th, .retention-table td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
+.retention-table th { background: #faf5f5; }
+.retention-records { max-height: 460px; border: 1px solid #e8e8ed; border-radius: 10px; }
+.retention-subject-table { min-width: 850px; table-layout: fixed; }
+.retention-subject-table th:first-child { width: 35%; }
+.retention-subject-table th:nth-child(2) { width: 23%; }
+.retention-subject-table th:nth-child(3) { width: 23%; }
+.retention-subject-table th:last-child { width: 19%; }
+.retention-subject-table thead th { position: sticky; top: 0; z-index: 1; font-size: 10px; text-transform: uppercase; letter-spacing: .3px; }
+.retention-pagination { margin-top: 14px; font-size: 12px; }
+.retention-preview-content { text-align: left; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.swal2-popup.retention-dialog { display: flex !important; flex-direction: column; padding: 0; gap: 0; max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); border-radius: 18px; overflow: hidden; background: #fff; color: #273449; font-family: 'Poppins', sans-serif; box-shadow: 0 22px 80px #20030340; }
+.retention-dialog .retention-dialog-title { order: 0; display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin: 0; padding: 19px 48px 19px 22px; border-bottom: 3px solid #e7b932; background: linear-gradient(120deg, #671515, #a52626); color: #fff; font-size: 17px; line-height: 1.5; font-weight: 700; text-align: left; }
+.retention-dialog-title::before { content: '!'; display: inline-grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border: 1px solid #ffffff55; border-radius: 9px; background: #ffffff15; color: #ffe5a1; font-size: 17px; }
+.retention-dialog .swal2-close { position: absolute; top: 14px; right: 10px; color: #fff; font-size: 25px; width: 32px; height: 32px; }
+.retention-dialog .retention-dialog-body { order: 1; flex: 0 1 auto; min-height: 0; margin: 0; padding: 18px 22px; overflow-y: auto; text-align: left; }
+.retention-preview-subject { border: 1px solid #ebe2e2; background: #fcf9f9; border-radius: 12px; padding: 14px; }
+.retention-preview-name { margin: 0 0 8px; color: #3c2020; font-size: 14px; line-height: 1.5; font-weight: 700; }
+.retention-preview-status { display: inline-block; padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+.retention-preview-status.eligible { color: #197044; background: #e4f8ec; }
+.retention-preview-status.blocked { color: #8d4c0f; background: #fff0cf; }
+.retention-preview-reason { margin: 9px 0 0; color: #66748b; font-size: 11px; }
+.retention-preview-metrics { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px; margin: 12px 0; }
+.retention-preview-metric { padding: 10px; border: 1px solid #e7e9ef; border-radius: 10px; }
+.retention-preview-metric span { display: block; font-size: 9px; line-height: 1.5; color: #6e7a8d; }
+.retention-preview-metric strong { display: block; margin-top: 5px; font-size: 14px; color: #781616; line-height: 1.4; }
+.retention-preview-details { padding: 10px 0; border-top: 1px solid #ececf1; }
+.retention-preview-details summary { cursor: pointer; color: #781616; font-size: 11px; font-weight: 600; }
+.retention-preview-tables { margin: 10px 0; padding-left: 18px; font-size: 11px; color: #55657c; }
+.retention-preview-files { max-height: 150px; overflow-y: auto; margin: 10px 0; padding: 10px 10px 10px 26px; border-radius: 8px; background: #f4f5f8; color: #637087; font: 10px/1.8 monospace; overflow-wrap: anywhere; }
+.retention-preview-detail-note { color: #748095; font-size: 10px; margin: 8px 0; }
+.retention-preview-warning { border-left: 3px solid #d59d25; border-radius: 0 9px 9px 0; padding: 10px 12px; background: #fffaeb; color: #6f5428; }
+.retention-preview-warning strong { font-size: 11px; }
+.retention-preview-warning p { margin: 4px 0 0; font-size: 10px; }
+.retention-preview-readonly { margin: 12px 0 0; font-size: 11px; color: #627086; }
+.retention-dialog .retention-dialog-input-label { order: 2; flex-shrink: 0; justify-content: flex-start; margin: 0 22px 7px; padding: 0; color: #40506a; font-size: 11px; font-weight: 600; }
+.retention-dialog .retention-dialog-input { order: 3; flex-shrink: 0; height: 40px; min-height: 40px; width: calc(100% - 44px); margin: 0 22px 16px; border: 1px solid #d7c3c3; border-radius: 9px; padding: 8px 12px; box-shadow: none; color: #3c2525; font: 600 13px 'Poppins', sans-serif; letter-spacing: 1px; }
+.retention-dialog .retention-dialog-input:focus { border-color: #9c3030; box-shadow: 0 0 0 3px #78161612; }
+.retention-dialog .retention-dialog-validation { order: 4; flex-shrink: 0; margin: 0; padding: 10px 22px; font-size: 11px; }
+.retention-dialog .retention-dialog-actions { order: 5; flex-shrink: 0; display: flex; justify-content: flex-end; gap: 8px; margin: 0; padding: 13px 22px; border-top: 1px solid #ececf1; background: #fbfbfc; }
+.retention-dialog .retention-dialog-confirm, .retention-dialog .retention-dialog-cancel { margin: 0; padding: 10px 15px; border-radius: 9px; font-size: 11px; font-weight: 600; box-shadow: none; }
+.retention-dialog .retention-dialog-cancel { border: 1px solid #d8dce5; background: #fff; color: #526078; }
+.retention-dialog .retention-dialog-confirm:focus-visible, .retention-dialog .retention-dialog-cancel:focus-visible { outline: 3px solid #d5a72e; outline-offset: 2px; }
+.swal2-popup.retention-dialog .swal2-title.retention-dialog-title { color: #fff !important; }
+.swal2-popup.retention-dialog .swal2-confirm.retention-dialog-confirm { background: #781616 !important; color: #fff !important; }
+.swal2-popup.retention-dialog .swal2-cancel.retention-dialog-cancel { background: #fff !important; color: #40506a !important; border: 1px solid #cbd2de; }
+.swal2-popup.retention-dialog .swal2-cancel.retention-dialog-cancel:hover { background: #f1f4f8 !important; }
+.swal2-popup.retention-dialog .swal2-confirm.retention-dialog-confirm:hover { background: #5e1010 !important; }
+.dark-mode .swal2-popup.retention-dialog { background: #202633; color: #e4e8ef; }
+.dark-mode .retention-preview-subject, .dark-mode .retention-preview-metric, .dark-mode .retention-preview-files { background: #282f3d; border-color: #444c5d; }
+.dark-mode .retention-preview-name, .dark-mode .retention-preview-metric strong, .dark-mode .retention-preview-details summary { color: #f4d48e; }
+.dark-mode .retention-preview-reason, .dark-mode .retention-preview-metric span, .dark-mode .retention-preview-tables, .dark-mode .retention-preview-detail-note, .dark-mode .retention-preview-readonly { color: #bdc6d5; }
+.dark-mode .retention-preview-warning { background: #3a3122; color: #f0d49e; }
+.dark-mode .retention-dialog .retention-dialog-actions { background: #272e3b; border-color: #424a58; }
+.dark-mode .retention-dialog .retention-dialog-input, .dark-mode .retention-dialog .retention-dialog-cancel { background: #202633; color: #e4e8ef; border-color: #52596a; }
+.dark-mode .retention-dialog .retention-dialog-input-label { color: #ced5e0; }
+.dark-mode .swal2-popup.retention-dialog .swal2-cancel.retention-dialog-cancel { background: #30394a !important; color: #f1f5f9 !important; border-color: #65738a; }
+.dark-mode .swal2-popup.retention-dialog .swal2-cancel.retention-dialog-cancel:hover { background: #3d495e !important; }
+@media (max-width: 480px) { .retention-dialog .retention-dialog-title { font-size: 15px; padding-left: 16px; } .retention-dialog .retention-dialog-body { padding: 14px 16px; } .retention-dialog .retention-dialog-actions { padding: 12px 16px; flex-wrap: wrap; } .retention-dialog .retention-dialog-confirm, .retention-dialog .retention-dialog-cancel { flex: 1 1 auto; } .retention-preview-metric { padding: 8px; } .retention-preview-metric strong { font-size: 12px; } }
+.dark-mode .retention-workspace, .dark-mode .retention-button.secondary { background: #202633; border-color: #424956; color: #ecedf2; }
+.dark-mode .retention-heading h2 { color: #f6e2b0; }
+.dark-mode .retention-policy span, .dark-mode .retention-state-form, .dark-mode .retention-table th { background: #282e3a; border-color: #424956; color: #ecedf2; }
+.dark-mode .retention-policy strong, .dark-mode .retention-policy-details > summary { color: #f6ce82; }
+.dark-mode .retention-intro, .dark-mode .retention-note { color: #b7c0cf; }
+.dark-mode .retention-category, .dark-mode .retention-state-form input:not([type=checkbox]) { background: #202633; color: #ecedf2; border-color: #424956; }
+#retentionDetailsModal .modal-header { background: linear-gradient(135deg, #781616, #ac2525); color: #fff; }
+#retentionDetailsModal .modal-title { font-size: 17px; color: #fff; }
+#retentionDetailsModal .btn-close { filter: brightness(0) invert(1); }
+#retentionDetailsModal form { display: flex; flex-direction: column; min-height: 0; }
+#retentionDetailsModal .retention-modal-label { font-size: 12px; margin: 6px 0 0; opacity: .85; overflow-wrap: anywhere; }
+#retentionDetailsModal [hidden] { display: none !important; }
+@media (max-width: 600px) { .retention-heading { padding: 16px; align-items: flex-start; } .retention-heading h2 { font-size: 15px; } .retention-heading-actions { flex-direction: column; gap: 8px; align-items: flex-end; } .retention-mode { font-size: 9px; } .retention-body { padding: 0 14px 14px; } .retention-state-form { grid-template-columns: 1fr; } .retention-filters > label { flex: 1 1 140px; } .retention-filters > button { width: 100%; } }

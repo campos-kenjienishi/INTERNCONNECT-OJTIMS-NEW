@@ -26,8 +26,9 @@ class MaintenanceController extends Controller
                     }
 
         $data=Courses::all();
+        $retentionWorkspace = app(DataRetentionController::class)->workspace(request(), app(\App\Services\DataRetentionService::class));
 
-    return view('ojtCoordinator.maintenance', compact('data','user'));
+    return view('ojtCoordinator.maintenance', compact('data','user', 'retentionWorkspace'));
         
     }
     public function courses(Request $request){
