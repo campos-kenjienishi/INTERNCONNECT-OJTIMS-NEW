@@ -1,7 +1,3 @@
-<?php
-$email = $_GET['email'] ?? '';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,6 +20,7 @@ $email = $_GET['email'] ?? '';
         })();
     </script>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>InternConnect - Reset Password</title>
@@ -121,12 +118,15 @@ $email = $_GET['email'] ?? '';
                 </div>
             @else
                 <div class="reset-header">
-                    <h2>Set New Password</h2>
+                    <h2>Set New Local Password</h2>
                     <p>Your new password must be different from your previous password.</p>
                 </div>
 
-                <form action="{{ url('/reset-password') }}?email={{ $email }}" method="post">
+                <p class="info-note">This resets only your InternConnect local password, not your institutional IdP password.</p>
+                <form action="{{ route('password.reset') }}" method="post">
                     @csrf
+                    <input type="hidden" name="email" value="{{ $email }}">
+                    <input type="hidden" name="token" value="{{ $token }}">
 
                     @if($errors->any())
                         <div class="alert alert-danger">
@@ -148,7 +148,7 @@ $email = $_GET['email'] ?? '';
                         <label class="form-label">New Password</label>
                         <div class="input-wrap">
                             <i class="fa fa-lock i-icon"></i>
-                            <input type="password" placeholder="Enter new password" name="password" id="new_password" autocomplete="new-password">
+                            <input type="password" placeholder="Enter new password" name="password" id="new_password" autocomplete="new-password" maxlength="72" required>
                             <i class="far fa-eye toggle-pw" id="toggleNewPassword"></i>
                         </div>
 
@@ -205,7 +205,7 @@ $email = $_GET['email'] ?? '';
                     </div>
 
                     <div class="footer-wrap">
-                        <a href="login"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
+                        <a href="{{ route('login.gateway') }}"><i class="fa fa-arrow-left"></i> Back to Sign In</a>
                     </div>
 
                 </form>
@@ -215,10 +215,7 @@ $email = $_GET['email'] ?? '';
     </div>
 </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ vasset('js/pages/auth-reset.js') }}"></script>
     <script src="{{ vasset('js/darkmode.js') }}"></script>
-    <script src="{{ vasset('js/components/chatbot-widget.js') }}"></script>
-    <script src="{{ vasset('assets/js/voice-input.js') }}"></script>
 </body>
 </html>

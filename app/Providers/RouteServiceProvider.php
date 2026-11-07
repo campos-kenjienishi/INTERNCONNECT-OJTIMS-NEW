@@ -39,6 +39,17 @@ class RouteServiceProvider extends ServiceProvider
                 ->by((string) ($request->session()->get('loginId') ?: $request->ip()));
         });
 
+        RateLimiter::for('password-recovery', function (Request $request) {
+            return [
+                Limit::perHour(10)->by('password-recovery-ip:'.$request->ip()),
+                Limit::perHour(3)->by('password-recovery-email:'.hash('sha256', Str::lower(trim((string) $request->input('email'))))),
+            ];
+        });
+
+        RateLimiter::for('password-reset', function (Request $request) {
+            return Limit::perMinute(10)->by('password-reset-ip:'.$request->ip());
+        });
+
         RateLimiter::for('login', function (Request $request) {
             $identity = Str::lower(trim((string) $request->input('email')));
 
