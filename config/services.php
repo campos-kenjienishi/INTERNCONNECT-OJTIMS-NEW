@@ -63,6 +63,8 @@ return [
         'callback_url'  => env('IDP_CALLBACK_URL', env('APP_URL', 'http://127.0.0.1:8000') . '/auth/callback'),
         'verify_tls'    => filter_var(env('IDP_VERIFY_TLS', true), FILTER_VALIDATE_BOOL),
         'enforce_state' => filter_var(env('IDP_ENFORCE_STATE', true), FILTER_VALIDATE_BOOL),
+        'allow_missing_state' => filter_var(env('IDP_ALLOW_MISSING_STATE', false), FILTER_VALIDATE_BOOL),
+        'login_attempt_seconds' => (int) env('IDP_LOGIN_ATTEMPT_SECONDS', 600),
     ],
 
     'guisis' => [
