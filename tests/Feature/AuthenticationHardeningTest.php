@@ -54,7 +54,7 @@ class AuthenticationHardeningTest extends TestCase
     {
         config()->set('services.idp.enforce_state', true);
 
-        $this->withSession(['idp_oauth_state' => 'expected-state'])
+        $this->withSession(['idp_oauth_state' => str_repeat('a', 64), 'idp_oauth_started_at' => now()->timestamp])
             ->get('/auth/callback?code=authorization-code&state=wrong-state')
             ->assertOk()
             ->assertSee('The authentication response could not be verified.');

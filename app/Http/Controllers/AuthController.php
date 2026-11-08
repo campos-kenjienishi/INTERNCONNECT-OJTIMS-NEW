@@ -36,6 +36,7 @@ use Dompdf\Options;
 use App\Helpers\AuditLogger;
 use App\Services\ReportAiInsightService;
 use App\Services\IdpService;
+use App\Services\IdpLoginAttempt;
 use App\Services\FacultyApiService;
 use Illuminate\Support\Facades\Log;
 
@@ -85,34 +86,28 @@ class AuthController extends Controller
             Session::put('target_login_portal', $portal);
         }
 
-        $state = Str::random(64);
-        $request->session()->put('idp_oauth_state', $state);
+        $state = app(IdpLoginAttempt::class)->begin($request);
 
         return redirect()->away($this->idpService->getAuthorizeUrl($state));
     }
 
     public function handleIdpCallback(Request $request, FacultyApiService $flssApi)
     {
-        $code = $request->query('code');
+        try {
+            $verificationMode = app(IdpLoginAttempt::class)->consume($request);
+        } catch (\Throwable $exception) {
+            Log::notice('IdP callback rejected before token exchange.', ['exception_type' => $exception::class]);
 
-        if (!$code) {
             return view('auth.idp-transition', [
-                'error' => 'Authorization code was not provided by Identity Provider.'
+                'error' => 'The authentication response could not be verified. The login attempt may have expired. Please start signing in again.',
             ]);
         }
 
-        if (config('services.idp.enforce_state', true)) {
-            $expectedState = $request->session()->pull('idp_oauth_state');
-            $providedState = $request->query('state');
-
-            if (!is_string($expectedState)
-                || !is_string($providedState)
-                || !hash_equals($expectedState, $providedState)) {
-                return view('auth.idp-transition', [
-                    'error' => 'The authentication response could not be verified. Please try signing in again.'
-                ]);
-            }
+        if ($verificationMode === 'code_only') {
+            Log::warning('IdP code-only compatibility callback accepted for token verification. OAuth state binding was unavailable.');
         }
+
+        $code = $request->query('code');
 
         try {
             // 1. Exchange code for tokens

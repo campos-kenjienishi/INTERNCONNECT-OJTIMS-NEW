@@ -109,8 +109,9 @@ class AuthenticationAuditTest extends TestCase
         $this->app->instance(IdpService::class, $idp);
         config(['services.idp.enforce_state' => true]);
 
-        $this->withSession(['idp_oauth_state' => 'test-state', 'target_login_portal' => $portal])
-            ->get('/auth/callback?code=test-code&state=test-state')
+        $state = str_repeat('a', 64);
+        $this->withSession(['idp_oauth_state' => $state, 'idp_oauth_started_at' => now()->timestamp, 'target_login_portal' => $portal])
+            ->get('/auth/callback?code=test-code&state='.$state)
             ->assertRedirect($destination)->assertSessionHas('loginId', 1)
             ->assertSessionHas('authentication_method', 'idp');
 
