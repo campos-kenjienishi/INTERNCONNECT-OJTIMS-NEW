@@ -87,6 +87,7 @@
             const custom = typeof options.customClass === 'object' ? options.customClass : {};
             options.customClass = {
                 ...custom,
+                container: [custom.container, 'ic-feedback-container'].filter(Boolean).join(' '),
                 popup: [typeof options.customClass === 'string' ? options.customClass : custom.popup, 'ic-feedback-popup'].filter(Boolean).join(' '),
                 confirmButton: [custom.confirmButton, 'ic-feedback-confirm'].filter(Boolean).join(' '),
                 cancelButton: [custom.cancelButton, 'ic-feedback-cancel'].filter(Boolean).join(' '),
@@ -275,6 +276,20 @@
         if (busyForms.has(form)) return true;
         const upload = [...form.querySelectorAll('input[type="file"]')].some(input => input.files?.length);
         if (upload && String(form.method).toUpperCase() === 'POST') {
+            const previousError = form.querySelector('.ic-feedback-upload-error');
+            if (previousError) previousError.remove();
+            const uploadError = message => {
+                const warning = textElement('div', message, 'ic-feedback-upload-error');
+                warning.setAttribute('role', 'alert');
+                warning.setAttribute('tabindex', '-1');
+                form.prepend(warning);
+                warning.focus();
+                showResult({ type: 'error', title: 'Upload interrupted', message }, 'modal');
+            };
+            if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+                uploadError('You are offline. This upload was not sent. Reconnect to the internet, then submit your selected file again.');
+                return true;
+            }
             // Construct before disabling the submitter; preserve multipart fields and CSRF.
             const body = new FormData(form);
             if (submitter?.name) body.append(submitter.name, submitter.value);
@@ -283,10 +298,22 @@
             const op = begin({ ...info, title: uploadTitle, description: uploadDescription, mode: 'modal', progress: 0 }, form, submitter);
             busyForms.set(form, op);
             const xhr = new XMLHttpRequest(); xhr.__icOwnUpload = true;
+            let completed = false;
+            const complete = () => {
+                if (completed) return false;
+                completed = true;
+                end(op);
+                return true;
+            };
+            const connectionFailed = () => {
+                if (!complete()) return;
+                uploadError('The connection was interrupted. We could not confirm whether your upload completed. Reconnect and check your submitted files before trying again. Your selected file has been kept on this page.');
+            };
             xhr.open('POST', form.action || location.href);
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.setRequestHeader('X-InternConnect-Upload', '1');
             xhr.upload.addEventListener('progress', event => {
+                if (completed) return;
                 if (!event.lengthComputable) return;
                 op.progress = Math.round(event.loaded / event.total * 100);
                 op.title = op.progress >= 100 ? uploadTitle : 'Uploading file…';
@@ -294,7 +321,7 @@
                 renderLoading();
             });
             xhr.addEventListener('load', () => {
-                end(op);
+                if (!complete()) return;
                 const data = parseJson(xhr.responseText);
                 const result = resultOf(xhr.status, data) || { type: 'error', message: 'The server did not confirm the upload. Please try again.' };
                 const filename = [...form.querySelectorAll('input[type="file"]')].flatMap(input => [...input.files]).map(file => file.name).join(', ');
@@ -308,8 +335,8 @@
                     location.assign(destination);
                 });
             });
-            for (const event of ['error', 'abort', 'timeout']) xhr.addEventListener(event, () => { end(op); showResult(resultOf(0, null), 'modal'); });
-            try { xhr.send(body); } catch (_) { end(op); showResult(resultOf(0, null), 'modal'); }
+            for (const event of ['error', 'abort', 'timeout']) xhr.addEventListener(event, connectionFailed);
+            try { xhr.send(body); } catch (_) { connectionFailed(); }
             return true;
         }
         // Regular forms keep their existing browser navigation and server validation.

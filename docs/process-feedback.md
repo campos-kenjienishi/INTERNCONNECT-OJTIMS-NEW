@@ -35,6 +35,11 @@ claim completion because the browser does not expose whether a download was save
   Specific upload and MOA renewal feedback takes priority over generic flash messages.
 - Uploads retain inputs/files on validation, transport or business failure. They
   navigate to the server-provided same-origin redirect only after acknowledgment.
+- When the browser reports offline, uploads are blocked before sending. Transport
+  failures display a persistent in-form warning and a foreground error dialog,
+  restore the submit button, and keep the selected file. Users must reconnect and
+  check existing submissions before retrying; interrupted requests may already
+  have reached the server. Uploads are never retried automatically.
 - AJAX responses are observed without consuming the caller's original body or
   changing its callbacks. A 200 response alone is never interpreted as success.
 - Existing SweetAlert2 results are styled and reused. The component works without
