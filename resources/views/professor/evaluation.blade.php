@@ -152,21 +152,36 @@
         </div>
     @endif
 
-    <div class="card-shell section-gap">
-        <div class="card-header-shell">
-            <h2><span class="header-icon"><i class="fa fa-robot"></i></span> AI Evaluation Insight</h2>
-            <button type="button" class="btn-eval btn-eval-primary" id="generateEvaluationInsightBtn">
+    <div class="bud-ai-insight-card section-gap evaluation-insight-card">
+        <div class="bud-ai-header">
+            <div class="bud-ai-brand">
+                <div class="bud-ai-avatar">
+                    <i class="fa fa-paw" aria-hidden="true" style="color:#d97706; font-size:18px;"></i>
+                    <span class="bud-ai-avatar-pulse"></span>
+                </div>
+                <div class="bud-ai-title-wrap">
+                    <h2>Bud AI Intelligence <span>&bull; Evaluation Insights</span></h2>
+                    <p>Supervisor evaluation progress, pending submissions, and adviser action points</p>
+                </div>
+            </div>
+            <div class="bud-ai-actions">
+            <button type="button" class="bud-generate-btn" id="generateEvaluationInsightBtn" aria-controls="evaluationInsightPanel" aria-expanded="false">
                 <i class="fa fa-magic"></i> Generate AI Insight
             </button>
+            <div class="bud-source-badge" id="evaluationAiSourceWrap" hidden>
+                <i class="fa fa-brain" aria-hidden="true"></i>
+                <span id="evaluationAiSource"></span>
+            </div>
+            </div>
         </div>
-        <div class="card-body-shell" id="evaluationInsightPanel" style="display:none;">
+        <div class="bud-ai-body" id="evaluationInsightPanel" style="display:none;">
             <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
                 <button type="button" id="evaluationInsightCloseBtn" class="btn-eval btn-eval-outline" style="padding:7px 11px; font-size:12px;">
                     <i class="fa fa-times"></i> Close
                 </button>
             </div>
             <div class="panel-note" id="evaluationInsightIntro">
-                AI insight is generated only when you click the button, so Gemini usage is controlled by the user.
+                Bud generates an insight only when requested. If the AI service is unavailable, an internal insight may be shown.
             </div>
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:14px;">
                 <div class="summary-card"><div class="label">Submitted</div><div class="value">{{ $evaluationAiData['metrics']['submitted_evaluations'] ?? 0 }}</div></div>
@@ -174,21 +189,23 @@
                 <div class="summary-card"><div class="label">Expired</div><div class="value">{{ $evaluationAiData['metrics']['expired_requests'] ?? 0 }}</div></div>
                 <div class="summary-card"><div class="label">Classes Pending</div><div class="value">{{ $evaluationAiData['metrics']['classes_with_pending'] ?? 0 }}</div></div>
             </div>
-            <div id="evaluationAiStatus" style="display:none; font-size:12px; color:var(--text-secondary); margin-bottom:12px;"></div>
+            <div id="evaluationAiStatus" role="status" aria-live="polite" style="display:none; font-size:12px; color:var(--text-secondary); margin-bottom:12px;"></div>
             <div id="evaluationAiResult" style="display:none;">
-                <p id="evaluationAiSummary" style="font-size:14px; line-height:1.7; color:var(--text-primary); margin:0 0 16px;"></p>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
-                    <div style="background:var(--surface-muted); border:1px solid var(--border); border-radius:12px; padding:14px;">
-                        <div style="font-size:12px; font-weight:800; color:var(--danger); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Key Findings</div>
-                        <ul id="evaluationAiFindings" style="margin:0; padding-left:18px; color:var(--text-primary); line-height:1.65;"></ul>
+                <div class="bud-ai-summary-card">
+                    <p id="evaluationAiSummary" style="margin:0; line-height:1.7;"></p>
+                </div>
+                <div class="bud-pillars-grid">
+                    <div class="bud-pillar highlights">
+                        <div class="bud-pillar-title"><i class="fa fa-chart-line" aria-hidden="true"></i> Key Findings</div>
+                        <ul id="evaluationAiFindings" class="bud-pillar-list"></ul>
                     </div>
-                    <div style="background:var(--surface-muted); border:1px solid var(--border); border-radius:12px; padding:14px;">
-                        <div style="font-size:12px; font-weight:800; color:var(--danger); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Watchouts</div>
-                        <ul id="evaluationAiWatchouts" style="margin:0; padding-left:18px; color:var(--text-primary); line-height:1.65;"></ul>
+                    <div class="bud-pillar watchouts">
+                        <div class="bud-pillar-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Watchouts &amp; Risks</div>
+                        <ul id="evaluationAiWatchouts" class="bud-pillar-list"></ul>
                     </div>
-                    <div style="background:var(--surface-muted); border:1px solid var(--border); border-radius:12px; padding:14px;">
-                        <div style="font-size:12px; font-weight:800; color:var(--danger); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px;">Recommended Actions</div>
-                        <ul id="evaluationAiActions" style="margin:0; padding-left:18px; color:var(--text-primary); line-height:1.65;"></ul>
+                    <div class="bud-pillar actions">
+                        <div class="bud-pillar-title"><i class="fa fa-tasks" aria-hidden="true"></i> Recommended Actions</div>
+                        <ul id="evaluationAiActions" class="bud-pillar-list"></ul>
                     </div>
                 </div>
             </div>

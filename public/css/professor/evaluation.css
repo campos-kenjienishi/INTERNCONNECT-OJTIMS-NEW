@@ -1,5 +1,36 @@
 /* Professor Evaluation Styles */
 
+.evaluation-insight-card .bud-source-badge[hidden] {
+    display: none !important;
+}
+
+.evaluation-insight-card .bud-ai-brand,
+.evaluation-insight-card .bud-ai-title-wrap,
+.evaluation-insight-card .bud-pillar {
+    min-width: 0;
+}
+
+.evaluation-insight-card .bud-ai-title-wrap h2 {
+    flex-wrap: wrap;
+}
+
+.evaluation-insight-card .bud-ai-summary-card,
+.evaluation-insight-card .bud-pillar-list {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    .evaluation-insight-card .bud-ai-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .evaluation-insight-card .bud-generate-btn {
+        justify-content: center;
+        flex: 1 1 100%;
+    }
+}
+
         .question-confirm-overlay {
             position: fixed;
             inset: 0;
