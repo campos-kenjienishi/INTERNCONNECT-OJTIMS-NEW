@@ -39,6 +39,8 @@
             const insightFindings = document.getElementById('evaluationAiFindings');
             const insightWatchouts = document.getElementById('evaluationAiWatchouts');
             const insightActions = document.getElementById('evaluationAiActions');
+            const insightSourceWrap = document.getElementById('evaluationAiSourceWrap');
+            const insightSource = document.getElementById('evaluationAiSource');
 
             function renderList(target, items, emptyText) {
                 if (!target) return;
@@ -55,6 +57,11 @@
                 if (!insightResult || !insightSummary) return;
 
                 insightSummary.textContent = data.summary || 'No AI insight was returned.';
+                if (insightSource && insightSourceWrap) {
+                    insightSource.textContent = data.source === 'gemini' ? 'Gemini AI'
+                        : (data.source === 'openai' ? 'OpenAI' : 'Internal Insight');
+                    insightSourceWrap.hidden = false;
+                }
                 renderList(insightFindings, data.key_findings, 'No key findings available.');
                 renderList(insightWatchouts, data.watchouts, 'No major watchouts detected.');
                 renderList(insightActions, data.recommendations, 'No actions suggested.');
@@ -65,6 +72,7 @@
             if (generateInsightBtn) {
                 generateInsightBtn.addEventListener('click', function () {
                     generateInsightBtn.disabled = true;
+                    generateInsightBtn.setAttribute('aria-expanded', 'true');
                     if (insightPanel) {
                         insightPanel.style.display = 'block';
                     }
@@ -109,6 +117,7 @@
             if (insightCloseBtn && insightPanel) {
                 insightCloseBtn.addEventListener('click', function () {
                     insightPanel.style.display = 'none';
+                    generateInsightBtn?.setAttribute('aria-expanded', 'false');
                 });
             }
 
@@ -231,4 +240,3 @@
                 }
             });
         })();
-    
