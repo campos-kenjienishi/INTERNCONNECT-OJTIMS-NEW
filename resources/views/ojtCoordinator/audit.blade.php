@@ -228,7 +228,7 @@
             </div>
         </div>
 
-        <div class="table-card" style="margin-bottom: 24px;">
+        <div class="table-card" id="upload-security-evidence" style="margin-bottom: 24px;">
             <div class="table-card-header">
                 <div class="table-card-header-left">
                     <div class="header-icon"><i class="fa fa-shield-alt"></i></div>
@@ -246,7 +246,7 @@
                     </div>
                 @else
                     <div class="audit-table-wrapper" style="overflow-x: auto;">
-                        <table class="dataTable display" style="width:100%;">
+                        <table id="securityEvidenceTable" class="dataTable display" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>Recorded</th>
@@ -261,7 +261,7 @@
                             <tbody>
                                 @foreach($securityRecords as $securityRecord)
                                     <tr>
-                                        <td>{{ optional($securityRecord->created_at)->format('M d, Y h:i A') }}</td>
+                                        <td data-order="{{ optional($securityRecord->created_at)->timestamp }}">{{ optional($securityRecord->created_at)->format('M d, Y h:i A') }}</td>
                                         <td>
                                             <strong>{{ strtoupper($securityRecord->extension) }}</strong><br>
                                             <small>{{ $securityRecord->source_type ? class_basename($securityRecord->source_type) : $securityRecord->origin }}</small>

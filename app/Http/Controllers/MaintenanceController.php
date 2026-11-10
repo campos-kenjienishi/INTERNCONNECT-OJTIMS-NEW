@@ -145,7 +145,7 @@ class MaintenanceController extends Controller
                 'unscanned' => (clone $securityQuery)->where('lifecycle_status', 'active')->where('scan_status', 'disabled')->count(),
                 'issues' => (clone $securityQuery)->whereIn('lifecycle_status', ['missing', 'integrity_failed', 'unreadable'])->count(),
             ];
-            $securityRecords = $securityQuery->latest()->limit(100)->get();
+            $securityRecords = $securityQuery->latest()->orderByDesc('id')->get();
         }
 
         // Return the coordinator audit log view

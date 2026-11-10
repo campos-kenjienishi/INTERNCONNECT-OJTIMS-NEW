@@ -4,6 +4,17 @@
    ========================================================================== */
 
                     $(document).ready(function () {
+                        if (document.getElementById('securityEvidenceTable')) {
+                            $('#securityEvidenceTable').DataTable({
+                                order: [],
+                                pageLength: 5,
+                                lengthChange: false,
+                                searching: false,
+                                autoWidth: false,
+                                dom: 't<"history-bottom"ip>'
+                            });
+                        }
+
                         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                             if (settings.nTable.id !== 'auditTable') {
                                 return true;

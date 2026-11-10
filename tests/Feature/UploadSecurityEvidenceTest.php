@@ -157,6 +157,29 @@ class UploadSecurityEvidenceTest extends TestCase
         );
     }
 
+    public function test_audit_security_evidence_provides_all_records_for_client_side_pagination(): void
+    {
+        Schema::create('audit_logs', function (Blueprint $table) {
+            $table->id();
+            $table->string('action')->nullable();
+            $table->timestamps();
+        });
+        Session::forget('loginId');
+
+        for ($recordNumber = 1; $recordNumber <= 105; $recordNumber++) {
+            UploadSecurityRecord::create(array_merge($this->recordAttributes(hash('sha256', (string) $recordNumber)), [
+                'storage_path' => 'requirements/document-' . $recordNumber . '.pdf',
+            ]));
+        }
+
+        $controller = new \App\Http\Controllers\MaintenanceController;
+        $firstPage = $controller->auditTrail()->getData()['securityRecords'];
+        $this->assertCount(105, $firstPage);
+        $this->assertSame(105, $firstPage->first()->id);
+        $this->assertSame(1, $firstPage->last()->id);
+        $this->assertSame(105, $controller->auditTrail()->getData()['securitySummary']['active']);
+    }
+
     private function recordAttributes(string $sha256): array
     {
         return [
