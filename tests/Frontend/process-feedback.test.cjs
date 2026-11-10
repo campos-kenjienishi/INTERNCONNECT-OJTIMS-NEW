@@ -209,3 +209,60 @@ test('upload validation and connection failures preserve the form and allow retr
         assert.equal(e.XHR.instances.length, 2);
     }
 });
+
+test('offline uploads show feedback without sending and can be submitted after reconnection', () => {
+    const e = environment();
+    e.context.navigator = { onLine: false };
+    e.run(); e.ready();
+    const form = new e.Form('/uploadReq', [{ files: [{ name: 'test.pdf' }] }]);
+    const button = new e.Element();
+    const submit = () => e.windowEvents.submit({ target: form, submitter: button, defaultPrevented: false, preventDefault() {} });
+    submit();
+    assert.equal(e.XHR.instances.length, 0);
+    assert.equal(button.disabled, false);
+    assert.match(e.alerts[0].text, /offline.*not sent/i);
+    assert.match(e.alerts[0].customClass.container, /ic-feedback-container/);
+    assert.equal(form.querySelector('.ic-feedback-upload-error').getAttribute('role'), 'alert');
+    e.context.navigator.onLine = true;
+    submit(); submit();
+    assert.equal(e.XHR.instances.length, 1);
+    assert.equal(button.disabled, true);
+    assert.equal(form.querySelector('.ic-feedback-upload-error'), null);
+    assert.equal(form.files[0].files[0].name, 'test.pdf');
+});
+
+test('transport failures show one persistent warning, restore controls and never retry automatically', () => {
+    for (const event of ['error', 'abort', 'timeout']) {
+        const e = environment(); e.run(); e.ready();
+        const form = new e.Form('/uploadReq', [{ files: [{ name: 'test.pdf' }] }]);
+        const button = new e.Element();
+        e.windowEvents.submit({ target: form, submitter: button, defaultPrevented: false, preventDefault() {} });
+        const xhr = e.XHR.instances[0];
+        xhr.emit(event); xhr.emit('error'); xhr.emit('load');
+        assert.equal(e.alerts.length, 1);
+        assert.equal(e.alerts[0].icon, 'error');
+        assert.match(e.alerts[0].text, /check your submitted files before trying again/);
+        assert.match(form.querySelector('.ic-feedback-upload-error').textContent, /could not confirm/);
+        assert.equal(button.disabled, false);
+        assert.equal(form.getAttribute('aria-busy'), null);
+        assert.equal(e.XHR.instances.length, 1);
+        assert.equal(e.location.assigned, undefined);
+    }
+});
+
+test('network feedback still appears without SweetAlert or an online status API', () => {
+    const e = environment(); delete e.window.Swal;
+    e.run(); e.ready();
+    const form = new e.Form('/uploadReq', [{ files: [{ name: 'test.pdf' }] }]);
+    e.windowEvents.submit({ target: form, defaultPrevented: false, preventDefault() {} });
+    e.XHR.instances[0].emit('error');
+    assert.ok(form.querySelector('.ic-feedback-upload-error'));
+    assert.ok(e.document.body.querySelector('.ic-feedback-dialog'));
+    assert.match(e.document.body.querySelector('p').textContent, /connection was interrupted/);
+});
+
+test('feedback dialogs are layered above upload modals', () => {
+    const css = fs.readFileSync('public/css/components/process-feedback.css', 'utf8');
+    assert.match(css, /\.swal2-container\.ic-feedback-container\s*\{\s*z-index: 40000 !important/);
+    assert.match(css, /\.ic-feedback-dialog\s*\{[^}]*z-index: 40000/);
+});
