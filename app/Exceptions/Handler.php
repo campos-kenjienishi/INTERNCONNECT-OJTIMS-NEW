@@ -21,6 +21,7 @@ class Handler extends ExceptionHandler
         'new_password',
         'new_password_confirmation',
         'token',
+        'code',
     ];
 
     /**

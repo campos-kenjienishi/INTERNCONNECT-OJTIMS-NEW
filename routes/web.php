@@ -66,6 +66,8 @@ Route::get('/privacy', function () {
 });
 
 Route::get('/evaluation/form/{token}', [EvaluationController::class, 'showSupervisorForm'])->name('evaluation.form.show');
+Route::post('/evaluation/form/{token}/verification/send', [EvaluationController::class, 'sendSupervisorVerification'])->name('evaluation.verification.send')->middleware('throttle:10,10');
+Route::post('/evaluation/form/{token}/verification/verify', [EvaluationController::class, 'verifySupervisorEmail'])->name('evaluation.verification.verify')->middleware('throttle:30,10');
 Route::post('/evaluation/form/{token}/review', [EvaluationController::class, 'reviewSupervisorForm'])->name('evaluation.form.review');
 Route::post('/evaluation/form/{token}', [EvaluationController::class, 'submitSupervisorForm'])->name('evaluation.form.submit');
 Route::get('/evaluation/submitted', [EvaluationController::class, 'thankYou'])->name('evaluation.form.thankyou');

@@ -15,7 +15,7 @@
     </p>
 
     <p>
-        Please click the secure link below to open the evaluation form:
+        Please click the secure link below. Before opening the evaluation form, request and enter a verification code sent to this email address. No account is required. Use the same browser for the code request and evaluation, and do not share the link or code.
     </p>
 
     <p>
