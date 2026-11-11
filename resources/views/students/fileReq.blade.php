@@ -240,14 +240,14 @@
                 <div class="stat-icon {{ $basicIconColor }}"><i class="fa fa-unlock-alt"></i></div>
                 <div>
                     <div class="stat-num">{{ $submittedBasicCount }}/{{ $totalBasicCount }}</div>
-                    <div class="stat-name">Basic Requirements Submitted</div>
+                    <div class="stat-name">Basic Requirements Approved</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon {{ $hasSubmittedNotarizedMoa ? 'green' : 'red' }}"><i class="fa fa-file-contract"></i></div>
                 <div>
                     <div class="stat-num">{{ $hasSubmittedNotarizedMoa ? 'Yes' : 'No' }}</div>
-                    <div class="stat-name">Notarized MOA Submitted</div>
+                    <div class="stat-name">Notarized MOA Approved / Waived</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -286,7 +286,7 @@
 
                         <div class="phase-summary-stats">
                             <div class="phase-summary-stat">
-                                <div class="phase-summary-stat-label">Submitted</div>
+                                <div class="phase-summary-stat-label">Approved</div>
                                 <div class="phase-summary-stat-value">{{ $submittedBasicCount }}/{{ $totalBasicCount }}</div>
                             </div>
                             <div class="phase-summary-stat">
@@ -311,7 +311,7 @@
                                     {{ $otherRequirementsUnlocked ? 'Unlocked' : 'Locked' }}
                                 </span>
                             </div>
-                            <div class="phase-panel-subtitle">These open after the basics and Notarized MOA are done.</div>
+                            <div class="phase-panel-subtitle">These open after all basic requirements and the Notarized MOA are approved, or the MOA is waived for in-house OJT.</div>
                         </div>
 
                         <div class="phase-summary-stats">
@@ -348,7 +348,7 @@
                                 </span>
                             </div>
                             <div class="phase-progress-item">
-                                <span>Notarized MOA Submitted</span>
+                                <span>Notarized MOA Approved / Waived</span>
                                 <span class="status-badge {{ $hasSubmittedNotarizedMoa ? 'status-approved' : 'status-denied' }}">
                                     {{ $hasSubmittedNotarizedMoa ? 'Yes' : 'No' }}
                                 </span>
@@ -645,7 +645,7 @@
                                 <span>{{ $category->fileName }}</span>
                             </div>
                             <span class="status-badge {{ $isSubmittedBasic ? 'status-approved' : 'status-pending' }}">
-                                {{ $isSubmittedBasic ? 'Submitted' : 'Pending' }}
+                                {{ $isSubmittedBasic ? 'Approved' : 'Awaiting approval' }}
                             </span>
                         </div>
                     @empty
@@ -673,7 +673,7 @@
             </div>
             <div class="modal-body">
                 <div style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:16px;">
-                    These will be available after all basic requirements are submitted and your Notarized MOA is completed.
+                    These will be available after all basic requirements and your Notarized MOA are approved, unless the MOA is waived for in-house OJT.
                 </div>
                 <div class="phase-modal-list">
                     @forelse ($otherCategories as $category)
@@ -718,7 +718,7 @@
                         <div class="phase-modal-item">
                             <div class="phase-modal-item-name">
                                 <i class="fa fa-file-alt" style="color:#64748b;"></i>
-                                <span>Basic requirements left: {{ $missingBasicCategories->pluck('fileName')->implode(', ') }}</span>
+                                <span>Basic requirements awaiting approval: {{ $missingBasicCategories->pluck('fileName')->implode(', ') }}</span>
                             </div>
                             <span class="status-badge status-pending">Pending</span>
                         </div>
@@ -727,7 +727,7 @@
                         <div class="phase-modal-item">
                             <div class="phase-modal-item-name">
                                 <i class="fa fa-file-contract" style="color:#64748b;"></i>
-                                <span>Submit your Notarized MOA from the MOA page.</span>
+                                <span>Your Notarized MOA must be submitted and approved, unless waived for in-house OJT.</span>
                             </div>
                             <span class="status-badge status-pending">Pending</span>
                         </div>

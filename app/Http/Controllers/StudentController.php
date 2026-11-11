@@ -754,6 +754,10 @@ public function ojtInformation()
 }
 public function ojt_edit(Request $request,$studentNum)
     {
+        $request->validate([
+            'start_date' => ['nullable', 'date_format:Y-m-d'],
+            'finish_date' => array_merge(['nullable', 'date_format:Y-m-d'], $request->filled('start_date') ? ['after_or_equal:start_date'] : []),
+        ]);
 
         $data=array();
         if(Session::has('loginId')){
@@ -801,6 +805,9 @@ public function ojt_edit(Request $request,$studentNum)
 
     public function update(Request $request, $studentNum)
     {
+        $request->validate([
+            'status' => ['required', \Illuminate\Validation\Rule::in(['Pending', 'Approved and For Notary', 'With Revision'])],
+        ]);
         // Update OJTInformation model if necessary
         $ojtInformation = OJTInformation::where('studentNum', $studentNum)->first();
     

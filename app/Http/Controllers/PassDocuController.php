@@ -165,7 +165,7 @@ class PassDocuController extends Controller
             ->unique()
             ->values();
         $validSubmittedNames = $submittedRequirements
-            ->filter(fn ($requirement) => (int) ($requirement->status ?? 0) !== 2)
+            ->filter(fn ($requirement) => (int) ($requirement->status ?? 0) === 1)
             ->pluck('fileName')
             ->filter()
             ->map(fn ($name) => mb_strtolower(trim((string) $name)))
@@ -182,7 +182,7 @@ class PassDocuController extends Controller
 
         $isInhouseOjt = (bool) ($student?->is_inhouse_ojt ?? false);
         $hasSubmittedNotarizedMoa = $isInhouseOjt || $validSubmittedNames->contains(mb_strtolower('Notarized MOA'));
-        $otherRequirementsUnlocked = $missingBasicCategories->isEmpty() && $hasSubmittedNotarizedMoa;
+        $otherRequirementsUnlocked = $basicCategories->isNotEmpty() && $missingBasicCategories->isEmpty() && $hasSubmittedNotarizedMoa;
 
         return [
             'fileCategories' => $fileCategories,
@@ -345,6 +345,15 @@ class PassDocuController extends Controller
         }
 
         return $user;
+    }
+
+    private function authorizeRequirementReview(FileRequirement $requirement): void
+    {
+        $reviewer = User::find(Session::get('loginId'));
+        abort_unless($reviewer, 401);
+        abort_unless(in_array((int) $reviewer->role, [1, 2], true), 403);
+        abort_unless(trim((string) $reviewer->full_name) !== ''
+            && $this->documentAccess->canAccessRequirement($reviewer, $requirement), 403);
     }
 
     private function propagateSharedNotarizedMoaStatus(FileRequirement $fileRequirement, int $status, ?string $reason = null): void
@@ -607,8 +616,8 @@ public function fileReqCreate(Request $request){
 
     if ($categoryPhase === 'other' && !$phaseState['otherRequirementsUnlocked']) {
         return back()
-            ->with('fail', 'Submit all basic requirements and your Notarized MOA first before uploading other requirements.')
-            ->with('upload_error', 'Submit all basic requirements and your Notarized MOA before uploading other requirements.');
+            ->with('fail', 'All basic requirements and your Notarized MOA must be approved before uploading other requirements. In-house OJT may waive the MOA only.')
+            ->with('upload_error', 'All basic requirements and your Notarized MOA must be approved before uploading other requirements. In-house OJT may waive the MOA only.');
     }
 
     $normalizedCategoryName = mb_strtolower(trim((string) $request->fileName));
@@ -644,7 +653,7 @@ public function fileReqCreate(Request $request){
         $fileup->fileName = $request->fileName;
         $fileup->file = $storedUpload->filename;
         $fileup->status = 0;
-        $fileup->adviser = $request->adviser;
+        $fileup->adviser = $adviserName;
         $fileup->uploadedBy = $user->full_name;
         $fileup->uploader_user_id = $user->id;
 
@@ -904,6 +913,8 @@ public function fileReqCreate(Request $request){
                 // Find the file requirement by ID
                 $fileRequirement = FileRequirement::findOrFail($id);
 
+                $this->authorizeRequirementReview($fileRequirement);
+
                 if ($this->isCompletionCertificateName($fileRequirement->fileName)) {
                     return back()->with('error', 'Use the dedicated COC Validation module for this document.');
                 }
@@ -949,6 +960,7 @@ public function fileReqCreate(Request $request){
                 }
 
                 foreach ($files as $fileRequirement) {
+                    $this->authorizeRequirementReview($fileRequirement);
                     $this->propagateSharedNotarizedMoaStatus($fileRequirement, 1);
                 }
 
@@ -965,12 +977,12 @@ public function fileReqCreate(Request $request){
 
             public function updateDeniedStatus(Request $request, $id)
             {
+                $fileRequirement = FileRequirement::findOrFail($id);
+                $this->authorizeRequirementReview($fileRequirement);
+
                 $validated = $request->validate([
                     'reason' => 'required|string|max:1000',
                 ]);
-        
-                // Find the file requirement by ID
-                $fileRequirement = FileRequirement::findOrFail($id);
 
                 if ($this->isCompletionCertificateName($fileRequirement->fileName)) {
                     return back()->with('error', 'Use the dedicated COC Validation module for this document.');
