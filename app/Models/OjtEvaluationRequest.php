@@ -37,6 +37,11 @@ class OjtEvaluationRequest extends Model
         return $this->belongsTo(User::class, 'student_id');
     }
 
+    public function tokenHasExpired(): bool
+    {
+        return !$this->token_expires_at || now()->greaterThanOrEqualTo($this->token_expires_at);
+    }
+
     public function template()
     {
         return $this->belongsTo(OjtEvaluationTemplate::class, 'template_id');

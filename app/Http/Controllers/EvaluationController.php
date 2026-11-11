@@ -305,12 +305,19 @@ class EvaluationController extends Controller
             return back()->with('error', 'Submitted evaluations can no longer be resent.');
         }
 
-        $requestRow->token = Str::random(64);
-        $requestRow->token_expires_at = now()->addDays(14);
-        $requestRow->emailed_at = now();
-        $requestRow->opened_at = null;
-        $requestRow->status = 'sent';
-        $requestRow->save();
+        $rotated = OjtEvaluationRequest::whereKey($requestRow->id)->where('token', $requestRow->token)
+            ->whereIn('status', ['sent', 'opened', 'expired', 'cancelled'])->whereNull('submitted_at')
+            ->whereDoesntHave('evaluation')->update([
+                'token' => Str::random(64),
+                'token_expires_at' => now()->addDays(14),
+                'emailed_at' => now(),
+                'opened_at' => null,
+                'status' => 'sent',
+            ]);
+        if ($rotated !== 1) {
+            return back()->with('error', 'This evaluation request has changed. Please reload the page.');
+        }
+        $requestRow->refresh();
 
         Mail::to($requestRow->supervisor_email)->send(new SupervisorEvaluationInvite($requestRow));
 
@@ -339,9 +346,12 @@ class EvaluationController extends Controller
             return back()->with('error', 'Submitted evaluations cannot be cancelled.');
         }
 
-        $requestRow->status = 'cancelled';
-        $requestRow->token_expires_at = now();
-        $requestRow->save();
+        $cancelled = OjtEvaluationRequest::whereKey($requestRow->id)->where('token', $requestRow->token)
+            ->whereIn('status', ['sent', 'opened', 'expired'])->whereNull('submitted_at')
+            ->whereDoesntHave('evaluation')->update(['status' => 'cancelled', 'token_expires_at' => now()]);
+        if ($cancelled !== 1) {
+            return back()->with('error', 'This evaluation request has changed. Please reload the page.');
+        }
 
         AuditLogger::log(
             'Evaluation',
@@ -454,25 +464,20 @@ class EvaluationController extends Controller
             abort(404);
         }
 
-        if (
-            $requestRow->token_expires_at
-            && now()->greaterThan($requestRow->token_expires_at)
-            && !in_array($requestRow->status, ['submitted', 'cancelled'], true)
-        ) {
-            $requestRow->status = 'expired';
-            $requestRow->save();
-        }
+        $this->supervisorRequestError($requestRow);
 
-        if ($requestRow->status === 'sent') {
-            $requestRow->status = 'opened';
-            $requestRow->opened_at = now();
-            $requestRow->save();
-        }
+        OjtEvaluationRequest::whereKey($requestRow->id)->where('token', $token)
+            ->where('status', 'sent')->where('token_expires_at', '>', now())
+            ->update(['status' => 'opened', 'opened_at' => now()]);
+        $requestRow = OjtEvaluationRequest::with(['template.items', 'evaluation'])
+            ->whereKey($requestRow->id)->where('token', $token)->firstOrFail();
 
         return view('evaluations.supervisor_form', [
             'requestRow' => $requestRow,
-            'submitted' => $requestRow->status === 'submitted',
-            'expired' => $requestRow->status === 'expired',
+            'submitted' => $requestRow->status === 'submitted' || $requestRow->submitted_at || $requestRow->evaluation,
+            'expired' => !in_array($requestRow->status, ['submitted', 'cancelled'], true)
+                && !$requestRow->submitted_at && !$requestRow->evaluation
+                && (!in_array($requestRow->status, ['sent', 'opened'], true) || $requestRow->tokenHasExpired()),
             'cancelled' => $requestRow->status === 'cancelled',
         ]);
     }
@@ -484,18 +489,8 @@ class EvaluationController extends Controller
             abort(404);
         }
 
-        if ($requestRow->status === 'submitted') {
-            return back()->with('error', 'This evaluation has already been submitted.');
-        }
-
-        if ($requestRow->status === 'cancelled') {
-            return back()->with('error', 'This evaluation request has been cancelled by the student.');
-        }
-
-        if ($requestRow->token_expires_at && now()->greaterThan($requestRow->token_expires_at) && $requestRow->status !== 'cancelled') {
-            $requestRow->status = 'expired';
-            $requestRow->save();
-            return back()->with('error', 'This evaluation link has expired.');
+        if ($error = $this->supervisorRequestError($requestRow)) {
+            return back()->with('error', $error);
         }
 
         $validated = $this->validateSupervisorPayload($request, $requestRow, true);
@@ -521,66 +516,86 @@ class EvaluationController extends Controller
 
     public function submitSupervisorForm(Request $request, $token)
     {
-        $requestRow = OjtEvaluationRequest::with('template.items')->where('token', $token)->first();
-        if (!$requestRow) {
-            abort(404);
-        }
+        return DB::transaction(function () use ($request, $token) {
+            $requestRow = OjtEvaluationRequest::with('template.items')->where('token', $token)->lockForUpdate()->first();
+            if (!$requestRow) {
+                abort(404);
+            }
 
-        if ($requestRow->status === 'submitted') {
-            return back()->with('error', 'This evaluation has already been submitted.');
+            if ($error = $this->supervisorRequestError($requestRow)) {
+                return back()->with('error', $error);
+            }
+
+            $validated = $this->validateSupervisorPayload($request, $requestRow, false);
+
+            $responses = [];
+            foreach ($requestRow->template->items as $item) {
+                if ($item->input_type === 'rating') {
+                    $responses[] = [
+                        'item_id' => $item->id,
+                        'section' => $item->section,
+                        'label' => $item->label,
+                        'score' => (int) ($validated['rating_' . $item->id] ?? 0),
+                    ];
+                }
+            }
+
+            $claimed = OjtEvaluationRequest::whereKey($requestRow->id)->where('token', $token)
+                ->whereIn('status', ['sent', 'opened'])->whereNull('submitted_at')
+                ->where('token_expires_at', '>', now())->whereDoesntHave('evaluation')
+                ->update([
+                    'status' => 'submitted',
+                    'submitted_at' => now(),
+                    'supervisor_name' => $validated['supervisor_name'],
+                ]);
+
+            if ($claimed !== 1) {
+                return back()->with('error', 'This evaluation link is no longer available. Please reload the page.');
+            }
+
+            OjtEvaluation::create(
+                [
+                    'request_id' => $requestRow->id,
+                    'template_id' => $requestRow->template_id,
+                    'supervisor_name' => $validated['supervisor_name'],
+                    'responses_json' => json_encode($responses),
+                    'comments' => $validated['comments'] ?? null,
+                    'supervisor_confirmation' => (bool) ($validated['supervisor_confirmation'] ?? false),
+                    'submitted_at' => now(),
+                    'released_to_student_at' => null,
+                ]
+            );
+
+            AuditLogger::log(
+                'Evaluation',
+                'submit',
+                'Supervisor submitted evaluation for student: ' . ($requestRow->student_name ?: ('Student ID ' . $requestRow->student_id)),
+                $requestRow->student_id
+            );
+
+            return redirect()->route('evaluation.form.thankyou')
+                ->with('success', 'Your evaluation was submitted successfully.');
+        });
+    }
+
+    protected function supervisorRequestError(OjtEvaluationRequest $requestRow): ?string
+    {
+        if ($requestRow->status === 'submitted' || $requestRow->submitted_at || $requestRow->evaluation()->exists()) {
+            return 'This evaluation has already been submitted.';
         }
 
         if ($requestRow->status === 'cancelled') {
-            return back()->with('error', 'This evaluation request has been cancelled by the student.');
+            return 'This evaluation request has been cancelled by the student.';
         }
 
-        if ($requestRow->token_expires_at && now()->greaterThan($requestRow->token_expires_at) && $requestRow->status !== 'cancelled') {
-            $requestRow->status = 'expired';
-            $requestRow->save();
-            return back()->with('error', 'This evaluation link has expired.');
+        if (!in_array($requestRow->status, ['sent', 'opened'], true) || $requestRow->tokenHasExpired()) {
+            OjtEvaluationRequest::whereKey($requestRow->id)->where('token', $requestRow->token)
+                ->whereIn('status', ['sent', 'opened'])->whereNull('submitted_at')
+                ->whereDoesntHave('evaluation')->update(['status' => 'expired']);
+            return 'This evaluation link has expired.';
         }
 
-        $validated = $this->validateSupervisorPayload($request, $requestRow, false);
-
-        $responses = [];
-        foreach ($requestRow->template->items as $item) {
-            if ($item->input_type === 'rating') {
-                $responses[] = [
-                    'item_id' => $item->id,
-                    'section' => $item->section,
-                    'label' => $item->label,
-                    'score' => (int) ($validated['rating_' . $item->id] ?? 0),
-                ];
-            }
-        }
-
-        OjtEvaluation::updateOrCreate(
-            ['request_id' => $requestRow->id],
-            [
-                'template_id' => $requestRow->template_id,
-                'supervisor_name' => $validated['supervisor_name'],
-                'responses_json' => json_encode($responses),
-                'comments' => $validated['comments'] ?? null,
-                'supervisor_confirmation' => (bool) ($validated['supervisor_confirmation'] ?? false),
-                'submitted_at' => now(),
-                'released_to_student_at' => null,
-            ]
-        );
-
-        $requestRow->status = 'submitted';
-        $requestRow->submitted_at = now();
-        $requestRow->supervisor_name = $validated['supervisor_name'];
-        $requestRow->save();
-
-        AuditLogger::log(
-            'Evaluation',
-            'submit',
-            'Supervisor submitted evaluation for student: ' . ($requestRow->student_name ?: ('Student ID ' . $requestRow->student_id)),
-            $requestRow->student_id
-        );
-
-        return redirect()->route('evaluation.form.thankyou')
-            ->with('success', 'Your evaluation was submitted successfully.');
+        return null;
     }
 
     protected function validateSupervisorPayload(Request $request, OjtEvaluationRequest $requestRow, $isReviewStep = true)
