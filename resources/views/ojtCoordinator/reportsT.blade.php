@@ -175,7 +175,7 @@
             <div class="stat-card">
                 <div class="stat-icon green"><i class="fa fa-building"></i></div>
                 <div>
-                    <div class="stat-num">{{ collect($studentData)->pluck('ojt.company_name')->unique()->count() }}</div>
+                    <div class="stat-num">{{ collect($studentData)->pluck('ojt.company_name')->filter()->unique()->count() }}</div>
                     <div class="stat-name">Companies</div>
                 </div>
             </div>
@@ -396,7 +396,6 @@
                         </thead>
                         <tbody>
                             @foreach ($studentData as $data)
-                                @if(isset($data['ojt']) && $data['ojt'])
                                 <tr data-course="{{ $data['student']->course ?? '' }}"
                                     data-section="{{ $data['student']->year_and_section ?? '' }}"
                                     data-department="{{ $data['ojt']->assigned_department ?? '' }}"
@@ -412,22 +411,21 @@
                                     <td class="company-name-cell">
                                         <div class="ojt-company-wrap">
                                             <i class="fa fa-building" style="color:var(--red); font-size:11px;"></i>
-                                            {{ $data['ojt']->company_name }}
+                                            {{ $data['ojt']->company_name ?? 'Not provided' }}
                                         </div>
                                     </td>
-                                    <td class="department-cell">{{ $data['ojt']->assigned_department ?? '' }}</td>
-                                    <td class="role-cell">{{ $data['ojt']->student_role ?? '' }}</td>
-                                    <td class="date-cell"><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date }}</span></td>
-                                    <td class="date-cell"><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date }}</span></td>
+                                    <td class="department-cell">{{ $data['ojt']->assigned_department ?? 'Not provided' }}</td>
+                                    <td class="role-cell">{{ $data['ojt']->student_role ?? 'Not provided' }}</td>
+                                    <td class="date-cell"><span class="date-badge"><i class="fa fa-calendar-alt"></i> {{ $data['ojt']->start_date ?? 'Not provided' }}</span></td>
+                                    <td class="date-cell"><span class="date-badge"><i class="fa fa-calendar-check"></i> {{ $data['ojt']->finish_date ?? 'Not provided' }}</span></td>
                                     <td class="report-time-cell">
-                                        <div class="report-time-wrap"><i class="fa fa-clock"></i><span>{{ $data['ojt']->report_time }}</span></div>
+                                        <div class="report-time-wrap"><i class="fa fa-clock"></i><span>{{ $data['ojt']->report_time ?? 'Not provided' }}</span></div>
                                     </td>
-                                    <td class="contact-name-cell">{{ $data['ojt']->contact_name }}</td>
+                                    <td class="contact-name-cell">{{ $data['ojt']->contact_name ?? 'Not provided' }}</td>
                                     <td class="contact-number-cell">
-                                        <div class="contact-number-wrap"><i class="fa fa-phone"></i><span>{{ $data['ojt']->contact_number }}</span></div>
+                                        <div class="contact-number-wrap"><i class="fa fa-phone"></i><span>{{ $data['ojt']->contact_number ?? 'Not provided' }}</span></div>
                                     </td>
                                 </tr>
-                                @endif
                             @endforeach
                         </tbody>
                     </table>

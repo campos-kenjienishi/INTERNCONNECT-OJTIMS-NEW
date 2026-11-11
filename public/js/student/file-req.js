@@ -267,10 +267,10 @@
             } else {
                 const missingParts = [];
                 if (missingBasicRequirementNames.length) {
-                    missingParts.push('Basic requirements remaining: ' + missingBasicRequirementNames.join(', '));
+                    missingParts.push('Basic requirements awaiting approval: ' + missingBasicRequirementNames.join(', '));
                 }
                 if (!hasSubmittedNotarizedMoa) {
-                    missingParts.push('Submit your Notarized MOA from the MOA page first.');
+                    missingParts.push('Your Notarized MOA must be approved, unless waived for in-house OJT.');
                 }
                 phaseHelpText.textContent = missingParts.join(' ');
             }
