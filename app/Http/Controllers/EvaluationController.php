@@ -11,6 +11,7 @@ use App\Models\OjtEvaluationTemplate;
 use App\Models\OjtEvaluationTemplateItem;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\SupervisorEmailVerification;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -464,7 +465,11 @@ class EvaluationController extends Controller
             abort(404);
         }
 
-        $this->supervisorRequestError($requestRow);
+        $error = $this->supervisorRequestError($requestRow);
+        if (!$error && !app(SupervisorEmailVerification::class)->isVerified($requestRow)) {
+            return response()->view('evaluations.supervisor_verify', ['token' => $token])
+                ->header('Cache-Control', 'no-store, private');
+        }
 
         OjtEvaluationRequest::whereKey($requestRow->id)->where('token', $token)
             ->where('status', 'sent')->where('token_expires_at', '>', now())
@@ -482,6 +487,36 @@ class EvaluationController extends Controller
         ]);
     }
 
+    public function sendSupervisorVerification(Request $request, $token)
+    {
+        $invitation = OjtEvaluationRequest::where('token', $token)->firstOrFail();
+        if ($error = $this->supervisorRequestError($invitation)) {
+            return redirect()->route('evaluation.form.show', ['token' => $token])->with('error', $error);
+        }
+
+        $verification = app(SupervisorEmailVerification::class);
+        if (!$verification->isVerified($invitation)) {
+            $verification->send($invitation, (string) $request->ip());
+        }
+
+        return redirect()->route('evaluation.form.show', ['token' => $token])
+            ->with('success', 'A verification code was sent to the supervisor email recorded on this invitation.');
+    }
+
+    public function verifySupervisorEmail(Request $request, $token)
+    {
+        $invitation = OjtEvaluationRequest::where('token', $token)->firstOrFail();
+        if ($error = $this->supervisorRequestError($invitation)) {
+            return redirect()->route('evaluation.form.show', ['token' => $token])->with('error', $error);
+        }
+
+        $validated = $request->validate(['code' => ['required', 'string', 'regex:/^[0-9]{6}$/']]);
+        app(SupervisorEmailVerification::class)->verify($invitation, $validated['code'], (string) $request->ip());
+
+        return redirect()->route('evaluation.form.show', ['token' => $token])
+            ->with('success', 'Email verified. You can now complete the evaluation.');
+    }
+
     public function reviewSupervisorForm(Request $request, $token)
     {
         $requestRow = OjtEvaluationRequest::with('template.items')->where('token', $token)->first();
@@ -491,6 +526,11 @@ class EvaluationController extends Controller
 
         if ($error = $this->supervisorRequestError($requestRow)) {
             return back()->with('error', $error);
+        }
+
+        if (!app(SupervisorEmailVerification::class)->isVerified($requestRow)) {
+            return redirect()->route('evaluation.form.show', ['token' => $token])
+                ->with('error', 'Please verify your supervisor email before continuing.');
         }
 
         $validated = $this->validateSupervisorPayload($request, $requestRow, true);
@@ -524,6 +564,11 @@ class EvaluationController extends Controller
 
             if ($error = $this->supervisorRequestError($requestRow)) {
                 return back()->with('error', $error);
+            }
+
+            if (!app(SupervisorEmailVerification::class)->isVerified($requestRow)) {
+                return redirect()->route('evaluation.form.show', ['token' => $token])
+                    ->with('error', 'Please verify your supervisor email before submitting.');
             }
 
             $validated = $this->validateSupervisorPayload($request, $requestRow, false);
@@ -572,6 +617,8 @@ class EvaluationController extends Controller
                 'Supervisor submitted evaluation for student: ' . ($requestRow->student_name ?: ('Student ID ' . $requestRow->student_id)),
                 $requestRow->student_id
             );
+
+            DB::afterCommit(fn () => app(SupervisorEmailVerification::class)->forget($requestRow));
 
             return redirect()->route('evaluation.form.thankyou')
                 ->with('success', 'Your evaluation was submitted successfully.');
