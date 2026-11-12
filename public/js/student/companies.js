@@ -259,19 +259,6 @@ $(document).ready(function () {
                 e.preventDefault();
                 return;
             }
-
-            if (this.dataset.submitting === 'true') {
-                e.preventDefault();
-                return;
-            }
-
-            this.dataset.submitting = 'true';
-
-            const submitButton = this.querySelector('button[type="submit"]');
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Saving...';
-            }
         });
     });
 
@@ -347,7 +334,11 @@ $(document).ready(function () {
     const studentMoaForm = document.getElementById('studentMoaForm');
     if (studentMoaForm) {
         studentMoaForm.addEventListener('submit', function (e) {
-            if (window.moaLockConfirmed) return;
+            if (e.defaultPrevented) return;
+            if (window.moaLockConfirmed) {
+                window.moaLockConfirmed = false;
+                return;
+            }
 
             e.preventDefault();
             const companyNameInput = this.querySelector('input[name="company_name"]');
@@ -374,8 +365,14 @@ $(document).ready(function () {
     const btnConfirmLockSubmit = document.getElementById('btnConfirmLockSubmit');
     if (btnConfirmLockSubmit) {
         btnConfirmLockSubmit.addEventListener('click', function () {
-            this.disabled = true;
-            this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Processing...';
+            if (pendingFormType === 'create' && studentMoaForm && !studentMoaForm.checkValidity()) {
+                studentMoaForm.reportValidity();
+                return;
+            }
+
+            const confirmModalEl = document.getElementById('confirmMoaLockModal');
+            const confirmModal = confirmModalEl ? bootstrap.Modal.getInstance(confirmModalEl) : null;
+            if (confirmModal) confirmModal.hide();
 
             if (pendingFormType === 'link') {
                 const linkForm = document.getElementById('linkExistingMoaForm');

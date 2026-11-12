@@ -28,8 +28,9 @@
             ['url' => url('/student/ojtinfo'), 'icon' => 'fa-layer-group', 'label' => 'OJT Information', 'pattern' => 'student/ojtinfo*'],
             ['url' => url('/student/class'), 'icon' => 'fa-clipboard', 'label' => 'Class', 'pattern' => 'student/class*'],
             ['url' => url('/student/files'), 'icon' => 'fa-download', 'label' => 'Downloadable Files', 'pattern' => 'student/files*'],
-            ['url' => url('/student/MOA'), 'icon' => 'fa-file-alt', 'label' => 'MOA', 'pattern' => 'student/MOA*'],
+            ['url' => url('/student/MOA'), 'icon' => 'fa-file-contract', 'label' => 'Notarized MOA', 'pattern' => 'student/MOA*'],
             ['url' => url('/student/requirements'), 'icon' => 'fa-cloud-upload-alt', 'label' => 'Requirements', 'pattern' => 'student/requirements*'],
+            ['url' => route('student.completion-certificate.index'), 'icon' => 'fa-certificate', 'label' => 'Completion Certificate', 'pattern' => 'student/completion-certificate*'],
             ['url' => url('/student/evaluation'), 'icon' => 'fa-star-half-alt', 'label' => 'Evaluation', 'pattern' => 'student/evaluation*'],
         ];
     } elseif ($role === 'professor') {
@@ -37,6 +38,7 @@
             ['url' => url('/professor/home'), 'icon' => 'fa-home', 'label' => 'Dashboard', 'pattern' => 'professor/home*'],
             ['url' => url('/professor/class'), 'icon' => 'fa-clipboard', 'label' => 'Class', 'pattern' => 'professor/class*'],
             ['url' => route('professor.requirementStatus.classes'), 'icon' => 'fa-clipboard-check', 'label' => 'Requirement Status', 'pattern' => 'professor/requirement-status*'],
+            ['url' => route('professor.completion-certificates.index'), 'icon' => 'fa-certificate', 'label' => 'COC Validation', 'pattern' => 'professor/completion-certificates*'],
             ['url' => url('/professor/analytics'), 'icon' => 'fa-chart-line', 'label' => 'Analytics', 'pattern' => 'professor/analytics*'],
             ['url' => url('/reportsExpiredProf'), 'icon' => 'fa-file-contract', 'label' => 'MOA', 'pattern' => 'reportsExpiredProf*'],
             ['url' => url('/professor/maintain'), 'icon' => 'fa-cogs', 'label' => 'Maintenance', 'pattern' => 'professor/maintain*'],
@@ -50,6 +52,7 @@
             ['url' => url('/uploadpage'), 'icon' => 'fa-file-upload', 'label' => 'Upload Templates', 'pattern' => 'uploadpage*'],
             ['url' => url('/maintenance'), 'icon' => 'fa-cogs', 'label' => 'Maintenance', 'pattern' => 'maintenance*'],
             ['url' => url('/MOA'), 'icon' => 'fa-file-contract', 'label' => 'MOA', 'pattern' => 'MOA*'],
+            ['url' => route('coordinator.completion-certificates.index'), 'icon' => 'fa-certificate', 'label' => 'COC Validation', 'pattern' => 'coordinator/completion-certificates*'],
             ['url' => url('/reports'), 'icon' => 'fa-chart-bar', 'label' => 'Reports', 'pattern' => 'reports*'],
             ['url' => url('/auditlog'), 'icon' => 'fa-clipboard-list', 'label' => 'Audit Log', 'pattern' => 'auditlog*'],
         ];
