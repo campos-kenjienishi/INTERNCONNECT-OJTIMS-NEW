@@ -584,9 +584,10 @@
                 }
             };
 
-            frame.onload = function () {
-                setTimeout(function () {
+            frame.onload = async function () {
+                try {
                     if (frame.contentWindow) {
+                        await frame.contentWindow.prepareReportPrint();
                         frame.contentWindow.focus();
                         frame.contentWindow.print();
                         window.addEventListener('afterprint', cleanup, { once: true });
@@ -594,18 +595,15 @@
                     } else {
                         cleanup();
                     }
-                }, 150);
+                } catch (error) {
+                    cleanup();
+                    window.alert('The analytics report could not be prepared. Please try again.');
+                }
             };
 
             document.body.appendChild(frame);
         } else {
-            const wrapper = document.getElementById('print-area-wrapper');
-            if (!wrapper) return;
-            wrapper.innerHTML = buildAnalyticsPrintHTML();
-            window.print();
-            setTimeout(function () {
-                wrapper.innerHTML = '';
-            }, 1000);
+            window.ReportPrint.print(buildAnalyticsPrintHTML, { sections: true }).catch((error) => window.alert(error.message));
         }
     });
 

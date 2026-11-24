@@ -331,13 +331,5 @@
             `;
         }
 
-        document.getElementById('printBtn')?.addEventListener('click', () => {
-            const wrapper = document.getElementById('print-area-wrapper');
-            if (!wrapper) return;
-            wrapper.innerHTML = buildCoordinatorPrintHTML();
-            window.print();
-            setTimeout(() => {
-                wrapper.innerHTML = '';
-            }, 1000);
-        });
+        window.ReportPrint.bindPrint('printBtn', buildCoordinatorPrintHTML, { sections: true });
 

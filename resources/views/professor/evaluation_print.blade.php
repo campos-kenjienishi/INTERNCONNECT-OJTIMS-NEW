@@ -313,12 +313,12 @@
         <a href="{{ route('professor.evaluation') }}" class="btn-tool">
             <i class="fa fa-arrow-left"></i> Back
         </a>
-        <button type="button" class="btn-tool primary" id="printBtn" onclick="window.print()">
+            <button type="button" class="btn-tool primary" id="printBtn">
             <i class="fa fa-print"></i> Print Report
         </button>
     </div>
 
-    <div class="report" id="printReport">
+    <div class="report" id="printReport" data-print-document>
         <div class="report-head">
             <div class="report-head-band"></div>
             <div class="report-head-inner">
@@ -410,5 +410,8 @@
         </div>
     </div>
 </div>
+<link rel="stylesheet" href="{{ vasset('css/report-print.css') }}">
+<script src="{{ vasset('js/report-print.js') }}"></script>
+<script src="{{ vasset('js/report-print-document.js') }}"></script>
 </body>
 </html>

@@ -335,13 +335,13 @@
                 <i class="fa fa-arrow-left"></i>
                 Back to Analytics
             </a>
-            <button type="button" class="btn-tool primary" id="printBtn" onclick="window.print()">
+            <button type="button" class="btn-tool primary" id="printBtn">
                 <i class="fa fa-print"></i>
                 <span>Print Analytics Report</span>
             </button>
         </div>
 
-        <div class="report" id="report">
+        <div class="report" id="report" data-print-document data-print-sections data-print-orientation="portrait">
             <div class="report-head">
                 <div class="report-head-band"></div>
                 <div class="report-head-inner">
@@ -367,7 +367,7 @@
                 <div class="report-meta-note">Analytics snapshot</div>
             </div>
 
-            <div class="report-body">
+            <div class="report-body" data-report-content>
                 <div class="summary-band">
                     <div class="section-label" style="margin-bottom:12px;">Report Summary</div>
                     <div class="mini-cards">
@@ -511,5 +511,8 @@
             </div>
         </div>
     </div>
+<link rel="stylesheet" href="{{ vasset('css/report-print.css') }}">
+<script src="{{ vasset('js/report-print.js') }}"></script>
+<script src="{{ vasset('js/report-print-document.js') }}"></script>
 </body>
 </html>

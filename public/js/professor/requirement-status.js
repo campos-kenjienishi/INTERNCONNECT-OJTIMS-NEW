@@ -326,22 +326,7 @@
             </div>`;
     }
 
-    const printReportBtnEl = document.getElementById('printReportBtn');
-    if (printReportBtnEl) {
-        printReportBtnEl.addEventListener('click', function () {
-            let printWrapper = document.getElementById('print-area-wrapper');
-            if (!printWrapper) {
-                printWrapper = document.createElement('div');
-                printWrapper.id = 'print-area-wrapper';
-                document.body.appendChild(printWrapper);
-            }
-            printWrapper.innerHTML = buildRequirementPrintHTML();
-            window.print();
-            setTimeout(function () {
-                printWrapper.innerHTML = '';
-            }, 1000);
-        });
-    }
+    window.ReportPrint.bindPrint('printReportBtn', buildRequirementPrintHTML, { pageLabel: true });
 
     const requirementModal = document.getElementById('requirementListModal');
     const requirementModalTitle = document.getElementById('requirementListTitle');

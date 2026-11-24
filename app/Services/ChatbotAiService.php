@@ -107,7 +107,7 @@ class ChatbotAiService
     protected function buildSystemPrompt(?string $userRole): string
     {
         $roleName = match ($userRole) {
-            'student', '3' => 'STUDENT',
+            'student', '0', '3' => 'STUDENT',
             'professor', 'faculty', '2' => 'PROFESSOR / FACULTY ADVISER',
             'coordinator', 'admin', '1' => 'OJT COORDINATOR',
             default => 'GENERAL USER / LANDING PAGE VISITOR'
@@ -120,8 +120,8 @@ class ChatbotAiService
   2. MY CLASS & ADVISER: Viewing enrolled class section, course schedule, room assignment, and designated OJT Faculty Adviser (/student/class).
   3. NOTARIZED MOA & PARTNER COMPANIES: Submitting a new Notarized MOA PDF, linking to an active partner company, or declaring School In-House OJT (/student/MOA). Requesting coordinator unlock for approved MOAs.
   4. OJT PLACEMENT INFO: Encoding host company address, assigned department, internship role, supervisor contact (name, email, phone), work modality (Onsite/Hybrid/Remote), and weekly training schedule (/student/ojtinfo).
-  5. REQUIREMENTS AND COMPLETION: Student documents are separated into Basic Requirements, Other Requirements, Notarized MOA, and a dedicated Certificate of Completion module. COC validation is sequential: professor review first, then final coordinator review. Handling denied documents includes reviewing remarks and uploading a corrected copy.
-  6. SUPERVISOR EVALUATION: Sending the digital evaluation form link to the company supervisor's email (/student/evaluation), resending if not received, and viewing released evaluation grades.
+  5. REQUIREMENTS AND COMPLETION: Student documents are separated into Basic Requirements, Other Requirements, Notarized MOA, and a dedicated Certificate of Completion module. Professor COC review is optional; coordinator final approval is required and may proceed without professor endorsement. Students upload the company-issued certificate; the system does not issue it. Handling denied documents includes reviewing remarks and uploading a corrected copy.
+  6. SUPERVISOR EVALUATION: Sending the digital evaluation form link to the company supervisor's email (/student/evaluation), resending if not received, and viewing professor-released supervisor evaluation ratings. These ratings are not automatically the student's official final OJT course grade.
   7. DOWNLOADABLE FORMS & CLASS FILES: Official templates and institutional forms uploaded by your OJT Coordinator can be accessed and downloaded on the Downloadable Files page (/student/files). Meanwhile, class-specific files, announcements, and syllabus materials uploaded by your Professor can be viewed on your My Class page (/student/class).
 - FORBIDDEN TOPICS: Coordinator administrative tools (FLSS faculty sync, global MOA partner creation, database backups, audit logs, student directory cohort sync, system maintenance), faculty class management. If asked, you MUST DECLINE and set escalate: true.",
             'professor', 'faculty', '2' => "The user is a PROFESSOR / FACULTY ADVISER.
@@ -137,13 +137,14 @@ class ChatbotAiService
 - ALLOWED TOPICS:
   1. DASHBOARD & GLOBAL OVERVIEW: Institutional metrics overview, student compliance count, MOA status summaries, and active rooms (/dashboard).
   2. FACULTY & FLSS SYNC: Syncing faculty advisers and class schedule loads from FLSS (/coordinator/sync-faculty), syncing accounts from IdP (/coordinator/sync-users-idp) and GuiSIS (/coordinator/sync-users-guisis), pruning inactive faculty, and transferring coordinator role (/professorTab).
-  3. PARTNER COMPANIES & MOA MANAGEMENT: Adding partner host companies, tracking MOA start and expiration dates, verifying notarized MOA PDF uploads, assigning students to companies (/MOA), and reviewing student MOA unlock requests (/moa/unlock-requests).
+  3. PARTNER COMPANIES & MOA MANAGEMENT: Adding partner host companies, tracking MOA start and expiration dates, verifying notarized MOA PDF uploads, assigning students to companies (/MOA), and reviewing student MOA unlock requests (/moa/unlock-requests). Renew an existing company agreement through its Renew action with the replacement PDF and validity details; view previous agreements and renewal dates in its renewal history. Expiration does not automatically renew or delete an agreement.
   4. STUDENT DIRECTORY & COMPLIANCE: Searching and filtering student cohorts across sections, viewing individual requirements submissions (/coordinator/student-requirements), toggling School In-House OJT status, and batch-syncing student records from GuiSIS (/studentLists).
   5. REPORTS & EXPIRED MOA MANAGEMENT: Generating comprehensive OJT student reports (/OJTReports), generating Expired MOA reports with CSV/PDF exports (/reportsExpired), and sending automated email notices to companies with expiring MOAs.
   6. INSTITUTIONAL ANALYTICS: Viewing university-wide requirement completion charts, modality breakdowns (Onsite/Hybrid/Remote), and exporting analytics reports (/analytics).
   7. DOWNLOADABLE FORMS & TEMPLATES: Uploading and managing official university OJT forms, templates, and guidelines accessible by students (/uploadpage).
   8. SYSTEM MAINTENANCE & AUDIT TRAIL: Managing academic programs/courses, viewing audit logs of administrative actions (/maintenance, /auditlog).
-  9. COORDINATOR ACCOUNT SETTINGS: Updating profile details, contact information, and local password (/accountinfo).",
+  9. COORDINATOR ACCOUNT SETTINGS: Updating profile details, contact information, and local password (/accountinfo).
+  10. TARGETED ANNOUNCEMENTS: On the dashboard (/dashboard), target student programs or eligible OJT professors, including specific eligible professors. Eligibility comes from matching OJT assignments or manual announcement designations, not simply every FLSS faculty account. Preview recipients before publishing. Email delivery is optional; an in-app announcement need not email recipients.",
             default => "The user is a VISITOR or GUEST on the InternConnect Landing Page (/) or Login Gateway (/login-gateway).\n- ALLOWED TOPICS:
 1. HOW TO GO TO THE MAIN WEBSITE / LOGIN: Click 'Launch Portal' in the top navigation bar or go to the Login Gateway (/login-gateway). Select either 'Student Portal' (/login-gateway?portal=student) or 'Faculty & Staff Portal' (/login-gateway?portal=faculty).
 2. PORTAL ROLES:
@@ -167,6 +168,9 @@ When greeted, you can introduce yourself: "Hi, my name is Bud, your OJT Buddy! �
 
 CURRENT USER ROLE: {$roleName}
 {$roleContext}
+
+WORKFLOW ACCURACY:
+Professor Certificate of Completion endorsement is optional; coordinator final validation is required. Supervisor evaluation ratings are not the official final OJT course grade. No personal submission deadline or private record is supplied with this prompt: never invent one or claim Requirements/Downloadable Files displays a due date. Refer personal deadline questions to the assigned professor or OJT coordinator and official class announcements. For unfamiliar external systems, acknowledge the limitation instead of inventing instructions.
 
 STRICT ROLE-BASED ACCESS CONTROL (MANDATORY RULE):
 You must ONLY provide answers and navigation that belong to the user's specific role ({$roleName}).
@@ -279,6 +283,11 @@ PROMPT;
                     ];
                 }
             }
+        }
+
+        $workflowReply = $this->checkWorkflowMatches($lower, $userRole, $isStudent, $isProfessor);
+        if ($workflowReply !== null) {
+            return $workflowReply;
         }
 
         // Professor-specific quick matches
@@ -1318,24 +1327,6 @@ PROMPT;
             ];
         }
 
-        // Module 4: Certificate of Completion
-        if (str_contains($lower, 'certificate of completion') || str_contains($lower, 'completion certificate') || preg_match('/\bcoc\b/', $lower)) {
-            $actions = match (true) {
-                $isStudent => [['label' => 'Open Certificate of Completion', 'url' => '/student/completion-certificate', 'icon' => 'fas fa-certificate']],
-                $isProfessor => [['label' => 'Open COC Validation', 'url' => '/professor/completion-certificates', 'icon' => 'fas fa-user-check']],
-                $userRole === 'coordinator' || $userRole === '1' => [['label' => 'Open COC Final Validation', 'url' => '/coordinator/completion-certificates', 'icon' => 'fas fa-user-shield']],
-                default => [['label' => 'Launch Portal', 'url' => '/login-gateway', 'icon' => 'fas fa-sign-in-alt']],
-            };
-
-            return [
-                'reply' => 'The **Certificate of Completion** uses a dedicated two-level validation process. The student uploads the official PDF, the assigned professor reviews it first, and the OJT coordinator performs the final approval. Rejected submissions include remarks and can be corrected and resubmitted.',
-                'actions' => $actions,
-                'suggestions' => ['Who validates the COC?', 'What if my COC is rejected?', 'Where can I see my COC status?'],
-                'escalate' => false,
-                'source' => 'system',
-            ];
-        }
-
         // Module 5: General Requirements Upload & Category Tracking
         if (str_contains($lower, 'requirement') || str_contains($lower, 'submit requirement') || str_contains($lower, 'upload requirement') || str_contains($lower, 'medical clearance') || str_contains($lower, 'endorsement letter') || str_contains($lower, 'dtr') || str_contains($lower, 'parent consent') || str_contains($lower, 'insurance') || str_contains($lower, 'narrative report') || str_contains($lower, 'upload document')) {
             $actions = [];
@@ -1550,9 +1541,51 @@ PROMPT;
         ];
     }
 
-    /**
-     * Safely extract JSON object from AI string
-     */
+    protected function checkWorkflowMatches(string $message, ?string $role, bool $isStudent, bool $isProfessor): ?array
+    {
+        $isCoordinator = in_array($role, ['coordinator', 'admin', '1'], true);
+        $reply = null;
+        $actions = [];
+        $escalate = false;
+
+        if (preg_match('/certificate of completion|completion certificate|\bcoc\b/', $message)) {
+            $reply = 'Professor review of the **Certificate of Completion** is optional. The OJT coordinator performs the required final validation and may approve without professor endorsement. Upload the company-issued PDF in the dedicated Certificate of Completion page; rejected copies can be corrected using the reviewer remarks. InternConnect does not issue the company certificate.';
+            $destination = match (true) {
+                $isStudent => '/student/completion-certificate',
+                $isProfessor => '/professor/completion-certificates',
+                $isCoordinator => '/coordinator/completion-certificates',
+                default => '/login-gateway',
+            };
+            $actions = [['label' => 'Certificate of Completion', 'url' => $destination, 'icon' => 'fas fa-certificate']];
+        } elseif (preg_match('/evaluation|supervisor|rating|score/', $message) && preg_match('/final.*grade|class grade|course grade/', $message)) {
+            $reply = 'No. Supervisor evaluation scores summarize the supervisor’s rubric ratings; they do not automatically become your official final OJT class grade. The professor reviews and releases the evaluation result to the student. Determining the official course grade remains an academic responsibility outside this automated evaluation scoring.';
+            $destination = match (true) {
+                $isStudent => '/student/evaluation',
+                $isProfessor => '/professor/evaluation',
+                default => '/login-gateway',
+            };
+            $actions = [['label' => 'Supervisor Evaluation', 'url' => $destination, 'icon' => 'fas fa-star']];
+        } elseif ($isStudent && preg_match('/deadline|due date|submission date/', $message)) {
+            $reply = 'I cannot confirm your personal submission deadline because no verified deadline record was supplied to me. Please confirm the exact calendar date with your assigned OJT professor or OJT coordinator, and consult official class announcements. I will not invent a date or assume your Requirements or Downloadable Files page contains one.';
+            $actions = [['label' => 'My Class', 'url' => '/student/class', 'icon' => 'fas fa-chalkboard']];
+            $escalate = true;
+        } elseif ($isCoordinator && preg_match('/announcement|announce\b/', $message)) {
+            $reply = 'Yes. Use the dashboard announcement form to target selected student programs or eligible OJT professors, including specific eligible professors. Eligibility comes from matching OJT assignments or manual announcement designations, not every faculty account imported from FLSS. Preview the recipient list before publishing. Email notifications are optional: leave them unchecked for an in-app announcement without emailing everyone.';
+            $actions = [['label' => 'Announcements', 'url' => '/dashboard', 'icon' => 'fas fa-bullhorn']];
+        } elseif ($isCoordinator && preg_match('/\bmoa\b|agreement/', $message) && preg_match('/renew/', $message)) {
+            $reply = 'Open **MOA**, find the existing partner company, and use its **Renew** action to submit the renewed agreement PDF and updated validity details. Use the company’s **Renewal History** action to see previous agreements and when renewals were recorded. Expiration does not automatically renew or delete an agreement; renewal preserves the agreement history.';
+            $actions = [['label' => 'MOA and Renewal History', 'url' => '/MOA', 'icon' => 'fas fa-file-contract']];
+        }
+
+        return $reply === null ? null : [
+            'reply' => $reply,
+            'actions' => $actions,
+            'suggestions' => [],
+            'escalate' => $escalate,
+            'source' => 'system',
+        ];
+    }
+
     protected function extractJson(string $text): ?array
     {
         $text = trim($text);
