@@ -327,6 +327,77 @@ class ReportsController extends Controller
     }
 
 
+    public function professorStudentReports(Request $request)
+    {
+        $user = User::find(Session::get('loginId'));
+        abort_unless($user, 401);
+        abort_unless(in_array((int) $user->role, [1, 2], true), 403);
+
+        $filters = $request->validate([
+            'class_id' => 'nullable|integer|min:1',
+            'course' => 'nullable|string|max:255',
+            'school_year' => ['nullable', 'regex:/^\d{4}\s*-\s*\d{4}$/'],
+            'semester' => 'nullable|in:1st Semester,2nd Semester,Summer Term',
+        ]);
+        $classes = Classes::where('adviser_name', $user->full_name)
+            ->when(trim((string) $user->full_name) === '', fn ($query) => $query->whereRaw('1 = 0'))
+            ->orderByDesc('id')->get();
+        $selectedClassId = (string) ($filters['class_id'] ?? '');
+        abort_if($selectedClassId !== '' && !$classes->contains('id', (int) $selectedClassId), 403);
+
+        $selectedCourse = trim($filters['course'] ?? '');
+        $selectedSchoolYear = preg_replace('/\s+/', '', $filters['school_year'] ?? '');
+        $selectedSemester = $filters['semester'] ?? '';
+        $normalizeSemester = static function ($semester) {
+            return match (strtolower(trim((string) $semester))) {
+                '1st sem', '1st semester' => '1st Semester',
+                '2nd sem', '2nd semester' => '2nd Semester',
+                'summer', 'summer term' => 'Summer Term',
+                default => '',
+            };
+        };
+        $reportClasses = $classes->filter(function ($class) use ($selectedClassId, $selectedCourse, $selectedSchoolYear, $selectedSemester, $normalizeSemester) {
+            return ($selectedClassId === '' || (int) $class->id === (int) $selectedClassId)
+                && ($selectedCourse === '' || $class->course === $selectedCourse)
+                && ($selectedSchoolYear === '' || $class->school_year_start . '-' . $class->school_year_end === $selectedSchoolYear)
+                && ($selectedSemester === '' || $normalizeSemester($class->semester) === $selectedSemester);
+        });
+        $classIds = $reportClasses->pluck('id');
+        $legacyPrograms = $reportClasses->filter(fn ($class) => empty($class->school_year_start) || empty($class->school_year_end))
+            ->pluck('course')->filter()->unique();
+        $students = User::where('role', 0)->where('status', 1)->with('studentInfo')
+            ->whereHas('studentInfo', function ($query) use ($classIds, $legacyPrograms, $user) {
+                $query->where(function ($scope) use ($classIds, $legacyPrograms, $user) {
+                    $scope->whereIn('class_id', $classIds);
+                    if ($legacyPrograms->isNotEmpty()) {
+                        $scope->orWhere(function ($legacy) use ($legacyPrograms, $user) {
+                            $legacy->whereNull('class_id')->where('adviser_name', $user->full_name)
+                                ->whereIn('course', $legacyPrograms);
+                        });
+                    }
+                });
+            })->orderBy('full_name')->orderBy('id')->get();
+        $studentNumbers = $students->map(fn ($student) => $student->studentNum)->filter()->unique();
+        $ojtRecords = OJTInformation::whereIn('studentNum', $studentNumbers)->orderBy('id')->get()->unique('studentNum')->keyBy('studentNum');
+        $studentData = $students->map(fn ($student) => [
+            'student' => $student,
+            'ojt' => $ojtRecords->get($student->studentNum),
+            'subjects' => [],
+        ])->all();
+        $course = $classes->pluck('course')->filter()->unique()->sort()->values()
+            ->map(fn ($name) => (object) ['course' => $name]);
+        $schoolYears = $classes->filter(fn ($class) => $class->school_year_start && $class->school_year_end)
+            ->map(fn ($class) => $class->school_year_start . '-' . $class->school_year_end)
+            ->unique()->sortDesc()->values();
+        $classLabel = $selectedClassId === '' ? 'All My Classes' : (string) $classes->firstWhere('id', (int) $selectedClassId)->room;
+        $isProfessorReport = true;
+        $reportInsights = $this->buildStudentReportInsights($studentData, $selectedCourse ?: null);
+
+        return view('ojtCoordinator.reportsT', compact('user', 'studentData', 'course', 'schoolYears',
+            'classes', 'selectedClassId', 'classLabel', 'selectedCourse', 'selectedSchoolYear', 'selectedSemester',
+            'isProfessorReport', 'reportInsights'));
+    }
+
     public function sendEmail(Request $request)
 {
     

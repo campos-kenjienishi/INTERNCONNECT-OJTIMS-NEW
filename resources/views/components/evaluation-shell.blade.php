@@ -41,6 +41,7 @@
             ['url' => route('professor.completion-certificates.index'), 'icon' => 'fa-certificate', 'label' => 'COC Validation', 'pattern' => 'professor/completion-certificates*'],
             ['url' => url('/professor/analytics'), 'icon' => 'fa-chart-line', 'label' => 'Analytics', 'pattern' => 'professor/analytics*'],
             ['url' => url('/reportsExpiredProf'), 'icon' => 'fa-file-contract', 'label' => 'MOA', 'pattern' => 'reportsExpiredProf*'],
+            ['url' => route('professor.reports'), 'icon' => 'fa-user-graduate', 'label' => 'Student OJT Report', 'pattern' => 'professor/reports*'],
             ['url' => url('/professor/maintain'), 'icon' => 'fa-cogs', 'label' => 'Maintenance', 'pattern' => 'professor/maintain*'],
             ['url' => url('/professor/evaluation'), 'icon' => 'fa-star-half-alt', 'label' => 'Evaluation', 'pattern' => 'professor/evaluation*'],
         ];

@@ -539,6 +539,8 @@
         csrfToken: @json(csrf_token())
     };
 </script>
+<link rel="stylesheet" href="{{ vasset('css/report-print.css') }}">
+<script src="{{ vasset('js/report-print.js') }}"></script>
 <script src="{{ vasset('js/coordinator/analytics.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>

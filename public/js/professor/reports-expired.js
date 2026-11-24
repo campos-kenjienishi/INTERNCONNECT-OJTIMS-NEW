@@ -164,11 +164,10 @@
         const timeStr  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
 
         const dt               = $('#companyTable').DataTable();
-        const currentPageNodes = dt.rows({ page: 'current' }).nodes();
+        const currentPageNodes = dt.rows({ search: 'applied', order: 'applied' }).nodes();
         const total            = currentPageNodes.length;
-        const pageInfo         = dt.page.info();
-        const pageNum          = pageInfo.page + 1;
-        const pageCount        = pageInfo.pages;
+        const pageNum          = 1;
+        const pageCount        = 1;
 
         const sySelect = document.getElementById('school_year');
         const syLabel  = sySelect && sySelect.value ? sySelect.value : 'All School Years';
@@ -183,7 +182,7 @@
         for (let i = 0; i < currentPageNodes.length; i++) {
             const tr     = currentPageNodes[i];
             const tds    = tr.querySelectorAll('td');
-            const rowNum = pageInfo.start + i + 1;
+            const rowNum = i + 1;
             const rowBg  = i % 2 === 0 ? '#ffffff' : '#f9fafb';
 
             const getCompany = () => {
@@ -246,7 +245,7 @@
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
                         <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
-                            <div style="font-size:18px; font-weight:800; color:#fff; line-height:1;">${total}</div>
+                            <div data-report-page-records style="font-size:18px; font-weight:800; color:#fff; line-height:1;">${total}</div>
                             <div style="font-size:7.5px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; margin-top:1px;">Page Records</div>
                         </div>
                         <div style="font-size:8.5px; color:rgba(255,255,255,0.55); margin-top:4px; text-align:center;">Page ${pageNum} of ${pageCount}</div>
@@ -354,24 +353,9 @@
     const previewModalEl = document.getElementById('printPreviewModal');
     const previewModal   = new bootstrap.Modal(previewModalEl, { backdrop: 'static', keyboard: true });
 
-    document.getElementById('openPreviewBtn').addEventListener('click', function () {
-        document.getElementById('printPreviewContent').innerHTML = buildPrintHTML();
-        previewModal.show();
-    });
+    window.ReportPrint.bind(buildPrintHTML, () => previewModal.show());
 
     /* ── Print ── */
-    document.getElementById('doPrintBtn').addEventListener('click', function () {
-        // 1. Put the generated HTML into the hidden print wrapper on the main page
-        document.getElementById('print-area-wrapper').innerHTML = buildPrintHTML();
-        
-        // 2. Trigger the native browser print dialog
-        window.print();
-        
-        // 3. Clear the wrapper after printing to free memory
-        setTimeout(function() {
-            document.getElementById('print-area-wrapper').innerHTML = '';
-        }, 1000);
-    });
 
     /* ── Send email (preserved from original) ── */
     function sendEmail(course, userEmail) {

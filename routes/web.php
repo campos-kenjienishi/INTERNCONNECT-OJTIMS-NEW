@@ -227,6 +227,7 @@ Route::middleware(['auth.session.custom', 'role:2'])->group(function () {
     Route::post('/update/denied/status/{id}', [PassDocuController::class, 'updateDeniedStatus']);
     Route::get('/requireview',[PassDocuController::class,'requirementsView']);
     Route::get('/reportsExpiredProf', [ReportsController::class, 'reportsExpiredProf'])->name('reportsExpiredProf');
+    Route::match(['get', 'post'], '/professor/reports', [ReportsController::class, 'professorStudentReports'])->name('professor.reports');
     Route::match(['get', 'post'], '/ExpiredMOAReportsProf', [ReportsController::class, 'generateMOAReportProf'])->name('reports.generate.prof');
     Route::post('/professor/template/remove/{id}', [FileController::class, 'removeProfessorTemplate']);
     Route::get('/professor/evaluation', [EvaluationController::class, 'professorIndex'])->name('professor.evaluation');

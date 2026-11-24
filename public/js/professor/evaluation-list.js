@@ -77,9 +77,10 @@
                 }
             };
 
-            frame.onload = function () {
-                setTimeout(function () {
+            frame.onload = async function () {
+                try {
                     if (frame.contentWindow) {
+                        await frame.contentWindow.prepareReportPrint();
                         frame.contentWindow.focus();
                         frame.contentWindow.print();
                         window.addEventListener('afterprint', cleanup, { once: true });
@@ -87,7 +88,10 @@
                     } else {
                         cleanup();
                     }
-                }, 150);
+                } catch (error) {
+                    cleanup();
+                    window.alert('The evaluation report could not be prepared. Please try again.');
+                }
             };
 
             document.body.appendChild(frame);

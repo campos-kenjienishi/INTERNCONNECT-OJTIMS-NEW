@@ -136,33 +136,36 @@ $(document).ready(function () {
    BUILD PRINT HTML
 ══════════════════════════════════════════════ */
 function buildPrintHTML() {
+    const escapeText = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+    const appliedFilters = window.__reportsConfig?.useAppliedFilters === true;
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
     const dt = $('#fileTable').DataTable();
-    const currentPageNodes = dt.rows({ page: 'current' }).nodes();
+    const currentPageNodes = dt.rows({ search: 'applied', order: 'applied' }).nodes();
     const total = currentPageNodes.length;
-    const pageInfo = dt.page.info();
-    const pageNum = pageInfo.page + 1;
-    const pageCount = pageInfo.pages;
+    const pageNum = 1;
+    const pageCount = 1;
 
     const schoolYearEl = document.getElementById('school_year');
     const courseEl = document.getElementById('course');
 
     const rawSchoolYear = schoolYearEl ? (schoolYearEl.value || (schoolYearEl.selectedIndex >= 0 ? schoolYearEl.options[schoolYearEl.selectedIndex].text : '')) : '';
-    const schoolYear = (rawSchoolYear && rawSchoolYear !== 'Select School Year') ? rawSchoolYear : (window.studentAiContext?.metrics?.school_year || window.__reportsConfig?.schoolYear || 'All School Years');
+    const schoolYear = escapeText(appliedFilters ? (window.__reportsConfig.schoolYear || 'All School Years') : ((rawSchoolYear && rawSchoolYear !== 'Select School Year') ? rawSchoolYear : (window.studentAiContext?.metrics?.school_year || window.__reportsConfig?.schoolYear || 'All School Years')));
 
     const rawCourse = courseEl ? (courseEl.value || (courseEl.selectedIndex >= 0 ? courseEl.options[courseEl.selectedIndex].text : '')) : '';
-    const courseName = (rawCourse && rawCourse !== 'Select Course' && rawCourse !== 'Select Program') ? rawCourse : (window.studentAiContext?.metrics?.course || window.__reportsConfig?.course || 'All Programs');
+    const courseName = escapeText(appliedFilters ? (window.__reportsConfig.course || 'All Programs') : ((rawCourse && rawCourse !== 'Select Course' && rawCourse !== 'Select Program') ? rawCourse : (window.studentAiContext?.metrics?.course || window.__reportsConfig?.course || 'All Programs')));
 
     const semesterEl = document.getElementById('semester');
     const rawSemester = semesterEl ? (semesterEl.value || (semesterEl.selectedIndex >= 0 ? semesterEl.options[semesterEl.selectedIndex].text : '')) : '';
-    const semester = rawSemester || window.__reportsConfig?.semester || window.reportConfig?.semester || '1st Semester';
+    const semester = escapeText(appliedFilters ? (window.__reportsConfig.semester || 'All Semesters') : (rawSemester || window.__reportsConfig?.semester || window.reportConfig?.semester || '1st Semester'));
 
     const rawCampus = window.__reportsConfig?.campusName || window.reportConfig?.campusName || 'PUP Taguig Campus';
-    const campusName = rawCampus.replace(/\bBranch\b/gi, 'Campus');
-    const coordinatorName = window.__reportsConfig?.coordinatorName || window.reportConfig?.coordinatorName || 'OJT Coordinator';
+    const campusName = escapeText(rawCampus.replace(/\bBranch\b/gi, 'Campus'));
+    const coordinatorName = escapeText(window.__reportsConfig?.coordinatorName || window.reportConfig?.coordinatorName || 'OJT Coordinator');
+    const preparedByRole = escapeText(window.__reportsConfig?.preparedByRole || 'OJT Coordinator');
+    const classLabel = escapeText(window.__reportsConfig?.classLabel || '');
 
     let rowsHTML = '';
     for (let i = 0; i < currentPageNodes.length; i++) {
@@ -179,15 +182,15 @@ function buildPrintHTML() {
             return tds[3].textContent.trim();
         };
 
-        const rowNum = pageInfo.start + i + 1;
+        const rowNum = i + 1;
         const rowBg = i % 2 === 0 ? '#ffffff' : '#f9fafb';
-        const studentName = getName();
-        const courseMajor = tr.getAttribute('data-course') || (tds[1] ? tds[1].textContent.trim() : '');
-        const section = tr.getAttribute('data-section') || (tds[2] ? tds[2].textContent.trim() : '');
-        const companyName = getCompany();
-        const startDate = tds[6] ? tds[6].textContent.trim() : '';
-        const assignedDepartment = tr.getAttribute('data-department') || (tds[4] ? tds[4].textContent.trim() : '');
-        const studentRole = tr.getAttribute('data-role') || (tds[5] ? tds[5].textContent.trim() : '');
+        const studentName = escapeText(getName());
+        const courseMajor = escapeText(tr.getAttribute('data-course') || (tds[1] ? tds[1].textContent.trim() : ''));
+        const section = escapeText(tr.getAttribute('data-section') || (tds[2] ? tds[2].textContent.trim() : ''));
+        const companyName = escapeText(getCompany());
+        const startDate = escapeText(tds[6] ? tds[6].textContent.trim() : '');
+        const assignedDepartment = escapeText(tr.getAttribute('data-department') || (tds[4] ? tds[4].textContent.trim() : ''));
+        const studentRole = escapeText(tr.getAttribute('data-role') || (tds[5] ? tds[5].textContent.trim() : ''));
 
         rowsHTML += `
             <tr style="background:${rowBg}; border-bottom:1px solid #e5e7eb;">
@@ -220,7 +223,7 @@ function buildPrintHTML() {
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
                         <div style="display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:6px; padding:5px 12px; text-align:center;">
-                            <div style="font-size:18px; font-weight:800; color:#fff; line-height:1;">${total}</div>
+                            <div data-report-page-records style="font-size:18px; font-weight:800; color:#fff; line-height:1;">${total}</div>
                             <div style="font-size:7.5px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; margin-top:1px;">Page Records</div>
                         </div>
                         <div style="font-size:8.5px; color:rgba(255,255,255,0.55); margin-top:4px; text-align:center;">Page ${pageNum} of ${pageCount}</div>
@@ -249,11 +252,11 @@ function buildPrintHTML() {
                     </div>
                     <div style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#374151;">
                         <span style="width:5px; height:5px; background:#dc2626; border-radius:50%; display:inline-block; flex-shrink:0;"></span>
-                        <span style="color:#6b7280;">Total No. of Students:</span>
+                        <span style="color:#6b7280;">Total Students:</span>
                         <strong style="color:#111827;">${total}</strong>
                     </div>
                 </div>
-                <div style="font-size:8.5px; color:#9ca3af;">Generated: ${dateStr} at ${timeStr}</div>
+                <div style="font-size:8.5px; color:#9ca3af;">${classLabel ? `Class: ${classLabel}<br>` : ''}Generated: ${dateStr} at ${timeStr}</div>
             </div>
 
             <!-- SECTION LABEL -->
@@ -298,7 +301,7 @@ function buildPrintHTML() {
             <div style="padding:22px 22px 10px 22px; font-size:11px;">
                 <div style="width:40%;">
                     <div style="font-weight:800; color:#111827; margin-top:8px; font-size:11.5px;">${coordinatorName}</div>
-                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">OJT Coordinator</div>
+                    <div style="font-size:9.5px; color:#6b7280; font-weight:600;">${preparedByRole}</div>
                 </div>
             </div>
 
@@ -332,25 +335,10 @@ function buildPrintHTML() {
 const previewModalEl = document.getElementById('printPreviewModal');
 const previewModal = new bootstrap.Modal(previewModalEl, { backdrop: 'static', keyboard: true });
 
-document.getElementById('openPreviewBtn').addEventListener('click', function () {
-    document.getElementById('printPreviewContent').innerHTML = buildPrintHTML();
-    previewModal.show();
-});
+window.ReportPrint.bind(buildPrintHTML, () => previewModal.show());
 
 /* ══════════════════════════════════════════════
    PRINT
    Native Print via hidden #print-area-wrapper
 ══════════════════════════════════════════════ */
-document.getElementById('doPrintBtn').addEventListener('click', function () {
-    // 1. Inject the HTML into the print wrapper
-    document.getElementById('print-area-wrapper').innerHTML = buildPrintHTML();
-
-    // 2. Trigger the native print dialog
-    window.print();
-
-    // 3. Clean up memory
-    setTimeout(function () {
-        document.getElementById('print-area-wrapper').innerHTML = '';
-    }, 1000);
-});
 

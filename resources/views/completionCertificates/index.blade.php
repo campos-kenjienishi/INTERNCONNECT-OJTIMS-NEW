@@ -50,6 +50,7 @@
             <a href="{{ route('professor.completion-certificates.index') }}" class="nav-item active"><span class="nav-icon"><i class="fa fa-certificate"></i></span><span class="nav-label">COC Validation</span><span class="tooltip-label">COC Validation</span></a>
             <a href="{{ url('/professor/analytics') }}" class="nav-item"><span class="nav-icon"><i class="fa fa-chart-line"></i></span><span class="nav-label">Analytics</span><span class="tooltip-label">Analytics</span></a>
             <a href="{{ url('/reportsExpiredProf') }}" class="nav-item"><span class="nav-icon"><i class="fa fa-file-contract"></i></span><span class="nav-label">MOA</span><span class="tooltip-label">MOA</span></a>
+        @include('partials.professor-student-report-link')
             <a href="{{ url('/professor/maintain') }}" class="nav-item"><span class="nav-icon"><i class="fa fa-cogs"></i></span><span class="nav-label">Maintenance</span><span class="tooltip-label">Maintenance</span></a>
             <a href="{{ url('/professor/evaluation') }}" class="nav-item"><span class="nav-icon"><i class="fa fa-star-half-alt"></i></span><span class="nav-label">Evaluation</span><span class="tooltip-label">Evaluation</span></a>
         @else

@@ -84,6 +84,7 @@
             <span class="nav-label">MOA</span>
             <span class="tooltip-label">MOA</span>
         </a>
+        @include('partials.professor-student-report-link')
         <a href="{{ url('/professor/maintain') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-cogs"></i></span>
             <span class="nav-label">Maintenance</span>
@@ -666,6 +667,8 @@
         csrfToken: @json(csrf_token())
     };
 </script>
+<link rel="stylesheet" href="{{ vasset('css/report-print.css') }}">
+<script src="{{ vasset('js/report-print.js') }}"></script>
 <script src="{{ vasset('js/professor/analytics.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>
 @include('partials.password-setup-modal')

@@ -1,3 +1,6 @@
+@php
+    $isProfessorReport = $isProfessorReport ?? false;
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +29,7 @@
     <link rel="stylesheet" href="{{ vasset('css/coordinator/reports-table.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
     <script src="{{ vasset('js/darkmode.js') }}"></script>
+    <link rel="stylesheet" href="{{ vasset('css/report-print.css') }}">
 </head>
 
 <body>
@@ -43,7 +47,7 @@
         </div>
     </a>
 
-    <a href="{{ url('/accountinfo') }}" class="sidebar-user">
+    <a href="{{ url($isProfessorReport ? '/professor/accountinfo' : '/accountinfo') }}" class="sidebar-user">
         <div class="user-avatar">
             @if(isset($user->profile_photo) && $user->profile_photo)
                 <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Profile">
@@ -53,11 +57,14 @@
         </div>
         <div class="user-info">
             <span class="user-name">{{ $user->full_name }}</span>
-            <span class="user-role">OJT Coordinator</span>
+            <span class="user-role">{{ $isProfessorReport ? 'Professor' : 'OJT Coordinator' }}</span>
         </div>
     </a>
 
     <nav class="sidebar-nav">
+        @if($isProfessorReport)
+            @include('professor.report-navigation')
+        @else
         <a href="{{ url('/dashboard') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-home"></i></span>
             <span class="nav-label">Dashboard</span>
@@ -121,6 +128,7 @@
             <span class="nav-label">Audit Log</span>
             <span class="tooltip-label">Audit Log</span>
         </a>
+        @endif
     </nav>
 
     <div class="sidebar-footer">
@@ -144,7 +152,7 @@
         </div>
         <div class="topbar-right">
             <div class="topbar-badge">
-                <i class="fa fa-user-shield"></i> OJT Coordinator
+                <i class="fa {{ $isProfessorReport ? 'fa-chalkboard-teacher' : 'fa-user-shield' }}"></i> {{ $isProfessorReport ? 'Professor Portal' : 'OJT Coordinator' }}
             </div>
         </div>
     </div>
@@ -155,7 +163,7 @@
             <div>
                 <h1>Student OJT <span>Reports</span></h1>
                 <div class="breadcrumb">
-                    <a href="{{ url('/dashboard') }}"><i class="fa fa-home"></i> Dashboard</a>
+                    <a href="{{ url($isProfessorReport ? '/professor/home' : '/dashboard') }}"><i class="fa fa-home"></i> Dashboard</a>
                     <i class="fa fa-chevron-right"></i>
                     <span>Reports</span>
                     <i class="fa fa-chevron-right"></i>
@@ -310,17 +318,28 @@
                 <div class="panel-header-icon"><i class="fa fa-filter"></i></div>
                 <div>
                     <h2>Generate Report</h2>
-                    <p>Filter by school year and program to generate the OJT report</p>
+                    <p>{{ $isProfessorReport ? 'Generate OJT placement reports for students in your classes only' : 'Filter by school year and program to generate the OJT report' }}</p>
                 </div>
             </div>
             <div class="panel-card-body">
-                <form id="reportForm" action="{{ route('studentojt.report.generate') }}" method="post">
+                <form id="reportForm" action="{{ route($isProfessorReport ? 'professor.reports' : 'studentojt.report.generate') }}" method="post">
                     @csrf
                     <div class="filter-grid">
+                        @if($isProfessorReport)
+                        <div class="field-group report-class-filter">
+                            <label class="field-label" for="class_id"><i class="fa fa-chalkboard-teacher"></i> Class</label>
+                            <select class="field-select" id="class_id" name="class_id">
+                                <option value="">All My Classes</option>
+                                @foreach($classes as $class)
+                                    <option value="{{ $class->id }}" @selected((string) $selectedClassId === (string) $class->id)>{{ $class->room }} — {{ $class->course }}{{ $class->school_year_start ? ' · ' . $class->school_year_start . '-' . $class->school_year_end : '' }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-calendar-alt"></i> School Year</label>
-                            <select class="field-select" id="school_year" name="school_year" required>
-                                <option value="">Select School Year</option>
+                            <select class="field-select" id="school_year" name="school_year" @required(!$isProfessorReport)>
+                                <option value="">{{ $isProfessorReport ? 'All School Years' : 'Select School Year' }}</option>
                                 @foreach (($schoolYears ?? collect()) as $schoolYear)
                                     <option value="{{ $schoolYear }}" {{ ($selectedSchoolYear ?? '') === $schoolYear ? 'selected' : '' }}>
                                         {{ $schoolYear }}
@@ -340,6 +359,9 @@
                         <div class="field-group">
                             <label class="field-label"><i class="fa fa-calendar-check"></i> Semester</label>
                             <select class="field-select" id="semester" name="semester">
+                                @if($isProfessorReport)
+                                    <option value="">All Semesters</option>
+                                @endif
                                 <option value="1st Semester" {{ ($selectedSemester ?? request('semester') ?? '1st Semester') === '1st Semester' ? 'selected' : '' }}>1st Semester</option>
                                 <option value="2nd Semester" {{ ($selectedSemester ?? request('semester')) === '2nd Semester' ? 'selected' : '' }}>2nd Semester</option>
                                 <option value="Summer Term" {{ ($selectedSemester ?? request('semester')) === 'Summer Term' ? 'selected' : '' }}>Summer Term</option>
@@ -362,7 +384,7 @@
                     <div class="header-icon"><i class="fa fa-user-graduate"></i></div>
                     <div>
                         <h2>Student OJT Information</h2>
-                        <p>OJT placement details for all students</p>
+                        <p>{{ $isProfessorReport ? 'OJT placement details for your class students' : 'OJT placement details for all students' }}</p>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -478,11 +500,13 @@
     </div>
 </div>
 
+@unless($isProfessorReport)
 <form id="sendEmailForm" action="{{ url('/reportsExpired/send-email') }}" method="post" enctype="multipart/form-data" style="display:none;">
     @csrf
     <input type="hidden" id="courseHidden" name="course" value="{{ $selectedCourse ?? '' }}">
     <input type="hidden" id="emailHidden"  name="email"  value="{{ $user->email ?? '' }}">
 </form>
+@endunless
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -513,12 +537,16 @@
     window.__reportsConfig = {
         campusName: @json($campusName ?? config('campus.name', 'PUP Taguig Campus')),
         coordinatorName: @json($coordinatorFullName ?: 'OJT Coordinator'),
+        preparedByRole: @json($isProfessorReport ? 'OJT Professor' : 'OJT Coordinator'),
+        useAppliedFilters: @json($isProfessorReport),
+        classLabel: @json($classLabel ?? ''),
         schoolYear: @json($selectedSchoolYear ?? request('school_year') ?? ''),
         course: @json($selectedCourse ?? ''),
         semester: @json($selectedSemester ?? request('semester') ?? '1st Semester')
     };
     window.reportConfig = window.__reportsConfig;
 </script>
+<script src="{{ vasset('js/report-print.js') }}"></script>
 <script src="{{ vasset('js/coordinator/reports-table.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>

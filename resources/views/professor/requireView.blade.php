@@ -89,6 +89,7 @@
             <span class="nav-label">MOA</span>
             <span class="tooltip-label">MOA</span>
         </a>
+        @include('partials.professor-student-report-link')
         <a href="{{ url('/professor/maintain') }}" class="nav-item">
             <span class="nav-icon"><i class="fa fa-cogs"></i></span>
             <span class="nav-label">Maintenance</span>

@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="{{ vasset('css/coordinator/reports-expired.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ vasset('css/darkmode.css') }}">
     <script src="{{ vasset('js/darkmode.js') }}"></script>
+    <link rel="stylesheet" href="{{ vasset('css/report-print.css') }}">
 </head>
 
 <body>
@@ -571,6 +572,7 @@
     };
     window.__reportsConfig = window.reportConfig;
 </script>
+<script src="{{ vasset('js/report-print.js') }}"></script>
 <script src="{{ vasset('js/coordinator/reports-expired.js') }}?v={{ time() }}"></script>
 <script src="{{ vasset('js/sidebar-persist.js') }}"></script>
 <script src="{{ vasset('js/ai-insight-controls.js') }}"></script>

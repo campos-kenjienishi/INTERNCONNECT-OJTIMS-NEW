@@ -347,6 +347,11 @@
         }
 
         @media print {
+            @page { size: A4 portrait; margin: 15mm; }
+            .voucher-shell, .page-card, .print-area, .coupon {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
             body {
                 background: #fff;
                 padding: 0;
@@ -372,7 +377,7 @@
             }
 
             .coupon {
-                width: 620px;
+                width: 170mm;
                 height: 250px;
                 margin: 0 auto;
                 -webkit-print-color-adjust: exact;
